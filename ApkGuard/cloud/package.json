@@ -1,0 +1,24 @@
+{
+  "name": "kiberqalqon-cloud",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KiberQalqon — Vercel serverless API + Telegram bot + Supabase",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "set-webhook": "node scripts/set-webhook.mjs",
+    "ping": "node scripts/ping.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@vercel/node": "^3.2.0",
+    "typescript": "^5.5.0",
+    "vercel": "^37.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

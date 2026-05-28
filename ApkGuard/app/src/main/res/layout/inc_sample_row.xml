@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Single row inside the "5 namuna" card on Stats. §3.8 — filename + package +
+  sev chip on the right; 3 mini tags (family / size / sha1) below.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingVertical="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvSampleName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="—"
+                android:textColor="@color/kq_ink"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSamplePkg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="middle"
+                android:fontFamily="monospace"
+                android:singleLine="true"
+                android:text="—"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSampleSev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/kq_sev_crit"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.08"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:text="@string/kq_sev_crit"
+            android:textColor="@color/kq_danger_ink"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tagFamily"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/kq_sample_tag"
+            android:fontFamily="monospace"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:text="—"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/tagSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/kq_sample_tag"
+            android:fontFamily="monospace"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:text="—"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/tagSha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/kq_sample_tag"
+            android:fontFamily="monospace"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:text="—"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

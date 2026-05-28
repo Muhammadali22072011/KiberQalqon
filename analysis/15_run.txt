@@ -1,0 +1,84 @@
+﻿[+] Looking for decrypt-like methods (Base64.decode + xor loop)
+
+[+] Found 2 candidate decrypt methods
+
+
+========================================================================
+  METHOD: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;
+  STRING LITERALS: ['', 'eWhsckQAXAYJWj5PQCw5HHphDGN1OTkgPQkxACADXns=', 'LTwgAwpECEAZQlZYXg==']
+========================================================================
+    invoke-virtual v7, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v7, ""
+    return-object v7
+    const/4 v0, 2
+    invoke-static v7, v0, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v0
+    const-string v1, "eWhsckQAXAYJWj5PQCw5HHphDGN1OTkgPQkxACADXns="
+    invoke-static v1, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    sget-object v2, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v1, v2, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v1
+    const-string v2, "LTwgAwpECEAZQlZYXg=="
+    invoke-static v2, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v2
+    nop 
+    invoke-static v1, v2, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    array-length v2, v0
+    new-array v2, v2, [B
+    array-length v3, v0
+    const/4 v4, 0
+    nop 
+    if-ge v4, v3, +011h
+    aget-byte v5, v0, v4
+    array-length v6, v1
+    rem-int v6, v4, v6
+    aget-byte v6, v1, v6
+    xor-int/2addr v5, v6
+    int-to-byte v5, v5
+    aput-byte v5, v2, v4
+    nop 
+    add-int/lit8 v4, v4, 1
+    goto -10h
+    new-instance v0, Ljava/lang/String;
+    nop 
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v0, v2, v1, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    move-object v7, v0
+    return-object v7
+
+========================================================================
+  METHOD: Lizbhposedczokv/ffpmuejysxtpa; bxwmmwxospk (Ljava/lang/String;)Ljava/lang/String;
+  STRING LITERALS: ['', 'JYTAs0m31lxvwkQE42Y10Ktm']
+========================================================================
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v9, ""
+    return-object v9
+    const/4 v1, 2
+    invoke-static v9, v1, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v2
+    const-string v3, "JYTAs0m31lxvwkQE42Y10Ktm"
+    sget-object v8, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-virtual v3, v8, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v4
+    array-length v0, v2
+    new-array v5, v0, [B
+    const/4 v6, 0
+    if-ge v6, v0, +011h
+    aget-byte v7, v2, v6
+    array-length v8, v4
+    rem-int v8, v6, v8
+    aget-byte v8, v4, v8
+    xor-int v7, v7, v8
+    int-to-byte v7, v7
+    aput-byte v7, v5, v6
+    add-int/lit16 v6, v6, 1
+    goto -10h
+    new-instance v8, Ljava/lang/String;
+    sget-object v6, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-direct v8, v5, v6, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    return-object v8

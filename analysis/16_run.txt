@@ -1,0 +1,78 @@
+﻿
+========================================================================
+[+] RASMLAR_18
+========================================================================
+  [wrapper] LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  lits=['eWhsckQAXAYJWj5PQCw5HHphDGN1OTkgPQkxACADXns=', 'LTwgAwpECEAZQlZYXg==']
+  [base method] Lizbhposedczokv/ffpmuejysxtpa; bxwmmwxospk (Ljava/lang/String;)Ljava/lang/String;  key='JYTAs0m31lxvwkQE42Y10Ktm'
+  [derived top_key] b'3183701586F97GhYNSURErMMwPeAS33H'  len=32
+  candidates: 3068
+  decoded readable: 1040
+  *** JUICY hits: 7 ***
+    [base] BOTTOM_UP
+    [base] Builder configured to both enable and disable APK Signature Scheme v3 signing
+    [base] com.topjohnwu.magisk
+    [base] vpvaggzk.com.fileprovider
+    [base] vpvaggzk.com.K9m2vL74pR3
+    [base] vpvaggzk.com.H5w8jN63qT2
+    [base] vpvaggzk.com.P3r6xM92bW7
+
+========================================================================
+[+] RASMLAR_8
+========================================================================
+  [wrapper] LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  lits=['YFhcbkBkZEt4UEQfEQkyIHpgcSI3egQEMTBtdQp3QGE=', 'MggZGwgiNwFjGhhafw==']
+  [base method] Lcvzyd/nnuynj; ejpwqplfj (Ljava/lang/String;)Ljava/lang/String;  key='UmmYqVRrK46tVxAG5PDVUI5rSF72a6p1'
+  [derived top_key] b'551712693drkGqsgO05tb31vbvZGkA0P'  len=32
+  candidates: 2806
+  decoded readable: 1195
+  *** JUICY hits: 12 ***
+    [base] Builder configured to both enable and disable APK Signature Scheme v3 signing
+    [base] BOTTOM_UP
+    [base] LineHeightStyle.Trim.LastLineBottom
+    [base] LineHeightStyle.Trim.Both
+    [base] type.googleapis.com/protobuf_analytics_events.v1.AnalyticsEventEnvelope
+    [base] fysrzn.com.K9m2vL74pR3
+    [base] fysrzn.com.fileprovider
+    [base] fysrzn.com.P3r6xM92bW7
+    [base] com.topjohnwu.magisk
+    [base] bottom_sheet
+    [base] https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+    [base] , bottom=
+
+========================================================================
+[+] VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+========================================================================
+  [wrapper] LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  lits=['cAEBS3EIX2trHQpyDAAPRyY8MQ1FDCE1DBgvHBtCABE=', 'JFFNOzhMDStxWF0bSg==']
+  [base method] Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn; uzrkycnrf (Ljava/lang/String;)Ljava/lang/String;  key='C49yA8hXYvs5cz7wGeEX7cQLTzYn'
+  [derived top_key] b'358200732kyGoz80aYtUropyXbvrXv9h'  len=32
+  candidates: 3249
+  decoded readable: 1202
+  *** JUICY hits: 6 ***
+    [base] BOTTOM_UP
+    [base] com.topjohnwu.magisk
+    [base] zrtssr.com.K9m2vL74pR3
+    [base] zrtssr.com.H5w8jN63qT2
+    [base] zrtssr.com.fileprovider
+    [base] zrtssr.com.P3r6xM92bW7
+
+========================================================================
+[+] toydanfotolar9jpg_10
+========================================================================
+  [wrapper] LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  lits=['cmJVW0FiAXt4PRcrMUVOPl49WHEzbkhbcCUvJRIhe3c=', 'JjMWLwEkXDBmQn90ew==']
+  [base method] Lzsfniessjsztphp/sytchwgjrpro; trtobhtalyz (Ljava/lang/String;)Ljava/lang/String;  key='AVbmxP9CNlQZRrzvnJhFw92n'
+  [derived top_key] b'347692886QFqc74H0w07DWz51sMHjqB4'  len=32
+  candidates: 3049
+  decoded readable: 1222
+  *** JUICY hits: 11 ***
+    [base] BOTTOM_UP
+    [base] Builder configured to both enable and disable APK Signature Scheme v3 signing
+    [base] com.topjohnwu.magisk
+    [base] example@openai.com
+    [base] nicklas@openai.com
+    [base] paymentBannerLastShownAt
+    [base] ujsfgsyu.com.fileprovider
+    [base] ujsfgsyu.com.P3r6xM92bW7
+    [base] ujsfgsyu.com.K9m2vL74pR3
+    [base] ujsfgsyu.com.H5w8jN63qT2
+    [base] type.googleapis.com/protobuf_analytics_events.v1.ChatgptConversationDetailsMerge
+
+[+] Saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\16_decrypts.json

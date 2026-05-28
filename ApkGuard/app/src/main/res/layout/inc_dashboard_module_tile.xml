@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Single 2×2 module cell on the dashboard. §3.3 — kq_primary_soft icon tile +
+  safe status dot + title + sub. Includes wrap the GridLayout cell metrics
+  (column weight, margin) on the LinearLayout itself.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_columnWeight="1"
+    android:layout_margin="5dp"
+    android:background="@drawable/kq_module_tile"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/kq_icon_tile_primary">
+
+            <ImageView
+                android:id="@+id/ivModuleIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_shield"
+                app:tint="@color/kq_primary" />
+        </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <View
+            android:id="@+id/vStatusDot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/kq_safe_dot" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvModuleTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="FileObserver"
+        android:textColor="@color/kq_ink"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvModuleSub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Downloads kuzatuvi"
+        android:textColor="@color/kq_ink_3"
+        android:textSize="11sp" />
+</LinearLayout>

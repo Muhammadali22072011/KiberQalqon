@@ -1,0 +1,128 @@
+﻿
+##############################################################################
+# RASMLAR_18_fixed.apk
+##############################################################################
+  total decrypted plaintexts: 1310
+
+  [URLs HTTP] 0
+
+  [Telegram bot tokens] 0
+
+  [IPs] 0
+
+  [Suspicious domains] 4
+    android.app
+    android.net
+    com.chrome.dev
+    vpvaggzk.com
+
+  [Path-like '/api/...'] 0
+
+  [SMS / exfil / API-style plaintexts]
+    $C2/
+    /data/local/tmp/frida-server
+    /sdcard/frida-server
+    /system/bin/frida-server
+    /system/xbin/frida-server
+    Attempt to invoke virtual method 'android.os.Handler android.app.FragmentHostCallback.getHandler()' on a null object reference
+    Could not check if package matches token.
+    Exception when creating token.
+    Token
+    addObserver
+    frida-server
+    removeObserver
+
+##############################################################################
+# RASMLAR_8_fixed.apk
+##############################################################################
+  total decrypted plaintexts: 1538
+
+  [URLs HTTP] 1
+
+  [Telegram bot tokens] 0
+
+  [IPs] 0
+
+  [Suspicious domains] 4
+    android.app
+    android.net
+    chat.com
+    fysrzn.com
+
+  [Path-like '/api/...'] 0
+
+  [SMS / exfil / API-style plaintexts]
+    /data/local/tmp/frida-server
+    /sdcard/frida-server
+    /system/bin/frida-server
+    /system/xbin/frida-server
+    Attempt to invoke virtual method 'android.os.Handler android.app.FragmentHostCallback.getHandler()' on a null object reference
+    Retry Token Exchange
+    addObserver
+    frida-server
+    removeObserver
+    sms-mfa-regions-by-verification-channel
+
+##############################################################################
+# toydanfotolar9jpg_10_fixed.apk
+##############################################################################
+  total decrypted plaintexts: 1565
+
+  [URLs HTTP] 0
+
+  [Telegram bot tokens] 0
+
+  [IPs] 0
+
+  [Suspicious domains] 3
+    android.app
+    android.net
+    ujsfgsyu.com
+
+  [Path-like '/api/...'] 2
+    /lG
+    /oF
+
+  [SMS / exfil / API-style plaintexts]
+     hostAddress=
+    /data/local/tmp/frida-server
+    /sdcard/frida-server
+    /system/bin/frida-server
+    /system/xbin/frida-server
+    Attempt to invoke virtual method 'android.os.Handler android.app.FragmentHostCallback.getHandler()' on a null object reference
+    addObserver
+    frida-server
+    maxTokens
+    notifyInvalidatedObservers
+    notifyInvalidatedObservers(Ljava/util/Set;)V
+    removeObserver
+
+##############################################################################
+# VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_fixed.apk
+##############################################################################
+  total decrypted plaintexts: 1563
+
+  [URLs HTTP] 0
+
+  [Telegram bot tokens] 0
+
+  [IPs] 0
+
+  [Suspicious domains] 3
+    android.app
+    android.net
+    zrtssr.com
+
+  [Path-like '/api/...'] 0
+
+  [SMS / exfil / API-style plaintexts]
+    /data/local/tmp/frida-server
+    /sdcard/frida-server
+    /system/bin/frida-server
+    /system/xbin/frida-server
+    Attempt to invoke virtual method 'android.os.Handler android.app.FragmentHostCallback.getHandler()' on a null object reference
+    Invalid URL host: "
+    addObserver
+    frida-server
+    host == null
+    removeObserver

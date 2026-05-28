@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  APK list screen — §3.4 of the design handoff.
+  Layout is spec-ready: eyebrow + title + subtitle + upload icon, filter chip
+  row, single MaterialCardView wrapping the recycler, bottom outlined CTA.
+
+  Stable IDs preserved for existing callers (if/when wired):
+    toolbar, btnBack, btnSearch, chipGroup, chipAll, chipDangerous,
+    chipSuspicious, chipSafe, txtStatTotal, txtStatDanger, txtStatSuspicious,
+    txtStatSafe, recyclerView, layoutEmpty, fabScanAll.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="24dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp">
+
+            <!-- Header row: back + eyebrow/title/sub + upload icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/kq_icon_btn"
+                    android:contentDescription="Back"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/kq_ink" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.12"
+                        android:text="SKANER"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/apk_list_title"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtStatTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="8 ta fayl tekshirildi"
+                        android:textColor="@color/kq_ink_2"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/btnSearch"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/kq_icon_btn"
+                    android:contentDescription="Upload"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_upload_cyber"
+                    app:tint="@color/kq_ink" />
+            </LinearLayout>
+
+            <!-- Filter chips row, horizontally scrollable -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacing="8dp"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipAll"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/filter_all_count"
+                        android:textColor="@color/kq_primary"
+                        app:chipBackgroundColor="@color/kq_primary_soft"
+                        app:chipStrokeColor="@color/kq_primary"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipDangerous"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_dangerous_count"
+                        android:textColor="@color/kq_ink_2"
+                        app:chipBackgroundColor="@android:color/transparent"
+                        app:chipStrokeColor="@color/kq_hairline_strong"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipSafe"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_safe_count"
+                        android:textColor="@color/kq_ink_2"
+                        app:chipBackgroundColor="@android:color/transparent"
+                        app:chipStrokeColor="@color/kq_hairline_strong"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipSuspicious"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_suspicious"
+                        android:textColor="@color/kq_ink_2"
+                        android:visibility="gone"
+                        app:chipBackgroundColor="@android:color/transparent"
+                        app:chipStrokeColor="@color/kq_hairline_strong"
+                        app:chipStrokeWidth="1dp" />
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+            <!-- Hidden compat stats (kept for any older binding refs) -->
+            <TextView
+                android:id="@+id/txtStatDanger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/txtStatSuspicious"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/txtStatSafe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <!-- List card — single MaterialCardView, recycler inside, rows separated
+                 by 1dp hairlines (handled by an ItemDecoration in code or by Recycler
+                 divider). Currently we just rely on each item's 14dp padding. -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Empty state -->
+            <LinearLayout
+                android:id="@+id/layoutEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:alpha="0.6"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_empty_box"
+                    app:tint="@color/kq_ink_3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/empty_apk_list"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="@string/empty_apk_desc"
+                    android:textColor="@color/kq_ink_2"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Bottom CTA — "Hammasi qayta tekshirilsin" -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fabScanAll"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="18dp"
+                android:text="@string/apk_list_rescan"
+                android:textAllCaps="false"
+                android:textColor="@color/kq_ink"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="999dp"
+                app:icon="@drawable/ic_radar_scan"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/kq_ink"
+                app:strokeColor="@color/kq_hairline_strong"
+                app:strokeWidth="1dp" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

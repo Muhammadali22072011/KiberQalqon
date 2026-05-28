@@ -1,0 +1,23 @@
+META-INF\2E262283.RSA
+META-INF\2E262283.SF
+META-INF\MANIFEST.MF
+META-INF\androidx.activity_activity-compose.version
+META-INF\androidx.activity_activity-ktx.version
+META-INF\androidx.activity_activity.version
+META-INF\androidx.appcompat_appcompat-resources.version
+META-INF\androidx.appcompat_appcompat.version
+META-INF\androidx.lifecycle_lifecycle-runtime.version
+META-INF\androidx.savedstate_savedstate-ktx.version
+META-INF\androidx.savedstate_savedstate.version
+_\classes.dex\  .png
+_\classes.dex\AndroidManifest.xml.9.png
+classes.dex\  .png
+kotlin\annotation\ .png
+kotlin\annotation\AndroidManifest.xml.xml
+kotlin\collections\  .9.png
+kotlin\internal\internal.kotlin_builtins
+res\values\arrays.xml\resources.arsc.png
+res\values\bools.xml\  .png
+res\values\bools.xml\resources.arsc.xml
+res\values\ids.xml\resources.arsc.9.png
+res\values\strings.xml\classes.dex.png

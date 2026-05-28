@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Единая нижняя навигация KiberQalqon. Включается через <include layout="@layout/view_kq_bottom_nav"/>
+  на каждом из 4 главных экранов (Dashboard/Main/Stats/Settings).
+
+  Активная вкладка обозначается pill-фоном через программный setBackgroundResource +
+  изменение tint иконки и цвета лейбла. Kotlin-хелпер KqBottomNav.setActive(...) делает это
+  по одному вызову.
+
+  ID:
+    - navHome, navScan, navStats, navSettings — клик-таргеты
+    - navHomePill / navScanPill / navStatsPill / navSettingsPill — pill-контейнеры
+      (background swap при активации)
+    - navHomeIcon / navScanIcon / navStatsIcon / navSettingsIcon — иконки (tint swap)
+    - navHomeLabel / navScanLabel / navStatsLabel / navSettingsLabel — текст (color swap)
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/kqBottomNav"
+    android:layout_width="match_parent"
+    android:layout_height="68dp"
+    android:background="@drawable/kq_bottom_nav_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="8dp">
+
+    <!-- Asosiy -->
+    <LinearLayout
+        android:id="@+id/navHome"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="6dp">
+
+        <LinearLayout
+            android:id="@+id/navHomePill"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <ImageView
+                android:id="@+id/navHomeIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_shield"
+                app:tint="@color/kq_ink_3" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/navHomeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/nav_home"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Skaner -->
+    <LinearLayout
+        android:id="@+id/navScan"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="6dp">
+
+        <LinearLayout
+            android:id="@+id/navScanPill"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <ImageView
+                android:id="@+id/navScanIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_radar_scan"
+                app:tint="@color/kq_ink_3" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/navScanLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/nav_scan"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Statistika -->
+    <LinearLayout
+        android:id="@+id/navStats"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="6dp">
+
+        <LinearLayout
+            android:id="@+id/navStatsPill"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <ImageView
+                android:id="@+id/navStatsIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_history"
+                app:tint="@color/kq_ink_3" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/navStatsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/nav_stats"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Sozlamalar -->
+    <LinearLayout
+        android:id="@+id/navSettings"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="6dp">
+
+        <LinearLayout
+            android:id="@+id/navSettingsPill"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <ImageView
+                android:id="@+id/navSettingsIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/kq_ink_3" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/navSettingsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/nav_settings"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>

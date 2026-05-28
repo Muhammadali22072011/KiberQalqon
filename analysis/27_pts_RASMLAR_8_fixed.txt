@@ -1,0 +1,1543 @@
+-"
+ (Kotlin reflection is not available)
+ : 
+ < 
+ > 
+ > minSdkVersion 
+ > toIndex: 
+ MessageDigest not available
+ V3 signers; the V3 signature scheme only supports one signer
+ and #
+ and .
+ at 
+ at file offset 
+ attribute missing
+ but was 
+ bytes
+ bytes read
+ bytes read, 
+ bytes starting at file offset 
+ bytes) to fit in memory.
+ bytes, CD: 
+ bytes, actual: 
+ bytes, available: 
+ bytes. Chunk size: 
+ chunks
+ content digest for 
+ data differs from what was requested
+ digest: 
+ does not have a Parcelizer
+ downTo 
+ entry 
+ extends beyond start of Central Directory. LFH end: 
+ failed
+ handlers
+ has no target state
+ have the same name: 
+ id=
+ in 
+ in CHOICE class 
+ in component 
+ in header name: 
+ is less than minimum 
+ is less than zero.
+ is not annotated with 
+ is not in the signing history of the other targeted signing configs
+ is not supported for APK Signature Scheme v3 signing
+ is too big (
+ is too big to fit in memory.
+ is too large: 
+ len=
+ malformed
+ matched
+ missing
+ mode=
+ ms) cannot be negative
+ must be called on the main thread
+ must have default constructor in order to be automatically recreated
+ must not be null
+ not annotated with 
+ not computed
+ not numeric: 
+ not present
+ not supported
+ not yet output despite this having been requested
+ of class 
+ off=
+ out of bounds: 
+ overlaps with Central Directory. Data Descriptor end: 
+ overlaps with Central Directory. LFH data start: 
+ pkg=
+ provided
+ seconds for 
+ signature using public key from certificate
+ size out of range: 
+ size=
+ step 
+ tint=
+ to 
+ to ASN.1 
+ too large: 
+ uint16s
+ under signer index 
+ uri=
+ used on a static field: 
+ using 
+ value
+ vs 
+ wasn't found
+ when parsing SourceStampCertificateLineage object
+ when parsing V3SigningCertificateLineage object
+ when verifying SourceStampCertificateLineage object
+ when verifying V3SigningCertificateLineage object
+ x 
+", CD: "
+"ZI+
+#.*
+#212226
+#FFFFFF
+$onBackInvoked
+$this$$receiver
+$this$initializer
+&Z7
+&fp
+() cannot be called after featureGates()/paramKeys()/configKeys()/experiments().
+(this Map)
+(this Set)
+) + size (
+) < strings offset (
+) > source size (
+) cannot be the same as the name of the original descriptor (
+) is out of range. Each dimension must be between 0 and 16777215.
+) is virtual
+) overflow
+*VE
++json
+, C=
+, CD start: 
+, CD: 
+, EoCD start: 
+, L=
+, LFH data end: 
+, O=
+, OU=
+, S=
+, aliasIconResIds=
+, applicationInfo=
+, arscBytes=
+, available: 
+, bottom=
+, buf.length: 
+, but found 
+, but read: 
+, computed: 
+, constraints=
+, data=
+, depth=
+, endAffinity=
+, endIndex=
+, endLineIndex=
+, for this SignerConfig
+, hint=
+, history=
+, keyPool=
+, label=
+, lastDensity=
+, limit: 
+, max: 
+, max: 2147483647
+, must be less than the first targeted SDK version, 
+, packageOffset=
+, packageSize=
+, parameter 
+, progress=
+, remaining: 
+, signature algorithm: 
+, size: 
+, source size: 
+, startIndex=
+, startLineIndex=
+, strings=
+, swipeEdge=
+, text=
+, toIndex: 
+, top=
+, totalSize: 
+, touchY=
+, trim=
+, typePool=
+, v2 exception: 
+,mode=
+-----BEGIN CERTIFICATE-----
+-----END CERTIFICATE-----
+-alias
+-dname
+-genkeypair
+-keyalg
+-keypass
+-keysize
+-keystore
+-storepass
+-storetype
+-validity
+.  All signing certificates should be unique
+. Expected 
+. Expected: 
+. LFH: 
+. Last read tag: 
+. Reader position: 
+. Signature: 0x
+. ZIP End of Central Directory offset: 
+. v1 signer names must be unique
+.Companion
+.SF
+.apk
+.dp
+.dp)
+.dsa
+.ec
+.qw
+.rsa
+.sf
+.so
+.xml
+/data/app/frida
+/data/local/tmp/frida
+/data/local/tmp/frida-server
+/proc/self/maps
+/sdcard/frida-server
+/system/bin/frida-server
+/system/lib/frida-gadget.so
+/system/lib64/frida-gadget.so
+/system/xbin/frida-server
+0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+0123456789abcdef
+0x%08x
+1)#
+1.0
+1.0 (Android)
+1.2.840.10040.4.1
+1.2.840.10040.4.3
+1.2.840.10045.2.1
+1.2.840.10045.4.1
+1.2.840.10045.4.3.1
+1.2.840.10045.4.3.2
+1.2.840.10045.4.3.3
+1.2.840.10045.4.3.4
+1.2.840.113549.1.1.1
+1.2.840.113549.1.1.11
+1.2.840.113549.1.1.12
+1.2.840.113549.1.1.13
+1.2.840.113549.1.1.14
+1.2.840.113549.1.1.4
+1.2.840.113549.1.1.5
+1.2.840.113549.1.7.1
+1.2.840.113549.1.7.2
+1.2.840.113549.2.5
+1.3.14.3.2.26
+1019200597
+1087439294
+1386661413
+1480848253
+1485876563
+2.16.840.1.101.3.4.2.1
+2.16.840.1.101.3.4.2.2
+2.16.840.1.101.3.4.2.3
+2.16.840.1.101.3.4.2.4
+2.16.840.1.101.3.4.3.1
+2.16.840.1.101.3.4.3.2
+2.16.840.1.101.3.4.3.3
+2.16.840.1.101.3.4.3.4
+2.5.4.10
+2.5.4.11
+2.5.4.3
+2.5.4.6
+2.5.4.7
+2.5.4.8
+2488676886
+252123922
+2690524466
+3104911833
+3397531287
+3508943026
+3651369243
+3724819382
+3977034283
+4188796439
+551712693drkGqsgO05tb31vbvZGkA0P
+630131675
+679269502
+934056609
+:dev
+<TextLayoutResult>
+<get-values>(...)
+<init>
+<init>()V
+<this>
+?!q/
+@kotlinx.serialization.json.JsonClassDiscriminator(discriminator=kind)
+@kotlinx.serialization.json.JsonClassDiscriminator(discriminator=type)
+A<(
+A?f
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+ANY
+APK Signature Scheme v1 only supports a maximum of 10, 
+APK Signature Scheme v2 only supports a maximum of 10, 
+APK Signature Scheme v4 signing requires at least v2 or v3 signing to be enabled
+APK Signing Block addition of signature(s) requested by outputZipSections() hasn't been fulfilled yet
+APK Signing Block entry #
+APK Signing Block is not aligned on 4k boundary: 
+APK Signing Block offset out of range: 
+APK Signing Block size is not multiple of page size: 
+APK Signing Block size not a multiple of 4096: 
+APK Signing Block size out of range: 
+APK Signing Block sizes in header and footer do not match: 
+APK entry 
+APK is debuggable (see android:debuggable attribute) and this engine is configured to refuse to sign debuggable APKs
+APK signing block size out of range: 
+APK too small for APK Signing Block. ZIP Central Directory offset: 
+APPLICATION
+AUTOMATIC
+About Settings
+Absolute
+Access is out of bound, offset: 
+ActivityResult{resultCode=
+Algorithm associated with first signing certificate invalid on desired platform versions
+Already attached to lifecycleOwner
+Already done
+An entry modification is not supported
+AndroidBridge
+AndroidManifest.xml
+AnimationVector1D: value = 
+AppInfo(packageName=
+AppUpdateListenerRegistry
+Argument must not be null
+Arrangement#Center
+Arrangement#End
+Arrangement#Start
+Arrangement#spacedAligned(
+ArrayDeque is empty.
+At least one Try must be provided.
+At least one signer config must be provided
+Attempt to invoke virtual method 'android.os.Handler android.app.FragmentHostCallback.getHandler()' on a null object reference
+Attempted to animate to hidden when skipHiddenState was enabled. Set skipHiddenState to false to use this function.
+Attempted to animate to partial expanded when skipPartiallyExpanded was enabled. Set skipPartiallyExpanded to false to use this function.
+Attributes end offset out of bounds: 
+Attributes start offset out of bounds: 
+Auth0-Client
+Avatar Cropper
+AxmlReader: Unsupported tag: 
+BIT STRING
+BITMAP
+BITMAP_MASKABLE
+BIT_STRING
+BKS
+BOOLEAN
+BOTTOM_UP
+BackEventCompat{touchX=
+BackupHdrProfileEncoderProfilesProvider
+Bad 
+Bad source stamp entry
+Baklava
+Base Bitrate(%dbps) * Bit Depth Ratio (%d / %d) = %d
+Base-128 number too large
+BeaconActionItemId(value=
+Blank serial names are prohibited
+Block index 
+Builder configured to both enable and disable APK Signature Scheme v3 signing
+Bundle with restored state for the component "androidx.savedstate.Restarter" must contain list of strings by the key "classes_to_restore"
+ByteBuffer byte order must be little endian
+CHOICE
+CHOICE fields are indistinguishable because they have the same tag class and number: 
+CHUNKED_SHA256
+CHUNKED_SHA512
+CN=
+CONTEXT_SPECIFIC
+CRC-32 mismatch between Local File Header and Central Directory for entry 
+CREATED
+Can not perform this action after onSaveInstanceState
+Cannot coerce to boolean: value type 
+Cannot coerce to int: value type 
+Cannot coerce to string: value type 
+Cannot coerce value to an empty range: maximum 
+Cannot determine debuggable status of output APK because AndroidManifest.xml entry contents have not yet been requested
+Cannot generate SourceStamp. APK contains an existing entry with the name: stamp-cert-sha256, and it is different than the provided source stamp certificate
+Cannot share image without asset pointer.
+Cannot share images without asset pointers.
+Caught a exception encoding the public key: 
+Cert index 
+Certificate not found in SigningCertificateLineage
+Char sequence is empty.
+Check failed.
+Chunk size greater than expected: 
+Class 
+Closed
+Closed UserCoroutineScope for 
+Closed UserReleaseCompletable for 
+Closing UserGraph for 
+Codegen error? Duplicates in the provider list
+Collection doesn't contain element at index 
+Collection is empty.
+Combined SigningInfos length exceeded limit of 7K: 
+CompanionObject
+CompositionLocal 
+Compressed size mismatch between Local File Header and Central Directory for entry 
+Conversation ID is null
+CornerSize(size = 
+Couldn't find meta-data for provider with authority 
+Created-By
+Creating new LoginGraph for 
+Creating new UserGraph for 
+Current event not a START_ELEMENT
+DATA
+DESTROYED
+DETDSA_WITH_SHA256
+DSA
+DSA_WITH_SHA256
+Data Descriptor of 
+Data Descriptor presence mismatch between Local File Header and Central Directory for entry 
+Data of entry 
+Datadog context resolution timeout exceeded.
+Deque is too big.
+Details of the products must be provided.
+Developer Settings
+Down
+Dp.Unspecified
+ECDSA
+ECDSA signatures only supported for minSdkVersion 18 and higher
+ECDSA_WITH_SHA256
+ECDSA_WITH_SHA512
+ENTERPRISE
+EXPLICIT
+EXTRA_PACKAGE_NAME
+EXTRA_STATUS
+Empty OBJECT IDENTIFIER
+Empty array can't be reduced.
+Empty input
+Empty list doesn't contain element at index 
+Empty name
+Encoded SigningCertificateLineage has a version different than any of which we are aware
+Encountered duplicate entries in SigningCertificateLineage at certificate #
+End element chunk too short. Need at least 8 bytes. Available: 
+Engine closed
+Enter
+Error checking if document (with authority: 
+Error switching account
+Exit
+Expanded
+Expected FIXED32 or LENGTH_DELIMITED but was 
+Expected FIXED64 or LENGTH_DELIMITED but was 
+Expected LENGTH_DELIMITED but was 
+Expected VARINT or LENGTH_DELIMITED but was 
+Expected to end at 
+FLAG_SYSTEM
+FOREGROUND_SERVICE_TYPE_DATA_SYNC
+FREE
+Factory.create(String) is unsupported.  This Factory requires `CreationExtras` to be passed into `create` method.
+Failed requirement.
+Failed to close response body channel
+Failed to compute content digests
+Failed to compute digests of APK
+Failed to create X.509 CertificateFactory
+Failed to decode certificate #
+Failed to decode top-level data value
+Failed to determine APK's minimum supported Android platform version
+Failed to determine whether the APK is debuggable
+Failed to download image in time, showing notification without it
+Failed to download image: 
+Failed to encode 
+Failed to encode V3SigningCertificateLineage certificate
+Failed to encode certificates
+Failed to encode signature block
+Failed to encode source stamp certificate
+Failed to extract and parse v2 block
+Failed to extract and parse v3 block
+Failed to find a supported digest in the source APK
+Failed to find configured root that contains 
+Failed to generate certificate: 
+Failed to generate manifest file
+Failed to generate v1 signature
+Failed to inflate data
+Failed to instantiate 
+Failed to obtain X.509 CertificateFactory
+Failed to obtain X.509 encoded form of public key 
+Failed to obtain an instance of a previously available message digest
+Failed to obtain v2/v3 digest, v3 exception: 
+Failed to parse 
+Failed to parse SourceStampCertificateLineage object
+Failed to parse V3SigningCertificateLineage object
+Failed to parse android.support.FILE_PROVIDER_PATHS meta-data
+Failed to parse certificate
+Failed to parse certificate #
+Failed to parse certificates
+Failed to read 
+Failed to read APK being signed
+Failed to read Local File Header of 
+Failed to read chunk
+Failed to read chunk #
+Failed to read contents of EXPLICIT data value
+Failed to read data of 
+Failed to read data value
+Failed to read from store
+Failed to read the input stream
+Failed to resolve canonical path for 
+Failed to set value of 
+Failed to sign using 
+Failed to sign using signer "
+Failed to verify generated 
+Failed to verify signature over signed data for certificate #
+Failed to write in-memory .SF file
+Failed to write in-memory MANIFEST.MF
+Failed to write to ByteArrayOutputStream
+Fields have the same index: 
+File 
+FileService
+FirebaseMessaging
+First two nodes out of range: 
+Flow was aborted, no more elements needed
+For StructureKind.CLASS please use 'buildClassSerialDescriptor' instead
+FxmCRShVQJsoyp1wmJ_N2hO0FrUhpyHfZZ6XHRpF6CA=
+GENERALIZED TIME
+GENERALIZED_TIME
+GET_META_DATA
+GUEST
+G^V
+Gesture
+Get plus
+Gizmo Accounts
+HandlerScheduledFuture-
+HardDeprecation
+Hidden
+High tag numbers not supported: 
+High-tag-number form not supported
+IMPLICIT
+INITIALIZED
+INTEGER
+INTEGER cannot be represented as int: %1$d (0x%1$x)
+INTEGER cannot be represented as long: %1$d (0x%1$x)
+ISO-8859-1
+Icon(typ=
+ImageVector.Builder is single use, create a new instance to create a new ImageVector
+Incorrect encoded size of boolean value: 
+Indefinite-length contents too long
+Index overflow has happened.
+Index: 
+Initial span creation Datadog context is not available at the write time.
+Input APK not specified
+Input too long: 
+Input too short. Need at least: 46 bytes, available: 
+Input too short. Need: 
+Insufficient data to read size of APK Signing Block entry #
+Insufficient space in output buffer for 
+Interrupted while downloading image, showing notification without it
+Invalid
+Invalid ASN.1 annotation on 
+Invalid FocusDirection
+Invalid V3 scheme provided: 
+Invalid fontMetrics: line height can not be negative.
+Invalid hash algorithm, only SHA2-256 over 4 KB chunks supported.
+Invalid icon
+Invalid mode: 
+Invalid report content id
+Invalid signature version.
+Invalid value for node #
+Invalid value for node #1: 
+Invalid value for node #2: 
+JKS
+Joining UserCoroutineScope timed out at 
+JsonAdapter isn't ready
+KEY_COMPONENT_ACTIVITY_LAUNCHED_KEYS
+KEY_COMPONENT_ACTIVITY_PENDING_RESULT
+KEY_COMPONENT_ACTIVITY_REGISTERED_KEYS
+KEY_COMPONENT_ACTIVITY_REGISTERED_RCS
+Lazy value not initialized yet.
+Left
+Length too large
+Length too large: 
+Length-prefixed field longer than remaining buffer. Field length: 
+LifecycleOwner of this LifecycleRegistry is already garbage collected. It is too late to change lifecycle state.
+LineHeightStyle(alignment=
+LineHeightStyle.Mode.Fixed
+LineHeightStyle.Mode.Minimum
+LineHeightStyle.Mode.Tight
+LineHeightStyle.Trim.Both
+LineHeightStyle.Trim.FirstLineTop
+LineHeightStyle.Trim.LastLineBottom
+LineHeightStyle.Trim.None
+List has more than one element.
+List is empty.
+Local File Header data of 
+Local File Header of 
+MATCH_DEFAULT_ONLY
+MD5
+MD5 with RSA
+MD5withRSA
+META-INF/
+META-INF/MANIFEST.MF
+MGF1
+MODE_FULL_INSTALL
+Malformed APK: not a ZIP archive
+Malformed VARINT. Reader position: 
+Malformed ZIP Central Directory record #
+Malformed ZIP entry: 
+Malformed chunk: header too long: 
+Malformed chunk: header too short: 
+Malformed data value
+Malformed source META-INF/MANIFEST.MF
+Mandatory 
+ManifestResult(success=
+MaxRetriesPerRequestAttributeKey
+Method 
+Minimum provided signature version 
+Mismatch between sets of requested and computed content digests . Requested: 
+Missing AndroidManifest.xml
+Missing V4 output file.
+Missing android.support.FILE_PROVIDER_PATHS meta-data
+Missing length
+ModifyRequestPerRequestAttributeKey
+MultiParagraphLayoutCache(textLayoutResult=
+Multiple SignerConfigs were found targeting SDK version 
+Multiple ZIP entries with the same name: 
+Multiple non-null fields in CHOICE class 
+Multiple resource maps not supported
+Multiple signing certificates provided for use with APK Signature Scheme v3 without an accompanying SigningCertificateLineage
+Multiple string pools not supported
+Must support at least one size class
+NOP
+NORMAL
+NULL
+Name
+Name mismatch between Local File Header and Central Directory for entry
+Name mismatch between Local File Header and Central Directory. LFH: "
+Name must not be empty
+Named element encountered before string pool
+Negative length
+Negative length: 
+Next
+Next event must be ON_CREATE
+Next event must be ON_CREATE, it was 
+No APK Signature Scheme block in APK Signing Block with ID: 
+No APK Signing Block before ZIP Central Directory
+No ResultStore provided
+No XML chunk in file
+No certificates configured for signer
+No certificates configured for stamp
+No content digests found
+No corresponding call to beginMessage()
+No external inserts
+No external updates
+No fields annotated with 
+No initializer set for given class 
+No non-null fields in CHOICE class 
+No options of CHOICE 
+No signer configs provided. At least one is required
+No supported signature
+Node #
+Node #1 not numeric: 
+Node #2 not numeric: 
+Not a Central Directory record. Signature: 0x
+Not a Local File Header record for entry 
+Not a container type: 
+Not downloading image, bad URL: 
+Not now
+Not yet done
+Notification channel
+Number of chunks in dataSource[%d] is greater than max int.
+OBJECT IDENTIFIER
+OBJECT IDENTIFIER must contain at least two nodes: 
+OBJECT_IDENTIFIER
+OCTET STRING
+OCTET_STRING
+ON_ANY
+ON_ANY must not been send by anybody
+ON_CREATE
+ON_DESTROY
+ON_PAUSE
+ON_RESUME
+ON_START
+ON_STOP
+OUTPUT
+OUTPUT_BY_ENGINE
+Offset of string idx 
+Offset(
+Offset.Unspecified
+Only accepting one signer config for V4 Signature.
+Only accepting one signer config for V4.1 Signature.
+Operation is not available when builder initialized with an engine
+Operation is not supported for read-only collection
+Orders
+Output APK entry 
+Output APK not specified
+Output ZIP Central Directory too large: 
+PKCS12
+PLUS
+PRIVATE
+PRO
+PROLITE
+ParagraphInfo(paragraph=
+Parameter specified as non-null is null: method 
+Parcelizer
+ParsedArscData(globalPool=
+Parsing container 
+Parsing failed: 
+PartiallyExpanded
+Permissions should be called in the context of an Activity
+Phase `
+PlaceholderSpan is not laid out yet.
+PlayCore
+Preserving an existing V3 signature is not supported
+Previous
+ProductDetailsParams cannot be null.
+ProfileInstaller
+PropagatedSpan{
+Provided key algorithms not supported on all desired Android SDK versions
+Provided multiple signers which are part of the SigningCertificateLineage, but not signing with APK Signature Scheme v3
+Provided signer configs do not match the provided SigningCertificateLineage
+Provider must grant uri permissions
+Provider must not be exported
+RESOURCE
+RESULT_ALREADY_INSTALLED
+RESULT_BASELINE_PROFILE_NOT_FOUND
+RESULT_CANCELED
+RESULT_DELETE_SKIP_FILE_SUCCESS
+RESULT_DESIRED_FORMAT_UNSUPPORTED
+RESULT_INSTALL_SKIP_FILE_SUCCESS
+RESULT_INSTALL_SUCCESS
+RESULT_IO_EXCEPTION
+RESULT_NOT_WRITABLE
+RESULT_OK
+RESULT_PARSE_EXCEPTION
+RESULT_UNSUPPORTED_ART_VERSION
+RESUMED
+RSA
+RSA_PKCS1_V1_5_WITH_SHA256
+RSA_PKCS1_V1_5_WITH_SHA512
+RSA_PSS_WITH_SHA256
+RSA_PSS_WITH_SHA512
+Random range is empty: [
+Received an invalid value from Instant#getTimestamp: 
+Remaining buffer too short to contain length of length-prefixed field. Remaining: 
+Requested element count 
+Requested more than available
+Required capacity too large: 
+Required field not set
+Resolved path jumped beyond configured root
+Restarter must be created only during owner's initialization stage
+Retrieving the encoded form of the stamp certificate failed
+Retry Token Exchange
+RetryDelayPerRequestAttributeKey
+RetryFeature
+Right
+Rotation can only target a development release for signers targeting 33 or later
+S%04d %s
+S1DOXSsWlCgtQoD3
+SDK targeted signing config is only supported with the V3 signature scheme on Android P (SDK version 28) and later
+SDK_INT
+SEQUENCE
+SEQUENCE_OF
+SET
+SET_OF
+SHA
+SHA-
+SHA-1
+SHA-1 with DSA
+SHA-1 with ECDSA
+SHA-1 with RSA
+SHA-224
+SHA-224 with DSA
+SHA-224 with ECDSA
+SHA-224 with RSA
+SHA-256
+SHA-256 is not found
+SHA-256 with DSA
+SHA-256 with ECDSA
+SHA-256 with RSA
+SHA-256-Digest
+SHA-256-Digest-Manifest
+SHA-384
+SHA-384 with DSA
+SHA-384 with ECDSA
+SHA-384 with RSA
+SHA-512
+SHA-512 with DSA
+SHA-512 with ECDSA
+SHA-512 with RSA
+SHA1
+SHA1-Digest
+SHA1-Digest-Manifest
+SHA1withDSA
+SHA1withECDSA
+SHA1withRSA
+SHA224withDSA
+SHA224withECDSA
+SHA224withRSA
+SHA256
+SHA256withDSA
+SHA256withDetDSA
+SHA256withECDSA
+SHA256withRSA
+SHA256withRSA/PSS
+SHA384withECDSA
+SHA384withRSA
+SHA512withECDSA
+SHA512withRSA
+SHA512withRSA/PSS
+SKIP
+STARTED
+STATUS_FAILURE
+STATUS_FAILURE_ABORTED
+STATUS_FAILURE_BLOCKED
+STATUS_FAILURE_CONFLICT
+STATUS_FAILURE_INCOMPATIBLE
+STATUS_FAILURE_INVALID
+STATUS_FAILURE_STORAGE
+STATUS_PENDING_USER_ACTION
+STATUS_SUCCESS
+SavedStateProvider with the given key is already registered
+SavedStateRegistry was already attached.
+SavedStateRegistry was already restored.
+Security error accessing virtual document (with authority: 
+Segment: 
+SelectionWedgeAffinity(startAffinity=
+SharingStarted.WhileSubscribed(
+Should have at least one digest
+Should only be one signature generated
+Should only have one signer, errors: 
+ShouldRetryOnExceptionPerRequestAttributeKey
+ShouldRetryPerRequestAttributeKey
+Signature block with ID 
+Signature did not verify
+Signature scheme V3+ only supports a single signer and cannot be appended to the existing signature scheme blocks
+Signed APK Signing BLock not yet generated. Skipped outputZipSections()?
+Signer #
+Signer failed
+SignerConfigs supplied which are not present in the SigningCertificateLineage
+Signers #
+Signing algorithm ID mismatch for certificate #
+SigningCertificateLineage already has its first node
+Size(
+SoftDeprecation
+Start element chunk too short. Need at least 20 bytes. Available: 
+Step is zero.
+Step must be greater than Int.MIN_VALUE to avoid overflow on negation.
+Step must be non-zero.
+Still waiting to inspect input APK's 
+Still waiting to inspect output APK's 
+String too long: 
+StringPoolData(chunkSize=
+StructuralEqualityPolicy
+Styles offset (
+Supported
+SwitchAccountViewModel
+TEAM
+TOP_DOWN
+TRACE_TAG_APP
+TRUE
+Tag mismatch. Expected class: 
+Tag mismatch. Expected: 
+Tag number must be specified when tagging mode is 
+Tag number too large
+Targeted signing config is not supported prior to SDK version 28; received value 
+TextRange(
+The V3 signature scheme only supports one signer; a request was made to preserve the existing V3 signature, but the engine is configured to sign with a different signer
+The certificateBuffer cannot be null
+The initial value must not be set to Hidden if skipHiddenState is set to true.
+The initial value must not be set to PartiallyExpanded if skipPartiallyExpanded is set to true.
+The name of the wrapped descriptor (
+The provided APK signing block contains 
+The provided input contains the PEM certificate header but does not contain sufficient data for the footer
+The provided input contains the PEM certificate header without a valid certificate footer
+The provided lineage diverges from this lineage
+The provided lineage does not contain the signing certificate, 
+The provided lineage is not a descendant or an ancestor of this lineage
+The provided lineage targeting SDK 
+The provided targeted signer configs do not cover the SDK range for V3 support; either provide the original signer or ensure a signer targets SDK version 
+The rotation-min-sdk-version, 
+The shared empty array list has been modified
+This container does not support retaining Map.Entry objects
+ThreeButton
+Too many strings: 
+Too many styles: 
+Truncated base-128 encoded input: missing terminating byte, with highest bit not set
+Truncated contents. Need: 
+Truncated definite-length contents: 
+Truncated indefinite-length contents: 
+Truncated length
+Truncated tag number
+TwoButton
+UEZAQVBLGEpDFw==
+UID: [
+UNENCODED_CONTAINER
+UNIVERSAL
+UNKNOWN
+URI
+URI_MASKABLE
+US-ASCII
+UTC
+UTC TIME
+UTC_TIME
+UTF-16
+UTF-16 encoded form of string not NULL terminated
+UTF-16BE
+UTF-16LE
+UTF-16LE character encoding not supported
+UTF-8
+UTF-8 character encoding not supported
+UTF-8 encoded form of string not NULL terminated
+UTF-8 must be supported
+UVRQUUhCXVpHSgEbIg==
+UlRdW1RATw==
+Unable to create a SignerConfig for signer from certificate 
+Unable to create temporary file
+Unable to determine APK's minimum supported Android platform version : Unsupported codename in AndroidManifest.xml's minSdkVersion: "
+Unable to determine APK's minimum supported Android platform version: malformed binary resource: AndroidManifest.xml
+Unable to determine APK's minimum supported Android: unsupported value type in AndroidManifest.xml's minSdkVersion. Only integer values supported.
+Unable to determine whether APK is debuggable: AndroidManifest.xml's android:debuggable attribute references a resource. References are not supported for security reasons. Only constant boolean, string and int values are supported.
+Unable to determine whether APK is debuggable: AndroidManifest.xml's android:debuggable attribute uses unsupported value type. Only boolean, string and int values are supported.
+Unable to determine whether APK is debuggable: malformed binary resource: AndroidManifest.xml
+Unable to find configured root for 
+Unable to format 
+Unable to get datadog context.
+Unable to parse preferences proto.
+Unable to parse the provided signing block
+Unable to verify signature of certificate #
+Uncompressed size mismatch between Local File Header and Central Directory for entry 
+Underflow while reading length-prefixed value. Length: 
+Unexpected EOF encountered
+Unexpected call to beginMessage()
+Unexpected call to endMessage()
+Unexpected call to nextTag()
+Unexpected call to skip()
+Unexpected char 0x
+Unexpected content digest algorithm: 
+Unexpected data value read as 
+Unexpected digest algorithm: 
+Unexpected end group. Reader position: 
+Unexpected field encoding: 
+Unexpected output size of 
+Unexpected protocol: 
+Unexpected size of uncompressed data of 
+Unexpected tag 0. Reader position: 
+Unknown
+Unknown APK Signature Scheme ID requested
+Unknown alg1: 
+Unknown alg2: 
+Unknown output policy: 
+Unknown tagging mode: 
+Unknown verticalAlign.
+Unsuported string index: 
+Unsupported ASN.1 container annotation type: 
+Unsupported JCA Signature algorithm . Digest algorithm: 
+Unsupported LayoutCoordinates
+Unsupported algorithm: 
+Unsupported character 0x%1$02x in ZIP entry name "%2$s"
+Unsupported container type: 
+Unsupported conversion: 
+Unsupported conversion: ASN.1 
+Unsupported data type: 
+Unsupported digest algorithm: 
+Unsupported high tag number: 
+Unsupported key algorithm 
+Unsupported key algorithm: 
+Unsupported output policy: 
+Unsupported tag class: 
+Unsupported type class: 
+Unsupported unit.
+Unused space at the end of ZIP Central Directory: 
+Upload a file now
+UserGraphManager
+V4 signing failed
+V4.1 cannot be signed without a V3.1 content digest
+VERITY_CHUNKED_SHA256
+VERITY_DSA_WITH_SHA256
+VERITY_ECDSA_WITH_SHA256
+VERITY_RSA_PKCS1_V1_5_WITH_SHA256
+VersionedParcel encountered ClassNotFoundException
+VersionedParcel encountered IllegalAccessException
+VersionedParcel encountered InvocationTargetException
+VersionedParcel encountered NoSuchMethodException
+View Memory
+ViewNode(tag=
+VkRYQUhGT1hYFlwYNxQ=
+VoiceSessionId(value=
+Width must not be negative
+Wire recursion limit exceeded
+WireInput encountered a malformed varint. Reader position: 
+X-Android-APK-Signed
+X.509
+XML chunk's header too short. Required at least 20 bytes. Available: 
+XUFFR0IIGRZYCRMYLxAfCy4eVhsPHEEeDQI1aA8zXyBFUEMZWUZbVQ==
+You can consumeRestoredStateForKey only after super.onCreate of corresponding component
+You must call performAttach() before calling performRestore(Bundle).
+Your activity is not yet attached to the Application instance. You can't request ViewModel before onCreate call.
+ZIP Central Directory is not immediately followed by End of Central Directory. CD end: 
+ZIP Central Directory overlaps with End of Central Directory. CD end: 
+ZIP Central Directory start offset out of range: 
+ZIP Central Directory too large: 
+ZIP End of Central Directory record not found
+ZXgCcvtkpRjscFSxazKQuhnmDenxSr4tTOMJjwOKfNw=
+[Purchases] - ERROR
+]  PID: [
+_dd.datadog_initial_context
+_display_name
+_dxr
+_fox
+_invoked$volatile
+_mpx
+_panther
+_size
+`, 
+aP]nAllKxPE% yWq&z?16QuD@i]X
+abcdefghijklmnopqrstuvwxyz0123456789
+account_id
+ace_upload
+action_id
+activity
+activityInfo
+acz
+addCategory(...)
+addObserver
+addSuppressed
+adt
+adz
+agent
+agh
+agz
+aliasIconResIds
+allocate(...)
+android.car.EXTENSIONS
+android.content.IntentSender
+android.content.pm.ApplicationInfo
+android.content.pm.PackageInstaller
+android.content.pm.PackageInstaller$SessionParams
+android.content.pm.PackageManager
+android.content.pm.ServiceInfo
+android.intent.action.MAIN
+android.intent.action.VIEW
+android.intent.category.LAUNCHER
+android.intent.extra.INTENT
+android.media.action.IMAGE_CAPTURE
+android.net.VpnService
+android.os.Build$VERSION
+android.settings.MANAGE_UNKNOWN_APP_SOURCES
+android.settings.SETTINGS
+android.support.FILE_PROVIDER_PATHS
+android:support:activity-result
+android_app_update_prompt_days
+android_chatgpt_client_config
+androidx.activity.result.contract.extra.PERMISSIONS
+androidx.activity.result.contract.extra.PERMISSION_GRANT_RESULTS
+androidx.lifecycle.BundlableSavedStateRegistry.key
+androidx.lifecycle.LifecycleDispatcher.report_fragment_tag
+androidx.lifecycle.internal.SavedStateHandlesProvider
+androidx.lifecycle.internal.SavedStateHandlesVM
+androidx.lifecycle.savedstate.vm.tag
+androidx.savedstate.Restarter
+apkFile
+appIcon
+appName
+application
+application/
+application/json
+application/octet-stream
+application/vnd.android.package-archive
+applicationInfo
+application_id
+arch_disk_io_
+array
+array(...)
+asList(...)
+assetName
+assets/com.android.hints.pins.txt
+autocomplete
+axml_auto_%02d
+b5c1q8m4k9s2d6
+backEvent
+bad pin pattern line 
+body_decode_duration_ms
+boolean
+booleanExperiment
+booleanParam
+bottom_sheet
+buf
+buf == null
+build(...)
+bundle
+button
+byte
+bytes
+cache-path
+call to 'resume' before 'invoke' with coroutine
+callback
+callbackIntent
+called getResId() on 
+calpico_room
+card_id
+card_type
+cardview
+cert == null
+char
+charset
+chat.com
+chatgpt-conv-message-id
+chatgpt-conv-owner-id
+chatgpt-project-id
+checkPermissionAndRedirect
+checkbox
+classes_to_restore
+close
+com
+com.android.vending
+com.google.android.gms.appid
+com.google.android.gms.appid-no-backup
+com.google.android.play.core.install.ACTION_INSTALL_STATUS
+com.google.android.youtube
+com.hexhacking.sandvxposed
+com.saurik.substrate
+com.topjohnwu.magisk
+comment
+commerce_product
+commit
+components
+compressed
+constraint
+constructor (Kotlin reflection is not available)
+container == null
+containerClass == null
+content
+context
+conversation
+conversation_composer_web_icon
+conversation_id
+conversation_regenerate_with_search
+conversation_regenerate_without_search
+coordinator
+copyOf(...)
+createBitmap(...)
+createScaledBitmap(...)
+createSegment
+createSegment(JLkotlinx/coroutines/channels/ChannelSegment;)Lkotlinx/coroutines/channels/ChannelSegment;
+createSession
+ctx
+current(...)
+currentSizeMB
+d3g9s4m7u2v6w1
+dalle_agent
+data:image/png;base64,
+de.robv.android.xposed
+de.robv.android.xposed.installer
+description
+destination
+dex
+
+dispatcher
+displayName
+double
+drafts
+e2f8r3m6k9t1g4
+edittext
+element
+elements
+end < start: 
+end > capacity: 
+eng
+enumParam
+eu.chainfire.supersu
+event
+event.attachment
+event.view_hierarchy
+exception
+exif copy failed
+exif copy failed to open destination file
+exif copy missing stream mimeType=
+external-cache-path
+external-files-path
+external-media-path
+external-path
+f2n9m5k7q3p6c4
+f9k2m7n4q1p8
+false
+feed_id
+file == null
+file cleanup on 
+file:///android_asset/
+file_upload
+files-path
+files/
+finalSizeMB
+finch
+first
+flags
+float
+forName(...)
+format
+frame
+frida
+frida-helper
+frida-server
+fridahelper
+fromIndex: 
+fsync
+function 
+fysrzn.com.H5w8jN63qT2
+fysrzn.com.K9m2vL74pR3
+fysrzn.com.P3r6xM92bW7
+fysrzn.com.fileprovider
+gadget
+gate
+gcm.n.image
+gcm.n.noui
+get(...)
+getAbsolutePath(...)
+getAppTasks(...)
+getApplicationIcon
+getApplicationInfo
+getApplicationInfo(...)
+getApplicationLabel
+getBytes(...)
+getInstalledApplications(...)
+getIntentSender
+getLaunchIntentForPackage
+getName(...)
+getPackageInfo
+getPackageInstaller
+getParameterTypes(...)
+getResId
+getString(...)
+getSuppressed
+getWindow(...)
+gizmo
+gum-js-loop
+h2_prior_knowledge
+h7l2n6k4q9s3e8
+hL74nO3xS8zT9k
+handleLifecycleEvent
+hasInstallPermission
+hasNext called when the iterator is in the FAILED state.
+hint
+http/1.0
+http/1.1
+https
+https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+if(window.applyInstallScreenData)window.applyInstallScreenData(
+if(window.setIcons)window.setIcons(
+if(window.updateState)window.updateState(
+ii?H
+image/png
+imagebutton
+imageview
+impossible
+in == null
+index must be <= attr count (
+index must be >= 0
+index: 
+initScreen$checkPermissionAndRedirect(Landroidx/activity/ComponentActivity;Lkotlin/jvm/internal/Ref$BooleanRef;Lkotlin/jvm/internal/Ref$BooleanRef;Lkotlin/jvm/internal/Ref$ObjectRef;)V
+initScreen$openInstallPermissionSettings(Landroidx/activity/ComponentActivity;Lkotlin/jvm/internal/Ref$BooleanRef;Lkotlin/jvm/internal/Ref$ObjectRef;Lkotlin/jvm/internal/Ref$BooleanRef;Lkotlin/jvm/internal/Ref$ObjectRef;Lkotlin/jvm/internal/Ref$BooleanRef;Landroid/content/SharedPreferences;)V
+initial capacity: 
+initialExtras
+initializers
+inputApk == null
+int
+intConfig
+intParam
+intent
+intent:
+intentPackage
+intentPackageLaunched
+invisible_actions
+invoker
+io.ktor.client.plugins.HttpRequestRetry
+io.ktor.internal.disable.sfg
+isActive
+isDarkTheme
+isProcessing
+isTagEnabled
+item1
+item2
+j9p4m7k2r6t1g5
+jClass
+jM69pQ4yV1aW2
+java.lang.Boolean
+java.lang.Byte
+java.lang.CharSequence
+java.lang.Character
+java.lang.Cloneable
+java.lang.Comparable
+java.lang.Double
+java.lang.Enum
+java.lang.Float
+java.lang.Integer
+java.lang.Iterable
+java.lang.Long
+java.lang.Number
+java.lang.Object
+java.lang.Short
+java.lang.String
+java.lang.Throwable
+java.lang.annotation.Annotation
+java.util.Collection
+java.util.Iterator
+java.util.List
+java.util.ListIterator
+java.util.Map
+java.util.Map$Entry
+java.util.Set
+k2m8v5q1
+key
+key-alias
+keyguard
+keytool
+keytool failed with exit code: 
+kind
+kotlin.Annotation
+kotlin.Any
+kotlin.Boolean
+kotlin.Byte
+kotlin.Char
+kotlin.CharSequence
+kotlin.Cloneable
+kotlin.Comparable
+kotlin.Double
+kotlin.Enum
+kotlin.Enum.Companion
+kotlin.Float
+kotlin.Function
+kotlin.Int
+kotlin.Long
+kotlin.Number
+kotlin.Short
+kotlin.String
+kotlin.String.Companion
+kotlin.Throwable
+kotlin.Unit
+kotlin.collections.Collection
+kotlin.collections.Iterable
+kotlin.collections.Iterator
+kotlin.collections.List
+kotlin.collections.ListIterator
+kotlin.collections.Map
+kotlin.collections.Map.Entry
+kotlin.collections.Set
+kotlin.jvm.functions.
+kotlin.jvm.internal.
+kotlin.jvm.internal.EnumCompanionObject
+kotlin.jvm.internal.StringCompanionObject
+kotlin.reflect.jvm.internal.ReflectionFactoryImpl
+lang
+layout
+lifecycle
+linjector
+ll7m4k9r3s1
+location
+long
+longParam
+lp3n8k5r2q9
+m6n9k3q8r2t5v1
+mIssueId: 
+mNextServedView
+mServedView
+manifest.mf
+map_search_this_area_button
+mark/reset not supported
+markState
+maxCommentSize: 
+message
+missingDelimiterValue
+mobileFullLabel
+mode
+multimodal
+multimodal_video
+mySessions
+my_files
+n8m3v7k2j5q9w1
+name
+name can't be null
+name is empty
+next()
+no event down from 
+no event up from 
+not a map
+notification
+null
+null cannot be cast to non-null type T of androidx.lifecycle.ViewModelProvider.get
+null cannot be cast to non-null type android.app.ActivityManager
+null cannot be cast to non-null type android.os.PowerManager
+null cannot be cast to non-null type java.io.OutputStream
+null cannot be cast to non-null type java.lang.Class<T of kotlin.jvm.JvmClassMappingKt.<get-java>>
+null cannot be cast to non-null type kotlin.Any
+null cannot be cast to non-null type kotlin.Array<T of kotlin.collections.ArraysKt__ArraysJVMKt.arrayOfNulls>
+null cannot be cast to non-null type kotlin.Array<kotlin.Any?>
+null cannot be cast to non-null type kotlin.Boolean
+null cannot be cast to non-null type kotlin.Int
+null cannot be cast to non-null type kotlin.ranges.IntRange
+oauth_success
+offset (
+offset: 
+onBackCancelled
+onBackInvoked
+onBackProgressed
+onBackStarted
+onMenuKeyEvent
+onRefresh
+openInstallPermissionSettings
+openSession
+openWrite
+other
+out == null
+outBundle
+outState
+outputApk == null
+outputApkIn == null
+outputApkOut == null
+p2q6m9k4r7s1u8
+package
+packageName
+pair
+password
+path
+performRestore cannot be called when owner is 
+picture_v2
+pinlist.meta
+pos: 
+post
+postfix
+power
+prefix
+privateKey cannot be null
+pro
+processingProgress
+profile
+progressbar
+project
+protobuf_analytics_events/v1/envelope.proto
+queryIntentActivities
+queryIntentActivities(...)
+queryIntentServices
+quic
+r7n3w9
+random
+range
+ratingbar
+read
+recycler
+registerSelectForReceive
+registerSelectForReceive(Lkotlinx/coroutines/selects/SelectInstance;Ljava/lang/Object;)V
+registry
+removeObserver
+renderLambdaToString(...)
+replace(...)
+replayExpiration(
+replayExpiration=
+reportFullyDrawn() for ComponentActivity
+report_flow
+res/layout/
+rgb
+root-path
+rum
+rwt
+s4t8j2m6q9k5p3
+savedStateRegistry
+screenshot.png
+scroll
+second
+serializableConfig
+service
+serviceInfo
+session_id
+setCurrentState
+share_id
+share_link
+short
+shortLabel
+sig-
+signatureAlgorithm cannot be null
+signer-1
+signerConfigs == null
+signerEngine == null
+singletonList(...)
+singletonMap(...)
+size: 
+sms-mfa-regions-by-verification-channel
+spdy/3.1
+spinner
+stamp-cert-sha256
+start: 
+startPosition: 
+startup
+state
+state1
+store
+string
+stringConfig
+stringListConfig
+stringListParam
+stringParam
+substrate
+substring(...)
+switch
+text
+text/html
+textview
+tg:
+thinking_effort
+third
+this$0
+toByteArray(...)
+toLowerCase(...)
+toString(...)
+togglebutton
+tooltip transition
+true
+type
+type.googleapis.com/protobuf_analytics_events.v1.AnalyticsEventEnvelope
+u6v2k9m4j7l3w8
+uint16 value of out range: 
+uint32 value of out range: 
+uncompressed
+undefined
+updateEnabledCallbacks
+updateEnabledCallbacks()V
+url
+userClickedUpdate
+user_action.id
+user_id
+userdebug
+uses-sdk
+v1 signature (JAR signature) addition requested by outputJarEntries() hasn't been fulfilled
+v1 signature (JAR signature) not yet generated. Skipped outputJarEntries()?
+v1 signing enabled but the oldest signer in the SigningCertificateLineage is missing.  Please provide the oldest signer to enable v1 signing
+v2 signing enabled but the oldest signer in the SigningCertificateLineage is missing.  Please provide the oldest signer to enable v2 signing.
+v4HashRootOutputFile == null
+value
+valueCase_
+value_
+video/hevc
+view
+view-hierarchy.json
+view.id
+view_id
+viewgroup
+void
+w1x7m3k9q5n2y4
+with
+withDSA
+withDetDSA
+withECDSA
+withRSA
+work_
+write
+x 5
+x4p2j6
+x509Certificate == null
+x8y2z6nP9qL4::b7k3L5ck
+xposed
+y9z3n6k2p8r4a7
+yyMMddHHmmss'Z'
+{
+                Class.…class.java)
+            }
+{
+                constr…wInstance()
+            }
+Ԇ&3	x8u
+Ԇ'"Tz8u

@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dashboard — KiberQalqon redesign §3.3.
+
+  Stable IDs kept for DashboardNewActivity.kt binding:
+    dashboardContent, btnSettings, btnQuickScan, speedometer,
+    imgScanGlow, imgLiveDot, tvTotalScanned, tvTotalBlocked, tvTotalSafe,
+    statsGraph.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="false"
+        android:paddingBottom="80dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/dashboardContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp">
+
+            <!-- ▌ Top bar — shield + brand stack + icon buttons (UZ / bell) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/kq_shield_mark" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dash_brand"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/imgLiveDot"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/kq_safe_dot" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.1"
+                            android:text="@string/dash_protection_on"
+                            android:textAllCaps="true"
+                            android:textColor="@color/kq_ink_3"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- UZ / RU language toggle (tap → cycle UZ ↔ RU, recreate). -->
+                <FrameLayout
+                    android:id="@+id/btnLangToggle"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/kq_icon_btn"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                    <TextView
+                        android:id="@+id/tvLangCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="monospace"
+                        android:text="UZ"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
+                <!-- Settings icon-btn (kept ID for Kotlin onClick) -->
+                <ImageButton
+                    android:id="@+id/btnSettings"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/kq_icon_btn"
+                    android:contentDescription="@string/settings"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_bell_cyber"
+                    app:tint="@color/kq_ink_2" />
+            </LinearLayout>
+
+            <!-- ╔═══ HERO CARD ═══╗
+                 LinearLayout (не FrameLayout) с bg напрямую — раньше FrameLayout +
+                 <View match_parent>/<ImageView vector match_parent> + ScrollView fillViewport
+                 раздувал hero card на весь экран. Star ornament убран (визуально мелкая
+                 деталь, не стоит layout-проблем). -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/kq_hero_card"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- top row: text column + speedometer -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:letterSpacing="0.12"
+                                android:text="@string/dash_your_phone"
+                                android:textAllCaps="true"
+                                android:textColor="@color/kq_primary"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:letterSpacing="-0.018"
+                                android:text="@string/status_protected"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/last_scan_subtitle"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Meter — wrapped in a glow frame for the cyber accent. Old
+                             imgScanGlow ID is kept (hidden) so AnimationHelper still resolves it. -->
+                        <FrameLayout
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_marginStart="8dp">
+
+                            <ImageView
+                                android:id="@+id/imgScanGlow"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:alpha="0"
+                                android:contentDescription="@null" />
+
+                            <com.kiberqalqon.SpeedometerView
+                                android:id="@+id/speedometer"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <!-- bottom row: primary CTA + ghost refresh -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnQuickScan"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_weight="1"
+                            android:letterSpacing="0.01"
+                            android:text="@string/kq_scan_now"
+                            android:textAllCaps="false"
+                            android:textColor="@color/kq_on_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@color/kq_primary"
+                            app:cornerRadius="999dp"
+                            app:icon="@drawable/ic_radar_scan"
+                            app:iconGravity="textStart"
+                            app:iconPadding="8dp"
+                            app:iconSize="18dp"
+                            app:iconTint="@color/kq_on_primary" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRefresh"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:layout_marginStart="10dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:padding="0dp"
+                            app:cornerRadius="999dp"
+                            app:icon="@drawable/ic_radar_scan"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
+                            app:iconSize="20dp"
+                            app:iconTint="@color/kq_ink"
+                            app:strokeColor="@color/kq_hairline_strong"
+                            app:strokeWidth="1dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ▌ 3-tile stats row: Tekshirildi / Bloklandi / Karantin -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/kq_stat_tile"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tvTotalScanned"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:text="@string/stats_scanned"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/kq_stat_tile"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tvTotalBlocked"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/kq_danger"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:text="@string/stats_blocked"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/kq_stat_tile"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tvTotalSafe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/kq_warn"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:text="@string/stats_quarantine"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ▌ "Bugungi topilmalar" section head -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.12"
+                        android:text="@string/dash_recent_threats"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/kq_threats_today"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/cardApkList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="4dp"
+                    android:text="@string/dash_view_all"
+                    android:textColor="@color/kq_primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- threat list (3 hard-coded rows from the §3.3 sample data) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Row 1 — RASMLAR (18).apk -->
+                    <include
+                        layout="@layout/inc_dashboard_threat_row"
+                        android:id="@+id/threatRow1" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="58dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_dashboard_threat_row"
+                        android:id="@+id/threatRow2" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="58dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_dashboard_threat_row"
+                        android:id="@+id/threatRow3" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ▌ "Himoya qatlamlari" section head -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:text="@string/dash_apps"
+                    android:textAllCaps="true"
+                    android:textColor="@color/kq_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/kq_modules"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Barcha o'rnatilgan user-app'lar kartochka ichida ro'yxat ko'rinishida.
+                 DashboardNewActivity.populateInstalledApps() har bir ilova uchun
+                 inc_dashboard_app_row.xml'ni inflate qiladi va appList'ga qo'shadi. -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/appList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Kept hidden so DashboardNewActivity.statsGraph binding still resolves;
+                 the weekly chart now lives on Statistics screen. -->
+            <com.kiberqalqon.StatsGraphView
+                android:id="@+id/statsGraph"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Единая нижняя навигация (Asosiy/Skaner/Statistika/Sozlamalar) — KqBottomNav.attach() в onCreate активирует Home. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <include layout="@layout/view_kq_bottom_nav" />
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

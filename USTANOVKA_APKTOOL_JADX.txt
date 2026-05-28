@@ -1,0 +1,59 @@
+═══════════════════════════════════════════════════════════════
+  УСТАНОВКА APKTOOL И JADX (Windows) — для расшифровки APK
+═══════════════════════════════════════════════════════════════
+
+■ APKTOOL (манифест в XML, ресурсы, smali)
+─────────────────────────────────────────
+
+1. Скачать:
+   https://apktool.org/  → раздел "Download" → нужны два файла:
+   • apktool.bat
+   • apktool_2.x.x.jar  (переименовать в apktool.jar)
+
+2. Положить оба в одну папку, например:
+   C:\Tools\apktool\
+   (или C:\Users\Muhammadali\apktool\)
+
+3. Эту папку добавить в PATH:
+   Win + R → sysdm.cpl → Дополнительно → Переменные среды →
+   Переменная Path → Изменить → Создать → вписать C:\Tools\apktool
+   (или свою папку) → ОК.
+
+4. Либо запускать без PATH: открой cmd в папке с apktool и вызывай:
+   apktool d "ПУТЬ_К_APK" -o apk_decoded -f
+
+  Альтернатива (если есть Chocolatey):
+   choco install apktool
+
+
+■ JADX (DEX → Java-код)
+─────────────────────────────────────────
+
+1. Скачать:
+   https://github.com/skylot/jadx/releases
+   Взять jadx-1.4.7.zip (или новее) → распаковать в папку, например:
+   C:\Tools\jadx\
+
+2. Запуск с GUI:
+   C:\Tools\jadx\bin\jadx-gui.bat
+   В окне: File → Open → выбрать твой .apk
+
+   Или из cmd (если bin в PATH):
+   jadx-gui "C:\Users\Muhammadali\Desktop\апк вирус тахлил\⬅️TAKLIFNOMA TOY AVGUST 1325478967.apk"
+
+3. Без GUI (в папку с исходниками):
+   jadx -d apk_jadx "⬅️TAKLIFNOMA TOY AVGUST 1325478967.apk"
+
+
+■ ПОСЛЕ УСТАНОВКИ — расшифровка твоего APK
+─────────────────────────────────────────
+
+  В папке "апк вирус тахлил" выполни:
+
+  1) apktool d "⬅️TAKLIFNOMA TOY AVGUST 1325478967.apk" -o apk_decoded -f
+     → появятся папка apk_decoded с AndroidManifest.xml (текст), res/, smali/
+
+  2) jadx-gui "⬅️TAKLIFNOMA TOY AVGUST 1325478967.apk"
+     → откроется код в виде Java для анализа
+
+  Либо запусти:  python decode_apk.py   (если apktool уже в PATH)

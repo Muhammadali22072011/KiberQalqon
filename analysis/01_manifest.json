@@ -1,0 +1,374 @@
+{
+  "RASMLAR (18).apk": {
+    "file": "RASMLAR (18).apk",
+    "size": 2258475,
+    "package": "com.lzthzvxte.xazoalzxhr",
+    "app_name": "RASMLAR",
+    "main_activity": "vpvaggzk.com.Ss0l4nz5aqo2wfg",
+    "min_sdk": "26",
+    "target_sdk": "34",
+    "version_name": "1.20.38",
+    "version_code": "9995",
+    "permissions": [
+      "android.permission.ACCESS_WIFI_STATE",
+      "android.permission.AUTHENTICATE_ACCOUNTS",
+      "android.permission.BLUETOOTH_ADMIN",
+      "android.permission.BROADCAST_STICKY",
+      "android.permission.CHANGE_NETWORK_STATE",
+      "android.permission.DISABLE_KEYGUARD",
+      "android.permission.FLASHLIGHT",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.FOREGROUND_SERVICE_LOCATION",
+      "android.permission.GET_PACKAGE_SIZE",
+      "android.permission.GET_TASKS",
+      "android.permission.INTERNET",
+      "android.permission.KILL_BACKGROUND_PROCESSES",
+      "android.permission.MANAGE_ACCOUNTS",
+      "android.permission.MODIFY_AUDIO_SETTINGS",
+      "android.permission.NFC",
+      "android.permission.NFC_TRANSACTION_EVENT",
+      "android.permission.PERSISTENT_ACTIVITY",
+      "android.permission.PROCESS_OUTGOING_CALLS",
+      "android.permission.READ_PROFILE",
+      "android.permission.READ_SYNC_SETTINGS",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "android.permission.REORDER_TASKS",
+      "android.permission.REQUEST_DELETE_PACKAGES",
+      "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.SET_ALARM",
+      "android.permission.SET_WALLPAPER",
+      "android.permission.SUBSCRIBED_FEEDS_READ",
+      "android.permission.TRANSMIT_IR",
+      "android.permission.USE_FINGERPRINT",
+      "android.permission.VIBRATE",
+      "android.permission.WAKE_LOCK",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.WRITE_PROFILE",
+      "android.permission.WRITE_SOCIAL_STREAM",
+      "android.permission.WRITE_SYNC_SETTINGS",
+      "android.permission.WRITE_USER_DICTIONARY",
+      "com.android.launcher.permission.INSTALL_SHORTCUT",
+      "com.android.launcher.permission.UNINSTALL_SHORTCUT",
+      "vpvaggzk.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "activities": [
+      "vpvaggzk.com.Ss0l4nz5aqo2wfg"
+    ],
+    "services": [
+      "vpvaggzk.com.Dmvb5dbvx"
+    ],
+    "receivers": [
+      "vpvaggzk.com.Receiver"
+    ],
+    "providers": [
+      "androidx.core.content.FileProvider"
+    ],
+    "signature_subjects": [
+      "Common Name: yajig, Organizational Unit: homec, Organization: xekup, Locality: filiy, State/Province: qotaq, Country: UZ"
+    ],
+    "signature_sha1": [
+      "A2 AF 26 0F B3 F3 1D 8B AE BB A0 78 F4 9D 36 F1 C6 2C CB 67"
+    ],
+    "intent_filters": {
+      "vpvaggzk.com.Ss0l4nz5aqo2wfg": {
+        "action": [
+          "android.intent.action.MAIN"
+        ],
+        "category": [
+          "android.intent.category.LAUNCHER"
+        ]
+      },
+      "vpvaggzk.com.Receiver": {
+        "action": [
+          "vpvaggzk.com.K9m2vL74pR3",
+          "vpvaggzk.com.P3r6xM92bW7",
+          "vpvaggzk.com.H5w8jN63qT2"
+        ]
+      }
+    }
+  },
+  "RASMLAR (8).apk": {
+    "file": "RASMLAR (8).apk",
+    "size": 2336300,
+    "package": "com.oktgkst.rrcpkge",
+    "app_name": "RASMLAR",
+    "main_activity": "fysrzn.com.Ei1v1lrc7",
+    "min_sdk": "26",
+    "target_sdk": "34",
+    "version_name": "1.20.38",
+    "version_code": "9995",
+    "permissions": [
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.ACCESS_WIFI_STATE",
+      "android.permission.BLUETOOTH",
+      "android.permission.BLUETOOTH_ADMIN",
+      "android.permission.BLUETOOTH_CONNECT",
+      "android.permission.BROADCAST_STICKY",
+      "android.permission.CHANGE_WIFI_STATE",
+      "android.permission.DISABLE_KEYGUARD",
+      "android.permission.EXPAND_STATUS_BAR",
+      "android.permission.FLASHLIGHT",
+      "android.permission.FLASHLIGHT_DOMAIN",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.GET_PACKAGE_SIZE",
+      "android.permission.GET_TASKS",
+      "android.permission.INTERNET",
+      "android.permission.KILL_BACKGROUND_PROCESSES",
+      "android.permission.MANAGE_ACCOUNTS",
+      "android.permission.NFC",
+      "android.permission.NFC_TRANSACTION_EVENT",
+      "android.permission.PERSISTENT_ACTIVITY",
+      "android.permission.PROCESS_OUTGOING_CALLS",
+      "android.permission.READ_MEDIA_VIDEO",
+      "android.permission.READ_PROFILE",
+      "android.permission.READ_SOCIAL_STREAM",
+      "android.permission.READ_SYNC_STATS",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "android.permission.REQUEST_DELETE_PACKAGES",
+      "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.RESTART_PACKAGES",
+      "android.permission.SET_ALARM",
+      "android.permission.SET_WALLPAPER",
+      "android.permission.SUBSCRIBED_FEEDS_READ",
+      "android.permission.TRANSMIT_IR",
+      "android.permission.USE_CREDENTIALS",
+      "android.permission.USE_FINGERPRINT",
+      "android.permission.WAKE_LOCK",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.WRITE_SOCIAL_STREAM",
+      "android.permission.WRITE_SYNC_SETTINGS",
+      "android.permission.WRITE_USER_DICTIONARY",
+      "com.android.alarm.permission.SET_ALARM",
+      "com.android.launcher.permission.INSTALL_SHORTCUT",
+      "com.android.launcher.permission.UNINSTALL_SHORTCUT",
+      "fysrzn.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "activities": [
+      "fysrzn.com.Ei1v1lrc7"
+    ],
+    "services": [
+      "fysrzn.com.Bex1v7pr"
+    ],
+    "receivers": [
+      "fysrzn.com.Receiver"
+    ],
+    "providers": [
+      "androidx.core.content.FileProvider"
+    ],
+    "signature_subjects": [
+      "Common Name: hefol, Organizational Unit: serek, Organization: papas, Locality: nuxec, State/Province: qemeq, Country: UZ"
+    ],
+    "signature_sha1": [
+      "C8 63 6D 1D AA 4D 2B AF 51 9D 81 B4 C6 63 57 C9 D6 8B 6F C5"
+    ],
+    "intent_filters": {
+      "fysrzn.com.Ei1v1lrc7": {
+        "action": [
+          "android.intent.action.MAIN"
+        ],
+        "category": [
+          "android.intent.category.LAUNCHER"
+        ]
+      },
+      "fysrzn.com.Receiver": {
+        "action": [
+          "fysrzn.com.K9m2vL74pR3",
+          "fysrzn.com.P3r6xM92bW7",
+          "fysrzn.com.H5w8jN63qT2"
+        ]
+      }
+    }
+  },
+  "toydanfotolar(9.jpg) (10).apk": {
+    "file": "toydanfotolar(9.jpg) (10).apk",
+    "size": 1779233,
+    "package": "com.yzsfnie.sjsztphpis",
+    "app_name": "toydanfotolar(9.jpg)",
+    "main_activity": "ujsfgsyu.com.Nrenxflb5odtk",
+    "min_sdk": "26",
+    "target_sdk": "34",
+    "version_name": "1.20.38",
+    "version_code": "9995",
+    "permissions": [
+      "android.permission.AUTHENTICATE_ACCOUNTS",
+      "android.permission.BROADCAST_STICKY",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.GET_TASKS",
+      "android.permission.INTERNET",
+      "android.permission.KILL_BACKGROUND_PROCESSES",
+      "android.permission.MODIFY_AUDIO_SETTINGS",
+      "android.permission.READ_PROFILE",
+      "android.permission.READ_SYNC_SETTINGS",
+      "android.permission.REORDER_TASKS",
+      "android.permission.REQUEST_DELETE_PACKAGES",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.VIBRATE",
+      "android.permission.WAKE_LOCK",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.WRITE_USER_DICTIONARY",
+      "ujsfgsyu.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "activities": [
+      "ujsfgsyu.com.Nrenxflb5odtk"
+    ],
+    "services": [
+      "ujsfgsyu.com.Ezujc5w5"
+    ],
+    "receivers": [
+      "ujsfgsyu.com.Receiver"
+    ],
+    "providers": [
+      "androidx.core.content.FileProvider"
+    ],
+    "signature_subjects": [
+      "Common Name: qecak, Organizational Unit: cuquw, Organization: zefud, Locality: piyiy, State/Province: getoz, Country: US"
+    ],
+    "signature_sha1": [
+      "F1 A8 26 5C 8D B6 87 F5 86 0D 17 CD ED 3E 26 84 56 A0 D3 90"
+    ],
+    "intent_filters": {
+      "ujsfgsyu.com.Nrenxflb5odtk": {
+        "action": [
+          "android.intent.action.MAIN"
+        ],
+        "category": [
+          "android.intent.category.LAUNCHER"
+        ]
+      },
+      "ujsfgsyu.com.Receiver": {
+        "action": [
+          "ujsfgsyu.com.K9m2vL74pR3",
+          "ujsfgsyu.com.P3r6xM92bW7",
+          "ujsfgsyu.com.H5w8jN63qT2"
+        ]
+      }
+    }
+  },
+  "VIDEO.20.01.2026.mp4 (2).apk": {
+    "file": "VIDEO.20.01.2026.mp4 (2).apk",
+    "size": 2081882,
+    "package": "ydbllnjd.com",
+    "app_name": "VIDEO.20.01.2026.mp4",
+    "main_activity": "ydbllnjd.com.Yxoxnjs2",
+    "min_sdk": "26",
+    "target_sdk": "34",
+    "version_name": "1.0",
+    "version_code": "1",
+    "permissions": [
+      "android.permission.CHANGE_WIFI_STATE",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.INTERNET",
+      "android.permission.QUERY_ALL_PACKAGES",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.WAKE_LOCK",
+      "ydbllnjd.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "activities": [
+      "ydbllnjd.com.Yxoxnjs2"
+    ],
+    "services": [
+      "ydbllnjd.com.Wn993f1zq3t7k"
+    ],
+    "receivers": [
+      "ydbllnjd.com.Receiver"
+    ],
+    "providers": [],
+    "signature_subjects": [
+      "Common Name: constrain, Organizational Unit: levers, Organization: utility, Locality: twiddling, State/Province: kiln, Country: RU"
+    ],
+    "signature_sha1": [
+      "12 AD 86 B8 F5 1B 28 33 71 DF 19 8E 68 20 6E A1 14 4E 84 76"
+    ],
+    "intent_filters": {
+      "ydbllnjd.com.Yxoxnjs2": {
+        "action": [
+          "android.intent.action.MAIN"
+        ],
+        "category": [
+          "android.intent.category.LAUNCHER"
+        ]
+      },
+      "ydbllnjd.com.Receiver": {
+        "action": [
+          "ydbllnjd.com.w8q92mK47",
+          "ydbllnjd.com.p3n67vR29",
+          "ydbllnjd.com.d7k58bL36"
+        ]
+      }
+    }
+  },
+  "VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ.apk": {
+    "file": "VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ.apk",
+    "size": 1304034,
+    "package": "com.puhfvysb.nzbftunmqq",
+    "app_name": "VID_23856_21052026",
+    "main_activity": "zrtssr.com.Rt28pxjh06wm39",
+    "min_sdk": "26",
+    "target_sdk": "34",
+    "version_name": "1.20.38",
+    "version_code": "9995",
+    "permissions": [
+      "android.permission.BLUETOOTH",
+      "android.permission.FLASHLIGHT",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.INTERNET",
+      "android.permission.MANAGE_ACCOUNTS",
+      "android.permission.MODIFY_AUDIO_SETTINGS",
+      "android.permission.NFC",
+      "android.permission.PERSISTENT_ACTIVITY",
+      "android.permission.READ_SYNC_STATS",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.SET_ALARM",
+      "android.permission.USE_CREDENTIALS",
+      "android.permission.USE_FINGERPRINT",
+      "android.permission.WAKE_LOCK",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.WRITE_SOCIAL_STREAM",
+      "com.android.alarm.permission.SET_ALARM",
+      "zrtssr.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "activities": [
+      "zrtssr.com.Rt28pxjh06wm39"
+    ],
+    "services": [
+      "zrtssr.com.Uj4jmxmov4f37z"
+    ],
+    "receivers": [
+      "zrtssr.com.Receiver"
+    ],
+    "providers": [
+      "androidx.core.content.FileProvider"
+    ],
+    "signature_subjects": [
+      "Common Name: wadoy, Organizational Unit: yoleq, Organization: lixon, Locality: kinof, State/Province: sariq, Country: UZ"
+    ],
+    "signature_sha1": [
+      "23 1E 98 2E A8 99 20 4A 08 7B C6 33 21 D3 DC 91 99 11 19 74"
+    ],
+    "intent_filters": {
+      "zrtssr.com.Rt28pxjh06wm39": {
+        "action": [
+          "android.intent.action.MAIN"
+        ],
+        "category": [
+          "android.intent.category.LAUNCHER"
+        ]
+      },
+      "zrtssr.com.Receiver": {
+        "action": [
+          "zrtssr.com.K9m2vL74pR3",
+          "zrtssr.com.P3r6xM92bW7",
+          "zrtssr.com.H5w8jN63qT2"
+        ]
+      }
+    }
+  }
+}

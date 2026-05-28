@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Auto-scan alert — §3.5 of the redesign.
+
+  Phase A (layoutScanning) is shown while scanning; Phase B (layoutResult)
+  swaps in once verdict is ready. Background is always the dark cyber gradient
+  even in light theme — this is a full-screen interrupt and should look like a
+  high-stakes terminal.
+
+  Stable IDs preserved for AutoScanActivity.kt:
+    btnClose, tvApkName,
+    layoutScanning, scanPulse1, radarBeam, centerShield, tvScanStatus, progressBar, tvProgress,
+    layoutResult, cardResult, resultPulse, resultShield, tvResultTitle, tvResultMessage,
+    tvAutoDelete, btnDelete, btnCancel, tvDeleteHint.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/kq_autoscan_bg">
+
+    <!-- Star-pattern overlay, always white-on-transparent. The drawable already
+         honors kq_primary tint, which on this dark bg reads as bright teal. -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/kq_star_tile_white" />
+
+    <!-- Close X — top right -->
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btn_close"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_close_x"
+        app:tint="#80FFFFFF" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="64dp"
+            android:paddingBottom="24dp">
+
+            <!-- ╔════════ PHASE A — SCANNING ════════╗ -->
+            <LinearLayout
+                android:id="@+id/layoutScanning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <!-- 220dp pulse-ring container with progress-style ring + glass disc -->
+                <FrameLayout
+                    android:layout_width="220dp"
+                    android:layout_height="220dp">
+
+                    <ImageView
+                        android:id="@+id/scanPulse1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:alpha="0.4"
+                        android:background="@drawable/bg_scan_pulse_safe"
+                        android:contentDescription="@null" />
+
+                    <ImageView
+                        android:id="@+id/radarBeam"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_radar_scan"
+                        app:tint="#5EEAD4" />
+
+                    <FrameLayout
+                        android:layout_width="130dp"
+                        android:layout_height="130dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/kq_shield_halo">
+
+                        <TextView
+                            android:id="@+id/tvProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0%"
+                            android:textColor="#FFFFFF"
+                            android:textSize="38sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/centerShield"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:alpha="0.25"
+                            android:contentDescription="@null"
+                            android:src="@drawable/kq_shield_mark_white" />
+                    </FrameLayout>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tvScanStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:letterSpacing="-0.01"
+                    android:text="@string/kq_new_apk_scanning"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvApkName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:ellipsize="middle"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="example.apk"
+                    android:textColor="#A8D5D9"
+                    android:textSize="13sp" />
+
+                <!-- Hidden progress bar so existing animator binding stays alive. -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="14dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressBackgroundTint="#1AFFFFFF"
+                    android:progressTint="#5EEAD4" />
+
+                <!-- Terminal log card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/kq_terminal_card"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="# Telegram → Downloads/"
+                        android:textColor="#6A7A83"
+                        android:textSize="11.5sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="[+] FileObserver: CLOSE_WRITE"
+                        android:textColor="#82E0A6"
+                        android:textSize="11.5sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="[+] ZIP-evasion check… GP-flag=0x01"
+                        android:textColor="#82E0A6"
+                        android:textSize="11.5sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="[+] Manifest unpack… OK"
+                        android:textColor="#82E0A6"
+                        android:textSize="11.5sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="[+] DEX scan… ajina pattern"
+                        android:textColor="#F0BF6C"
+                        android:textSize="11.5sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="[!] SMS_READ + ACCESSIBILITY /* danger */"
+                        android:textColor="#F0BF6C"
+                        android:textSize="11.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ╔════════ PHASE B — RESULT (XAVFLI) ════════╗ -->
+            <LinearLayout
+                android:id="@+id/layoutResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/cardResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <FrameLayout
+                            android:id="@+id/resultBadge"
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:background="@drawable/kq_danger_badge">
+
+                            <ImageView
+                                android:id="@+id/resultPulse"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:alpha="0"
+                                android:contentDescription="@null" />
+
+                            <ImageView
+                                android:id="@+id/resultShield"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_alert_triangle"
+                                app:tint="#FFFFFF" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvResultTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:letterSpacing="-0.02"
+                            android:text="@string/auto_scan_dangerous_title"
+                            android:textColor="#FFFFFF"
+                            android:textSize="30sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvResultMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:lineSpacingMultiplier="1.4"
+                            android:text="@string/auto_scan_dangerous_body"
+                            android:textColor="#E0BFC2"
+                            android:textSize="14sp" />
+
+                        <!-- Danger-only details: info card + perm chips. Прячется при SAFE/SUSPICIOUS. -->
+                        <LinearLayout
+                            android:id="@+id/dangerDetails"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                        <!-- Info card (translucent white) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:background="@drawable/kq_info_card_alpha"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="monospace"
+                                        android:letterSpacing="0.16"
+                                        android:text="@string/auto_scan_label_file"
+                                        android:textAllCaps="true"
+                                        android:textColor="#FF9AA6"
+                                        android:textSize="10sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvAsScanFileName"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:text=""
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/kq_perm_chip"
+                                    android:fontFamily="monospace"
+                                    android:letterSpacing="0.08"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="@string/kq_sev_crit"
+                                    android:textColor="#FFD4D9"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="12dp"
+                                android:layout_marginBottom="10dp"
+                                android:background="#14FFFFFF" />
+
+                            <TextView
+                                android:id="@+id/tvAsScanMeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:lineSpacingMultiplier="1.45"
+                                android:text=""
+                                android:textColor="#C5CFD2"
+                                android:textSize="11.5sp" />
+                        </LinearLayout>
+
+                        <!-- Perm chips -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:letterSpacing="0.12"
+                                android:text="@string/auto_scan_dangerous_perms"
+                                android:textAllCaps="true"
+                                android:textColor="#FF9AA6"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+
+                            <!-- 2 rows × 2 chips so we don't need a flexbox dep -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="6dp"
+                                    android:background="@drawable/kq_perm_chip"
+                                    android:fontFamily="monospace"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="SMS_READ"
+                                    android:textColor="#FFD4D9"
+                                    android:textSize="10.5sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/kq_perm_chip"
+                                    android:fontFamily="monospace"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="ACCESSIBILITY"
+                                    android:textColor="#FFD4D9"
+                                    android:textSize="10.5sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="6dp"
+                                    android:background="@drawable/kq_perm_chip"
+                                    android:fontFamily="monospace"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="OVERLAY"
+                                    android:textColor="#FFD4D9"
+                                    android:textSize="10.5sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/kq_perm_chip"
+                                    android:fontFamily="monospace"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="ACC_NOTIF"
+                                    android:textColor="#FFD4D9"
+                                    android:textSize="10.5sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                        </LinearLayout> <!-- /dangerDetails -->
+                    </LinearLayout>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tvAutoDelete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:text="@string/kq_auto_delete_5s"
+                    android:textColor="#80FFFFFF"
+                    android:textSize="11sp" />
+
+                <!-- Action row: filled danger + ghost details -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDelete"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="2"
+                        android:letterSpacing="0.01"
+                        android:text="@string/kq_delete_now"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/kq_danger"
+                        app:cornerRadius="999dp"
+                        app:icon="@drawable/ic_trash"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:iconSize="18dp"
+                        app:iconTint="#FFFFFF" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCancel"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="@string/kq_details"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        app:cornerRadius="999dp"
+                        app:strokeColor="#40FFFFFF"
+                        app:strokeWidth="1dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvDeleteHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="@string/delete_hint"
+                    android:textColor="#80FFFFFF"
+                    android:textSize="11sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>

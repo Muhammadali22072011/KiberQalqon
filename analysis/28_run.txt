@@ -1,0 +1,337 @@
+﻿[+] VIDEO.mp4 DEX — looking for XOR / Base64 decryption methods
+  8612 methods
+
+[+] Methods with Base64.decode + xor-int: 1
+
+  ----- Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo; o888ooo88oo8ooooo8o888o8oo8oo888o8ooo8o (Landroidx/activity/oooo8oooooooooo8oo8oo88o8ooo888888; I)Ljava/lang/String; -----
+  literals: ['getString(...)', '^[A-Za-z0-9+/]*={0,2}$', 'compile(...)', '+/=', 'getBytes(...)']
+    invoke-virtual v9, v10, Landroid/content/Context;->getString(I)Ljava/lang/String;
+    move-result-object v9
+    const-string v0, "getString(...)"
+    invoke-static v9, v0, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    const v0, 2131296272
+    invoke-static v0, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v0
+    const v1, 2131296259
+    invoke-static v1, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v1
+    const v2, 2131296273
+    invoke-static v2, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v2
+    const v3, 2131296274
+    invoke-static v3, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v3
+    const v4, 2131296260
+    invoke-static v4, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v4
+    filled-new-array v0, v1, v2, v3, v4, [Ljava/lang/Integer;
+    move-result-object v0
+    new-instance v1, Ljava/util/LinkedHashSet;
+    const/4 v2, 5
+    invoke-static v2, Loooo8oo88ooo8888ooo888o8888ooo/ooo8o8oo8oooo8ooooo8oo8o8o88888888888oo8ooo;->ooo8o88ooooo8ooo88o8o8888o88o8(I)I
+    move-result v3
+    invoke-direct v1, v3, Ljava/util/LinkedHashSet;-><init>(I)V
+    const/4 v3, 0
+    move v4, v3
+    if-ge v4, v2, +00ah
+    aget-object v5, v0, v4
+    invoke-interface v1, v5, Ljava/util/Collection;->add(Ljava/lang/Object;)Z
+    add-int/lit8 v4, v4, 1
+    goto -9h
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    const/4 v2, 4
+    if-ge v0, v2, +004h
+    goto/16 +124h
+    const-string v0, "^[A-Za-z0-9+/]*={0,2}$"
+    invoke-static v0, Ljava/util/regex/Pattern;->compile(Ljava/lang/String;)Ljava/util/regex/Pattern;
+    move-result-object v0
+    const-string v4, "compile(...)"
+    invoke-static v0, v4, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-virtual v0, v9, Ljava/util/regex/Pattern;->matcher(Ljava/lang/CharSequence;)Ljava/util/regex/Matcher;
+    move-result-object v0
+    invoke-virtual v0, Ljava/util/regex/Matcher;->matches()Z
+    move-result v0
+    if-nez v0, +004h
+    goto/16 +10dh
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    rem-int/2addr v0, v2
+    if-eqz v0, +004h
+    goto/16 +104h
+    move v0, v3
+    move v2, v0
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v4
+    if-ge v0, v4, +011h
+    invoke-virtual v9, v0, Ljava/lang/String;->charAt(I)C
+    move-result v4
+    invoke-static v4, Ljava/lang/Character;->isUpperCase(C)Z
+    move-result v4
+    if-eqz v4, +004h
+    add-int/lit8 v2, v2, 1
+    add-int/lit8 v0, v0, 1
+    goto -14h
+    move v0, v3
+    move v4, v0
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v5
+    if-ge v0, v5, +011h
+    invoke-virtual v9, v0, Ljava/lang/String;->charAt(I)C
+    move-result v5
+    invoke-static v5, Ljava/lang/Character;->isLowerCase(C)Z
+    move-result v5
+    if-eqz v5, +004h
+    add-int/lit8 v4, v4, 1
+    add-int/lit8 v0, v0, 1
+    goto -14h
+
+[+] Methods calling getSecretKey (native AES key fetch)
+
+  ----- Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo; o888ooo88oo8ooooo8o888o8oo8oo888o8ooo8o (Landroidx/activity/oooo8oooooooooo8oo8oo88o8ooo888888; I)Ljava/lang/String; -----
+  literals: ['getString(...)', '^[A-Za-z0-9+/]*={0,2}$', 'compile(...)', '+/=', 'getBytes(...)']
+    invoke-virtual v9, v10, Landroid/content/Context;->getString(I)Ljava/lang/String;
+    move-result-object v9
+    const-string v0, "getString(...)"
+    invoke-static v9, v0, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    const v0, 2131296272
+    invoke-static v0, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v0
+    const v1, 2131296259
+    invoke-static v1, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v1
+    const v2, 2131296273
+    invoke-static v2, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v2
+    const v3, 2131296274
+    invoke-static v3, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v3
+    const v4, 2131296260
+    invoke-static v4, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v4
+    filled-new-array v0, v1, v2, v3, v4, [Ljava/lang/Integer;
+    move-result-object v0
+    new-instance v1, Ljava/util/LinkedHashSet;
+    const/4 v2, 5
+    invoke-static v2, Loooo8oo88ooo8888ooo888o8888ooo/ooo8o8oo8oooo8ooooo8oo8o8o88888888888oo8ooo;->ooo8o88ooooo8ooo88o8o8888o88o8(I)I
+    move-result v3
+    invoke-direct v1, v3, Ljava/util/LinkedHashSet;-><init>(I)V
+    const/4 v3, 0
+    move v4, v3
+    if-ge v4, v2, +00ah
+    aget-object v5, v0, v4
+    invoke-interface v1, v5, Ljava/util/Collection;->add(Ljava/lang/Object;)Z
+    add-int/lit8 v4, v4, 1
+    goto -9h
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    const/4 v2, 4
+    if-ge v0, v2, +004h
+    goto/16 +124h
+    const-string v0, "^[A-Za-z0-9+/]*={0,2}$"
+    invoke-static v0, Ljava/util/regex/Pattern;->compile(Ljava/lang/String;)Ljava/util/regex/Pattern;
+    move-result-object v0
+    const-string v4, "compile(...)"
+    invoke-static v0, v4, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-virtual v0, v9, Ljava/util/regex/Pattern;->matcher(Ljava/lang/CharSequence;)Ljava/util/regex/Matcher;
+    move-result-object v0
+    invoke-virtual v0, Ljava/util/regex/Matcher;->matches()Z
+    move-result v0
+    if-nez v0, +004h
+    goto/16 +10dh
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    rem-int/2addr v0, v2
+    if-eqz v0, +004h
+    goto/16 +104h
+    move v0, v3
+    move v2, v0
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v4
+    if-ge v0, v4, +011h
+    invoke-virtual v9, v0, Ljava/lang/String;->charAt(I)C
+    move-result v4
+    invoke-static v4, Ljava/lang/Character;->isUpperCase(C)Z
+    move-result v4
+    if-eqz v4, +004h
+    add-int/lit8 v2, v2, 1
+    add-int/lit8 v0, v0, 1
+    goto -14h
+    move v0, v3
+    move v4, v0
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v5
+    if-ge v0, v5, +011h
+    invoke-virtual v9, v0, Ljava/lang/String;->charAt(I)C
+    move-result v5
+    invoke-static v5, Ljava/lang/Character;->isLowerCase(C)Z
+    move-result v5
+    if-eqz v5, +004h
+    add-int/lit8 v4, v4, 1
+    add-int/lit8 v0, v0, 1
+    goto -14h
+    move v0, v3
+    move v5, v0
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v6
+    if-ge v0, v6, +011h
+    invoke-virtual v9, v0, Ljava/lang/String;->charAt(I)C
+    move-result v6
+    invoke-static v6, Ljava/lang/Character;->isDigit(C)Z
+    move-result v6
+    if-eqz v6, +004h
+    add-int/lit8 v5, v5, 1
+    add-int/lit8 v0, v0, 1
+    goto -14h
+    move v0, v3
+    move v6, v0
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v7
+    if-ge v0, v7, +013h
+    invoke-virtual v9, v0, Ljava/lang/String;->charAt(I)C
+    move-result v7
+    const-string v8, "+/="
+    invoke-static v8, v7, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo(Ljava/lang/CharSequence; C)Z
+    move-result v7
+    if-eqz v7, +004h
+    add-int/lit8 v6, v6, 1
+    add-int/lit8 v0, v0, 1
+    goto -16h
+    const/16 v0, 12
+    if-nez v2, +00eh
+    if-nez v5, +00ch
+    if-nez v6, +00ah
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v2
+    if-ge v2, v0, +004h
+    goto/16 +096h
+    if-nez v4, +00eh
+    if-nez v5, +00ch
+    if-nez v6, +00ah
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v2
+
+  ----- Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo; run ()V -----
+  literals: ['getAbsolutePath(...)', '_rabbit', 'open(...)', 'getBytes(...)', '_tiger']
+    move-object/from16 v1, v28
+    iget-object v12, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oo888oooo8888ooooo8888o8o88o88 Lydbllnjd/com/Yxoxnjs2;
+    iget-object v8, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo Loooooo8888oo8ooooo88o8oooo88oo8/o888ooo88oo8o88ooo88oo8oo888oo88o;
+    iget-object v9, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->ooo8oo88o8888o888oo8o88o8o8oo Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    iget-object v10, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oo8ooo88o8888o8o8o88oooo8o8888888o8o888o8o8 Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    const-string v11, "getAbsolutePath(...)"
+    const v2, 2131296268
+    invoke-static v12, v2, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o888ooo88oo8ooooo8o888o8oo8oo888o8ooo8o(Landroidx/activity/oooo8oooooooooo8oo8oo88o8ooo888888; I)Ljava/lang/String;
+    move-result-object v2
+    invoke-static v12, Loo8ooooo8888ooo888o888o8oo8888888/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo(Landroid/content/Context;)Ljava/lang/String;
+    move-result-object v3
+    new-instance v13, Ljava/io/File;
+    invoke-virtual v12, Landroid/content/Context;->getFilesDir()Ljava/io/File;
+    move-result-object v4
+    invoke-direct v13, v4, v3, Ljava/io/File;-><init>(Ljava/io/File; Ljava/lang/String;)V
+    invoke-virtual v13, Ljava/io/File;->exists()Z
+    move-result v3
+    iget-object v15, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o88oo8o8o8ooo88oo8oo8888888oooooo Landroid/os/Handler;
+    iget-object v14, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oo88o8o8ooo88888o8oo8oo8ooo8o8888o8o88oo8o Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    iget-object v7, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o888ooooo888o88o888888o888ooo Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    iget-object v6, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oo88o8o88oo8oo88o888oo8ooo8o Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    iget-object v5, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->ooo88ooooo8ooo8oo8oo8888o8o88ooo8 Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    iget-object v4, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->ooo8oo888o8oo88oo8888o88oo888o8o Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    iget-object v0, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o888888ooo8o8oo888ooooo88oo8 Landroid/content/SharedPreferences;
+    move-object/from16 v16, v10
+    iget-object v10, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o888o8o8ooooo8o8888o8oo88ooo8o888o Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-object/from16 v17, v12
+    iget-object v12, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o8o8o8888ooo8oooo8o88oo8o8o8o8oo8oo8 Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    move-object/from16 v18, v12
+    iget-object v12, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->ooo8o88oooooooo88oo88o888oo8ooo88 Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    move-object/from16 v19, v12
+    iget-object v12, v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oo88888o88o88oo88oooo8oo88oo88o Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    if-eqz v3, +024h
+    new-instance v11, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oooooo888oooo88o88oooo8o8oo88ooo888oo;
+    move-object v2, v11
+    move-object v3, v14
+    move-object/from16 v20, v4
+    move-object v4, v13
+    move-object v8, v5
+    move-object v5, v7
+    move-object v7, v8
+    move-object/from16 v8, v20
+    move-object v9, v0
+    move-object v0, v11
+    move-object v11, v15
+    move-object/from16 v21, v12
+    move-object/from16 v12, v17
+    move-object/from16 v13, v18
+    move-object/from16 v14, v19
+    move-object v1, v15
+    move-object/from16 v15, v21
+    invoke-direct/range v2 ... v15, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oooooo888oooo88o88oooo8o8oo88ooo888oo;-><init>(Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Ljava/io/File; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Landroid/content/SharedPreferences; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Landroid/os/Handler; Lydbllnjd/com/Yxoxnjs2; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;)V
+    invoke-virtual v1, v0, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+    goto/16 +142h
+    move-object/from16 v20, v4
+    move-object/from16 v21, v12
+    move-object v1, v15
+    const/4 v3, 4
+    move-object v12, v5
+    new-array v4, v3, [C
+    fill-array-data v4, +0000139h
+    new-instance v15, Ljava/lang/String;
+    invoke-direct v15, v4, Ljava/lang/String;-><init>([C)V
+    new-instance v5, Ljava/io/File;
+    invoke-virtual v13, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
+    move-result-object v3
+    invoke-static v3, v11, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    const-string v4, "_rabbit"
+    invoke-static v3, v15, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v3
+    invoke-virtual v3, v15, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v3
+    invoke-direct v5, v3, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-virtual/range v17, Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;
+    move-result-object v3
+    invoke-virtual v3, v2, Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;
+    move-result-object v2
+    const-string v3, "open(...)"
+    invoke-static v2, v3, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v2, Loo888oo888o8ooooo888o88888oooo8888/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o88ooooooooo88o8o888oo888o8oo8o8o(Ljava/io/InputStream;)[B
+    move-result-object v3
+    sget-boolean v22, Loo888oo88oooo888888oooo8oo8oooooo8oo88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Z
+    if-nez v22, +004h
+    const/4 v4, 0
+    goto +ah
+    invoke-static Lydbllnjd/com/core/KeyManager;->getSecretKey()Ljava/lang/String;
+    move-result-object v22
+    goto +3h
+    const/16 v22, 0
+    move-object/from16 v4, v22
+    if-eqz v4, +010h
+    move-object/from16 v22, v6
+    sget-object v6, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/o888oooo8ooo8oo88o8o88o88o8oo8;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Ljava/nio/charset/Charset;
+    invoke-virtual v4, v6, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v4
+    const-string v6, "getBytes(...)"
+    invoke-static v4, v6, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    goto +4h
+    move-object/from16 v22, v6
+    const/4 v4, 0
+    if-nez v4, +008h
+    move-object/from16 v26, v0
+    move-object/from16 v24, v7
+    const/4 v6, 0
+    goto +22h
+    array-length v6, v3
+    new-array v6, v6, [B
+    move-object/from16 v24, v7
+    array-length v7, v3
+    const/16 v25, 0
+    move-object/from16 v26, v0
+    move/from16 v0, v25
+    if-ge v0, v7, +015h
+    aget-byte v25, v3, v0
+    move-object/from16 v27, v3
+    array-length v3, v4
+    rem-int v3, v0, v3
+    aget-byte v3, v4, v3
+    xor-int v3, v25, v3
+    int-to-byte v3, v3
+
+[+] Methods using javax/crypto/Cipher (AES)

@@ -1,0 +1,248 @@
+{
+  "RASMLAR_18": {
+    "manifest_xml": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.lzthzvxte.xazoalzxhr\" platformBuildVersionCode=\"35\" platformBuildVersionName=\"15\" android:versionCode=\"9995\" android:versionName=\"1.20.38\" android:compileSdkVersion=\"35\" android:compileSdkVersionCodename=\"15\">\n  <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"34\"/>\n  <uses-permission android:name=\"android.permission.INTERNET\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_DATA_SYNC\"/>\n  <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <uses-permission android:name=\"android.permission.WRITE_PROFILE\"/>\n  <uses-permission android:name=\"android.permission.PERSISTENT_ACTIVITY\"/>\n  <uses-permission android:name=\"android.permission.GET_TASKS\"/>\n  <uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>\n  <uses-permission android:name=\"android.permission.MANAGE_ACCOUNTS\"/>\n  <uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\"/>\n  <uses-permission android:name=\"android.permission.USE_FINGERPRINT\"/>\n  <uses-permission android:name=\"android.permission.NFC\"/>\n  <uses-permission android:name=\"android.permission.NFC_TRANSACTION_EVENT\"/>\n  <uses-permission android:name=\"android.permission.SET_WALLPAPER\"/>\n  <uses-permission android:name=\"android.permission.SET_ALARM\"/>\n  <uses-permission android:name=\"android.permission.READ_PROFILE\"/>\n  <uses-permission android:name=\"android.permission.REORDER_TASKS\"/>\n  <uses-permission android:name=\"android.permission.DISABLE_KEYGUARD\"/>\n  <uses-permission android:name=\"android.permission.BROADCAST_STICKY\"/>\n  <uses-permission android:name=\"android.permission.PROCESS_OUTGOING_CALLS\"/>\n  <uses-permission android:name=\"android.permission.READ_SYNC_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.TRANSMIT_IR\"/>\n  <uses-permission android:name=\"android.permission.SUBSCRIBED_FEEDS_READ\"/>\n  <uses-permission android:name=\"android.permission.FLASHLIGHT\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS\"/>\n  <uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.KILL_BACKGROUND_PROCESSES\"/>\n  <uses-permission android:name=\"android.permission.AUTHENTICATE_ACCOUNTS\"/>\n  <uses-permission android:name=\"android.permission.WRITE_USER_DICTIONARY\"/>\n  <uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>\n  <uses-permission android:name=\"android.permission.GET_PACKAGE_SIZE\"/>\n  <uses-permission android:name=\"com.android.launcher.permission.INSTALL_SHORTCUT\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_DELETE_PACKAGES\"/>\n  <uses-permission android:name=\"com.android.launcher.permission.UNINSTALL_SHORTCUT\"/>\n  <uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\"/>\n  <uses-permission android:name=\"android.permission.WRITE_SOCIAL_STREAM\"/>\n  <queries>\n    <intent>\n      <action android:name=\"android.intent.action.MAIN\"/>\n      <category android:name=\"android.intent.category.LAUNCHER\"/>\n    </intent>\n    <intent>\n      <action android:name=\"android.net.VpnService\"/>\n    </intent>\n    <package android:name=\"com.android.vending\"/>\n    <intent>\n      <action android:name=\"android.intent.action.VIEW\"/>\n      <data android:mimeType=\"application/vnd.android.package-archive\"/>\n    </intent>\n  </queries>\n  <uses-permission android:name=\"android.permission.WRITE_SYNC_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_LOCATION\"/>\n  <permission android:name=\"vpvaggzk.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\" android:protectionLevel=\"0x00000002\"/>\n  <uses-permission android:name=\"vpvaggzk.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\"/>\n  <application android:theme=\"@7F0A0005\" android:label=\"@7F090000\" android:icon=\"@7F080000\" android:allowBackup=\"true\" android:supportsRtl=\"true\" android:extractNativeLibs=\"false\" android:fullBackupContent=\"@7F0C0000\" android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\" android:dataExtractionRules=\"@7F0C0001\">\n    <provider android:name=\"androidx.core.content.FileProvider\" android:exported=\"false\" android:authorities=\"vpvaggzk.com.fileprovider\" android:grantUriPermissions=\"true\">\n      <meta-data android:name=\"android.support.FILE_PROVIDER_PATHS\" android:resource=\"@7F0C0002\"/>\n    </provider>\n    <activity android:name=\"vpvaggzk.com.Ss0l4nz5aqo2wfg\" android:exported=\"true\" android:configChanges=\"0x000005A0\">\n      <intent-filter>\n        <category android:name=\"android.intent.category.LAUNCHER\"/>\n        <action android:name=\"android.intent.action.MAIN\"/>\n      </intent-filter>\n    </activity>\n    <receiver android:name=\"vpvaggzk.com.Receiver\" android:permission=\"android.permission.REQUEST_INSTALL_PACKAGES\" android:enabled=\"true\" android:exported=\"true\">\n      <intent-filter>\n        <action android:name=\"vpvaggzk.com.K9m2vL74pR3\"/>\n        <action android:name=\"vpvaggzk.com.P3r6xM92bW7\"/>\n        <action android:name=\"vpvaggzk.com.H5w8jN63qT2\"/>\n      </intent-filter>\n    </receiver>\n    <service android:name=\"vpvaggzk.com.Dmvb5dbvx\" android:enabled=\"true\" android:exported=\"false\" android:foregroundServiceType=\"0x00000001\"/>\n  </application>\n</manifest>\n",
+    "encrypted_assets": [
+      {
+        "name": "assets/02cce475f26041e8.data",
+        "size": 1000000,
+        "head_hex": "ac31493310a6182934f782c66b84dd60d21b2df5ccac5fbd47e0ef3574bb1e833394ddf4e9b3d468eb6f6e65e18e75d63a5ef8fa5a8a1103c756fdce0d8b0026",
+        "tail_hex": "9d6bd816783e5341596ab621bdc49b59a4aa45c4a3e211709cbcb9248e68be4edb689c5546de9f748685c1cd1bd2b441b9b673b1b5a1f1a23be70054d1f14b1f"
+      },
+      {
+        "name": "assets/ahihasm.sps",
+        "size": 19636,
+        "head_hex": "0f107c7c746468657d162e4d5a2b5653723b213f2952212c1937586321461176390d505656540f3f181666190b2a0d2d2f73363a24003e28036d471407751e70",
+        "tail_hex": "201c092c0331457c735243385f487c5243510a3f1816661917674879337a7d7b7e786d6d5770596e20504121434506390b1f535a5c4f78330b68002d233f6b58"
+      },
+      {
+        "name": "assets/titmtilhmof.spe",
+        "size": 23706,
+        "head_hex": "0f107c7c746468657d162e4d5a2b5653723b213f2952212c1937586321461176390d505656540f3f181666190b2a0d2d2f73363a24003e28036d471407751e70",
+        "tail_hex": "242f37415c2157734a5a5357541b5758075a432e07370d3f3c312e5a6476572d5e4b731313680f1e4b5045594141063c7a1655280c207059697d2d062021495a"
+      },
+      {
+        "name": "assets/zejcc.spe",
+        "size": 796115,
+        "head_hex": "df8c310fa2ebca0244ada110a56edb55d7347416a30b61d44166d3388bd5aa0a0162312a7c18b4b9a97ed5f52e652bd12663011a549d97a1398ac232b94aed97",
+        "tail_hex": "408f0c74a8119571987805502e47892b8cd36f5e459d06336b4e2696a4d76aa9f03bcf8481a31643ae93ffdbb66b7f4e71f56cbf35c47a0e3878891b0ee6ac56"
+      }
+    ]
+  },
+  "RASMLAR_8": {
+    "manifest_xml": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.oktgkst.rrcpkge\" platformBuildVersionCode=\"35\" platformBuildVersionName=\"15\" android:versionCode=\"9995\" android:versionName=\"1.20.38\" android:compileSdkVersion=\"35\" android:compileSdkVersionCodename=\"15\">\n  <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"34\"/>\n  <uses-permission android:name=\"android.permission.INTERNET\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_DATA_SYNC\"/>\n  <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n  <uses-permission android:name=\"com.android.launcher.permission.INSTALL_SHORTCUT\"/>\n  <uses-permission android:name=\"com.android.alarm.permission.SET_ALARM\"/>\n  <uses-permission android:name=\"android.permission.FLASHLIGHT\"/>\n  <uses-permission android:name=\"android.permission.BLUETOOTH\"/>\n  <uses-permission android:name=\"android.permission.READ_SYNC_STATS\"/>\n  <uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_DELETE_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.PERSISTENT_ACTIVITY\"/>\n  <uses-permission android:name=\"android.permission.GET_PACKAGE_SIZE\"/>\n  <uses-permission android:name=\"android.permission.EXPAND_STATUS_BAR\"/>\n  <uses-permission android:name=\"android.permission.USE_CREDENTIALS\"/>\n  <uses-permission android:name=\"android.permission.PROCESS_OUTGOING_CALLS\"/>\n  <uses-permission android:name=\"android.permission.SUBSCRIBED_FEEDS_READ\"/>\n  <uses-permission android:name=\"android.permission.USE_FINGERPRINT\"/>\n  <uses-permission android:name=\"android.permission.RESTART_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\"/>\n  <uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>\n  <uses-permission android:name=\"android.permission.SET_WALLPAPER\"/>\n  <uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\"/>\n  <uses-permission android:name=\"android.permission.SET_ALARM\"/>\n  <uses-permission android:name=\"android.permission.WRITE_SOCIAL_STREAM\"/>\n  <uses-permission android:name=\"android.permission.WRITE_USER_DICTIONARY\"/>\n  <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>\n  <uses-permission android:name=\"android.permission.BROADCAST_STICKY\"/>\n  <uses-permission android:name=\"android.permission.NFC_TRANSACTION_EVENT\"/>\n  <uses-permission android:name=\"android.permission.MANAGE_ACCOUNTS\"/>\n  <uses-permission android:name=\"android.permission.READ_SOCIAL_STREAM\"/>\n  <uses-permission android:name=\"android.permission.TRANSMIT_IR\"/>\n  <uses-permission android:name=\"android.permission.GET_TASKS\"/>\n  <uses-permission android:name=\"android.permission.WRITE_SYNC_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.READ_PROFILE\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS\"/>\n  <uses-permission android:name=\"android.permission.NFC\"/>\n  <uses-permission android:name=\"com.android.launcher.permission.UNINSTALL_SHORTCUT\"/>\n  <uses-permission android:name=\"android.permission.KILL_BACKGROUND_PROCESSES\"/>\n  <uses-permission android:name=\"android.permission.FLASHLIGHT_DOMAIN\"/>\n  <uses-permission android:name=\"android.permission.DISABLE_KEYGUARD\"/>\n  <queries>\n    <intent>\n      <action android:name=\"android.intent.action.MAIN\"/>\n      <category android:name=\"android.intent.category.LAUNCHER\"/>\n    </intent>\n    <intent>\n      <action android:name=\"android.net.VpnService\"/>\n    </intent>\n    <package android:name=\"com.android.vending\"/>\n    <intent>\n      <action android:name=\"android.intent.action.VIEW\"/>\n      <data android:mimeType=\"application/vnd.android.package-archive\"/>\n    </intent>\n  </queries>\n  <uses-permission android:name=\"android.permission.READ_MEDIA_VIDEO\"/>\n  <uses-permission android:name=\"android.permission.BLUETOOTH_CONNECT\"/>\n  <permission android:name=\"fysrzn.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\" android:protectionLevel=\"0x00000002\"/>\n  <uses-permission android:name=\"fysrzn.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\"/>\n  <application android:theme=\"@7F0A0005\" android:label=\"@7F090000\" android:icon=\"@7F080000\" android:allowBackup=\"true\" android:supportsRtl=\"true\" android:extractNativeLibs=\"false\" android:fullBackupContent=\"@7F0C0000\" android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\" android:dataExtractionRules=\"@7F0C0001\">\n    <provider android:name=\"androidx.core.content.FileProvider\" android:exported=\"false\" android:authorities=\"fysrzn.com.fileprovider\" android:grantUriPermissions=\"true\">\n      <meta-data android:name=\"android.support.FILE_PROVIDER_PATHS\" android:resource=\"@7F0C0002\"/>\n    </provider>\n    <activity android:name=\"fysrzn.com.Ei1v1lrc7\" android:exported=\"true\" android:configChanges=\"0x000005A0\">\n      <intent-filter>\n        <category android:name=\"android.intent.category.LAUNCHER\"/>\n        <action android:name=\"android.intent.action.MAIN\"/>\n      </intent-filter>\n    </activity>\n    <receiver android:name=\"fysrzn.com.Receiver\" android:permission=\"android.permission.REQUEST_INSTALL_PACKAGES\" android:enabled=\"true\" android:exported=\"true\">\n      <intent-filter>\n        <action android:name=\"fysrzn.com.K9m2vL74pR3\"/>\n        <action android:name=\"fysrzn.com.P3r6xM92bW7\"/>\n        <action android:name=\"fysrzn.com.H5w8jN63qT2\"/>\n      </intent-filter>\n    </receiver>\n    <service android:name=\"fysrzn.com.Bex1v7pr\" android:enabled=\"true\" android:exported=\"false\" android:foregroundServiceType=\"0x00000001\"/>\n  </application>\n</manifest>\n",
+    "encrypted_assets": [
+      {
+        "name": "assets/cqivytyakr.spe",
+        "size": 775545,
+        "head_hex": "d98e346f656dc1ce0e10f5eb0fe6e713c838a7a62a18fc7621e199974260184d17bf1116e31393591336a04bcf6359ff3bb9b1a0d934f7e95a81b5b9127eff25",
+        "tail_hex": "7fcfbb44f345b054cb9200e5cc18c0fc5bf8adbd9a66b49800ca8adf998efd98853572941b785567adcedf06e7a41b93044d528ab6cc7887bf320b9e93d38962"
+      },
+      {
+        "name": "assets/d55abfda1195fb77.bak",
+        "size": 1000000,
+        "head_hex": "01d8c96ee5dd69cb4e59f479588a63d631798a431bfe8f70de676ada9ae1f68689886bce2e9823cf29b314140f861c2bb10a9480242926f14b0297ce18185bea",
+        "tail_hex": "6c6a1d2487cc52de18cdc7742dc4bedbb0a01faa4d062326c8dc9f8fd210dd11e9e177e5ebd026fc920ef8c926c1e7b9f2d44f0d06a1179a87dbbedb4092e2e2"
+      },
+      {
+        "name": "assets/daafypkct.spe",
+        "size": 19636,
+        "head_hex": "0914757872666f6976441a1f2a1d4d6d735841190e135d170c1167651934126e3f095952505608331344524b7b1c16132e10561c03414213164b78123f071d68",
+        "tail_hex": "075d751716177a7a4b204020594c755645530d331344524b6751534732191d5d59391156425666681822423945410f3d0d1d5456571d4c617b5e1b13225c0b7e"
+      },
+      {
+        "name": "assets/esqvay.sps",
+        "size": 23706,
+        "head_hex": "0914757872666f6976441a1f2a1d4d6d735841190e135d170c1167651934126e3f095952505608331344524b7b1c16132e10561c03414213164b78123f071d68",
+        "tail_hex": "1b290f335f395177435e555553175c0a330833181c090c5c5c17091b184d420b614d4b611070091a4254435b464d0d6e4e44251e171e713a095b0a475c1a5c7c"
+      }
+    ]
+  },
+  "VIDEO20012026mp4_2": {
+    "manifest_xml": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:versionCode=\"1\" android:versionName=\"1.0\" android:compileSdkVersion=\"35\" android:compileSdkVersionCodename=\"15\" package=\"ydbllnjd.com\" platformBuildVersionCode=\"35\" platformBuildVersionName=\"15\">\n  <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"34\"/>\n  <uses-permission android:name=\"android.permission.INTERNET\"/>\n  <uses-permission android:name=\"android.permission.QUERY_ALL_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_DATA_SYNC\"/>\n  <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n  <uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>\n  <permission android:name=\"ydbllnjd.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\" android:protectionLevel=\"0x00000002\"/>\n  <uses-permission android:name=\"ydbllnjd.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\"/>\n  <application android:theme=\"@7F0A0008\" android:label=\"@7F090014\" android:icon=\"@7F080000\" android:allowBackup=\"true\" android:supportsRtl=\"true\" android:extractNativeLibs=\"false\" android:fullBackupContent=\"@7F0C0000\" android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\" android:dataExtractionRules=\"@7F0C0001\">\n    <activity android:name=\"ydbllnjd.com.Yxoxnjs2\" android:exported=\"true\">\n      <intent-filter>\n        <category android:name=\"android.intent.category.LAUNCHER\"/>\n        <action android:name=\"android.intent.action.MAIN\"/>\n      </intent-filter>\n    </activity>\n    <receiver android:name=\"ydbllnjd.com.Receiver\" android:permission=\"android.permission.REQUEST_INSTALL_PACKAGES\" android:enabled=\"true\" android:exported=\"true\">\n      <intent-filter>\n        <action android:name=\"ydbllnjd.com.w8q92mK47\"/>\n        <action android:name=\"ydbllnjd.com.p3n67vR29\"/>\n        <action android:name=\"ydbllnjd.com.d7k58bL36\"/>\n      </intent-filter>\n    </receiver>\n    <service android:name=\"ydbllnjd.com.Wn993f1zq3t7k\" android:enabled=\"true\" android:exported=\"false\" android:foregroundServiceType=\"0x00000001\"/>\n  </application>\n</manifest>\n",
+    "native_lib": {
+      "path": "assets\\libs\\arm64-v8a\\libnative-lib.so",
+      "interesting_strings": [
+        "JNI_OnLoad",
+        "libnative-lib.so",
+        "sqsmlH2NOLPXeaDIFGnMEOdG6Uc2mVingetSecretKey",
+        "ydbllnjd/com/core/KeyManager",
+        "Android (10552028, +pgo, +bolt, +lto, -mlgo, based on r487747d) clang version 17.0.2 (https://android.googlesource.com/toolchain/llvm-project d9f89f4d16663d5012e5c09495f3b30ece3d2362)",
+        "GetObjectClass",
+        "_ZN7_JNIEnv5ThrowEP11_jthrowable",
+        "_ZN7_JNIEnv16CallObjectMethodEP8_jobjectP10_jmethodIDz",
+        "_ZN7_JNIEnv27CallNonvirtualDoubleMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv12GetByteFieldEP8_jobjectP9_jfieldID",
+        "_ZN7_JNIEnv13GetFloatFieldEP8_jobjectP9_jfieldID",
+        "_ZN7_JNIEnv14GetDoubleFieldEP8_jobjectP9_jfieldID",
+        "_ZN7_JNIEnv22CallStaticObjectMethodEP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv21GetStaticBooleanFieldEP7_jclassP9_jfieldID",
+        "_ZN7_JNIEnv17GetStaticIntFieldEP7_jclassP9_jfieldID",
+        "JNIEnv",
+        "_ZL6encKey",
+        "_ZN7_JNIEnv24CallNonvirtualByteMethodEP8_jobjectP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv21CallStaticByteMethodAEP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv20GetStaticDoubleFieldEP7_jclassP9_jfieldID",
+        "_ZN7_JNIEnv20SetStaticObjectFieldEP7_jclassP9_jfieldIDP8_jobject",
+        "_ZN7_JNIEnv19SetStaticShortFieldEP7_jclassP9_jfieldIDs",
+        "_ZN7_JNIEnv15GetStringLengthEP8_jstring",
+        "_ZN7_JNIEnv18SetByteArrayRegionEP11_jbyteArrayiiPKa",
+        "_ZN7_JNIEnv16GetObjectRefTypeEP8_jobject",
+        "_ZN7_JNIEnv17ToReflectedMethodEP7_jclassP10_jmethodIDh",
+        "_ZN7_JNIEnv16ToReflectedFieldEP7_jclassP9_jfieldIDh",
+        "_ZN7_JNIEnv19EnsureLocalCapacityEi",
+        "_ZN7_JNIEnv24CallNonvirtualCharMethodEP8_jobjectP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv25CallNonvirtualFloatMethodEP8_jobjectP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv11GetIntFieldEP8_jobjectP9_jfieldID",
+        "_ZN7_JNIEnv21CallStaticShortMethodEP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv18GetStaticLongFieldEP7_jclassP9_jfieldID",
+        "_ZN7_JNIEnv18SetStaticLongFieldEP7_jclassP9_jfieldIDl",
+        "_ZN7_JNIEnv21ReleaseStringUTFCharsEP8_jstringPKc",
+        "_ZN7_JNIEnv14NewDoubleArrayEi",
+        "_ZN7_JNIEnv18SetCharArrayRegionEP11_jcharArrayiiPKt",
+        "_ZN7_JNIEnv17UnregisterNativesEP7_jclass",
+        "_ZN7_JNIEnv17ExceptionDescribeEv",
+        "_ZN7_JNIEnv13PopLocalFrameEP8_jobject",
+        "_ZN7_JNIEnv9NewObjectEP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv11GetMethodIDEP7_jclassPKcS3_",
+        "_ZN7_JNIEnv14CallByteMethodEP8_jobjectP10_jmethodIDz",
+        "_ZN7_JNIEnv24CallNonvirtualVoidMethodEP8_jobjectP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv13GetShortFieldEP8_jobjectP9_jfieldID",
+        "_ZN7_JNIEnv24ReleaseCharArrayElementsEP11_jcharArrayPti",
+        "_ZN7_JNIEnv23GetDirectBufferCapacityEP8_jobject",
+        "_ZN7_JNIEnv14GetObjectClassEP8_jobject",
+        "_ZN7_JNIEnv16CallDoubleMethodEP8_jobjectP10_jmethodIDz",
+        "_ZN7_JNIEnv17CallDoubleMethodAEP8_jobjectP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv25CallNonvirtualLongMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv21CallStaticLongMethodAEP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv21CallStaticVoidMethodAEP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv17CallBooleanMethodEP8_jobjectP10_jmethodIDz",
+        "_ZN7_JNIEnv15CallCharMethodVEP8_jobjectP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv25CallNonvirtualLongMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv23CallStaticObjectMethodAEP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv14ExceptionCheckEv",
+        "_ZN7_JNIEnv14PushLocalFrameEi",
+        "_ZN7_JNIEnv11NewLocalRefEP8_jobject",
+        "_ZN7_JNIEnv23CallStaticBooleanMethodEP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv24CallStaticBooleanMethodVEP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv22CallStaticFloatMethodVEP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv17SetStaticIntFieldEP7_jclassP9_jfieldIDi",
+        "_ZN7_JNIEnv19SetStaticFloatFieldEP7_jclassP9_jfieldIDf",
+        "_ZN7_JNIEnv21GetObjectArrayElementEP13_jobjectArrayi",
+        "_ZN7_JNIEnv17GetStringCriticalEP8_jstringPh",
+        "FindClass",
+        "_ZN7_JNIEnv10NewObjectVEP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv15CallLongMethodAEP8_jobjectP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv21CallStaticVoidMethodVEP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv20SetStaticDoubleFieldEP7_jclassP9_jfieldIDd",
+        "_ZN7_JNIEnv25GetPrimitiveArrayCriticalEP7_jarrayPh",
+        "_ZN7_JNIEnv9FindClassEPKc",
+        "_ZN7_JNIEnv14CallIntMethodAEP8_jobjectP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv20CallStaticCharMethodEP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv21CallStaticCharMethodAEP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv21CallStaticLongMethodVEP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv21SetStaticBooleanFieldEP7_jclassP9_jfieldIDh",
+        "_ZN7_JNIEnv15NewBooleanArrayEi",
+        "_ZN7_JNIEnv20GetByteArrayElementsEP11_jbyteArrayPh",
+        "_JNIEnv",
+        "JNINativeMethod",
+        "encKey",
+        "_ZN7_JNIEnv8ThrowNewEP7_jclassPKc",
+        "_ZN7_JNIEnv25CallNonvirtualByteMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv26CallNonvirtualFloatMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv26ReleaseDoubleArrayElementsEP13_jdoubleArrayPdi",
+        "_ZN7_JNIEnv19SetFloatArrayRegionEP12_jfloatArrayiiPKf",
+        "_ZN7_JavaVM27AttachCurrentThreadAsDaemonEPP7_JNIEnvPv",
+        "getSecretKey",
+        "_ZN7_JNIEnv10GetVersionEv",
+        "_ZN7_JNIEnv16IsAssignableFromEP7_jclassS1_",
+        "_ZN7_JNIEnv24CallNonvirtualIntMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv25CallNonvirtualVoidMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv12GetLongFieldEP8_jobjectP9_jfieldID",
+        "_ZN7_JNIEnv14SetObjectFieldEP8_jobjectP9_jfieldIDS1_",
+        "_ZN7_JNIEnv20CallStaticLongMethodEP7_jclassP10_jmethodIDz",
+        "_ZN7_JNIEnv22GetDirectBufferAddressEP8_jobject",
+        "_ZN7_JNIEnv24CallNonvirtualIntMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv27CallNonvirtualDoubleMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv16GetStaticFieldIDEP7_jclassPKcS3_",
+        "_ZN7_JNIEnv14NewObjectArrayEiP7_jclassP8_jobject",
+        "_ZN7_JNIEnv21SetObjectArrayElementEP13_jobjectArrayiP8_jobject",
+        "_ZN7_JNIEnv23GetBooleanArrayElementsEP14_jbooleanArrayPh",
+        "_ZN7_JNIEnv21GetFloatArrayElementsEP12_jfloatArrayPh",
+        "_ZN7_JNIEnv23ReleaseIntArrayElementsEP10_jintArrayPii",
+        "UnregisterNatives",
+        "_ZN7_JNIEnv15CallByteMethodAEP8_jobjectP10_jmethodIDPK6jvalue",
+        "_ZN7_JNIEnv14CallIntMethodVEP8_jobjectP10_jmethodIDSt9__va_list",
+        "_ZN7_JNIEnv14GetArrayLengthEP7_jarray",
+        "_ZN7_JNIEnv21GetShortArrayElementsEP12_jshortArrayPh",
+        "_ZN7_JNIEnv17GetIntArrayRegionEP10_jintArrayiiPi",
+        "_ZN7_JNIEnv18GetLongArrayRegionEP11_jlongArrayiiPl",
+        "_ZN7_JNIEnv19DeleteWeakGlobalRefEP8_jobject",
+        "/home/webpanel/backend/src/utils/project/downloader/app/.cxx/RelWithDebInfo/6p4w5i2i/arm64-v8a",
+        "JNIWeakGlobalRefType",
+        "GetSuperclass",
+        "_ZN7_JNIEnv13GetSuperclassEP7_jclass",
+        "_ZN7_JNIEnv14ExceptionClearEv"
+      ]
+    },
+    "encrypted_assets": [
+      {
+        "name": "assets/cvsmcn.json",
+        "size": 1014969,
+        "head_hex": "0feb06393817e6b91ae8ebe35ee6dd48270fffa311f5e3d558d337880e3e71d466e165792922aa6fea0dc1368c27aeacb1fb81728a708b1a5d8ad8dc34b1b73d",
+        "tail_hex": "fa19a43f07cda8ccdce08ac3e88a4e6fa24dce314b7235a8cc965de610dd0dcd9bda49168c29d38bdd4fd0000699ad3333998450997b06183f29cec6bf8dbd09"
+      }
+    ]
+  },
+  "VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ": {
+    "manifest_xml": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.puhfvysb.nzbftunmqq\" platformBuildVersionCode=\"35\" platformBuildVersionName=\"15\" android:versionCode=\"9995\" android:versionName=\"1.20.38\" android:compileSdkVersion=\"35\" android:compileSdkVersionCodename=\"15\">\n  <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"34\"/>\n  <uses-permission android:name=\"android.permission.INTERNET\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_DATA_SYNC\"/>\n  <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n  <uses-permission android:name=\"android.permission.USE_CREDENTIALS\"/>\n  <uses-permission android:name=\"android.permission.FLASHLIGHT\"/>\n  <uses-permission android:name=\"android.permission.NFC\"/>\n  <uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.SET_ALARM\"/>\n  <uses-permission android:name=\"android.permission.MANAGE_ACCOUNTS\"/>\n  <uses-permission android:name=\"android.permission.READ_SYNC_STATS\"/>\n  <uses-permission android:name=\"com.android.alarm.permission.SET_ALARM\"/>\n  <uses-permission android:name=\"android.permission.USE_FINGERPRINT\"/>\n  <uses-permission android:name=\"android.permission.WRITE_SOCIAL_STREAM\"/>\n  <uses-permission android:name=\"android.permission.PERSISTENT_ACTIVITY\"/>\n  <queries>\n    <intent>\n      <action android:name=\"android.intent.action.MAIN\"/>\n      <category android:name=\"android.intent.category.LAUNCHER\"/>\n    </intent>\n    <intent>\n      <action android:name=\"android.net.VpnService\"/>\n    </intent>\n    <package android:name=\"com.android.vending\"/>\n    <intent>\n      <action android:name=\"android.intent.action.VIEW\"/>\n      <data android:mimeType=\"application/vnd.android.package-archive\"/>\n    </intent>\n  </queries>\n  <uses-permission android:name=\"android.permission.BLUETOOTH\"/>\n  <permission android:name=\"zrtssr.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\" android:protectionLevel=\"0x00000002\"/>\n  <uses-permission android:name=\"zrtssr.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\"/>\n  <application android:theme=\"@7F0A0005\" android:label=\"@7F090000\" android:icon=\"@7F080000\" android:allowBackup=\"true\" android:supportsRtl=\"true\" android:extractNativeLibs=\"false\" android:fullBackupContent=\"@7F0C0000\" android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\" android:dataExtractionRules=\"@7F0C0001\">\n    <provider android:name=\"androidx.core.content.FileProvider\" android:exported=\"false\" android:authorities=\"zrtssr.com.fileprovider\" android:grantUriPermissions=\"true\">\n      <meta-data android:name=\"android.support.FILE_PROVIDER_PATHS\" android:resource=\"@7F0C0002\"/>\n    </provider>\n    <activity android:name=\"zrtssr.com.Rt28pxjh06wm39\" android:exported=\"true\" android:configChanges=\"0x000005A0\">\n      <intent-filter>\n        <category android:name=\"android.intent.category.LAUNCHER\"/>\n        <action android:name=\"android.intent.action.MAIN\"/>\n      </intent-filter>\n    </activity>\n    <receiver android:name=\"zrtssr.com.Receiver\" android:permission=\"android.permission.REQUEST_INSTALL_PACKAGES\" android:enabled=\"true\" android:exported=\"true\">\n      <intent-filter>\n        <action android:name=\"zrtssr.com.K9m2vL74pR3\"/>\n        <action android:name=\"zrtssr.com.P3r6xM92bW7\"/>\n        <action android:name=\"zrtssr.com.H5w8jN63qT2\"/>\n      </intent-filter>\n    </receiver>\n    <service android:name=\"zrtssr.com.Uj4jmxmov4f37z\" android:enabled=\"true\" android:exported=\"false\" android:foregroundServiceType=\"0x00000001\"/>\n  </application>\n</manifest>\n",
+    "encrypted_assets": [
+      {
+        "name": "assets/nhondpu.sps",
+        "size": 822384,
+        "head_hex": "df8e3f6e63fdc1dc2f1196fa27ed1e10dcd0a62e65ff5e4c1852667ef95cb1ea27741110b224de9392232c5646f8702531cd525d700d71907042863c78485be6",
+        "tail_hex": "10495b2b0f37a1f8a8ed789420c62397d6e262c24f452d2c239582844a0417dace66c3a5194c2bee489ca7fde5be732871c8d846b1cf79024cd312038f05c737"
+      },
+      {
+        "name": "assets/npxtowvrif.spe",
+        "size": 23706,
+        "head_hex": "0f147c7d73646e63774b11330216063a5d3100381e4f1c1836054b502a031b563909505751540939124b596753175d440079173d131d031c2c5f54270c301450",
+        "tail_hex": "371c3c04560157774a5b5457521d5d0538241b13575e22351d3619475942781f4d78785619480f1a4b51425947470c6145680d155c495f53487a1a1b1d156668"
+      },
+      {
+        "name": "assets/skxnubh.sps",
+        "size": 19636,
+        "head_hex": "0f147c7d73646e63774b11330216063a5d3100381e4f1c1836054b502a031b563909505751540939124b596753175d440079173d131d031c2c5f54270c301450",
+        "tail_hex": "170134182c03564f781749185f4c7c5344510c39124b59674f5a18101c705c7c4965505978424a5d2b154b01434106380c1f555c5612474d535550440c354a5f"
+      }
+    ]
+  },
+  "toydanfotolar9jpg_10": {
+    "manifest_xml": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.yzsfnie.sjsztphpis\" platformBuildVersionCode=\"35\" platformBuildVersionName=\"15\" android:versionCode=\"9995\" android:versionName=\"1.20.38\" android:compileSdkVersion=\"35\" android:compileSdkVersionCodename=\"15\">\n  <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"34\"/>\n  <uses-permission android:name=\"android.permission.INTERNET\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_DATA_SYNC\"/>\n  <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n  <uses-permission android:name=\"android.permission.KILL_BACKGROUND_PROCESSES\"/>\n  <uses-permission android:name=\"android.permission.GET_TASKS\"/>\n  <uses-permission android:name=\"android.permission.BROADCAST_STICKY\"/>\n  <uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.READ_SYNC_SETTINGS\"/>\n  <uses-permission android:name=\"android.permission.WRITE_USER_DICTIONARY\"/>\n  <uses-permission android:name=\"android.permission.READ_PROFILE\"/>\n  <uses-permission android:name=\"android.permission.AUTHENTICATE_ACCOUNTS\"/>\n  <uses-permission android:name=\"android.permission.REQUEST_DELETE_PACKAGES\"/>\n  <uses-permission android:name=\"android.permission.REORDER_TASKS\"/>\n  <queries>\n    <intent>\n      <action android:name=\"android.intent.action.MAIN\"/>\n      <category android:name=\"android.intent.category.LAUNCHER\"/>\n    </intent>\n    <intent>\n      <action android:name=\"android.net.VpnService\"/>\n    </intent>\n    <package android:name=\"com.android.vending\"/>\n    <intent>\n      <action android:name=\"android.intent.action.VIEW\"/>\n      <data android:mimeType=\"application/vnd.android.package-archive\"/>\n    </intent>\n  </queries>\n  <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE\"/>\n  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <permission android:name=\"ujsfgsyu.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\" android:protectionLevel=\"0x00000002\"/>\n  <uses-permission android:name=\"ujsfgsyu.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION\"/>\n  <application android:theme=\"@7F0A0005\" android:label=\"@7F090000\" android:icon=\"@7F080000\" android:allowBackup=\"true\" android:supportsRtl=\"true\" android:extractNativeLibs=\"false\" android:fullBackupContent=\"@7F0C0000\" android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\" android:dataExtractionRules=\"@7F0C0001\">\n    <provider android:name=\"androidx.core.content.FileProvider\" android:exported=\"false\" android:authorities=\"ujsfgsyu.com.fileprovider\" android:grantUriPermissions=\"true\">\n      <meta-data android:name=\"android.support.FILE_PROVIDER_PATHS\" android:resource=\"@7F0C0002\"/>\n    </provider>\n    <activity android:name=\"ujsfgsyu.com.Nrenxflb5odtk\" android:exported=\"true\" android:configChanges=\"0x000005A0\">\n      <intent-filter>\n        <category android:name=\"android.intent.category.LAUNCHER\"/>\n        <action android:name=\"android.intent.action.MAIN\"/>\n      </intent-filter>\n    </activity>\n    <receiver android:name=\"ujsfgsyu.com.Receiver\" android:permission=\"android.permission.REQUEST_INSTALL_PACKAGES\" android:enabled=\"true\" android:exported=\"true\">\n      <intent-filter>\n        <action android:name=\"ujsfgsyu.com.K9m2vL74pR3\"/>\n        <action android:name=\"ujsfgsyu.com.P3r6xM92bW7\"/>\n        <action android:name=\"ujsfgsyu.com.H5w8jN63qT2\"/>\n      </intent-filter>\n    </receiver>\n    <service android:name=\"ujsfgsyu.com.Ezujc5w5\" android:enabled=\"true\" android:exported=\"false\" android:foregroundServiceType=\"0x00000001\"/>\n  </application>\n</manifest>\n",
+    "encrypted_assets": [
+      {
+        "name": "assets/5c8d3cf99f5cf4ac.dat",
+        "size": 600000,
+        "head_hex": "4a60b15e9c9acfab8359e67d1881c9cae689e8a2c660bbcf61e71eda0d408ee04a7e3f2a9414199883b3efde84e66fb2906a8df8dd11411f0b768cd97276f969",
+        "tail_hex": "1684149de5c9462e9548329c916967024d17006838de54b4e15b9c87fa2700e5f823bfd82f5acfeb0b3efa5f6d30ebf5c121d76c23553ae7e6fffc953bcd8f78"
+      },
+      {
+        "name": "assets/njwi.spe",
+        "size": 23706,
+        "head_hex": "0f1573797a66616873712e050e5b0a420c1f445a287716545f14706a1804600a39085f5358560632167166515f5a513c5157535f25250950454e6f1d3e376f0c",
+        "tail_hex": "0c260e032d5d5776455f5d555d16593f0712175e5b26731b59542f7f530e110e76424a5162140f1b44554b5b484c085b7a5e015850310e7d0c182c2317590f79"
+      },
+      {
+        "name": "assets/oiprcd.sps",
+        "size": 661100,
+        "head_hex": "df8f30626df9ce97edb56a20623ea66c57e71c76c613f3a720e9eb815e486165167e2512317aac18341b5670f6937cc6ba5f32b5c473eb1d3bb9e6ce1c1eae87",
+        "tail_hex": "df1734955c93a3683107b6dbc5966fa1ba1036a7a203f7fd9bbc1e3d46b0793675ea1cacfdcb98b908199d17588c31c85d5a594c03273fe9b3b3a2f196935871"
+      },
+      {
+        "name": "assets/wefa.sps",
+        "size": 19636,
+        "head_hex": "0f1573797a66616873712e050e5b0a420c1f445a287716545f14706a1804600a39085f5358560632167166515f5a513c5157535f25250950454e6f1d3e376f0c",
+        "tail_hex": "21393e5445126d754a1032445f4d73574d53033216716651431714684d5e181e7f5d5a15115371671912305d4340093c051d5a575228787b5f185c3c5d1b0e3d"
+      }
+    ]
+  }
+}

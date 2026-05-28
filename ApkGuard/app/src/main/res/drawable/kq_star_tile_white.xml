@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  White-on-gradient grid variant for the splash background.
+  Same approach as kq_star_tile.xml: 4x7 stars baked in so we can drop the
+  BitmapDrawable wrapper and reference the vector directly (works on API 28).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="560dp"
+    android:viewportWidth="320"
+    android:viewportHeight="560">
+
+    <!-- row 0 -->
+    <path android:pathData="M40 8 L48 32 L72 40 L48 48 L40 72 L32 48 L8 40 L32 32 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M40 18 L46 34 L62 40 L46 46 L40 62 L34 46 L18 40 L34 34 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 8 L128 32 L152 40 L128 48 L120 72 L112 48 L88 40 L112 32 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 18 L126 34 L142 40 L126 46 L120 62 L114 46 L98 40 L114 34 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 8 L208 32 L232 40 L208 48 L200 72 L192 48 L168 40 L192 32 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 18 L206 34 L222 40 L206 46 L200 62 L194 46 L178 40 L194 34 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 8 L288 32 L312 40 L288 48 L280 72 L272 48 L248 40 L272 32 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 18 L286 34 L302 40 L286 46 L280 62 L274 46 L258 40 L274 34 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+
+    <!-- row 1 -->
+    <path android:pathData="M40 88 L48 112 L72 120 L48 128 L40 152 L32 128 L8 120 L32 112 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 88 L128 112 L152 120 L128 128 L120 152 L112 128 L88 120 L112 112 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 88 L208 112 L232 120 L208 128 L200 152 L192 128 L168 120 L192 112 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 88 L288 112 L312 120 L288 128 L280 152 L272 128 L248 120 L272 112 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+
+    <!-- row 2 -->
+    <path android:pathData="M40 168 L48 192 L72 200 L48 208 L40 232 L32 208 L8 200 L32 192 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 168 L128 192 L152 200 L128 208 L120 232 L112 208 L88 200 L112 192 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 168 L208 192 L232 200 L208 208 L200 232 L192 208 L168 200 L192 192 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 168 L288 192 L312 200 L288 208 L280 232 L272 208 L248 200 L272 192 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+
+    <!-- row 3 -->
+    <path android:pathData="M40 248 L48 272 L72 280 L48 288 L40 312 L32 288 L8 280 L32 272 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 248 L128 272 L152 280 L128 288 L120 312 L112 288 L88 280 L112 272 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 248 L208 272 L232 280 L208 288 L200 312 L192 288 L168 280 L192 272 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 248 L288 272 L312 280 L288 288 L280 312 L272 288 L248 280 L272 272 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+
+    <!-- row 4 -->
+    <path android:pathData="M40 328 L48 352 L72 360 L48 368 L40 392 L32 368 L8 360 L32 352 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 328 L128 352 L152 360 L128 368 L120 392 L112 368 L88 360 L112 352 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 328 L208 352 L232 360 L208 368 L200 392 L192 368 L168 360 L192 352 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 328 L288 352 L312 360 L288 368 L280 392 L272 368 L248 360 L272 352 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+
+    <!-- row 5 -->
+    <path android:pathData="M40 408 L48 432 L72 440 L48 448 L40 472 L32 448 L8 440 L32 432 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 408 L128 432 L152 440 L128 448 L120 472 L112 448 L88 440 L112 432 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 408 L208 432 L232 440 L208 448 L200 472 L192 448 L168 440 L192 432 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 408 L288 432 L312 440 L288 448 L280 472 L272 448 L248 440 L272 432 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+
+    <!-- row 6 -->
+    <path android:pathData="M40 488 L48 512 L72 520 L48 528 L40 552 L32 528 L8 520 L32 512 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M120 488 L128 512 L152 520 L128 528 L120 552 L112 528 L88 520 L112 512 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M200 488 L208 512 L232 520 L208 528 L200 552 L192 528 L168 520 L192 512 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+    <path android:pathData="M280 488 L288 512 L312 520 L288 528 L280 552 L272 528 L248 520 L272 512 Z"
+        android:strokeWidth="1.2" android:strokeColor="#FFFFFF" android:strokeAlpha="0.18" android:fillColor="#00000000" />
+</vector>

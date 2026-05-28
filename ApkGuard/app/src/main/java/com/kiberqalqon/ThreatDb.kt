@@ -1,0 +1,102 @@
+package com.kiberqalqon
+
+import android.content.Context
+import android.util.Log
+
+/**
+ * Katta hajmli tahdid bazasi — `assets/` ichidagi matn fayllaridan ish vaqtida yuklanadi.
+ *
+ * Nega assets, Kotlin `mapOf` emas?
+ *   - Minglab imzo/hash'ni manba kodga yozish kompilyatsiyani sekinlashtiradi va
+ *     `<clinit>` (static init) ni shishiradi. AV'lar (va raqobatchi CyberHimoya ham)
+ *     blacklistni alohida data-fayl sifatida saqlaydi va o'qiydi.
+ *   - Bazani yangilash uchun faqat assets faylini almashtirish kifoya.
+ *
+ * Ikki bazis:
+ *   - [MaliciousHashes] / [MaliciousCerts] — qo'lda tahlil qilingan, oilasi aniq
+ *     o'zbek namunalari (yuqori sifat). Ular birinchi tekshiriladi.
+ *   - Bu klass — keng qamrov uchun tashqi feed (fayl yoki sertifikat SHA-256).
+ *
+ * Fayl formati (har ikkala fayl uchun):
+ *   - har qatorda bitta yozuv;
+ *   - `#` bilan boshlangan qatorlar — izoh, e'tiborsiz qoldiriladi;
+ *   - yozuv `sha256` yoki `sha256,oila_nomi` ko'rinishida.
+ *
+ * [init] App.onCreate'da bir marta chaqiriladi. Chaqirilmasa — lookup'lar shunchaki
+ * `null` qaytaradi (qo'lda kiritilgan bazaga ta'sir qilmaydi), shuning uchun unit
+ * testlar uchun ham xavfsiz.
+ */
+object ThreatDb {
+
+    private const val TAG = "ThreatDb"
+    private const val FILE_HASHES_ASSET = "malicious_hashes.txt"
+    private const val CERT_HASHES_ASSET = "malicious_certs.txt"
+
+    @Volatile private var loaded = false
+
+    private val fileHashes = HashMap<String, String>()   // sha256(apk fayl) -> oila
+    private val certHashes = HashMap<String, String>()    // sha256(sertifikat) -> oila
+
+    /** assets'dagi bazani xotiraga yuklaydi. Idempotent, thread-safe, hech qachon throw qilmaydi. */
+    fun init(context: Context) {
+        if (loaded) return
+        synchronized(this) {
+            if (loaded) return
+            val ctx = context.applicationContext ?: context
+            loadInto(ctx, FILE_HASHES_ASSET, fileHashes, defaultFamily = "Malware.tiFeed")
+            loadInto(ctx, CERT_HASHES_ASSET, certHashes, defaultFamily = "Cert.tiFeed")
+            loaded = true
+            Log.i(TAG, "loaded fileHashes=${fileHashes.size} certHashes=${certHashes.size}")
+        }
+    }
+
+    private fun loadInto(
+        context: Context,
+        asset: String,
+        target: MutableMap<String, String>,
+        defaultFamily: String,
+    ) {
+        try {
+            context.assets.open(asset).bufferedReader().useLines { lines ->
+                for (raw in lines) {
+                    val line = raw.trim()
+                    if (line.isEmpty() || line.startsWith("#")) continue
+                    val comma = line.indexOf(',')
+                    val hash = (if (comma >= 0) line.substring(0, comma) else line)
+                        .trim().lowercase()
+                    if (!isSha256(hash)) continue
+                    val family = if (comma >= 0) line.substring(comma + 1).trim() else ""
+                    target[hash] = if (family.isNotEmpty()) family else defaultFamily
+                }
+            }
+        } catch (e: Throwable) {
+            // Fayl yo'q yoki o'qib bo'lmadi — bu fatal emas, qo'lda kiritilgan baza ishlayveradi.
+            Log.w(TAG, "load '$asset' failed", e)
+        }
+    }
+
+    private fun isSha256(s: String): Boolean {
+        if (s.length != 64) return false
+        for (c in s) {
+            if (c !in '0'..'9' && c !in 'a'..'f') return false
+        }
+        return true
+    }
+
+    /** APK fayl SHA-256'si feed'da bo'lsa — oila nomi, aks holda null. */
+    fun fileHashFamily(sha256: String?): String? {
+        if (sha256.isNullOrBlank()) return null
+        return fileHashes[sha256.lowercase()]
+    }
+
+    /** Sertifikat SHA-256'si feed'da bo'lsa — oila nomi, aks holda null. */
+    fun certFamily(sha256: String?): String? {
+        if (sha256.isNullOrBlank()) return null
+        return certHashes[sha256.lowercase()]
+    }
+
+    /** Diagnostika uchun: yuklangan yozuvlar soni. */
+    fun fileHashCount(): Int = fileHashes.size
+    fun certHashCount(): Int = certHashes.size
+    fun isLoaded(): Boolean = loaded
+}

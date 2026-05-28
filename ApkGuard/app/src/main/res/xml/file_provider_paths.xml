@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- APK из Share-приёмника: cacheDir/shared/<filename>.apk -->
+    <cache-path name="shared_apks" path="shared/" />
+    <!-- На случай если когда-то будем класть в files/ — оставляем заранее. -->
+    <files-path name="internal" path="." />
+    <!-- Внешнее хранилище (Downloads и т.п.), чтобы можно было ставить файлы по абсолютному пути. -->
+    <external-path name="external" path="." />
+    <external-files-path name="external_files" path="." />
+</paths>

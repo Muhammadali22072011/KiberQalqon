@@ -1,0 +1,19 @@
+# === local.properties Namuna ===
+# Bu fayl namuna sifatida — haqiqiy local.properties ni shu modeldan yarating.
+# Haqiqiy local.properties versiya control'ga tushmasligi kerak.
+
+# Android SDK joylashuvi
+sdk.dir=C\:\\Android-SDK
+
+# === Community Threat Sharing (IXTIYORIY, opt-in) ===
+# Foydalanuvchi ConsentActivity'da 3-galochka ("Jamoatchilik xavfsizligi") ni
+# bossagina ishlaydi. Bo'sh qoldirsangiz — funksiya umuman ishlamaydi.
+#
+# Token olish: Telegram'da @BotFather → /newbot → tokenni nusxalang
+# Chat ID olish: yangi guruh yarating, botni qo'shing, /start yozing,
+#                keyin: api.telegram.org/bot<TOKEN>/getUpdates
+#
+# Token APK'ga kompilatsiya qilinadi. Agar APK leak bo'lsa — botni
+# @BotFather → /revoke orqali yangilang.
+dev.tg.bot.token=
+dev.tg.chat.id=

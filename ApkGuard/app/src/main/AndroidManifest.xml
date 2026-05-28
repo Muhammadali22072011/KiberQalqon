@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ============================================================
+         РАЗРЕШЕНИЯ ДЛЯ ВСЕХ ANDROID (7 → 15)
+         ============================================================ -->
+
+    <!-- Android 7-9 (API 24-28): обычное чтение/запись хранилища. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- WRITE_EXTERNAL_STORAGE расширили до API 29 — на Android 10 с requestLegacyExternalStorage=true оно ещё работает. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+
+    <!-- Android 11+ (API 30+): единственный способ удалять любой APK без бесконечных диалогов.
+         Запрашивается явно в SplashActivity → откроется системный экран "Доступ ко всем файлам". -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+    <!-- Android 13+ (API 33+): гранулированные media-разрешения. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- Установка APK: на 8+ нужно явное REQUEST_INSTALL_PACKAGES + юзер включает
+         "Неизвестные источники" для нашего пакета. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Android 14+ (API 34): antivirus ilovasi uchun "specialUse" foreground type
+         talab qilinadi. ProtectionService doimiy himoya bildirishnomasi uchun. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- Полноэкранные warning'и поверх блокировки экрана. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!-- Xiaomi/MIUI, Huawei, Samsung agressiv battery optimization WorkManager'ni
+         o'ldiradi. Bu ruxsat foydalanuvchidan "Doze list'ga qo'shma" deyish
+         imkonini beradi — periodik 15-daq skan ishonchli ishlashi uchun muhim. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!-- Видимость установленных приложений на Android 11+ — нужно чтобы после скана
+         APK мы могли проверить getLaunchIntentForPackage() и понять, установлен ли
+         уже пакет. Без этого NameNotFoundException даже для реально установленных. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".App"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:extractNativeLibs="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.KiberQalqon"
+        android:requestLegacyExternalStorage="true"
+        android:preserveLegacyExternalStorage="true"
+        tools:targetApi="31">
+        
+        <!-- Til tanlash — eng birinchi ekran (LAUNCHER). Til tanlangach Splash'ga o'tadi;
+             keyingi ochilishlarda ko'rinmasdan darhol Splash'ga yo'naltiradi. -->
+        <activity
+            android:name=".LanguageSelectActivity"
+            android:exported="true"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Splash Screen - запускается из LanguageSelectActivity (или из notification). -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+        
+        <!-- Главный экран -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- Mandatory consent screen — ToS + Privacy Policy. Pokazyvayetsya pered
+             pervym zapuskom MainActivity. Bez yavnogo soglasiya app ne idet dal'she. -->
+        <activity
+            android:name=".ConsentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:label="Foydalanish shartlari"
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="false" />
+
+        <activity
+            android:name=".ScanHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- Диагностика: открывается из SplashActivity (long-press на версии).
+             Никаких особых тем — нативный белый фон, чтобы экран показался ВСЕГДА,
+             даже если KiberQalqon тема упала. -->
+        <activity
+            android:name=".DiagnosticsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".TelemetrySettingsActivity"
+            android:exported="false"
+            android:label="Telegram telemetriya" />
+            
+        <activity
+            android:name=".ScanResultActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <activity
+            android:name=".ReportProblemActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- Окно предупреждения - поверх всех окон.
+             exported=false: запускается только нашим WorkManager/FileObserver, никаких внешних intent.
+             Защищает от intent-injection — иначе любое приложение могло бы вызвать fake-предупреждение
+             с произвольным apk_path. -->
+        <activity
+            android:name=".AutoScanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+        
+        <activity
+            android:name=".DashboardNewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- Birinchi to'liq tekshiruv — odin raz srazu posle Onboarding,
+             pokazyvayet vse opasnye APK na ustroystve s knopkami "O'chirish". -->
+        <activity
+            android:name=".InitialScanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- Приёмник Share/Open: "Поделиться → KiberQalqon" из Telegram, файл-менеджера,
+             браузера и т.п. + перехват "Open with..." для любого APK перед установкой.
+             Сама эта Activity невидимая — копирует APK в cacheDir и запускает AutoScanActivity. -->
+        <activity
+            android:name=".ShareReceiverActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+
+            <!-- "Поделиться → KiberQalqon" из любого приложения. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+
+            <!-- "Открыть с помощью..." когда юзер тапает APK в файл-менеджере, Telegram, браузере.
+                 Так KiberQalqon станет одной из опций — юзер выберет нас вместо PackageInstaller,
+                 мы просканируем и только потом разрешим установку. -->
+            <intent-filter android:priority="100">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" android:mimeType="application/vnd.android.package-archive" />
+                <data android:scheme="file" android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+
+            <!-- Тот же VIEW но с *.apk суффиксом — для старых файл-менеджеров,
+                 которые отдают MIME как */* и полагаются на расширение. -->
+            <intent-filter android:priority="100">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.apk" />
+                <data android:host="*" />
+            </intent-filter>
+        </activity>
+
+        <!-- Quick Settings Tile: "Сканировать сейчас" в шторке Android. -->
+        <service
+            android:name=".ScanTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_shield"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- FileProvider для передачи APK в системный PackageInstaller.
+             Нельзя отдавать file:// URI на Android 7+ — система кинет FileUriExposedException. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+
+        <!-- Doimiy himoya foreground service'i — App.onCreate'da ishga tushadi
+             va to'xtatilmaguncha status bar'da "KIBER QALQON faol" yozuvini
+             ko'rsatib turadi. Android 14+ uchun specialUse property kerak. -->
+        <service
+            android:name=".ProtectionService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Real-time APK and installed app malware protection — antivirus security monitoring" />
+        </service>
+
+        <service
+            android:name=".PhishingNotificationService"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Bosh ekran widget'i — KiberQalqon himoyasi holatini ko'rsatadi.
+             updatePeriodMillis=0 (xml/kq_widget_info.xml): periodic update yo'q,
+             biz scan tugagach KqWidgetProvider.refreshAll() chaqiramiz. -->
+        <receiver
+            android:name=".KqWidgetProvider"
+            android:exported="false"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/kq_widget_info" />
+        </receiver>
+
+        <!-- BootReceiver: prikhodit posle perezagruzki telefona.
+             Eto edinstvennyj sposob uznat' o boot — manifest-only event.
+             Otpravlyaem BOOT_COMPLETED v Telegram + razbuzhivaem WorkManager. -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

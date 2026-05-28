@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KIBER QALQON</string>
+    <string name="widget_description">KiberQalqon показывает статус защиты и последнюю проверку. Один тап — быстрый скан.</string>
+
+    <!-- Permissions dialogs -->
+    <string name="perm_storage_title">Доступ к файлам</string>
+    <string name="perm_storage_msg">Чтобы KiberQalqon мог проверять все ваши файлы, нужно разрешение.\n\nНажмите OK, чтобы предоставить разрешение.</string>
+    <string name="perm_overlay_title">Поверх других окон</string>
+    <string name="perm_overlay_msg">Нужно разрешение, чтобы сразу предупредить при обнаружении вируса.\n\nНажмите OK.</string>
+    <string name="perm_required_title">Требуется разрешение</string>
+    <string name="perm_required_msg">Без доступа к файлам KiberQalqon не сможет защитить ваше устройство.</string>
+    <string name="btn_retry">Повторить</string>
+    <string name="btn_exit">Выход</string>
+
+    <!-- MainActivity toasts -->
+    <string name="toast_init_error">Ошибка запуска: %1$s</string>
+    <string name="toast_grant_storage_first">Сначала предоставьте доступ к файлам</string>
+    <string name="toast_enable_background">Включите фоновую защиту</string>
+    <string name="toast_scan_failed">Не удалось проверить файл</string>
+    <string name="toast_scan_timeout">Проверка длится слишком долго</string>
+    <string name="toast_error_generic">Ошибка: %1$s</string>
+    <string name="toast_apk_found_count">✅ Найдено %1$d APK</string>
+    <string name="toast_apk_not_found">APK не найдены</string>
+    <string name="toast_search_timeout">Поиск занял слишком много времени. Попробуйте снова.</string>
+    <string name="toast_observer_started">🛡️ Слежение за всеми папками активно</string>
+    <string name="toast_observer_error">Ошибка слежения: %1$s</string>
+    <string name="toast_permission_required">Для работы требуется разрешение</string>
+    <string name="theme_dialog_title">Выбор темы</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="btn_cancel_generic">Отмена</string>
+
+    <!-- Share scan result -->
+    <string name="share_result">ПРЕДУПРЕЖДЕНИЕ ДЛЯ ДРУЗЕЙ</string>
+    <string name="share_subject">⚠️ Внимание: обнаружен вредоносный APK</string>
+    <string name="share_text_danger">⚠️ ВНИМАНИЕ! KiberQalqon обнаружил вредоносный файл:\n\n📦 %1$s\n\n❌ Этот файл содержит вирус — НЕ устанавливайте его!\n\n🛡️ Проверьте через KiberQalqon: t.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_suspicious">⚠️ KiberQalqon обнаружил подозрительный файл:\n\n📦 %1$s\n\nПеред установкой тщательно проверьте.\n\nt.me/kiberqalqon_alerts_bot</string>
+    <string name="share_via">Отправить</string>
+
+    <!-- AutoScanActivity install/back -->
+    <string name="autoscan_install">УСТАНОВИТЬ</string>
+    <string name="autoscan_open">ОТКРЫТЬ</string>
+    <string name="autoscan_safe_subtitle">В этом файле опасности не обнаружено. Можно установить.</string>
+    <string name="autoscan_already_installed_subtitle">Это приложение уже установлено. Нажмите кнопку ниже, чтобы открыть.</string>
+    <string name="autoscan_launch_failed">Не удалось запустить приложение.</string>
+    <string name="autoscan_close">Закрыть</string>
+    <string name="autoscan_scanning">Проверяем…</string>
+    <string name="autoscan_delete_cancelled">Удаление отменено. Файл всё ещё на устройстве.</string>
+    <string name="autoscan_no_path">Путь к файлу не указан.</string>
+    <string name="autoscan_self_refused">Это сам KiberQalqon — удалять защитника запрещено.</string>
+
+    <!-- FileDeleter results -->
+    <string name="filedel_no_permission">Не удалось удалить файл — нет разрешения. Удалите вручную.</string>
+    <string name="filedel_not_in_mediastore">Файл найден, но не может быть удалён через MediaStore.</string>
+    <string name="filedel_request_failed">Не удалось запросить разрешение.</string>
+    <string name="filedel_security">Удаление заблокировано системой безопасности.</string>
+    <string name="filedel_generic">Не удалось удалить файл.</string>
+
+    <!-- Settings — redesign §3.7 -->
+    <string name="kq_settings_appearance">Внешний вид</string>
+    <string name="kq_theme_day">День</string>
+    <string name="kq_theme_night">Ночь</string>
+    <string name="kq_accent">Цвет акцента</string>
+    <string name="kq_accent_turquoise">Бирюзовый</string>
+    <string name="kq_accent_saffron">Шафран</string>
+    <string name="kq_accent_pomegranate">Гранат</string>
+
+    <!-- Auto-scan — redesign §3.5 -->
+    <string name="kq_new_apk_scanning">Найден новый APK, проверяю…</string>
+    <string name="kq_auto_delete_5s">Автоудаление через 5 сек…</string>
+    <string name="kq_delete_now">Удалить сейчас</string>
+    <string name="kq_details">Подробнее</string>
+
+    <!-- APK list — redesign §3.4 -->
+    <string name="apk_list_title">APK файлы</string>
+    <string name="filter_all_count">Все (%1$d)</string>
+    <string name="filter_dangerous_count">Опасные (%1$d)</string>
+    <string name="filter_safe_count">Безопасные (%1$d)</string>
+    <string name="apk_list_rescan">Перепроверить все</string>
+    <string name="empty_apk_list">APK файлы не найдены</string>
+    <string name="empty_apk_desc">Загруженные APK файлы будут показаны здесь</string>
+    <string name="filter_dangerous">Опасные</string>
+    <string name="filter_suspicious">Подозрительные</string>
+    <string name="filter_safe">Безопасные</string>
+    <string name="filter_all">Все</string>
+
+    <!-- Dashboard - redesign §3.3 -->
+    <string name="status_protected">Защищено</string>
+    <string name="last_scan_subtitle">Последняя проверка 12 минут назад</string>
+    <string name="kq_scan_now">Проверить сейчас</string>
+    <string name="kq_threats_today">Найдено сегодня</string>
+    <string name="kq_modules">Установленные приложения</string>
+    <string name="kq_sev_crit">ОПАСНО</string>
+    <string name="kq_sev_high">ПОДОЗР.</string>
+    <string name="kq_sev_safe">БЕЗОПАСНО</string>
+    <string name="stats_quarantine">Карантин</string>
+    <string name="nav_home">Главная</string>
+    <string name="nav_scan">Сканер</string>
+    <string name="nav_stats">Статистика</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- 🇺🇿 Национальные слоганы -->
+    <string name="national_brand">НАЦИОНАЛЬНАЯ КИБЕРЗАЩИТА</string>
+    <string name="national_country">РЕСПУБЛИКА УЗБЕКИСТАН</string>
+    <string name="national_full">УЗБЕКИСТАН · НАЦИОНАЛЬНАЯ КИБЕРЗАЩИТА</string>
+    <string name="system_online">СИСТЕМА АКТИВНА</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Проверка APK</string>
+    <string name="tile_description">Проверка опасных APK файлов на телефоне</string>
+
+    <!-- Share Receiver -->
+    <string name="share_no_file">Файл не принят</string>
+    <string name="share_copy_failed">Не удалось прочитать файл</string>
+
+    <!-- Scan history -->
+    <string name="history_title">История проверок</string>
+    <string name="history_empty">Пока проверок нет. Проверенные файлы будут показаны здесь.</string>
+    <string name="history_reason_danger">Помечен как опасный — %s</string>
+    <string name="history_reason_suspicious">Помечен как подозрительный — %s</string>
+    <string name="history_reason_safe">Угроз не обнаружено</string>
+    <string name="history_clear">Очистить историю</string>
+
+    <!-- Context-aware messages -->
+    <string name="ctx_from_telegram">Этот APK пришёл через Telegram. Видео никогда не отправляются как APK — будьте осторожны.</string>
+    <string name="ctx_from_whatsapp">Этот APK пришёл через WhatsApp. Настоящие приложения устанавливаются только из Play Store.</string>
+    <string name="ctx_from_download">Этот APK был загружен. Перед установкой убедитесь в надёжности источника.</string>
+    <string name="ctx_from_share">Вы отправили этот APK в KiberQalqon на проверку.</string>
+
+    <!-- Onboarding -->
+    <string name="onb_eyebrow_1">01 · НАЧАЛО</string>
+    <string name="onb_eyebrow_2">02 · ОБНАРУЖЕНИЕ</string>
+    <string name="onb_eyebrow_3">03 · КОНТРОЛЬ</string>
+    <string name="onboarding_title_1">Автоматическая защита — 24/7</string>
+    <string name="onboarding_desc_1">KiberQalqon каждые 15 минут проверяет Telegram, Загрузки и другие папки. Если найден вредоносный APK — он блокируется сразу.</string>
+    <string name="onboarding_title_2">Распознаём 5 семейств угроз</string>
+    <string name="onboarding_desc_2">Новые поколения банковских троянов Центральной Азии — Ajina.Banker, RoundRift и другие — не доберутся до вашего телефона.</string>
+    <string name="onboarding_title_3">Простой язык, мощная защита</string>
+    <string name="onboarding_desc_3">Результаты на русском и узбекском. Никаких зашифрованных ключей и технических терминов.</string>
+    <string name="btn_next">Продолжить</string>
+    <string name="btn_skip">Пропустить</string>
+    <string name="btn_start">Начать · Включить защиту</string>
+
+    <!-- Onboarding visuals -->
+    <string name="onb_meter_label">Активна</string>
+    <string name="onb_sev_crit">КРИТ</string>
+    <string name="onb_sev_high">ВЫСОКО</string>
+    <string name="onb_threat_1">Ajina.Banker</string>
+    <string name="onb_threat_2">RoundRift</string>
+    <string name="onb_threat_3">SMS Stealer</string>
+    <string name="onb_threat_4">Phish Overlay</string>
+    <string name="onb_alert_title">Обнаружен опасный APK</string>
+    <string name="onb_alert_body">Файл <b>RASMLAR (18).apk</b> пришёл через Telegram.\nЗапрашивает доступ к SMS.</string>
+    <string name="onb_alert_delete">Удалить</string>
+    <string name="onb_alert_details">Подробнее</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Главная</string>
+    <string name="status_safe">БЕЗОПАСНО</string>
+    <string name="status_warning">ПОДОЗРИТЕЛЬНО</string>
+    <string name="status_danger">ОПАСНО</string>
+    <string name="phone_status">Статус телефона:</string>
+    <string name="protection_status">СТАТУС ЗАЩИТЫ</string>
+    <string name="last_scan">Последняя проверка:</string>
+    <string name="last_scan_now">Только что проверено</string>
+    <string name="minutes_ago">%d минут назад</string>
+    <string name="hours_ago">%d часов назад</string>
+    <string name="just_now">Только что</string>
+    <string name="btn_quick_scan">БЫСТРАЯ ПРОВЕРКА</string>
+    <string name="btn_full_scan">ПОЛНАЯ ПРОВЕРКА</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">СТАТИСТИКА</string>
+    <string name="stats_scanned">Проверено</string>
+    <string name="stats_blocked">Заблокировано</string>
+    <string name="stats_last_check">Последняя проверка</string>
+
+    <!-- Quick access / Menu -->
+    <string name="quick_access_title">БЫСТРЫЙ ДОСТУП</string>
+    <string name="menu_apk_list">APK файлы</string>
+    <string name="menu_apk_list_desc">Список проверенных приложений</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_settings_desc">Управление параметрами защиты</string>
+    <string name="menu_server">Сервер</string>
+    <string name="menu_notifications">Уведомления</string>
+    <string name="menu_statistics">Статистика</string>
+
+    <!-- APK List buttons -->
+    <string name="btn_check">Проверить</string>
+    <string name="btn_delete">Удалить</string>
+    <string name="btn_details">Подробнее</string>
+
+    <!-- Auto Scan Alert -->
+    <string name="scanning">Проверка...</string>
+    <string name="scanning_desc">Поиск вирусов и вредоносных программ</string>
+    <string name="alert_danger_title">⚠️ ОПАСНО</string>
+    <string name="alert_danger_desc">Обнаружено вредоносное ПО. Не устанавливайте этот файл!</string>
+    <string name="alert_auto_delete">Будет удалено автоматически через 5 секунд</string>
+    <string name="alert_warning_title">⚠️ ПОДОЗРИТЕЛЬНО</string>
+    <string name="alert_warning_desc">Обнаружены подозрительные признаки. Рекомендуется удалить файл.</string>
+    <string name="alert_safe_title">✓ БЕЗОПАСНО</string>
+    <string name="alert_safe_desc">Файл не содержит известных угроз.</string>
+    <string name="btn_delete_now">Удалить сейчас</string>
+    <string name="btn_cancel">Отмена</string>
+
+    <!-- Scan Result -->
+    <string name="scan_result_title">Результат проверки</string>
+    <string name="file_name">Имя файла:</string>
+    <string name="file_size">Размер:</string>
+    <string name="file_path">Путь:</string>
+    <string name="found_threats">Найденные угрозы:</string>
+    <string name="recommendation">Рекомендация:</string>
+    <string name="recommend_delete">Рекомендуется удалить файл</string>
+    <string name="recommend_safe">Файл выглядит безопасным</string>
+    <string name="btn_delete_file">Удалить файл</string>
+    <string name="btn_upload_server">Отправить на сервер</string>
+    <string name="btn_recheck">Проверить снова</string>
+    <string name="delete_success">✓ Файл успешно удалён</string>
+    <string name="delete_failed">❌ Не удалось удалить файл</string>
+    <string name="delete_hint">Удаление не даст установить этот APK на телефон</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="section_protection">🛡 Защита</string>
+    <string name="setting_background">Постоянная защита</string>
+    <string name="setting_background_desc">Автоматическая проверка каждые 15 минут</string>
+    <string name="section_server">📡 Сервер</string>
+    <string name="setting_upload">Отправка на сервер</string>
+    <string name="setting_upload_desc">Отправлять опасные APK файлы на сервер</string>
+    <string name="setting_server_url">Адрес сервера</string>
+    <string name="setting_server_url_hint">http://server.com:5000</string>
+    <string name="section_notifications">🚫 Уведомления</string>
+    <string name="setting_block_phishing">Блокировать фишинговые уведомления</string>
+    <string name="setting_block_phishing_desc">Автоматически скрывать подозрительные уведомления</string>
+    <string name="btn_enable_access">Предоставить доступ</string>
+    <string name="section_language">🌐 Язык</string>
+    <string name="setting_language">Язык приложения</string>
+    <string name="language_uzbek">O\'zbekcha</string>
+    <string name="language_russian">Русский</string>
+    <string name="section_about">ℹ О приложении</string>
+    <string name="setting_version">Версия</string>
+    <string name="version_number">7.6</string>
+
+    <!-- Notifications -->
+    <string name="notif_virus_found">🔴 Обнаружен вирус!</string>
+    <string name="notif_virus_blocked">Файл %s заблокирован и удалён</string>
+    <string name="notif_suspicious">🟠 Подозрительный файл</string>
+    <string name="notif_suspicious_desc">Файл %s содержит подозрительные признаки</string>
+    <string name="notif_safe">✓ Файл безопасен</string>
+    <string name="notif_safe_desc">Файл %s проверен и безопасен</string>
+    <string name="notif_stats" formatted="false">Проверено: %d | Заблокировано: %d</string>
+
+    <!-- Permissions -->
+    <string name="permission_needed">Требуется разрешение</string>
+    <string name="permission_storage">Предоставьте разрешение для проверки файлов</string>
+    <string name="permission_notification">Предоставьте разрешение для уведомлений</string>
+    <string name="btn_grant">Предоставить</string>
+
+    <!-- Common -->
+    <string name="btn_close">Закрыть</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Сохранить</string>
+    <string name="loading">Загрузка...</string>
+    <string name="error">Ошибка</string>
+    <string name="success">Успешно</string>
+
+    <!-- Welcome Screen -->
+    <string name="welcome_title">Добро пожаловать!</string>
+    <string name="welcome_subtitle">Введите ваши данные для продолжения</string>
+    <string name="welcome_tagline">Мы защитим ваш телефон</string>
+    <string name="hint_first_name">Ваше имя</string>
+    <string name="hint_last_name">Ваша фамилия</string>
+    <string name="agree_terms">Я ознакомился с условиями использования</string>
+    <string name="btn_continue">Продолжить</string>
+    <string name="about_project">ℹ О проекте</string>
+
+    <!-- Terms & Privacy -->
+    <string name="terms_title">Условия использования</string>
+    <string name="privacy_title">Политика конфиденциальности</string>
+    <string name="about_title">О проекте</string>
+    <string name="btn_accept">✓ Принимаю</string>
+    <string name="btn_understand">✓ Понятно</string>
+
+    <!-- Old strings for compatibility -->
+    <string name="subtitle">Проверка APK перед установкой</string>
+    <string name="scan_apks">Найти и проверить APK файлы</string>
+    <string name="permission_required">Нужен доступ к файлам</string>
+    <string name="permission_reason">Чтобы находить APK из Telegram и Загрузок</string>
+    <string name="grant">Разрешить</string>
+    <string name="result_safe">Безопасно</string>
+    <string name="result_suspicious">Подозрительно</string>
+    <string name="result_danger">Опасно</string>
+    <string name="delete_apk">Удалить файл</string>
+    <string name="deleted">Файл удалён</string>
+    <string name="not_deleted">Не удалось удалить</string>
+    <string name="danger_reason">Обнаружено вредоносное ПО. Не устанавливайте.</string>
+    <string name="suspicious_reason">Опасные разрешения или подозрительные признаки.</string>
+    <string name="safe_reason">Критических признаков не найдено.</string>
+    <string name="settings">Настройки</string>
+    <string name="language">Язык</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_uz">O\'zbekcha</string>
+    <string name="background_guard">Фоновая защита</string>
+    <string name="background_guard_hint">Автоматически проверять новые APK, удалять опасные и не давать их установить</string>
+    <string name="upload_to_server">Отправлять опасные APK на сервер</string>
+    <string name="upload_to_server_hint">Загружать найденные вредоносные файлы на ваш сервер</string>
+    <string name="server_url">URL сервера</string>
+    <string name="server_url_hint">https://your-server.com</string>
+    <string name="phishing_blocker">Блокировать фишинговые уведомления</string>
+    <string name="phishing_blocker_hint">Скрывать уведомления с кодами, ссылками, банком (нужно включить в настройках системы)</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="enable_notification_access">Включить доступ к уведомлениям</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="check_btn">Проверить</string>
+    <string name="delete_confirm_title">Удалить файл?</string>
+    <string name="delete_confirm_message">APK будет удалён с телефона и его нельзя будет установить. Продолжить?</string>
+    <string name="result_title">Результат проверки</string>
+    <string name="apk_count">Найдено APK: %d</string>
+
+    <!-- New Settings -->
+    <string name="auto_delete_title">Автоматическое удаление</string>
+    <string name="auto_delete_delete">Удалять сразу (рекомендуется)</string>
+    <string name="auto_delete_ask">Спрашивать перед удалением</string>
+    <string name="auto_delete_warn">Только предупреждать</string>
+
+    <string name="sensitivity_title">Уровень чувствительности</string>
+    <string name="sensitivity_low">Низкий (только явные вирусы)</string>
+    <string name="sensitivity_medium">Средний (рекомендуется)</string>
+    <string name="sensitivity_high">Высокий (блокировать все подозрительные)</string>
+
+    <string name="notifications_title">Звук и вибрация</string>
+    <string name="sound_enabled">Звук при обнаружении вируса</string>
+    <string name="vibration_enabled">Вибрация</string>
+
+    <string name="database_title">Обновление базы</string>
+    <string name="auto_update">Автоматическое обновление базы вирусов</string>
+    <string name="update_now">Обновить сейчас</string>
+
+    <string name="statistics_title">Статистика</string>
+    <string name="stats_scanned_count">Проверено: %d APK</string>
+    <string name="stats_blocked_count">Заблокировано: %d вирусов</string>
+    <string name="clear_stats">Очистить статистику</string>
+
+    <string name="whitelist_title">Белый список</string>
+    <string name="manage_whitelist">Управление белым списком</string>
+
+    <string name="first_run_title">Настройте защиту</string>
+    <string name="first_run_message">Для вашей безопасности настройте основные параметры!</string>
+    <string name="btn_go_settings">Перейти в настройки</string>
+    <string name="btn_later">Позже</string>
+
+    <string name="scanning_text">Проверка…</string>
+
+    <!-- Dashboard new redesign extras -->
+    <string name="dash_brand">KiberQalqon</string>
+    <string name="dash_protection_on">ЗАЩИТА · АКТИВНА</string>
+    <string name="dash_your_phone">ВАШ ТЕЛЕФОН</string>
+    <string name="dash_recent_threats">ПОСЛЕДНИЕ УГРОЗЫ</string>
+    <string name="dash_view_all">Все  ›</string>
+    <string name="dash_apps">ПРИЛОЖЕНИЯ</string>
+
+    <string name="scanner_eyebrow">СКАНЕР</string>
+    <string name="scanner_searching">Поиск APK файлов...</string>
+    <string name="scanner_found_count">Найдено APK: %1$d</string>
+
+    <string name="settings_eyebrow">НАСТРОЙКИ</string>
+    <string name="settings_header_title">Управление</string>
+    <string name="settings_header_subtitle">Настройте уровень защиты</string>
+    <string name="settings_pro_title">KiberQalqon Pro</string>
+    <string name="settings_pro_version">ВЕРСИЯ 7.8 · НАВОИ</string>
+    <string name="settings_pro_active">✓ АКТИВНО</string>
+    <string name="settings_section_protection">ЗАЩИТА</string>
+    <string name="settings_section_server">СЕРВЕР</string>
+    <string name="settings_server_url_label">Адрес сервера</string>
+    <string name="settings_server_url_example">https://api.kiberqalqon.uz</string>
+    <string name="settings_theme_label">Тема</string>
+    <string name="settings_theme_desc">Светлый или ночной режим</string>
+    <string name="settings_accent_label">Основной цвет бренда</string>
+    <string name="settings_section_language">ЯЗЫК</string>
+    <string name="settings_section_about">О ПРИЛОЖЕНИИ</string>
+    <string name="settings_footer">KIBERQALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
+
+    <string name="about_intro">KIBER QALQON — современное приложение киберзащиты, разработанное для Узбекистана. Защищает ваш телефон от вредоносных APK файлов, вирусов и фишинговых атак.</string>
+    <string name="about_section_features">ВОЗМОЖНОСТИ</string>
+    <string name="about_features_body">🛡 Автоматическая фоновая защита\n  • Проверка каждые 15 минут\n  • Удаление опасных файлов\n\n🔍 Ручная проверка\n  • Список всех APK файлов\n  • Подробные результаты анализа\n\n📡 Загрузка на сервер\n  • Отправка опасных файлов на анализ\n\n🚫 Защита от фишинговых уведомлений\n  • Блокировка подозрительных\n  • Безопасность банка и платежей\n\n🌐 Два языка\n  • O\'zbekcha (основной)\n  • Русский</string>
+    <string name="about_tech_body">• Kotlin — современный язык программирования\n• Material Design 3 — красивый дизайн\n• Android Jetpack — надёжные компоненты\n• WorkManager — фоновая работа\n• ProGuard — защита кода\n• OkHttp — безопасная сеть</string>
+    <string name="about_section_tech">ТЕХНОЛОГИИ</string>
+    <string name="about_section_author">АВТОР</string>
+    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/KiberQalqon\nEmail: support@KiberQalqon.uz</string>
+    <string name="about_section_license">ЛИЦЕНЗИЯ</string>
+    <string name="about_license_body">Проект с открытым исходным кодом для образовательных целей.\n\n© 2026 KIBER QALQON. Все права защищены.</string>
+    <string name="about_section_project">О ПРОЕКТЕ</string>
+    <string name="about_version">ВЕРСИЯ 7.6</string>
+
+    <string name="terms_breadcrumb">Условия использования</string>
+    <string name="terms_intro_title">Прежде чем начать использовать</string>
+    <string name="terms_last_update">ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ · 2026 · 05 · 22</string>
+    <string name="terms_section_terms">УСЛОВИЯ ИСПОЛЬЗОВАНИЯ</string>
+    <string name="terms_section_privacy">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</string>
+    <string name="terms_terms_body">Используя приложение KIBER QALQON, вы соглашаетесь с настоящими условиями. Если вы не согласны — не используйте приложение.</string>
+    <string name="terms_privacy_body">KIBER QALQON серьёзно относится к вашей конфиденциальности. Эта политика объясняет, какие данные собираются и как используются.</string>
+    <string name="terms_changes_body">Мы оставляем за собой право изменять эти условия в любое время. Изменения будут объявлены в приложении.</string>
+
+    <string name="consent_terms_chk">Я прочитал условия использования *</string>
+    <string name="consent_privacy_chk">Я согласен с политикой конфиденциальности *</string>
+    <string name="consent_community_chk">Делиться данными для общественной безопасности *</string>
+    <string name="consent_reject">Отказаться</string>
+    <string name="consent_accept">Принимаю</string>
+
+    <string name="welcome_terms_chk">Я ознакомился с условиями и политикой конфиденциальности</string>
+
+    <string name="initial_scan_eyebrow">ПЕРВАЯ ПРОВЕРКА</string>
+    <string name="initial_scan_title">Сканирование телефона</string>
+    <string name="initial_scan_desc">Идёт поиск вредоносных APK файлов. Это займёт несколько секунд.</string>
+    <string name="initial_scan_found">НАЙДЕНО</string>
+    <string name="initial_scan_danger">ОПАСНО</string>
+    <string name="initial_scan_dangerous_found">Найдены опасные APK файлы</string>
+    <string name="initial_scan_delete_all">Удалить все</string>
+    <string name="initial_scan_section_threats">НАЙДЕННЫЕ УГРОЗЫ</string>
+    <string name="initial_scan_continue">Продолжить</string>
+    <string name="initial_scan_skip">Пропустить</string>
+    <string name="initial_scan_scanning_files">Поиск APK файлов...</string>
+    <string name="initial_scan_count_recommend">Рекомендуется удалить %1$d файлов</string>
+    <string name="initial_scan_scanned_count">Проверено %1$d файлов</string>
+
+    <string name="auto_scan_dangerous_title">ОПАСНЫЙ APK!</string>
+    <string name="auto_scan_dangerous_body">Загруженный файл относится к семейству банковского трояна Ajina.Banker.</string>
+    <string name="auto_scan_label_file">ФАЙЛ</string>
+    <string name="auto_scan_label_size">РАЗМЕР</string>
+    <string name="auto_scan_label_source">ИСТОЧНИК</string>
+    <string name="auto_scan_label_detected">ОБНАРУЖЕНО</string>
+    <string name="auto_scan_dangerous_perms">ОПАСНЫЕ РАЗРЕШЕНИЯ</string>
+
+    <string name="splash_logo_title">KIBER QALQON</string>
+
+    <string name="apk_list_eyebrow">APK файлы</string>
+
+    <string name="scan_result_eyebrow">РЕЗУЛЬТАТ ПРОВЕРКИ</string>
+
+    <string name="history_today">Сегодня</string>
+    <string name="history_yesterday">Вчера</string>
+    <string name="history_week">Неделя ▾</string>
+
+    <!-- Scan history hardcoded -->
+    <string name="hist_section_stats">СТАТИСТИКА</string>
+    <string name="hist_period_last_7_days">За последние 7 дней</string>
+    <string name="hist_subtitle_protection">Защита вашего телефона</string>
+    <string name="hist_label_total">ВСЕГО</string>
+    <string name="hist_unit_checked_apks">проверено APK</string>
+    <string name="hist_label_blocked">ЗАБЛОКИРОВАНО</string>
+    <string name="hist_unit_malware_families">семейства вредоносов</string>
+    <string name="hist_section_activity">АКТИВНОСТЬ</string>
+    <string name="hist_subtitle_checks_per_day">Проверок в день</string>
+    <string name="hist_dropdown_week">Неделя ▾</string>
+    <string name="hist_subtitle_detected_threats">Обнаруженные угрозы</string>
+    <string name="hist_subtitle_threat_comparison">Сравнение обнаруженных угроз</string>
+    <string name="hist_subtitle_analysis_date">APK, проанализированные 21.05.2026</string>
+    <string name="hist_subtitle_c2_addresses">C2 адреса</string>
+    <string name="hist_label_city_navoiy">НАВОИ</string>
+    <string name="hist_button_refresh_report">Обновить отчёт</string>
+
+    <!-- Scan result hardcoded -->
+    <string name="sr_source_downloaded">TELEGRAM · ЗАГРУЖЕНО</string>
+    <string name="sr_section_summary">РЕЗЮМЕ</string>
+    <string name="sr_threat_description_example">Этот файл — банковский троян семейства Ajina.Banker. Используется для кражи SMS-OTP кодов.</string>
+    <string name="sr_label_size">РАЗМЕР</string>
+    <string name="sr_label_source">ИСТОЧНИК</string>
+    <string name="sr_label_detected">ОБНАРУЖЕНО</string>
+    <string name="sr_time_detected">12 мин назад</string>
+    <string name="sr_label_status">СТАТУС</string>
+    <string name="sr_status_blocked">Заблокировано</string>
+    <string name="sr_section_evasion">МЕТОДЫ ОБХОДА АНАЛИЗА</string>
+    <string name="sr_section_keys">КЛЮЧИ XOR/AES</string>
+    <string name="sr_section_network_ioc">СЕТЕВЫЕ ИНДИКАТОРЫ</string>
+    <string name="sr_section_html_overlay">HTML НАЛОЖЕНИЕ</string>
+    <string name="sr_overlay_title">← ФЕЙК НАЛОЖЕНИЕ (*.spe)</string>
+    <string name="sr_overlay_update_available">Доступно обновление</string>
+    <string name="sr_overlay_update_message">Для использования приложения необходимо установить обновление. Размер: 1.6 МБ.</string>
+    <string name="sr_button_install">Установить</string>
+    <string name="sr_button_details">Подробнее</string>
+    <string name="sr_overlay_description">Подготовлено на 3 языках (O\'zbek · Русский · Français). Нажатие кнопки запускает банкер через мост WebView ↔ Java.</string>
+    <string name="sr_button_delete">Удалить с телефона</string>
+    <string name="sr_button_recheck">Отправить на сервер (анализ)</string>
+
+    <!-- Scanner redesign 2026-05-27 -->
+    <string name="scan_hero_eyebrow">СОСТОЯНИЕ СИСТЕМЫ</string>
+    <string name="scan_hero_status_clean">Система чиста</string>
+    <string name="scan_hero_status_idle">Готово к проверке</string>
+    <string name="scan_hero_subtitle">Гранатовый щит на страже</string>
+    <string name="scan_live_chip">ОНЛАЙН</string>
+    <string name="scan_stat_all">Все</string>
+    <string name="scan_stat_danger">Опасные</string>
+    <string name="scan_stat_warn">Подозр.</string>
+    <string name="scan_stat_safe">Безопасные</string>
+    <string name="scan_now_cta">Проверить сейчас</string>
+    <string name="scan_section_found">НАЙДЕННЫЕ APK</string>
+    <string name="scan_empty_title">Система чиста</string>
+    <string name="scan_empty_desc">APK файлы не найдены. Новые отслеживаются автоматически.</string>
+    <string name="scan_guard_active">Авто-защита включена</string>
+
+    <!-- ═══ Анализ разрешений (ScanResultActivity) ═══ -->
+    <string name="perm_status_title">Статус угрозы</string>
+    <string name="perm_count">%1$d разрешений</string>
+    <string name="perm_section_dangerous">Опасные разрешения</string>
+    <string name="perm_section_others">Остальные разрешения (%1$d)</string>
+    <string name="perm_none_dangerous">Опасных разрешений не найдено</string>
+    <string name="perm_sev_critical">КРИТИЧНО</string>
+    <string name="perm_sev_warning">ВНИМАНИЕ</string>
+    <string name="reason_danger_default">Это приложение опасно. Перечисленные разрешения дают доступ к личным данным — SMS, звонки, геолокация. Внимательно проверьте перед установкой.</string>
+
+    <string name="perm_record_audio">Микрофон</string>
+    <string name="perm_fg_microphone">Фоновый микрофон</string>
+    <string name="perm_fine_location">Точная геолокация</string>
+    <string name="perm_bg_location">Геолокация в фоне</string>
+    <string name="perm_coarse_location">Приблизительная геолокация</string>
+    <string name="perm_camera">Камера</string>
+    <string name="perm_read_contacts">Контакты</string>
+    <string name="perm_write_contacts">Изменение контактов</string>
+    <string name="perm_get_accounts">Аккаунты</string>
+    <string name="perm_send_sms">Отправка SMS</string>
+    <string name="perm_receive_sms">Приём SMS</string>
+    <string name="perm_read_sms">Чтение SMS</string>
+    <string name="perm_receive_mms">Приём MMS</string>
+    <string name="perm_call_phone">Совершение звонков</string>
+    <string name="perm_answer_calls">Ответ на звонки</string>
+    <string name="perm_outgoing_calls">Исходящие звонки</string>
+    <string name="perm_read_call_log">Журнал звонков</string>
+    <string name="perm_write_call_log">Изменение журнала звонков</string>
+    <string name="perm_phone_state">Состояние телефона</string>
+    <string name="perm_phone_numbers">Номер телефона</string>
+    <string name="perm_overlay">Поверх других окон</string>
+    <string name="perm_install_packages">Установка приложений</string>
+    <string name="perm_accessibility">Спец. возможности</string>
+    <string name="perm_device_admin">Администратор устройства</string>
+    <string name="perm_all_files">Все файлы</string>
+    <string name="perm_read_storage">Файлы и медиа</string>
+    <string name="perm_write_storage">Запись в память</string>
+    <string name="perm_media_images">Фото</string>
+    <string name="perm_media_video">Видео</string>
+    <string name="perm_media_audio">Аудиофайлы</string>
+    <string name="perm_read_calendar">Календарь</string>
+    <string name="perm_write_calendar">Изменение календаря</string>
+    <string name="perm_body_sensors">Датчики тела</string>
+    <string name="uninstall_app">Удалить приложение</string>
+
+    <!-- ═══ Localization pass 2026-05-28: AutoScanActivity hardcoded UI ═══ -->
+    <string name="autoscan_unknown_file">Неизвестный файл</string>
+    <string name="autoscan_need_write_perm">Для удаления файла нужно разрешение \"Хранилище\".\n\nНастройки → Приложения → KiberQalqon → Разрешения → Хранилище</string>
+    <string name="autoscan_open_settings_btn">ОТКРЫТЬ НАСТРОЙКИ</string>
+    <string name="autoscan_permission_granted_deleting">Разрешение получено — удаляем…</string>
+    <string name="autoscan_cannot_show_result">Не удалось показать результат: %1$s</string>
+    <string name="autoscan_danger_body">Обнаружены признаки вредоносного ПО. Не устанавливайте этот файл.</string>
+    <string name="autoscan_auto_deleting">Автоматическое удаление…</string>
+    <string name="autoscan_suspicious_title">ПОДОЗРИТЕЛЬНЫЙ APK</string>
+    <string name="autoscan_suspicious_body">Обнаружены подозрительные признаки:</string>
+    <string name="autoscan_suspicious_recommend">Рекомендуется удалить файл.</string>
+    <string name="autoscan_file_not_found">Файл не найден</string>
+    <string name="autoscan_install_failed">Не удалось установить: %1$s</string>
+    <string name="autoscan_requesting_write_perm">Запрашиваем разрешение на запись…</string>
+    <string name="autoscan_confirm_in_system_dialog">Подтвердите удаление в системном окне, которое сейчас откроется.</string>
+    <string name="autoscan_need_all_files">Для удаления файла нужно разрешение \"Доступ ко всем файлам\".\n\nНажмите кнопку ниже и включите переключатель.</string>
+    <string name="autoscan_grant_btn">ПРЕДОСТАВИТЬ ДОСТУП</string>
+    <string name="autoscan_sandboxed_owner">Этот файл в личной папке приложения %1$s.\n\nЕго можно удалить только через приложение \"%1$s\" (например: Telegram → Настройки → Очистить данные).</string>
+    <string name="autoscan_delete_btn">УДАЛИТЬ</string>
+    <string name="autoscan_delete_hint_done">Удаление не даст установить этот APK на ваш телефон</string>
+
+    <!-- Localization pass: InitialScanActivity hardcoded UI -->
+    <string name="is_header_safe">Ваш телефон в безопасности</string>
+    <string name="is_header_done">Проверка завершена</string>
+    <string name="is_sub_no_threats">Опасных APK файлов не найдено.</string>
+    <string name="is_sub_threats_found">Найдено %1$d вредоносных или подозрительных APK.</string>
+    <string name="is_summary_no_threat">Угроз не обнаружено</string>
+    <string name="is_summary_no_threat_sub">Теперь KiberQalqon автоматически проверяет новые APK файлы в фоне.</string>
+    <string name="is_go_main">Перейти на главный экран</string>
+    <string name="is_dangerous_found_count">Найдено %1$d опасных APK</string>
+    <string name="is_recommend_delete">Рекомендуется удалить следующие файлы.</string>
+    <string name="is_need_all_files">Для удаления файла нужно разрешение \"Доступ ко всем файлам\".</string>
+    <string name="is_sandboxed_owner">Этот файл в личной папке приложения %1$s. Его можно удалить только через это приложение.</string>
+    <string name="is_dangerous_remaining_count">Осталось %1$d опасных APK</string>
+    <string name="is_all_deleted">Все опасные файлы удалены.</string>
+    <string name="is_delete_n_files_title">Удалить %1$d файлов?</string>
+    <string name="is_delete_all_message">Следующие файлы будут полностью удалены с телефона без возможности восстановления.</string>
+    <string name="is_yes_delete">Да, удалить</string>
+
+    <!-- Localization pass: ScanHistoryActivity hardcoded UI -->
+    <string name="hist_no_threat">Угроз нет</string>
+    <string name="hist_no_threat_detected">Угроз не обнаружено</string>
+    <string name="hist_unknown">Неизвестно</string>
+    <string name="hist_no_samples_yet">Пока нет образцов</string>
+    <string name="hist_no_threats_yet">Угроз пока не обнаружено</string>
+    <string name="hist_analysis_date_fmt">APK, проанализированные %1$s</string>
+
+    <!-- Localization pass: SettingsActivity hardcoded UI -->
+    <string name="set_row_autoscan_title">Автоматический сканер</string>
+    <string name="set_row_autoscan_sub">Проверяет папки каждые 15 минут</string>
+    <string name="set_row_autodelete_title">Удалять опасные APK</string>
+    <string name="set_row_autodelete_sub">Найденный вредоносный файл удаляется автоматически через 5 секунд</string>
+    <string name="set_row_phishing_title">Фишинговые уведомления</string>
+    <string name="set_row_phishing_sub">Скрывает подозрительные сообщения с OTP-кодами</string>
+    <string name="set_row_background_title">Фоновая служба</string>
+    <string name="set_row_background_sub">WorkManager · каждые 15 минут</string>
+    <string name="set_row_upload_title">Загрузка в облако</string>
+    <string name="set_row_upload_sub">Отправлять опасные APK на сервер для анализа</string>
+    <string name="set_help_center">Центр помощи</string>
+    <string name="set_about_dialog_title">KiberQalqon</string>
+    <string name="set_about_dialog_message">KiberQalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nНациональная защита от банковских троянов Центральной Азии. Распознаёт Ajina.Banker, RoundRift и другие вредоносные семейства.</string>
+    <string name="set_help_dialog_message">Вопрос или проблема? Свяжитесь с нами:\n\n• Telegram: @kiberqalqon_uz\n• Email: support@kiberqalqon.uz\n• Web: https://kiberqalqon.uz</string>
+    <string name="set_help_send_problem">Отправить проблему</string>
+    <!-- Экран отправки проблемы -->
+    <string name="rp_eyebrow">ПОМОЩЬ</string>
+    <string name="rp_title">Сообщить о проблеме</string>
+    <string name="rp_subtitle">Отправьте ошибку или проблему напрямую разработчику</string>
+    <string name="rp_section_desc">Описание проблемы</string>
+    <string name="rp_hint">Что случилось? Опишите проблему здесь…</string>
+    <string name="rp_info_title">Что отправляется?</string>
+    <string name="rp_info_items">• Устройство и версия Android\n• Версия приложения\n• Статус разрешений\n• Журнал последней ошибки (crash)</string>
+    <string name="rp_info_privacy">Личные данные (имя, номер, другие приложения) не отправляются.</string>
+    <string name="rp_send">Отправить</string>
+    <string name="rp_sending">Отправка…</string>
+    <string name="rp_sent">Отправлено ✓</string>
+    <string name="rp_sent_toast">✅ Спасибо! Проблема отправлена разработчику.</string>
+    <string name="rp_error_toast">❌ Не удалось отправить. Проверьте интернет.</string>
+    <string name="rp_not_configured">Telegram-канал не настроен.</string>
+    <string name="rp_empty">Пожалуйста, кратко опишите проблему.</string>
+    <string name="set_consent_given_at">Согласие дано: %1$s</string>
+    <string name="set_consent_not_given">Согласие не дано</string>
+    <string name="set_privacy_eyebrow">КОНФИДЕНЦИАЛЬНОСТЬ</string>
+    <string name="set_community_label">Общественная безопасность (только hash + пакет)</string>
+    <string name="set_revoke_consent">Отозвать согласие</string>
+    <string name="set_revoke_confirm_title">Отозвать согласие?</string>
+    <string name="set_revoke_confirm_message">Это отключит телеметрию Telegram, и при следующем запуске KiberQalqon снова запросит у вас согласие.\n\nПродолжить?</string>
+    <string name="set_yes_revoke">Да, отозвать</string>
+    <string name="set_consent_revoked">Согласие отозвано.</string>
+    <string name="set_no">Нет</string>
+
+    <!-- Localization pass: SplashActivity hardcoded UI -->
+    <string name="splash_subtitle">ЗАЩИТА ТЕЛЕФОНА · V %1$s</string>
+    <string name="splash_version">ВЕРСИЯ %1$s</string>
+    <string name="splash_oem_extra_setting_title">Доп. настройка %1$s</string>
+    <string name="splash_oem_guide_message">Ваш телефон автоматически завершает фоновые приложения. Чтобы KIBER QALQON работал 24/7, нужна одна разовая дополнительная настройка.</string>
+    <string name="splash_open_setting">Открыть настройку</string>
+    <string name="splash_later">Позже</string>
+    <string name="splash_dont_show">Инструкция</string>
+    <string name="splash_battery_title">Разрешение для постоянной защиты</string>
+    <string name="splash_battery_message">Xiaomi, Huawei, Samsung и другие завершают фоновые приложения ради \'экономии батареи\'. Разрешите KIBER QALQON работать 24/7.\n\nБез разрешения: скан будет запускаться раз в день, а не каждые 2-3 часа.</string>
+    <string name="splash_storage_title">Разрешение на доступ к файлам</string>
+    <string name="splash_storage_message">KIBER QALQON нужен доступ ко всем файлам, чтобы находить и проверять APK файлы.\n\nНажмите OK и предоставьте разрешение.</string>
+    <string name="splash_overlay_title">Разрешение показывать поверх других окон</string>
+    <string name="splash_overlay_message">KIBER QALQON должен показывать предупреждения поверх других приложений при обнаружении вирусов.\n\nНажмите OK и предоставьте разрешение.</string>
+    <string name="splash_oem_overlay_title">%1$s: доп. настройка</string>
+    <string name="splash_oem_overlay_message">Стандартного \'Display over other apps\' недостаточно. На вашем телефоне есть отдельные настройки.</string>
+    <string name="splash_storage_denied_message">Без доступа к файлам KIBER QALQON не сможет защитить ваше устройство.</string>
+    <string name="splash_retry">Повторить</string>
+    <string name="splash_subtitle2">Защита от вредоносных APK файлов</string>
+    <string name="hist_found_threats">Обнаруженные угрозы</string>
+    <string name="widget_status_protected_bg">Защищено · фон активен</string>
+    <string name="widget_suspicious_count">%1$d подозрительных файлов</string>
+    <string name="widget_danger_count">%1$d опасных файлов!</string>
+    <string name="widget_last_scan">Последняя проверка: %1$s</string>
+    <string name="widget_last_scan_never">Проверок ещё не было</string>
+    <string name="widget_ago_now">только что</string>
+    <string name="widget_ago_min">%1$d мин назад</string>
+    <string name="widget_ago_hour">%1$d ч назад</string>
+    <string name="widget_ago_day">%1$d дн назад</string>
+    <string name="widget_scan_btn">Скан</string>
+    <string name="notif_dangerous_apk_title">🛡️ Обнаружен опасный APK</string>
+    <string name="notif_tap_to_check">%1$s — нажмите для проверки</string>
+    <string name="notif_new_apk_big">Обнаружен новый APK файл:\n%1$s\n\nНажмите на уведомление — KiberQalqon покажет полный результат проверки и кнопку удаления, если файл опасен.</string>
+    <string name="notif_installed_danger_title">🔴 Установлено опасное приложение: %1$s</string>
+    <string name="notif_verdict_danger">Обнаружен опасный APK</string>
+    <string name="notif_verdict_suspicious">Обнаружен подозрительный APK</string>
+    <string name="notif_verdict_found">APK обнаружен</string>
+    <string name="notif_kill_title">⚠️ Защита была отключена</string>
+    <string name="notif_kill_text">KIBER QALQON не работал %1$d ч</string>
+    <string name="notif_kill_big">Ваше устройство %1$s завершило процесс KIBER QALQON %2$d ч назад. Для постоянной защиты нужна доп. настройка.\n\nНажмите, чтобы открыть %3$s.</string>
+    <string name="notif_kill_center_miui">MIUI Security Center</string>
+    <string name="notif_kill_center_default">настройки системы</string>
+    <string name="notif_welcome_title">✓ Защита включена</string>
+    <string name="notif_welcome_text">KIBER QALQON теперь защищает ваш телефон 24/7</string>
+    <string name="notif_welcome_big">Все стандартные настройки включены автоматически:\n• Фоновое сканирование каждые 15 минут\n• Новые APK проверяются сразу\n• Звуковые и вибро-оповещения\n• Автообновление базы\n\nНичего не меняя, ваш телефон защищён.</string>
+    <string name="notif_installed_suspicious_title">🟠 Подозрительное приложение: %1$s</string>
+</resources>

@@ -1,0 +1,1224 @@
+{
+  "RASMLAR (18).apk": [
+    {
+      "name": "assets/02cce475f26041e8.data",
+      "error": "File 'assets/02cce475f26041e8.data' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/zejcc.spe",
+      "error": "File 'assets/zejcc.spe' is encrypted, password required for extraction"
+    },
+    {
+      "name": "classes.dex",
+      "error": "File 'classes.dex' is encrypted, password required for extraction"
+    },
+    {
+      "name": "resources.arsc",
+      "error": "File 'resources.arsc' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/titmtilhmof.spe",
+      "error": "File 'assets/titmtilhmof.spe' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/kotlin.kotlin_builtins",
+      "size": 19736,
+      "compsize": 6534,
+      "sha256": "24f912244289527292ca2bd7ad4d70ce6a0577bf8550f5db15d0cca9296def1b",
+      "entropy": 6.028,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "assets/ahihasm.sps",
+      "error": "File 'assets/ahihasm.sps' is encrypted, password required for extraction"
+    },
+    {
+      "name": "AndroidManifest.xml",
+      "error": "File 'AndroidManifest.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/collections/collections.kotlin_builtins",
+      "size": 4031,
+      "compsize": 1963,
+      "sha256": "4420fc057a042519f7d36fe7ba951e57091e4678241ab81542058d4e0a1715c3",
+      "entropy": 6.091,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/ranges/ranges.kotlin_builtins",
+      "size": 3529,
+      "compsize": 1463,
+      "sha256": "5c0abc18cab5286bda0c10c87ec8b40f5110c718dd6b258689699b434081133f",
+      "entropy": 6.014,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/reflect/reflect.kotlin_builtins",
+      "size": 2878,
+      "compsize": 1834,
+      "sha256": "573b8bf6b908436377a764ca05c3b3435389eb39e4d68bd30dd8ec6e6706ddd8",
+      "entropy": 6.405,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "DebugProbesKt.bin",
+      "size": 2027,
+      "compsize": 1145,
+      "sha256": "a7e028498e313bc28776dac2a63859964720bd22f2bfe398397194a5b9d69e01",
+      "entropy": 6.012,
+      "magic": "BINARY",
+      "head_hex": "cafebabe00000034003f01002c6b6f74"
+    },
+    {
+      "name": "res/Rx.png",
+      "error": "File 'res/Rx.png' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/annotation/annotation.kotlin_builtins",
+      "size": 1266,
+      "compsize": 973,
+      "sha256": "109b83e71d8cbb1a382ff2327e6dfc71774f4b21e135c75e6424061c29057b1e",
+      "entropy": 6.621,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/internal/internal.kotlin_builtins",
+      "size": 1085,
+      "compsize": 887,
+      "sha256": "6954ff0369c14e282d22d5acb6200fc16176f3c4d3cec4436ab2cce9861f8e5f",
+      "entropy": 6.948,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin-tooling-metadata.json",
+      "size": 914,
+      "compsize": 620,
+      "sha256": "bdce5cedbddd462c199cad32cc48cb4329f2871631335bb4ae6c858cae10d9dd",
+      "entropy": 6.17,
+      "magic": "TEXT",
+      "head_hex": "7b0a202022736368656d615665727369"
+    },
+    {
+      "name": "kotlin/coroutines/coroutines.kotlin_builtins",
+      "size": 688,
+      "compsize": 674,
+      "sha256": "677f5c80870851e00fe836dd642f5f4e09740a5d4305053a08cfaa13dd6306e2",
+      "entropy": 7.439,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/8K.xml",
+      "error": "File 'res/8K.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.prof",
+      "error": "File 'assets/dexopt/baseline.prof' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/4j.xml",
+      "error": "File 'res/4j.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/Qq.xml",
+      "error": "File 'res/Qq.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.profm",
+      "error": "File 'assets/dexopt/baseline.profm' is encrypted, password required for extraction"
+    }
+  ],
+  "RASMLAR (8).apk": [
+    {
+      "name": "assets/d55abfda1195fb77.bak",
+      "error": "File 'assets/d55abfda1195fb77.bak' is encrypted, password required for extraction"
+    },
+    {
+      "name": "classes.dex",
+      "error": "File 'classes.dex' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/cqivytyakr.spe",
+      "error": "File 'assets/cqivytyakr.spe' is encrypted, password required for extraction"
+    },
+    {
+      "name": "resources.arsc",
+      "error": "File 'resources.arsc' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/esqvay.sps",
+      "error": "File 'assets/esqvay.sps' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/kotlin.kotlin_builtins",
+      "size": 20138,
+      "compsize": 6987,
+      "sha256": "e51933d42f7f02e43ef683b4d7de418314a8207e787e0d336cedb82a236b7137",
+      "entropy": 6.108,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "assets/daafypkct.spe",
+      "error": "File 'assets/daafypkct.spe' is encrypted, password required for extraction"
+    },
+    {
+      "name": "AndroidManifest.xml",
+      "error": "File 'AndroidManifest.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/collections/collections.kotlin_builtins",
+      "size": 3903,
+      "compsize": 1821,
+      "sha256": "d1a7d1fe082324fcb2383d2b09e3ec3a3b6f3e73839b3336c993cfef7bd26d9b",
+      "entropy": 5.967,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/ranges/ranges.kotlin_builtins",
+      "size": 3669,
+      "compsize": 1635,
+      "sha256": "c600659ed29c5c43e2b82e5a38895ed4e14fe0d0a26e70e352bd64c28580aac1",
+      "entropy": 6.186,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/reflect/reflect.kotlin_builtins",
+      "size": 2796,
+      "compsize": 1741,
+      "sha256": "b8164c21a542b18000b646f2a9a8a58aaed2bcd043f8c84937fbd5144324bc05",
+      "entropy": 6.314,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "DebugProbesKt.bin",
+      "size": 1941,
+      "compsize": 1048,
+      "sha256": "7200126206f3a0e5472c1c14597ff607131be936a0d764d6fa2d8da1847d2063",
+      "entropy": 5.858,
+      "magic": "BINARY",
+      "head_hex": "cafebabe00000034003f01002c6b6f74"
+    },
+    {
+      "name": "res/Rx.png",
+      "error": "File 'res/Rx.png' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/annotation/annotation.kotlin_builtins",
+      "size": 1315,
+      "compsize": 1030,
+      "sha256": "098a733790ca68f9f10cbf21cd8eb6f28e9b708b05ce3a07777e56c09e8b8d58",
+      "entropy": 6.734,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/internal/internal.kotlin_builtins",
+      "size": 990,
+      "compsize": 788,
+      "sha256": "4fb0835bfcedac00a571c0e94f60d2afc192840c168163749b05f1cc60b34c9b",
+      "entropy": 6.784,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin-tooling-metadata.json",
+      "size": 860,
+      "compsize": 563,
+      "sha256": "a9fab8862f5d797eda905344d3e08e4a83450f8c707e500c430e95a5507e0bb1",
+      "entropy": 5.973,
+      "magic": "TEXT",
+      "head_hex": "7b0a202022736368656d615665727369"
+    },
+    {
+      "name": "kotlin/coroutines/coroutines.kotlin_builtins",
+      "size": 335,
+      "compsize": 301,
+      "sha256": "79576323d0c84581c92a838148a2378d317b063f874be2617b2d56900d558480",
+      "entropy": 6.402,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/8K.xml",
+      "error": "File 'res/8K.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.prof",
+      "error": "File 'assets/dexopt/baseline.prof' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/4j.xml",
+      "error": "File 'res/4j.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/Qq.xml",
+      "error": "File 'res/Qq.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.profm",
+      "error": "File 'assets/dexopt/baseline.profm' is encrypted, password required for extraction"
+    }
+  ],
+  "VIDEO.20.01.2026.mp4 (2).apk": [
+    {
+      "name": "classes.dex",
+      "size": 1672636,
+      "compsize": 755767,
+      "sha256": "f23a205ef6dd126ff7735158ea465e3b569cfecf29206912fb4716cb4c09d6d2",
+      "entropy": 5.734,
+      "magic": "DEX-038",
+      "head_hex": "6465780a303338001db574fdf91f3198"
+    },
+    {
+      "name": "assets/cvsmcn.json",
+      "size": 1014969,
+      "compsize": 1015279,
+      "sha256": "4da320dfab525f684fe2b0904fae52118033e45444b66d413ed9a6c377d182b5",
+      "entropy": 7.999,
+      "magic": "BINARY",
+      "head_hex": "0feb06393817e6b91ae8ebe35ee6dd48"
+    },
+    {
+      "name": "assets/libs/arm64-v8a/libnative-lib.so",
+      "size": 47056,
+      "compsize": 47056,
+      "sha256": "5ac7ee658d482e476cdeea83b53f1d7ed3c62be28ea54abd416449896b0390c0",
+      "entropy": 5.517,
+      "magic": "ELF",
+      "head_hex": "7f454c46020101000000000000000000"
+    },
+    {
+      "name": "assets/libs/x86_64/libnative-lib.so",
+      "size": 46024,
+      "compsize": 46024,
+      "sha256": "729f4aed492f84b0d8b52aac981f09cf22a5a597209d7449f5187ae076f8be72",
+      "entropy": 5.523,
+      "magic": "ELF",
+      "head_hex": "7f454c46020101000000000000000000"
+    },
+    {
+      "name": "assets/libs/armeabi-v7a/libnative-lib.so",
+      "size": 44516,
+      "compsize": 44516,
+      "sha256": "cf00205e3e15d0e248ad47beb4e160f06f1df95a7d6b4879d8ee09ac84348232",
+      "entropy": 5.688,
+      "magic": "ELF",
+      "head_hex": "7f454c46010101000000000000000000"
+    },
+    {
+      "name": "assets/libs/x86/libnative-lib.so",
+      "size": 43884,
+      "compsize": 43884,
+      "sha256": "3a380f93a60f820b8f248d325022892f63a2754be095f07f3b00b2b542c5740b",
+      "entropy": 5.7,
+      "magic": "ELF",
+      "head_hex": "7f454c46010101000000000000000000"
+    },
+    {
+      "name": "res/oJ.webp",
+      "size": 29682,
+      "compsize": 29682,
+      "sha256": "f787910052a50c34e3d57957ba0f4c9e13662cec590950551c1dcdc0ff52eede",
+      "entropy": 7.948,
+      "magic": "RIFF/WAV",
+      "head_hex": "52494646ea7300005745425056503858"
+    },
+    {
+      "name": "kotlin/kotlin.kotlin_builtins",
+      "size": 18661,
+      "compsize": 5257,
+      "sha256": "212a7620a865ee3e276774963a50f3beda2a849ff918f89257f355be22e15746",
+      "entropy": 5.769,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "resources.arsc",
+      "size": 16788,
+      "compsize": 16788,
+      "sha256": "fec02060b3441de6cfda22a6af0e0fed93b58c3678454bb74536ea0f6cf970e9",
+      "entropy": 4.704,
+      "magic": "BINARY",
+      "head_hex": "02000c00944100000100000001001c00"
+    },
+    {
+      "name": "META-INF/CERT.SF",
+      "size": 8501,
+      "compsize": 3682,
+      "sha256": "d4f30ce463fb3b78995155116a6d0ca934b69c2f5e8bb40ef339716e8d9a6daf",
+      "entropy": 5.857,
+      "magic": "TEXT",
+      "head_hex": "5369676e61747572652d56657273696f"
+    },
+    {
+      "name": "res/Rx.png",
+      "size": 8495,
+      "compsize": 8495,
+      "sha256": "633a0ebce785f042ada66477203bee2dec71f2171b8f8948496eb30ada7472a8",
+      "entropy": 7.891,
+      "magic": "PNG",
+      "head_hex": "89504e470d0a1a0a0000000d49484452"
+    },
+    {
+      "name": "META-INF/MANIFEST.MF",
+      "size": 8424,
+      "compsize": 2886,
+      "sha256": "bfa07ee0a0a5bb4f96f83e95222b52fee6a58b8b0d28c94e0ac9daf2ff0cd9aa",
+      "entropy": 5.84,
+      "magic": "TEXT",
+      "head_hex": "4d616e69666573742d56657273696f6e"
+    },
+    {
+      "name": "AndroidManifest.xml",
+      "size": 4868,
+      "compsize": 1478,
+      "sha256": "905ff066944e5f2428dfdcf089dc05173b756c80c5be3e313a147156b3c29a34",
+      "entropy": 3.653,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008000413000001001c00ec090000"
+    },
+    {
+      "name": "kotlin/collections/collections.kotlin_builtins",
+      "size": 3685,
+      "compsize": 1521,
+      "sha256": "539b85c2403f6ef0638161ad99df7b11256412e9411335ed2ea3931a3efd7c76",
+      "entropy": 5.696,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/ranges/ranges.kotlin_builtins",
+      "size": 3399,
+      "compsize": 1292,
+      "sha256": "2b8775e1aabd4a95dbfc4cd9c0cc9ff03058202dfd9cd7ee5875ba3e9720f228",
+      "entropy": 5.856,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "assets/dexopt/baseline.prof",
+      "size": 2977,
+      "compsize": 2977,
+      "sha256": "7c5747c6f1c4bf5f4f52f11d8af1d47deb4841a677914e9a1daf9d54c29ccf07",
+      "entropy": 7.907,
+      "magic": "BINARY",
+      "head_hex": "70726f003031300001f05f0000900b00"
+    },
+    {
+      "name": "kotlin/reflect/reflect.kotlin_builtins",
+      "size": 2426,
+      "compsize": 1286,
+      "sha256": "1f5210ca940148b8252d5420b804d2568b4bbe11864f0290a77c576277da9857",
+      "entropy": 5.779,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "META-INF/CERT.RSA",
+      "size": 2133,
+      "compsize": 1910,
+      "sha256": "283d2abcdaefc314683e17a3e788e098ff57edf999e9bbef8f1507c9ff472ffe",
+      "entropy": 7.685,
+      "magic": "BINARY",
+      "head_hex": "3082085106092a864886f70d010702a0"
+    },
+    {
+      "name": "DebugProbesKt.bin",
+      "size": 1738,
+      "compsize": 782,
+      "sha256": "ae8a082dd609313835ba93c3ef479a3af9903977d7bdc81df45bbd209ec7d0da",
+      "entropy": 5.381,
+      "magic": "BINARY",
+      "head_hex": "cafebabe00000034003f01002c6b6f74"
+    },
+    {
+      "name": "kotlin/annotation/annotation.kotlin_builtins",
+      "size": 928,
+      "compsize": 561,
+      "sha256": "e5eeca63f4c5635660d306577a4e30926833513cb47e20ecea9ae6bbc3125995",
+      "entropy": 5.642,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/4z.xml",
+      "size": 876,
+      "compsize": 416,
+      "sha256": "397399c876fbf4d09ebf4b041b9e9a0efdfbb49f34a76e101abf606f8e912fe6",
+      "entropy": 3.92,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008006c03000001001c0028010000"
+    },
+    {
+      "name": "res/ro.xml",
+      "size": 652,
+      "compsize": 360,
+      "sha256": "ff1b997c8f9e74672d4685fc41a9dc6404d246f57dfa474d9fc3f266e988f0e5",
+      "entropy": 4.52,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008008c02000001001c0044010000"
+    },
+    {
+      "name": "kotlin/internal/internal.kotlin_builtins",
+      "size": 646,
+      "compsize": 394,
+      "sha256": "c76b70a3db1eccbe42ea91a53667d7661edfc615409d3d6e574b5843b1e2a05e",
+      "entropy": 5.446,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin-tooling-metadata.json",
+      "size": 627,
+      "compsize": 284,
+      "sha256": "8b6ffd9075a18317a70cb8683bf33f8caef39174155d1fbdbb41a6519ac78af0",
+      "entropy": 4.668,
+      "magic": "TEXT",
+      "head_hex": "7b0a202022736368656d615665727369"
+    },
+    {
+      "name": "assets/dexopt/baseline.profm",
+      "size": 394,
+      "compsize": 394,
+      "sha256": "a55077dc4343c83fd794ee1c0b605c0ebdfe5a1cf8a0d24d327fb8a709fac379",
+      "entropy": 7.462,
+      "magic": "BINARY",
+      "head_hex": "70726d00303032000100d10900007801"
+    },
+    {
+      "name": "res/cr.xml",
+      "size": 364,
+      "compsize": 201,
+      "sha256": "37ff040591f96786bfaf9d3d937fedf2f2f97e218c06beb3e7fe8a2442a181a8",
+      "entropy": 3.938,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008006c01000001001c00a8000000"
+    },
+    {
+      "name": "res/color/vector_tint_color.xml",
+      "size": 340,
+      "compsize": 180,
+      "sha256": "4bbb4ef3e0e3db260a05d794047a1765e420d699ee5673e90b57ff682a2fe34e",
+      "entropy": 3.561,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008005401000001001c0084000000"
+    },
+    {
+      "name": "res/color/vector_tint_theme_color.xml",
+      "size": 340,
+      "compsize": 182,
+      "sha256": "cf34dc5bdb4a6d1568143e115ac4e34448383ac772862ef0fdbb7fe8936c6dd3",
+      "entropy": 3.597,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008005401000001001c0084000000"
+    },
+    {
+      "name": "res/4j.xml",
+      "size": 212,
+      "compsize": 111,
+      "sha256": "ed967ccdc7621b9da4392c45f2503656e95f57df0b98fcf4a74265e4d518771e",
+      "entropy": 3.203,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "03000800d400000001001c004c000000"
+    },
+    {
+      "name": "kotlin/coroutines/coroutines.kotlin_builtins",
+      "size": 200,
+      "compsize": 157,
+      "sha256": "59a6d632b8a9f5dba26f2a689c3865e195351df7c3c08aa1669fe0df9f9eb883",
+      "entropy": 5.057,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/Qq.xml",
+      "size": 132,
+      "compsize": 76,
+      "sha256": "205b9da2674835adc339a8cd5f6f2ac716c8a7a159020b2b4943b3c8449ca4ab",
+      "entropy": 2.952,
+      "magic": "AXML(MANIFEST)",
+      "head_hex": "030008008400000001001c0038000000"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-viewmodel-savedstate.version",
+      "size": 85,
+      "compsize": 74,
+      "sha256": "421fc63528b574159fbab9883b3767b85c6f073415e4f58a166acd93706db90c",
+      "entropy": 4.317,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-livedata-core.version",
+      "size": 78,
+      "compsize": 67,
+      "sha256": "474006d0cc8100f8dfc68d9269f233a347c29eb4a36d859c20a4953aa41d4dfc",
+      "entropy": 4.258,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-viewmodel-ktx.version",
+      "size": 78,
+      "compsize": 67,
+      "sha256": "02f2e9cb451318a9c495a3d04fede9483a87475b03374e250c3ddf79a7c88bbf",
+      "entropy": 4.364,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/services/o888o88o8o8o88o888o8o8ooo8o8oooo8oo8oo88o8.o8ooo888o88oo888oo8ooo88ooo88ooooo",
+      "size": 78,
+      "compsize": 33,
+      "sha256": "83fc1aeffca66c841965c9f2322e28fc263488526988e7719c0ff349ef5c22be",
+      "entropy": 1.168,
+      "magic": "TEXT",
+      "head_hex": "6f3838386f38386f386f386f38386f38"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-runtime-ktx.version",
+      "size": 76,
+      "compsize": 65,
+      "sha256": "d48640b14ad33aac1db0b35c5d14aa7947543b7c2829019a6360d0c01546a2eb",
+      "entropy": 4.351,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-viewmodel.version",
+      "size": 74,
+      "compsize": 63,
+      "sha256": "405e9f0f83651ca097dac96b53a9d149a9b6f1c890d232e1f3e86bc03fcc62b1",
+      "entropy": 4.282,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/services/ooo88ooooo888o8o8o88oooooooo8o.o8oo8ooooo8888oo88o8oooooo888",
+      "size": 74,
+      "compsize": 33,
+      "sha256": "2839a569be7682f02b497aff4fc5f76bf6fcc97a14bfd8f32453babbb1664a7b",
+      "entropy": 1.179,
+      "magic": "TEXT",
+      "head_hex": "6f3838386f38386f386f386f38386f38"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-process.version",
+      "size": 72,
+      "compsize": 60,
+      "sha256": "ade1aef8b090839ec122c696be949dd1633ccbac22bcb1a0f895bacde74f66fd",
+      "entropy": 4.186,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/androidx.lifecycle_lifecycle-runtime.version",
+      "size": 72,
+      "compsize": 61,
+      "sha256": "4257cccbba3f7aea521a40937d1bfdd5949f5f3e1ed689c402a4f2977109030b",
+      "entropy": 4.274,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a6c6966656379636c65"
+    },
+    {
+      "name": "META-INF/androidx.arch.core_core-runtime.version",
+      "size": 67,
+      "compsize": 61,
+      "sha256": "1b7c606370188534dac5561fba2b2988093829697fce9e6e8832e9291d24ed00",
+      "entropy": 4.234,
+      "magic": "TEXT",
+      "head_hex": "7461736b20273a617263683a636f7265"
+    },
+    {
+      "name": "META-INF/com/android/build/gradle/app-metadata.properties",
+      "size": 56,
+      "compsize": 52,
+      "sha256": "6ccbaccd442f133352a3592c019a5c7d85665193f4a237e0018db8f3047adc20",
+      "entropy": 4.361,
+      "magic": "TEXT",
+      "head_hex": "6170704d657461646174615665727369"
+    },
+    {
+      "name": "META-INF/version-control-info.textproto",
+      "size": 46,
+      "compsize": 48,
+      "sha256": "38d377afa76b6364e5bf551cf4ffec1a881a46102a0047f523fbf148e0df6928",
+      "entropy": 4.315,
+      "magic": "TEXT",
+      "head_hex": "67656e65726174655f6572726f725f72"
+    },
+    {
+      "name": "META-INF/androidx.core_core-ktx.version",
+      "size": 7,
+      "compsize": 9,
+      "sha256": "c92df6bdde330be219d62f48ec6490b01889436f2f59027aab200e74de619168",
+      "entropy": 2.236,
+      "magic": "TEXT",
+      "head_hex": "312e31322e300a"
+    },
+    {
+      "name": "META-INF/androidx.core_core.version",
+      "size": 7,
+      "compsize": 9,
+      "sha256": "c92df6bdde330be219d62f48ec6490b01889436f2f59027aab200e74de619168",
+      "entropy": 2.236,
+      "magic": "TEXT",
+      "head_hex": "312e31322e300a"
+    },
+    {
+      "name": "META-INF/androidx.activity_activity-compose.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "e7066ea517cbc9e563967997e5cf2e3a899250403dac6fbaa25bb6b1815d16ca",
+      "entropy": 2.252,
+      "magic": "TEXT",
+      "head_hex": "312e382e320a"
+    },
+    {
+      "name": "META-INF/androidx.activity_activity-ktx.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "e7066ea517cbc9e563967997e5cf2e3a899250403dac6fbaa25bb6b1815d16ca",
+      "entropy": 2.252,
+      "magic": "TEXT",
+      "head_hex": "312e382e320a"
+    },
+    {
+      "name": "META-INF/androidx.activity_activity.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "e7066ea517cbc9e563967997e5cf2e3a899250403dac6fbaa25bb6b1815d16ca",
+      "entropy": 2.252,
+      "magic": "TEXT",
+      "head_hex": "312e382e320a"
+    },
+    {
+      "name": "META-INF/androidx.annotation_annotation-experimental.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "78b591400c56b7b67b8cb3b2b8a8e65e9093897f02ce0878e6b5405c68620fa7",
+      "entropy": 2.252,
+      "magic": "TEXT",
+      "head_hex": "312e342e300a"
+    },
+    {
+      "name": "META-INF/androidx.autofill_autofill.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e302e300a"
+    },
+    {
+      "name": "META-INF/androidx.compose.animation_animation-core.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.animation_animation.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.foundation_foundation-layout.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.foundation_foundation.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.material3_material3.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "1e5b51cde515396a9fa762909cf8ca6584ccc564b325d2eebeea76175fe95c4d",
+      "entropy": 2.252,
+      "magic": "TEXT",
+      "head_hex": "312e322e300a"
+    },
+    {
+      "name": "META-INF/androidx.compose.material_material-icons-core.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.material_material-ripple.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.runtime_runtime-saveable.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.runtime_runtime.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.ui_ui-geometry.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.ui_ui-graphics.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.ui_ui-text.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.ui_ui-unit.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.ui_ui-util.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.compose.ui_ui.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e362e310a"
+    },
+    {
+      "name": "META-INF/androidx.customview_customview-poolingcontainer.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e302e300a"
+    },
+    {
+      "name": "META-INF/androidx.emoji2_emoji2.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "64d23f858ef51b0f996e4966d4e27c0371b437e2d2787890b1f7ad22d4ec5663",
+      "entropy": 2.252,
+      "magic": "TEXT",
+      "head_hex": "312e332e300a"
+    },
+    {
+      "name": "META-INF/androidx.interpolator_interpolator.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e302e300a"
+    },
+    {
+      "name": "META-INF/androidx.savedstate_savedstate-ktx.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6cf4e084b47f33c9b02ef79279d157833868f8f70514169a768be353ee328fea",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e322e310a"
+    },
+    {
+      "name": "META-INF/androidx.savedstate_savedstate.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "6cf4e084b47f33c9b02ef79279d157833868f8f70514169a768be353ee328fea",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e322e310a"
+    },
+    {
+      "name": "META-INF/androidx.startup_startup-runtime.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "cc52f678848b814373757b460383bf61960e4943c203735adde0a350b3e50989",
+      "entropy": 1.459,
+      "magic": "TEXT",
+      "head_hex": "312e312e310a"
+    },
+    {
+      "name": "META-INF/androidx.tracing_tracing.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+      "entropy": 1.918,
+      "magic": "TEXT",
+      "head_hex": "312e302e300a"
+    },
+    {
+      "name": "META-INF/androidx.versionedparcelable_versionedparcelable.version",
+      "size": 6,
+      "compsize": 8,
+      "sha256": "cc52f678848b814373757b460383bf61960e4943c203735adde0a350b3e50989",
+      "entropy": 1.459,
+      "magic": "TEXT",
+      "head_hex": "312e312e310a"
+    },
+    {
+      "name": "META-INF/androidx.databinding_viewbinding.version",
+      "size": 5,
+      "compsize": 7,
+      "sha256": "1dd876afd95ffd9187db402d00e3dcba63108730513f5b526a7524b3efe48916",
+      "entropy": 1.922,
+      "magic": "TEXT",
+      "head_hex": "382e362e30"
+    },
+    {
+      "name": "META-INF/kotlinx_coroutines_android.version",
+      "size": 5,
+      "compsize": 7,
+      "sha256": "18ba3cd396b304c3bf6ebd743e5adbd9b9b5b2a42f553e7f74e0bcfb5495a21f",
+      "entropy": 1.522,
+      "magic": "TEXT",
+      "head_hex": "312e372e31"
+    },
+    {
+      "name": "META-INF/kotlinx_coroutines_core.version",
+      "size": 5,
+      "compsize": 7,
+      "sha256": "18ba3cd396b304c3bf6ebd743e5adbd9b9b5b2a42f553e7f74e0bcfb5495a21f",
+      "entropy": 1.522,
+      "magic": "TEXT",
+      "head_hex": "312e372e31"
+    }
+  ],
+  "VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ.apk": [
+    {
+      "name": "classes.dex",
+      "error": "File 'classes.dex' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/nhondpu.sps",
+      "error": "File 'assets/nhondpu.sps' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/npxtowvrif.spe",
+      "error": "File 'assets/npxtowvrif.spe' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/kotlin.kotlin_builtins",
+      "size": 19900,
+      "compsize": 6692,
+      "sha256": "3d4cdaf05f7a07ad416d5dc34654df9d17c6bb64f3d9e2e9eeb9e6a84a0f3a9e",
+      "entropy": 6.057,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "assets/skxnubh.sps",
+      "error": "File 'assets/skxnubh.sps' is encrypted, password required for extraction"
+    },
+    {
+      "name": "resources.arsc",
+      "error": "File 'resources.arsc' is encrypted, password required for extraction"
+    },
+    {
+      "name": "AndroidManifest.xml",
+      "error": "File 'AndroidManifest.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/collections/collections.kotlin_builtins",
+      "size": 3847,
+      "compsize": 1740,
+      "sha256": "55e095d3e2363296cd95a34143ecee2554476f2825edbf62afa00e1f1bfcff79",
+      "entropy": 5.907,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/ranges/ranges.kotlin_builtins",
+      "size": 3744,
+      "compsize": 1726,
+      "sha256": "28774d24e679f745c309eb4e58bbf89f21c916cc0d6129aff23efd003e030866",
+      "entropy": 6.258,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/Rx.png",
+      "error": "File 'res/Rx.png' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/reflect/reflect.kotlin_builtins",
+      "size": 2635,
+      "compsize": 1556,
+      "sha256": "e64e1e9062ec18d98316d127587fee9c9a7467cb224b62fc79d2fd28aead0979",
+      "entropy": 6.137,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "DebugProbesKt.bin",
+      "size": 2233,
+      "compsize": 1363,
+      "sha256": "b78d1b1112c6b310787dbb042418c822e7e9bbcbfef80659582e4694059fd097",
+      "entropy": 6.322,
+      "magic": "BINARY",
+      "head_hex": "cafebabe00000034003f01002c6b6f74"
+    },
+    {
+      "name": "kotlin/annotation/annotation.kotlin_builtins",
+      "size": 1325,
+      "compsize": 1042,
+      "sha256": "58c724a0737cf451b4003a18918c120936d810d9959de8ed4f324f5185a3daaa",
+      "entropy": 6.764,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/internal/internal.kotlin_builtins",
+      "size": 1012,
+      "compsize": 810,
+      "sha256": "7bd6f4a11d33797e7f08cffc454c8bf76106bcc72a0db490bba3f65d265dcc18",
+      "entropy": 6.755,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin-tooling-metadata.json",
+      "size": 919,
+      "compsize": 623,
+      "sha256": "9caaa6f50f3e05683c0d4c5825e7e122f547d354a2bc8d46979f6567949b7425",
+      "entropy": 6.156,
+      "magic": "TEXT",
+      "head_hex": "7b0a202022736368656d615665727369"
+    },
+    {
+      "name": "kotlin/coroutines/coroutines.kotlin_builtins",
+      "size": 315,
+      "compsize": 281,
+      "sha256": "45275f46966d0211448a672b738dd5e0c9a3ee1e799e362bbb0eaf0b86d1818a",
+      "entropy": 6.347,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/8K.xml",
+      "error": "File 'res/8K.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.prof",
+      "error": "File 'assets/dexopt/baseline.prof' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/4j.xml",
+      "error": "File 'res/4j.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/Qq.xml",
+      "error": "File 'res/Qq.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.profm",
+      "error": "File 'assets/dexopt/baseline.profm' is encrypted, password required for extraction"
+    }
+  ],
+  "toydanfotolar(9.jpg) (10).apk": [
+    {
+      "name": "classes.dex",
+      "error": "File 'classes.dex' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/oiprcd.sps",
+      "error": "File 'assets/oiprcd.sps' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/5c8d3cf99f5cf4ac.dat",
+      "error": "File 'assets/5c8d3cf99f5cf4ac.dat' is encrypted, password required for extraction"
+    },
+    {
+      "name": "resources.arsc",
+      "error": "File 'resources.arsc' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/njwi.spe",
+      "error": "File 'assets/njwi.spe' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/kotlin.kotlin_builtins",
+      "size": 20603,
+      "compsize": 7453,
+      "sha256": "9bd950904d29d065f3284f43989192f4593f126918a44b5d7907debc98d8468a",
+      "entropy": 6.184,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "assets/wefa.sps",
+      "error": "File 'assets/wefa.sps' is encrypted, password required for extraction"
+    },
+    {
+      "name": "AndroidManifest.xml",
+      "error": "File 'AndroidManifest.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/ranges/ranges.kotlin_builtins",
+      "size": 3876,
+      "compsize": 1874,
+      "sha256": "cbb5775963329f4e8a93f96a8223d14bcfd06bdaa012c84df2fab5919aeca2d6",
+      "entropy": 6.389,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/collections/collections.kotlin_builtins",
+      "size": 3852,
+      "compsize": 1746,
+      "sha256": "1c437ee92d5fea82a373dfdf6cb4f23b3190091a25ab8bdb586383f9e040959d",
+      "entropy": 5.912,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/reflect/reflect.kotlin_builtins",
+      "size": 2757,
+      "compsize": 1686,
+      "sha256": "47d25850949ac011f006955086d8692ffc7f660cb97c6acf2bc2817259af6b42",
+      "entropy": 6.259,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "DebugProbesKt.bin",
+      "size": 2010,
+      "compsize": 1125,
+      "sha256": "11983196eb4cf96ecebf8c59f2b6b2da4f093665e11196dce113768bc147fd7c",
+      "entropy": 5.983,
+      "magic": "BINARY",
+      "head_hex": "cafebabe00000034003f01002c6b6f74"
+    },
+    {
+      "name": "res/Rx.png",
+      "error": "File 'res/Rx.png' is encrypted, password required for extraction"
+    },
+    {
+      "name": "kotlin/annotation/annotation.kotlin_builtins",
+      "size": 1358,
+      "compsize": 1074,
+      "sha256": "acbc6120211f3e1eef1906d895e7270dc72471c464013d2c7d897e1c7b2419b1",
+      "entropy": 6.786,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin-tooling-metadata.json",
+      "size": 884,
+      "compsize": 588,
+      "sha256": "2ae8e7b16e236bde62489afaf5b891c7c486b79b2908bc8ca0f6f0ee892470cc",
+      "entropy": 6.099,
+      "magic": "TEXT",
+      "head_hex": "7b0a202022736368656d615665727369"
+    },
+    {
+      "name": "kotlin/internal/internal.kotlin_builtins",
+      "size": 838,
+      "compsize": 626,
+      "sha256": "17dc34112e798a1e2f0f38d9d0f15ed8018144047bf90a315ad3b66e70330478",
+      "entropy": 6.343,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "kotlin/coroutines/coroutines.kotlin_builtins",
+      "size": 348,
+      "compsize": 316,
+      "sha256": "6cff01c2bf44bf42818447a2b602bc912426b04ca750d0956f59db552a931dcf",
+      "entropy": 6.511,
+      "magic": "BINARY",
+      "head_hex": "00000003000000010000000000000007"
+    },
+    {
+      "name": "res/8K.xml",
+      "error": "File 'res/8K.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.prof",
+      "error": "File 'assets/dexopt/baseline.prof' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/4j.xml",
+      "error": "File 'res/4j.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "res/Qq.xml",
+      "error": "File 'res/Qq.xml' is encrypted, password required for extraction"
+    },
+    {
+      "name": "assets/dexopt/baseline.profm",
+      "error": "File 'assets/dexopt/baseline.profm' is encrypted, password required for extraction"
+    }
+  ]
+}

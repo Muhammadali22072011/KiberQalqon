@@ -1,0 +1,14 @@
+﻿  symbol: __emutls_unregister_key  type=STT_FUNC  bind=STB_LOCAL  st_value=0x700  st_size=8
+    section: .text  file_off=0x700
+    raw bytes (8): 5f2403d5c0035fd6
+    ascii: b'_$\x03\xd5\xc0\x03_\xd6'
+  symbol: _ZL12getSecretKeyP7_JNIEnvP8_jobject  type=STT_FUNC  bind=STB_LOCAL  st_value=0x804  st_size=104
+    section: .text  file_off=0x804
+    raw bytes (104): ff4301d1fd7b03a9f32300f9fdc3009153d03bd509000090681640f90a000090e10300912055c13da8831ff84159c13d080040f9ff830039e00700ad089d42f900013fd6681640f9a9835ff81f0109eba1000054fd7b43a9f32340f9ff430191c0035fd616000094
+    ascii: b'\xffC\x01\xd1\xfd{\x03\xa9\xf3#\x00\xf9\xfd\xc3\x00\x91S\xd0;\xd5\t\x00\x00\x90h\x16@\xf9\n\x00\x00\x90\xe1\x03\x00\x91 U\xc1=\xa8\x83\x1f\xf8AY\xc1=\x08\x00@\xf9\xff\x83\x009\xe0\x07\x00\xad\x08\x9dB\xf9\x00\x01?\xd6h\x16@\xf9\xa9\x83_\xf8\x1f\x01\t\xeb\xa1\x00\x00T\xfd{C\xa9\xf3#@\xf9\xffC\x01\x91\xc0\x03_\xd6\x16\x00\x00\x94'
+
+  encKey marker at file_off=0x5f99
+    ascii: b'\x00_ZN7_JNIEnv17GetStaticIntFieldEP7_jclassP9_jfieldID\x00JNIEnv\x00_ZL6encKey\x00unsigned int\x00_jfieldID\x00__vr_offs\x00CallCharMethodV\x00CallNonvirtualByteMethodA\x00CallNonvirtualLongMethod\x00CallNonvirtualFloatMethodV\x00GetBooleanField\x00SetBooleanField\x00CallStaticFloatMethodA\x00GetStaticCharField\x00jstring\x00GetLongArrayRegion\x00GetStringRegion\x00GetSt'
+
+  encKey marker at file_off=0x71ff
+    ascii: b'rayPh\x00_JNIEnv\x00_ZN7_JavaVM13DestroyJavaVMEv\x00name\x00JNINativeMethod\x00encKey\x00jobject\x00__gr_offs\x00jchar\x00jlong\x00CallNonvirtualBooleanMethod\x00CallNonvirtualBooleanMethodA\x00CallNonvirtualDoubleMethodV\x00jbyteArray\x00SetFloatArrayRegion\x00SetDoubleArrayRegion\x00MonitorExit\x00_ZN7_JNIEnv8ThrowNewEP7_jclassPKc\x00_ZN7_JNIEnv25CallNonvirtualByteMetho'

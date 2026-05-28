@@ -1,0 +1,40 @@
+﻿
+========================================================================
+[+] RASMLAR_18
+========================================================================
+
+  --- 02cce475f26041e8.data (1,000,000 bytes) ---
+    score=  200  key=md5_top         AES-CBC iv=ct[:16] body=ct[16:]
+      head: b'[\x83\xc5\xc1Q\xa0 \xaeFs\xd7C\x1e\x01\xf1\x14\xb9\xcb\xb0\xd1-\xb5\x15\xc0c\xc7\xees\xe5\xbb\xc81[\x96\xbc|\x0f\xcb\xc5\x86\x8dFC\x8a\xb3\x05\x15\x08\xaf\xc0P\xc7\xa5\x8f\x04\x1f\xcd7T\xd4\xf5\x9b\xed\x94'
+
+  --- zejcc.spe (796,115 bytes) ---
+
+========================================================================
+[+] RASMLAR_8
+========================================================================
+
+  --- cqivytyakr.spe (775,545 bytes) ---
+
+  --- d55abfda1195fb77.bak (1,000,000 bytes) ---
+    score=  200  key=top_24          AES-ECB
+      head: b"{h5\x1d\x8e\x16\xb6\x02\xd0\xcc4K0n\x05\x9b@\xd1K0AWX\xa96'`hsLd\x05\x8ffY\x85\x1e\xc1\x8b\x99\x1a\xb4\xdf\xbfp\xbdL\xa9\x94\x9dD\xd5\xcbJ~\xd0\xd2\xa5<T\x84\toB"
+    score=  200  key=top_24          AES-CBC iv=0
+      head: b'{h5\x1d\x8e\x16\xb6\x02\xd0\xcc4K0n\x05\x9bA\t\x82^\xa4\x8a1bx~\x94\x11+\xc6\x07\xd3\xbe\x1f\xd3\xc6\x05?\x04\xe9\xc4\xd3\xb5e\xea\\\xba/\x1d\x15/\x1b\xe5\xd2]\x1f\xfb\x16(@\x8b\x8fsi'
+
+========================================================================
+[+] VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+========================================================================
+
+  --- nhondpu.sps (822,384 bytes) ---
+
+========================================================================
+[+] toydanfotolar9jpg_10
+========================================================================
+
+  --- 5c8d3cf99f5cf4ac.dat (600,000 bytes) ---
+
+  --- oiprcd.sps (661,100 bytes) ---
+    score=  200  key=base_pad16      AES-ECB
+      head: b'{\x9cxJR\xfa\x88m\x18Q/\x19\xbbc\x96g\xb1\xe10\x06\xbc\x9d\xaf\x9cB\xc46\xe1\xd3}c\xaf\xd7\xc1;*\xa7\x05\xe7=q\xfe2\xa08\x00\xaaX\xd8\xb2\xb7\xae\xdc\xad\r\xb0\x00T\xd8\xbeY\xd12\xa0'
+    score=  200  key=base_pad16      AES-CBC iv=0
+      head: b"{\x9cxJR\xfa\x88m\x18Q/\x19\xbbc\x96gnn\x00d\xd1da\x0b\xafq\\\xc1\xb1C\xc5\xc3\x80&'\\a\x16\x14\x9aQ\x17\xd9!fH\xcb=\xce\xcc\x92\xbc\xed\xd7\xa1\xa84O\x8e\xce\xafBNf"

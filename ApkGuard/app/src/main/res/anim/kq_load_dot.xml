@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash bottom dot bounce. Mirrors @keyframes loadDot in screens-onboarding.jsx:
+    0%,100% { opacity:.3; transform:scale(.8) }
+    50%     { opacity:1;  transform:scale(1.1) }
+  Duration 1200ms; per-dot staggers applied via startOffset at runtime.
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="false"
+    android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+
+    <scale
+        android:duration="1200"
+        android:fromXScale="0.8"
+        android:fromYScale="0.8"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+        android:toXScale="1.1"
+        android:toYScale="1.1" />
+
+    <alpha
+        android:duration="1200"
+        android:fromAlpha="0.3"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+        android:toAlpha="1.0" />
+</set>

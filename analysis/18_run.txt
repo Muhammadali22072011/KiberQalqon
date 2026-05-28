@@ -1,0 +1,326 @@
+﻿
+========================================================================
+[+] DECRYPTED_RASMLAR_18_ahihasm.sps.bin  size=19,636
+========================================================================
+  URLs:1  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    URL    : http://www.w3.org/2000/svg%22
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=1081
+      (function() {
+      var pageTitle = {
+      ru: "Установка",
+      uz: "O\u2018rnatish"
+      };
+      function applyData(data) {
+      if (!data) return;
+      var isDark = data.isDarkTheme;
+      document.body.style.setProperty('--bg-color', isDark ? '#212226' : '#FFFFFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFFFFF' : '#000000');
+      document.body.style.setProperty('--track-color', isDark ? '#3A3A3A' : '#E0E0E0');
+      document.body.style.setProperty('--accent', '#39816B');
+      if (data.appIcon) document.getElementById('appIcon').src = data.appIcon;
+      if (data.appName !== undefined) document.getElementById('appName').textContent = data.appName;
+      var l = data.lang || 'ru';
+      document.documentElement.lang = l;
+      document.title = pageTitle[l] || pageTitle.ru;
+      }
+      window.applyInstallScreenData = applyData;
+      })();
+
+========================================================================
+[+] DECRYPTED_RASMLAR_18_titmtilhmof.spe.bin  size=23,706
+========================================================================
+  URLs:0  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=3739
+      var S = {
+      ru: { updateAvailable:"Доступно обновление", updateRequired:"Чтобы использовать приложение, необходимо установить обновление.", whatsNew:"Что нового", updateDate:"Дата обновления: 25 февраля 2026 г.", size:"Размер: 1.6 МБ", details:"Подробнее", install:"Установить", update:"Обновить" },
+      uz: { updateAvailable:"Yangilanish mavjud", updateRequired:"Ilovadan foydalanish uchun yangilanishni o\u2018rnatishingiz kerak", whatsNew:"Nima yangi", updateDate:"Yangilangan sana: 25-fevral, 2026-yil", size:"Hajmi: 1.6 MB", details:"Batafsil", install:"O\u2018rnatish", update:"Yangilash" }
+      };
+      var lang = 'ru', hasPerm = false;
+      window.setIcons = function(d) {
+      if (d.appIcon) document.getElementById('appIcon').src = d.appIcon;
+      if (d.appName) document.getElementById('appName').textContent = d.appName;
+      if (d.lang) lang = d.lang;
+      var s = S[lang] || S.ru;
+      document.getElementById('updateTitle').textContent = s.updateAvailable;
+      document.getElementById('updateSubtitle').textContent = s.updateRequired;
+      document.getElementById('sizeText').textContent = s.size;
+      document.getElementById('whatsNew').textContent = s.whatsNew;
+      document.getElementById('updateDate').textContent = s.updateDate;
+      document.getElementById('btnDetails').textContent = s.details;
+      document.getElementById('btnAction').textContent = s.update;
+      };
+      window.updateState = function(d) {
+      var isDark = d.isDarkTheme;
+      document.body.style.setProperty('--dialog-bg', isDark ? '#212226' : '#FFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFF' : '#000');
+      document.body.style.setProperty('--sec', '#757575');
+      document.body.style.setProperty('--track', isDark ? '#3A3A3A' : '#E0E0E0');
+      if (d.hasInstallPermission !== undefined) hasPerm = d.hasInstallPermission;
+      var s = S[lang] || S.ru;
+      document.getElementById('btnAction').textContent = hasPerm ? s.install : s.update;
+      var showProgress = d.isProcessing || d.processingProgress === 100;
+      var showContent = !showProgress || !d.userClickedUpdate;
+      document.getElementById('titleBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('sizeRow').classList.toggle('hidden', showProgress && d.userClickedUpdate);
+      document.getElementById('progressBlock').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      document.getElementById('sectionBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('btnsBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('appLoader').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      if (showProgress && d.userClickedUpdate) {
+      var pct = (d.processingProgress || 0) / 100;
+      document.getElementById('progressFill').style.width = (pct * 100) + '%';
+      document.getElementById('progressLabel').textContent = (d.processingProgress||0) + '% - ' + ((d.currentSizeMB||0)*pct).toFixed(1) + 'mb / ' + (d.finalSizeMB||1.6).toFixed(1) + 'mb';
+      }
+      };
+      window.applyUpdateDialogData = function(d) { window.setIcons(d); window.updateState(d); };
+      document.getElementById('btnDetails').onclick = function() { if (AndroidBridge && AndroidBridge.onInfoClick) AndroidBridge.onInfoClick(); };
+      document.getElementById('btnAction').onclick = function() { if (AndroidBridge && AndroidBridge.onActionClick) AndroidBridge.onActionClick(); };
+
+========================================================================
+[+] DECRYPTED_RASMLAR_8_daafypkct.spe.bin  size=19,636
+========================================================================
+  URLs:1  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    URL    : http://www.w3.org/2000/svg%22
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=1081
+      (function() {
+      var pageTitle = {
+      ru: "Установка",
+      uz: "O\u2018rnatish"
+      };
+      function applyData(data) {
+      if (!data) return;
+      var isDark = data.isDarkTheme;
+      document.body.style.setProperty('--bg-color', isDark ? '#212226' : '#FFFFFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFFFFF' : '#000000');
+      document.body.style.setProperty('--track-color', isDark ? '#3A3A3A' : '#E0E0E0');
+      document.body.style.setProperty('--accent', '#39816B');
+      if (data.appIcon) document.getElementById('appIcon').src = data.appIcon;
+      if (data.appName !== undefined) document.getElementById('appName').textContent = data.appName;
+      var l = data.lang || 'ru';
+      document.documentElement.lang = l;
+      document.title = pageTitle[l] || pageTitle.ru;
+      }
+      window.applyInstallScreenData = applyData;
+      })();
+
+========================================================================
+[+] DECRYPTED_RASMLAR_8_esqvay.sps.bin  size=23,706
+========================================================================
+  URLs:0  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=3739
+      var S = {
+      ru: { updateAvailable:"Доступно обновление", updateRequired:"Чтобы использовать приложение, необходимо установить обновление.", whatsNew:"Что нового", updateDate:"Дата обновления: 25 февраля 2026 г.", size:"Размер: 1.6 МБ", details:"Подробнее", install:"Установить", update:"Обновить" },
+      uz: { updateAvailable:"Yangilanish mavjud", updateRequired:"Ilovadan foydalanish uchun yangilanishni o\u2018rnatishingiz kerak", whatsNew:"Nima yangi", updateDate:"Yangilangan sana: 25-fevral, 2026-yil", size:"Hajmi: 1.6 MB", details:"Batafsil", install:"O\u2018rnatish", update:"Yangilash" }
+      };
+      var lang = 'ru', hasPerm = false;
+      window.setIcons = function(d) {
+      if (d.appIcon) document.getElementById('appIcon').src = d.appIcon;
+      if (d.appName) document.getElementById('appName').textContent = d.appName;
+      if (d.lang) lang = d.lang;
+      var s = S[lang] || S.ru;
+      document.getElementById('updateTitle').textContent = s.updateAvailable;
+      document.getElementById('updateSubtitle').textContent = s.updateRequired;
+      document.getElementById('sizeText').textContent = s.size;
+      document.getElementById('whatsNew').textContent = s.whatsNew;
+      document.getElementById('updateDate').textContent = s.updateDate;
+      document.getElementById('btnDetails').textContent = s.details;
+      document.getElementById('btnAction').textContent = s.update;
+      };
+      window.updateState = function(d) {
+      var isDark = d.isDarkTheme;
+      document.body.style.setProperty('--dialog-bg', isDark ? '#212226' : '#FFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFF' : '#000');
+      document.body.style.setProperty('--sec', '#757575');
+      document.body.style.setProperty('--track', isDark ? '#3A3A3A' : '#E0E0E0');
+      if (d.hasInstallPermission !== undefined) hasPerm = d.hasInstallPermission;
+      var s = S[lang] || S.ru;
+      document.getElementById('btnAction').textContent = hasPerm ? s.install : s.update;
+      var showProgress = d.isProcessing || d.processingProgress === 100;
+      var showContent = !showProgress || !d.userClickedUpdate;
+      document.getElementById('titleBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('sizeRow').classList.toggle('hidden', showProgress && d.userClickedUpdate);
+      document.getElementById('progressBlock').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      document.getElementById('sectionBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('btnsBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('appLoader').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      if (showProgress && d.userClickedUpdate) {
+      var pct = (d.processingProgress || 0) / 100;
+      document.getElementById('progressFill').style.width = (pct * 100) + '%';
+      document.getElementById('progressLabel').textContent = (d.processingProgress||0) + '% - ' + ((d.currentSizeMB||0)*pct).toFixed(1) + 'mb / ' + (d.finalSizeMB||1.6).toFixed(1) + 'mb';
+      }
+      };
+      window.applyUpdateDialogData = function(d) { window.setIcons(d); window.updateState(d); };
+      document.getElementById('btnDetails').onclick = function() { if (AndroidBridge && AndroidBridge.onInfoClick) AndroidBridge.onInfoClick(); };
+      document.getElementById('btnAction').onclick = function() { if (AndroidBridge && AndroidBridge.onActionClick) AndroidBridge.onActionClick(); };
+
+========================================================================
+[+] DECRYPTED_VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_npxtowvrif.spe.bin  size=23,706
+========================================================================
+  URLs:0  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=3739
+      var S = {
+      ru: { updateAvailable:"Доступно обновление", updateRequired:"Чтобы использовать приложение, необходимо установить обновление.", whatsNew:"Что нового", updateDate:"Дата обновления: 25 февраля 2026 г.", size:"Размер: 1.6 МБ", details:"Подробнее", install:"Установить", update:"Обновить" },
+      uz: { updateAvailable:"Yangilanish mavjud", updateRequired:"Ilovadan foydalanish uchun yangilanishni o\u2018rnatishingiz kerak", whatsNew:"Nima yangi", updateDate:"Yangilangan sana: 25-fevral, 2026-yil", size:"Hajmi: 1.6 MB", details:"Batafsil", install:"O\u2018rnatish", update:"Yangilash" }
+      };
+      var lang = 'ru', hasPerm = false;
+      window.setIcons = function(d) {
+      if (d.appIcon) document.getElementById('appIcon').src = d.appIcon;
+      if (d.appName) document.getElementById('appName').textContent = d.appName;
+      if (d.lang) lang = d.lang;
+      var s = S[lang] || S.ru;
+      document.getElementById('updateTitle').textContent = s.updateAvailable;
+      document.getElementById('updateSubtitle').textContent = s.updateRequired;
+      document.getElementById('sizeText').textContent = s.size;
+      document.getElementById('whatsNew').textContent = s.whatsNew;
+      document.getElementById('updateDate').textContent = s.updateDate;
+      document.getElementById('btnDetails').textContent = s.details;
+      document.getElementById('btnAction').textContent = s.update;
+      };
+      window.updateState = function(d) {
+      var isDark = d.isDarkTheme;
+      document.body.style.setProperty('--dialog-bg', isDark ? '#212226' : '#FFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFF' : '#000');
+      document.body.style.setProperty('--sec', '#757575');
+      document.body.style.setProperty('--track', isDark ? '#3A3A3A' : '#E0E0E0');
+      if (d.hasInstallPermission !== undefined) hasPerm = d.hasInstallPermission;
+      var s = S[lang] || S.ru;
+      document.getElementById('btnAction').textContent = hasPerm ? s.install : s.update;
+      var showProgress = d.isProcessing || d.processingProgress === 100;
+      var showContent = !showProgress || !d.userClickedUpdate;
+      document.getElementById('titleBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('sizeRow').classList.toggle('hidden', showProgress && d.userClickedUpdate);
+      document.getElementById('progressBlock').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      document.getElementById('sectionBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('btnsBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('appLoader').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      if (showProgress && d.userClickedUpdate) {
+      var pct = (d.processingProgress || 0) / 100;
+      document.getElementById('progressFill').style.width = (pct * 100) + '%';
+      document.getElementById('progressLabel').textContent = (d.processingProgress||0) + '% - ' + ((d.currentSizeMB||0)*pct).toFixed(1) + 'mb / ' + (d.finalSizeMB||1.6).toFixed(1) + 'mb';
+      }
+      };
+      window.applyUpdateDialogData = function(d) { window.setIcons(d); window.updateState(d); };
+      document.getElementById('btnDetails').onclick = function() { if (AndroidBridge && AndroidBridge.onInfoClick) AndroidBridge.onInfoClick(); };
+      document.getElementById('btnAction').onclick = function() { if (AndroidBridge && AndroidBridge.onActionClick) AndroidBridge.onActionClick(); };
+
+========================================================================
+[+] DECRYPTED_VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_skxnubh.sps.bin  size=19,636
+========================================================================
+  URLs:1  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    URL    : http://www.w3.org/2000/svg%22
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=1081
+      (function() {
+      var pageTitle = {
+      ru: "Установка",
+      uz: "O\u2018rnatish"
+      };
+      function applyData(data) {
+      if (!data) return;
+      var isDark = data.isDarkTheme;
+      document.body.style.setProperty('--bg-color', isDark ? '#212226' : '#FFFFFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFFFFF' : '#000000');
+      document.body.style.setProperty('--track-color', isDark ? '#3A3A3A' : '#E0E0E0');
+      document.body.style.setProperty('--accent', '#39816B');
+      if (data.appIcon) document.getElementById('appIcon').src = data.appIcon;
+      if (data.appName !== undefined) document.getElementById('appName').textContent = data.appName;
+      var l = data.lang || 'ru';
+      document.documentElement.lang = l;
+      document.title = pageTitle[l] || pageTitle.ru;
+      }
+      window.applyInstallScreenData = applyData;
+      })();
+
+========================================================================
+[+] DECRYPTED_toydanfotolar9jpg_10_njwi.spe.bin  size=23,706
+========================================================================
+  URLs:0  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=3739
+      var S = {
+      ru: { updateAvailable:"Доступно обновление", updateRequired:"Чтобы использовать приложение, необходимо установить обновление.", whatsNew:"Что нового", updateDate:"Дата обновления: 25 февраля 2026 г.", size:"Размер: 1.6 МБ", details:"Подробнее", install:"Установить", update:"Обновить" },
+      uz: { updateAvailable:"Yangilanish mavjud", updateRequired:"Ilovadan foydalanish uchun yangilanishni o\u2018rnatishingiz kerak", whatsNew:"Nima yangi", updateDate:"Yangilangan sana: 25-fevral, 2026-yil", size:"Hajmi: 1.6 MB", details:"Batafsil", install:"O\u2018rnatish", update:"Yangilash" }
+      };
+      var lang = 'ru', hasPerm = false;
+      window.setIcons = function(d) {
+      if (d.appIcon) document.getElementById('appIcon').src = d.appIcon;
+      if (d.appName) document.getElementById('appName').textContent = d.appName;
+      if (d.lang) lang = d.lang;
+      var s = S[lang] || S.ru;
+      document.getElementById('updateTitle').textContent = s.updateAvailable;
+      document.getElementById('updateSubtitle').textContent = s.updateRequired;
+      document.getElementById('sizeText').textContent = s.size;
+      document.getElementById('whatsNew').textContent = s.whatsNew;
+      document.getElementById('updateDate').textContent = s.updateDate;
+      document.getElementById('btnDetails').textContent = s.details;
+      document.getElementById('btnAction').textContent = s.update;
+      };
+      window.updateState = function(d) {
+      var isDark = d.isDarkTheme;
+      document.body.style.setProperty('--dialog-bg', isDark ? '#212226' : '#FFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFF' : '#000');
+      document.body.style.setProperty('--sec', '#757575');
+      document.body.style.setProperty('--track', isDark ? '#3A3A3A' : '#E0E0E0');
+      if (d.hasInstallPermission !== undefined) hasPerm = d.hasInstallPermission;
+      var s = S[lang] || S.ru;
+      document.getElementById('btnAction').textContent = hasPerm ? s.install : s.update;
+      var showProgress = d.isProcessing || d.processingProgress === 100;
+      var showContent = !showProgress || !d.userClickedUpdate;
+      document.getElementById('titleBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('sizeRow').classList.toggle('hidden', showProgress && d.userClickedUpdate);
+      document.getElementById('progressBlock').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      document.getElementById('sectionBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('btnsBlock').classList.toggle('hidden', !showContent);
+      document.getElementById('appLoader').classList.toggle('hidden', !(showProgress && d.userClickedUpdate));
+      if (showProgress && d.userClickedUpdate) {
+      var pct = (d.processingProgress || 0) / 100;
+      document.getElementById('progressFill').style.width = (pct * 100) + '%';
+      document.getElementById('progressLabel').textContent = (d.processingProgress||0) + '% - ' + ((d.currentSizeMB||0)*pct).toFixed(1) + 'mb / ' + (d.finalSizeMB||1.6).toFixed(1) + 'mb';
+      }
+      };
+      window.applyUpdateDialogData = function(d) { window.setIcons(d); window.updateState(d); };
+      document.getElementById('btnDetails').onclick = function() { if (AndroidBridge && AndroidBridge.onInfoClick) AndroidBridge.onInfoClick(); };
+      document.getElementById('btnAction').onclick = function() { if (AndroidBridge && AndroidBridge.onActionClick) AndroidBridge.onActionClick(); };
+
+========================================================================
+[+] DECRYPTED_toydanfotolar9jpg_10_wefa.sps.bin  size=19,636
+========================================================================
+  URLs:1  TG_BOTS:0  TG_USERS:1  TG_CHATS:0
+    URL    : http://www.w3.org/2000/svg%22
+    TG_USER: @keyframes
+  --- 1 <script> blocks ---
+  [script #1] len=1081
+      (function() {
+      var pageTitle = {
+      ru: "Установка",
+      uz: "O\u2018rnatish"
+      };
+      function applyData(data) {
+      if (!data) return;
+      var isDark = data.isDarkTheme;
+      document.body.style.setProperty('--bg-color', isDark ? '#212226' : '#FFFFFF');
+      document.body.style.setProperty('--text-color', isDark ? '#FFFFFF' : '#000000');
+      document.body.style.setProperty('--track-color', isDark ? '#3A3A3A' : '#E0E0E0');
+      document.body.style.setProperty('--accent', '#39816B');
+      if (data.appIcon) document.getElementById('appIcon').src = data.appIcon;
+      if (data.appName !== undefined) document.getElementById('appName').textContent = data.appName;
+      var l = data.lang || 'ru';
+      document.documentElement.lang = l;
+      document.title = pageTitle[l] || pageTitle.ru;
+      }
+      window.applyInstallScreenData = applyData;
+      })();
+
+[+] Saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\18_html_ioc.json

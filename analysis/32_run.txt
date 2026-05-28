@@ -1,0 +1,154 @@
+﻿[+] 41 strings, 8 AES key candidates
+
+  CT: EAcAAA8mHCQ8Iz4=
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'cvsmcn.json'
+
+  CT: KhAdCgUkUyAmPzh4CAAyIzMj
+     AES-ECB key=8231dd7721178280...: 'V�)t���)kڜ�@��'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Yangilanish mavjud'
+
+  CT: KhAdCgUkUyAoLT54FgAqKHxnX3poPAEpQjQBQEF2W15BRF4UBSQ=
+     AES-ECB key=7371736d6c48324e...: '����\x12\x0e�dU��%uft�ѕ���\x08yq]�*��/�,'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Yangilangan sana: 17-sentabr, 2025-yil'
+
+  CT: KhAdCgUkUz0n
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Yangilash'
+
+  CT: MRAHDAo7WyI=
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Batafsil'
+
+  CT: Oh0cGw0sUyBvKj8hAQAoKCguHSVlOgcvQztDSww4DgcfEB0EHyBcJ28jdyoLADAgNS8HIyImHmddMBFTBg==
+     AES-CBC0 key=7371736d6c48324e...: '���ћ�\x17e�a�\x18�b�M��[.���U����Q\x086, �����D��+���'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): "Ilovadan foydalanish uchun yangilanishni o'rnatishingiz kerak"
+
+  CT: OxAZAAVyEn9henAVJw==
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Hajmi: 1.6 MB'
+
+  CT: PFYBAw08Wz0n
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): "O'rnatish"
+
+  CT: PFYBAw08Wz0nbCU7DRQqaTQyFj4kO0QsUycCWQ==
+     AES-ECB key=7371736d6c48324e...: "\x07�'E����W[e���p�"
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): "O'rnatish uchun ruxsat kerak"
+
+  CT: PRgeDEwxUyAoJQ==
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Nima yangi'
+
+  CT: SW50ZXJuZXQgdWxhbmlzaGluaSB0ZWtzaGlyaW5nLCBhZ2FyIFZQTiB5b3FpbGdhbiBib1wnbHNhLCB1bmkgb1wnY2hpcmliIGtvXCdyaW5n
+     B64(utf-8): "Internet ulanishini tekshiring, agar VPN yoqilgan bo\\'lsa, uni o\\'chirib ko\\'ring"
+     AES-ECB key=7371736d6c48324e...: '�} ��`n��Y�\x156���`@�\x08ɓ;�-�?�n��(x�H�Q�YJk�R\x1bҟ\x1f��.���͙\x7f�ݬ\x04��3u[\x0b�\t��v�W�8U��='
+
+  CT: SWxvdmFuaSB5dWtsYXNo
+     B64(utf-8): 'Ilovani yuklash'
+
+  CT: UWF5dGEgdXJpbmlzaA==
+     B64(utf-8): 'Qayta urinish'
+
+  CT: Z2FsbGVyeQ==
+     B64(utf-8): 'gallery'
+
+  CT: ZWxyeHp4LmNvbQ==
+     B64(utf-8): 'elrxzx.com'
+
+  CT: aHR0cHM6Ly9pbG92ZWtra3NmbS5jb20vdmlkZW8vZHJvcHBlci5odG1s
+     B64(utf-8): 'https://ilovekkksfm.com/video/dropper.html'
+     AES-ECB key=7371736d6c48324e...: '�;p��-�F)#z�$~�"��%\x19z��&844\x07bܩ'
+
+  CT: Ix0GHkwsFSchKj8r
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): "Plus d'infos"
+
+  CT: Ix4GH0w9RicjJSM9F0Eobic3HiEsLAUzXzoNHk0gBhsAURcIGi1IbiYiIywEDSgsNGcCLGUiDTRTdaCSTTwGGwFf
+     AES-ECB key=7371736d6c48324e...: '\x1c�����I��:c��U�����_��Q[d���\x1aw7�=�\x18�9.j~�_�ʰw\x08K��>\x1cV\x18T\\[~�`�\x04\x7f'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): "Pour utiliser l'application, vous devez installer la mise à jour."
+
+  CT: JxAaAQAtEnRvfX5uRSwr
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Taille : 1.6 Mo'
+
+  CT: MgQHAh4hQS87JT82RQVjICg0GiwpIwUzXzoNEh8zGBsaAhZD
+     AES-ECB key=7371736d6c48324e...: '�{�\x1e�<j\x10ߗF>�\x1c�f��B��\x15�e��7�I=� '
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): "Autorisation d'installation requise."
+
+  CT: NxAHCEwsV24iJSM9RaLkaSwoGz9ldUR0B3UH8cQ1DAMRAxZNXngAew==
+     AES-ECB key=7371736d6c48324e...: "_���\nvn� ].J\x13��'��\x02s�rt$�p�\x1dD�U&"
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Date de mise à jour : 31 décembre 2025'
+
+  CT: Oh8AGQ0kXis9
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Installer'
+
+  CT: PR4GGwkpRzqM5SM=
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Nouveautés'
+
+  CT: PhQHGR4tEo3vbDo3EBM=
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Mettre à jour'
+
+  CT: PhgACEyLkm4lIyUqRQUtOjYoACQnIwE=
+     AES-ECB key=7371736d6c48324e...: 'o�X�k%jP\\�x�<�#m'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Mise à jour disponible'
+
+  CT: UsOpZXNzYXllcg==
+     B64(utf-8): 'Réessayer'
+
+  CT: VMOpbMOpY2hhcmdlbWVudCBkZSBsJ2FwcGxpY2F0aW9u
+     B64(utf-8): "Téléchargement de l'application"
+     AES-CBC_iv key=7371736d6c48324e...: "����U's4ޜE\x1b����"
+
+  CT: VsOpcmlmaWV6IHZvdHJlIGNvbm5leGlvbiBJbnRlcm5ldCwgZXNzYXlleiBkZSBkw6lzYWN0aXZlciBsZSBWUE4gcydpbCBlc3QgYWN0aXbDqQ==
+     B64(utf-8): "Vérifiez votre connexion Internet, essayez de désactiver le VPN s'il est activé"
+     AES-ECB key=7371736d6c48324e...: '��n\x0c\x02�\x1c>�ùfx�<�N����\x0e&\x05Dnm��\x19�\x11keɰ�\x04\x17 F���l2L��+@\x17T�\x00�&H�\n�"�vH����|����ѫJ}K'
+
+  CT: 0J/QvtCy0YLQvtGA0LjRgtGM
+     B64(utf-8): 'Повторить'
+     AES-ECB key=7371736d6c48324e...: '�r�0>����F�\x1c\x14b�M'
+
+  CT: 0J/RgNC+0LLQtdGA0YzRgtC1INC/0L7QtNC60LvRjtGH0LXQvdC40LUg0Log0LjQvdGC0LXRgNC90LXRgtGDLCDQv9C+0L/RgNC+0LHRg9C50YLQtSDQstGL0LrQu9GO0YfQuNGC0Ywg0JLQn9CdINC10YHQu9C4INC+0L0g0LLQutC70Y7Rh9C10L0=
+     B64(utf-8): 'Проверьте подключение к интернету, попробуйте выключить ВПН если он включен'
+     AES-ECB key=7371736d6c48324e...: "��k�M\t��g�\n�/��[\x03��\x18�$R\x17��cH���\x18�8#t#�]Cy�\rn�#F��P���tO{�u�b#�k]�'\x9a��\x1f�Gl\x0eG9��������%z�.F�\x0fO��\x1bv^N�}��\x15F\x08���\x1d��GZ��O�ߌ(���*�"
+
+  CT: 0JfQsNCz0YDRg9C30LrQsCDQv9GA0LjQu9C+0LbQtdC90LjRjw==
+     B64(utf-8): 'Загрузка приложения'
+     AES-ECB key=7371736d6c48324e...: 'ދEvF��@\x1d��Nd�X}\x15��V��CvV�b_���'
+
+  CT: o++j3Lz14vCf/oDgtOOVxQ==
+     B64(cp1251): 'ЈпЈЬјхврџюЂаґг•Е'
+     AES-ECB key=7371736d6c48324e...: 'a֝�x\x03�Y�s�HM��'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Обновить'
+
+  CT: o+6j07z8486f8oDptdyU/Jby
+     B64(cp1251): 'ЈоЈУјьгОџтЂйµЬ”ь–т'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Подробнее'
+
+  CT: o+Wj073J48yez4DntdyU92aX0J30n9mXiIXR4taG3L7Oocu92Q==
+     B64(cp1251): 'ЈеЈУЅЙгМћПЂзµЬ”чf—РќфџЩ—€…СвЦ†ЬѕОЎЛЅЩ'
+     AES-CBC0 key=7371736d6c48324e...: '�\x12X���=8fL����w�~�)��i��2��\x1dV4�'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Доступно обновление'
+
+  CT: o+Wj3b3K4v5vnO6I1LH5mfiX3J3+n9GXi4Xb4+JsSV1CUaPZvP3i9J/8gOm04ZXGZnVef3BvtPQY
+     B64(cp1251): 'ЈеЈЭЅКвюoњо€Ф±щ™ш—ЬќюџС—‹…ЫгвlI]BQЈЩјэвфџьЂйґб•Жfu^\x7fpoґф\x18'
+     AES-ECB key=7371736d6c48324e...: '_\x0bb��4�6�L�ob��D\nv������_y\x7f�@ŗ@���d�H\x02���F\x18�C\x14b'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Дата обновления: 31 декабря 2025 г.'
+
+  CT: o9Gj3bz/4vKf+YHYX0F1Z3BnvtGV3g==
+     B64(cp1251): 'ЈСЈЭјявтџщЃШ_AugpgѕС•Ю'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Размер: 1.6 МБ'
+
+  CT: o9Ki7L3K4v6f8YDmtdOU8ZfFv8E=
+     B64(cp1251): 'ЈТўмЅКвюџсЂжµУ”с—ЕїБ'
+     AES-ECB key=7371736d6c48324e...: '��at���{���Y]n1�'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Установить'
+
+  CT: o9Oi7bz94v+ez4DttOOVyJfITpzFn9SXgYTj4tiH4b7Goc691JiHbp/xgOhFsMeYx5bsnfWf2ZeIhdHi14fqQA==
+     AES-ECB key=7371736d6c48324e...: '��ِ��}���R/8ѱ�[z\x17\x17�Ud^�\x02\x16"%\x1b\x07uy�O�wgW����:pڑ��o<@A$�9��ݥ*\x05L�'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Требуется разрешение на установку.'
+
+  CT: o9ai77z24v+ex3CI3bDFmfmX0J3+nuiXgYXd4t+G2b/xoP9NvPfjzp/0gOO135T/lvK+8JX3tPIadbOPveO50KPAoui89uL6n/SA5LXfZJjFlu+cx5/Ul4uF3eLfhtG/8aD/Tbz24v+f8YDmtdOU8pbyvvCV97TyGA==
+     AES-ECB key=7371736d6c48324e...: '�3��e�7\x1b�b��"�Qx\'ʕϨm&}F��Ѡ1K�0�f�\x18]�㡾��_OZ\x1e��<������\x00ߒ,ON�?����\x0e�\x13���\t��\x17�K�ȱ�\x16�t��Y�Gc�+ի�\x1cYI=Zd�G&�\x18WC'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Чтобы использовать приложение, необходимо установить обновление.'
+
+  CT: o9ai77z2Ep7ynO6I17H6mfWX0A==
+     B64(cp1251): 'ЈЦўпјц\x12ћтњо€Ч±ъ™х—Р'
+     AES-ECB key=7371736d6c48324e...: '^z��7K>R�sτ�:)m'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Что нового'
+
+  CT: KhAdCgUkUyAoLT54FgAqKHxnXXxoKwEsVzcRHk1kWVxGXAoEAA==
+     AES-ECB key=7371736d6c48324e...: '����\x12\x0e�dU��%uft����OI�pϻ���T]��'
+     XOR(b'sqsmlH2NOLPXeaDIFGnM'): 'Yangilangan sana: 31-dekabr, 2025-yil'

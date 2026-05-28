@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (API 31+): запрещаем cloud-backup и device-transfer для всех данных приложения.
+  Без этого файла adb backup / Google Drive backup / device-to-device transfer
+  утаскивают SharedPreferences и /data/data/com.kiberqalqon/* — оттуда злоумышленник
+  может вытащить ScanHistory, FCM-токены, кэшированные APK и т.п.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

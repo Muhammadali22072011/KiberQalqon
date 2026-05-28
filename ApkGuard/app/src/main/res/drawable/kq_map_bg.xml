@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- C2 map background — sunken bg with a primary-soft tinted hint at top.
+     gradientRadius declared with explicit "fraction" type to avoid InflateException
+     on devices that require it for radial gradients. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/kq_bg_sunken" />
+    <corners android:radius="16dp" />
+</shape>

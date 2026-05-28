@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+.gradle/
+local.properties
+keystore.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Generated
+captures/
+.cxx/

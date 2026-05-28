@@ -1,0 +1,2475 @@
+﻿[+] 5 methods touch network/crypto APIs
+
+==============================================================================
+  METHOD: Loo8ooooo8888ooo888o888o8oo8888888/o8ooo888o88oo888oo8ooo88ooo88ooooo; o88oo8ooooooooo88o8oo88o88o8oo88oooo888o (Landroid/content/Context; Ljava/io/File; Landroid/content/Intent;)V
+  HITS: ['PackageInstaller']
+  literals: 5
+==============================================================================
+    const/4 v0, 5
+    const-string v1, "context"
+    invoke-static v11, v1, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-virtual v11, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+    move-result-object v1
+    const/16 v2, 19
+    new-array v2, v2, [B
+    fill-array-data v2, +0000178h
+    new-instance v3, Ljava/lang/String;
+    sget-object v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/o888oooo8ooo8oo88o8o88o88o8oo8;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Ljava/nio/charset/Charset;
+    invoke-direct v3, v2, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v2
+    const/4 v5, 0
+    invoke-virtual v2, v3, v5, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v2
+    invoke-virtual v2, v1, v5, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v1
+    const/16 v2, 49
+    new-array v2, v2, [B
+    fill-array-data v2, +000016bh
+    new-instance v3, Ljava/lang/String;
+    invoke-direct v3, v2, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-static v3, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+    move-result-object v2
+    const/16 v3, 17
+    new-array v3, v3, [B
+    fill-array-data v3, +0000179h
+    new-instance v6, Ljava/lang/String;
+    invoke-direct v6, v3, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v2, v6, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
+    move-result-object v3
+    invoke-virtual v3, v5, Ljava/lang/reflect/Field;->getInt(Ljava/lang/Object;)I
+    move-result v3
+    sget-object v6, Ljava/lang/Integer;->TYPE Ljava/lang/Class;
+    filled-new-array v6, [Ljava/lang/Class;
+    move-result-object v7
+    invoke-virtual v2, v7, Ljava/lang/Class;->getConstructor([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
+    move-result-object v7
+    invoke-static v3, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v3
+    filled-new-array v3, [Ljava/lang/Object;
+    move-result-object v3
+    invoke-virtual v7, v3, Ljava/lang/reflect/Constructor;->newInstance([Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v3
+    const/16 v7, 13
+    new-array v7, v7, [B
+    fill-array-data v7, +000015dh
+    new-instance v8, Ljava/lang/String;
+    invoke-direct v8, v7, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v7
+    filled-new-array v2, [Ljava/lang/Class;
+    move-result-object v2
+    invoke-virtual v7, v8, v2, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v2
+    filled-new-array v3, [Ljava/lang/Object;
+    move-result-object v3
+    invoke-virtual v2, v1, v3, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v2
+    const-string v3, "null cannot be cast to non-null type kotlin.Int"
+    invoke-static v2, v3, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo(Ljava/lang/Object; Ljava/lang/String;)V
+    check-cast v2, Ljava/lang/Integer;
+    invoke-virtual v2, Ljava/lang/Integer;->intValue()I
+    move-result v3
+    const/16 v7, 11
+    new-array v7, v7, [B
+    fill-array-data v7, +000013eh
+    new-instance v8, Ljava/lang/String;
+    invoke-direct v8, v7, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v7
+    filled-new-array v6, [Ljava/lang/Class;
+    move-result-object v6
+    invoke-virtual v7, v8, v6, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v6
+    filled-new-array v2, [Ljava/lang/Object;
+    move-result-object v2
+    invoke-virtual v6, v1, v2, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v1
+    const/4 v2, 7
+    new-array v2, v2, [B
+    fill-array-data v2, +0000129h
+    new-instance v6, Ljava/lang/String;
+    invoke-direct v6, v2, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    new-instance v2, Ljava/io/FileInputStream;
+    invoke-direct v2, v12, Ljava/io/FileInputStream;-><init>(Ljava/io/File;)V
+    const/16 v7, 9
+    new-array v7, v7, [B
+    fill-array-data v7, +0000120h
+    new-instance v8, Ljava/lang/String;
+    invoke-direct v8, v7, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v7
+    const-class v9, Ljava/lang/String;
+    sget-object v10, Ljava/lang/Long;->TYPE Ljava/lang/Class;
+    filled-new-array v9, v10, v10, [Ljava/lang/Class;
+    move-result-object v9
+    invoke-virtual v7, v8, v9, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v7
+    const-wide/16 v8, 0
+    invoke-static v8, v9, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+    move-result-object v8
+    invoke-virtual v12, Ljava/io/File;->length()J
+    move-result-wide v9
+    invoke-static v9, v10, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+    move-result-object v12
+    filled-new-array v6, v8, v12, [Ljava/lang/Object;
+    move-result-object v12
+    invoke-virtual v7, v1, v12, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v12
+    const-string v6, "null cannot be cast to non-null type java.io.OutputStream"
+    invoke-static v12, v6, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo(Ljava/lang/Object; Ljava/lang/String;)V
+    check-cast v12, Ljava/io/OutputStream;
+    invoke-static v2, v12, Loo888oo888o8ooooo888o88888oooo8888/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo88ooooo8ooo8oo8oo8888o8o88ooo8(Ljava/io/InputStream; Ljava/io/OutputStream;)V
+    new-array v6, v0, [B
+    fill-array-data v6, +00000f0h
+    new-instance v7, Ljava/lang/String;
+    invoke-direct v7, v6, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v6
+    const-class v8, Ljava/io/OutputStream;
+    filled-new-array v8, [Ljava/lang/Class;
+    move-result-object v8
+    invoke-virtual v6, v7, v8, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v6
+    filled-new-array v12, [Ljava/lang/Object;
+    move-result-object v7
+    invoke-virtual v6, v1, v7, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    invoke-static v12, v5, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8o88oooooooo88oo88o888oo8ooo88(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    invoke-static v2, v5, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8o88oooooooo88oo88o888oo8ooo88(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    sget v12, Landroid/os/Build$VERSION;->SDK_INT I
+    const/16 v2, 31
+    if-lt v12, v2, +009h
+    const/high16 v12, 167772160
+    invoke-static v11, v3, v13, v12, Landroid/app/PendingIntent;->getBroadcast(Landroid/content/Context; I Landroid/content/Intent; I)Landroid/app/PendingIntent;
+    move-result-object v11
+    goto +7h
+    const/high16 v12, 134217728
+    invoke-static v11, v3, v13, v12, Landroid/app/PendingIntent;->getBroadcast(Landroid/content/Context; I Landroid/content/Intent; I)Landroid/app/PendingIntent;
+    move-result-object v11
+    const-string v12, "android.content.IntentSender"
+    invoke-static v12, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+    move-result-object v12
+    invoke-virtual v11, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v13
+    const-string v2, "getIntentSender"
+    invoke-virtual v13, v2, v5, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v13
+    invoke-virtual v13, v11, v5, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v11
+    const/4 v13, 6
+    new-array v13, v13, [B
+    fill-array-data v13, +00000abh
+    new-instance v2, Ljava/lang/String;
+    invoke-direct v2, v13, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v13
+    filled-new-array v12, [Ljava/lang/Class;
+    move-result-object v12
+    invoke-virtual v13, v2, v12, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v12
+    filled-new-array v11, [Ljava/lang/Object;
+    move-result-object v11
+    invoke-virtual v12, v1, v11, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    new-array v11, v0, [B
+    fill-array-data v11, +0000096h
+    new-instance v12, Ljava/lang/String;
+    invoke-direct v12, v11, v4, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    invoke-virtual v1, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v11
+    invoke-virtual v11, v12, v5, Ljava/lang/Class;->getMethod(Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    move-result-object v11
+    invoke-virtual v11, v1, v5, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/Object;
+    goto +10h
+    move-exception v11
+    goto +8h
+    move-exception v11
+    throw v11
+    move-exception v13
+    invoke-static v12, v11, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8o88oooooooo88oo88o888oo8ooo88(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    throw v13
+    throw v11
+    move-exception v12
+    invoke-static v2, v11, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8o88oooooooo88oo88o888oo8ooo88(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    throw v12
+    return-void 
+    fill-array-data-payload b'getPackageInstaller\x00' | \x67\x65\x74\x50\x61\x63\x6b\x61\x67\x65\x49\x6e\x73\x74\x61\x6c\x6c\x65\x72\x00
+    fill-array-data-payload b'android.content.pm.PackageInstaller$SessionParams\x00' | \x61\x6e\x64\x72\x6f\x69\x64\x2e\x63\x6f\x6e\x74\x65\x6e\x74\x2e\x70\x6d\x2e\x50\x61\x63\x6b\x61\x67\x65\x49\x6e\x73\x74\x61\x6c\x6c\x65\x72\x24\x53\x65\x73\x73\x69\x6f\x6e\x50\x61\x72\x61\x6d\x73\x00
+    nop 
+    fill-array-data-payload b'MODE_FULL_INSTALL\x00' | \x4d\x4f\x44\x45\x5f\x46\x55\x4c\x4c\x5f\x49\x4e\x53\x54\x41\x4c\x4c\x00
+    nop 
+    fill-array-data-payload b'createSession\x00' | \x63\x72\x65\x61\x74\x65\x53\x65\x73\x73\x69\x6f\x6e\x00
+    nop 
+    fill-array-data-payload b'openSession\x00' | \x6f\x70\x65\x6e\x53\x65\x73\x73\x69\x6f\x6e\x00
+    fill-array-data-payload b'package\x00' | \x70\x61\x63\x6b\x61\x67\x65\x00
+    fill-array-data-payload b'openWrite\x00' | \x6f\x70\x65\x6e\x57\x72\x69\x74\x65\x00
+    nop 
+    fill-array-data-payload b'fsync\x00' | \x66\x73\x79\x6e\x63\x00
+    nop 
+    fill-array-data-payload b'commit' | \x63\x6f\x6d\x6d\x69\x74
+    nop 
+    fill-array-data-payload b'close\x00' | \x63\x6c\x6f\x73\x65\x00
+
+==============================================================================
+  METHOD: Lydbllnjd/com/Yxoxnjs2; onCreate (Landroid/os/Bundle;)V
+  HITS: ['webkit/WebView;->loadUrl']
+  literals: 11
+==============================================================================
+    move-object/from16 v15, v51
+    move-object/from16 v0, v52
+    const/4 v13, 0
+    const-string v1, "getString(...)"
+    invoke-super/range v51 ... v52, Landroidx/activity/oooo8oooooooooo8oo8oo88o8ooo888888;->onCreate(Landroid/os/Bundle;)V
+    invoke-virtual/range v51, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+    move-result-object v2
+    const-string v3, "abc_deer_monkey_raccoon_dolphin_dingo"
+    const-string v4, "string"
+    invoke-virtual/range v51, Landroid/content/Context;->getPackageName()Ljava/lang/String;
+    move-result-object v5
+    invoke-virtual v2, v3, v4, v5, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String;)I
+    move-result v2
+    if-eqz v2, +00eh
+    invoke-virtual v15, v2, Landroid/content/Context;->getString(I)Ljava/lang/String;
+    move-result-object v2
+    invoke-static v2, v1, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v15, v2, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o8o8o8888ooo8oooo8o88oo8o8o8o8oo8oo8(Lydbllnjd/com/Yxoxnjs2; Ljava/lang/String;)Z
+    move-result v2
+    goto +2h
+    move v2, v13
+    if-eqz v2, +006h
+    invoke-virtual/range v51, Landroid/app/Activity;->finish()V
+    return-void 
+    invoke-virtual/range v51, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+    move-result-object v2
+    const-string v3, "getWindow(...)"
+    invoke-static v2, v3, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    sget v3, Landroid/os/Build$VERSION;->SDK_INT I
+    const/16 v4, 30
+    if-lt v3, v4, +006h
+    invoke-static v2, v13, Lo8o8o8oo888ooooooo8oo8o8oooo88/oo8oooo8o8oo88o88o8oo8oo888oooooooo88;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo(Landroid/view/Window; Z)V
+    goto +4h
+    invoke-static v2, v13, Lo8o8o8oo888ooooooo8oo8o8oooo88/o88o8oo8o8ooooo88ooo8888oooo8;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo(Landroid/view/Window; Z)V
+    invoke-virtual v2, v13, Landroid/view/Window;->setNavigationBarColor(I)V
+    invoke-static/range v51, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8o88ooooo8ooo88o8o8888o88o8(Lydbllnjd/com/Yxoxnjs2;)Z
+    move-result v2
+    if-nez v2, +003h
+    return-void 
+    const-string v2, "w5m8k3n7p2q9"
+    invoke-virtual v15, v2, v13, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String; I)Landroid/content/SharedPreferences;
+    move-result-object v3
+    const-string v4, "m6k3n8j4p7q2"
+    invoke-interface v3, v4, v13, Landroid/content/SharedPreferences;->getBoolean(Ljava/lang/String; Z)Z
+    move-result v3
+    iput-boolean v3, v15, Lydbllnjd/com/Yxoxnjs2;->oo888oo88o8ooo888oooo88ooo888888o8o88 Z
+    const/16 v3, 103
+    const/16 v4, 107
+    const/16 v5, 99
+    const/16 v6, 97
+    const/16 v7, 80
+    const/16 v8, 101
+    const/16 v9, 116
+    const/16 v14, 110
+    const/16 v10, 105
+    if-eqz v0, +07dh
+    invoke-static Ljava/lang/System;->currentTimeMillis()J
+    int-to-char v11, v10
+    int-to-char v10, v14
+    int-to-char v14, v9
+    int-to-char v9, v8
+    int-to-char v8, v7
+    int-to-char v7, v6
+    int-to-char v6, v5
+    int-to-char v5, v4
+    int-to-char v4, v3
+    const/16 v3, 76
+    int-to-char v3, v3
+    const/16 v12, 117
+    int-to-char v12, v12
+    const/16 v13, 104
+    int-to-char v13, v13
+    move-object/from16 v38, v2
+    const/16 v2, 100
+    int-to-char v2, v2
+    move-object/from16 v39, v1
+    const/16 v1, 21
+    new-array v1, v1, [C
+    const/16 v37, 0
+    aput-char v11, v1, v37
+    const/4 v11, 1
+    aput-char v10, v1, v11
+    const/4 v11, 2
+    aput-char v14, v1, v11
+    const/4 v11, 3
+    aput-char v9, v1, v11
+    const/4 v11, 4
+    aput-char v10, v1, v11
+    const/4 v11, 5
+    aput-char v14, v1, v11
+    const/4 v11, 6
+    aput-char v8, v1, v11
+    const/4 v8, 7
+    aput-char v7, v1, v8
+    const/16 v8, 8
+    aput-char v6, v1, v8
+    const/16 v8, 9
+    aput-char v5, v1, v8
+    const/16 v5, 10
+    aput-char v7, v1, v5
+    const/16 v5, 11
+    aput-char v4, v1, v5
+    const/16 v4, 12
+    aput-char v9, v1, v4
+    const/16 v4, 13
+    aput-char v3, v1, v4
+    const/16 v3, 14
+    aput-char v7, v1, v3
+    const/16 v3, 15
+    aput-char v12, v1, v3
+    const/16 v3, 16
+    aput-char v10, v1, v3
+    const/16 v3, 17
+    aput-char v6, v1, v3
+    const/16 v3, 18
+    aput-char v13, v1, v3
+    const/16 v3, 19
+    aput-char v9, v1, v3
+    const/16 v3, 20
+    aput-char v2, v1, v3
+    new-instance v2, Ljava/lang/String;
+    invoke-direct v2, v1, Ljava/lang/String;-><init>([C)V
+    iget-boolean v1, v15, Lydbllnjd/com/Yxoxnjs2;->oo888oo88o8ooo888oooo88ooo888888o8o88 Z
+    invoke-virtual v0, v2, v1, Landroid/os/BaseBundle;->getBoolean(Ljava/lang/String; Z)Z
+    move-result v0
+    iput-boolean v0, v15, Lydbllnjd/com/Yxoxnjs2;->oo888oo88o8ooo888oooo88ooo888888o8o88 Z
+    goto +5h
+    move-object/from16 v39, v1
+    move-object/from16 v38, v2
+    invoke-virtual/range v51, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
+    move-result-object v0
+    invoke-static Ljava/lang/System;->currentTimeMillis()J
+    const/16 v1, 105
+    int-to-char v1, v1
+    const/16 v2, 110
+    int-to-char v2, v2
+    const/16 v3, 116
+    int-to-char v3, v3
+    const/16 v4, 101
+    int-to-char v4, v4
+    const/16 v5, 80
+    int-to-char v5, v5
+    const/16 v6, 97
+    int-to-char v6, v6
+    const/16 v7, 99
+    int-to-char v7, v7
+    const/16 v8, 107
+    int-to-char v8, v8
+    const/16 v9, 103
+    int-to-char v9, v9
+    const/16 v10, 13
+    new-array v10, v10, [C
+    const/4 v11, 0
+    aput-char v1, v10, v11
+    const/4 v1, 1
+    aput-char v2, v10, v1
+    const/4 v1, 2
+    aput-char v3, v10, v1
+    const/4 v1, 3
+    aput-char v4, v10, v1
+    const/4 v14, 4
+    aput-char v2, v10, v14
+    const/4 v1, 5
+    aput-char v3, v10, v1
+    const/4 v1, 6
+    aput-char v5, v10, v1
+    const/4 v1, 7
+    aput-char v6, v10, v1
+    const/16 v1, 8
+    aput-char v7, v10, v1
+    const/16 v1, 9
+    aput-char v8, v10, v1
+    const/16 v1, 10
+    aput-char v6, v10, v1
+    const/16 v1, 11
+    aput-char v9, v10, v1
+    const/16 v1, 12
+    aput-char v4, v10, v1
+    new-instance v1, Ljava/lang/String;
+    invoke-direct v1, v10, Ljava/lang/String;-><init>([C)V
+    invoke-virtual v0, v1, Landroid/content/Intent;->getParcelableExtra(Ljava/lang/String;)Landroid/os/Parcelable;
+    move-result-object v0
+    move-object/from16 v23, v0
+    check-cast v23, Landroid/content/Intent;
+    invoke-static/range v51, Loo888oo88oooo888888oooo8oo8oooooo8oo88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o88o8o8oooo88o88ooo8888ooo88o(Lydbllnjd/com/Yxoxnjs2;)V
+    new-instance v13, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v13, Ljava/lang/Object;-><init>()V
+    new-instance v12, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v12, Ljava/lang/Object;-><init>()V
+    const v0, 2131296272
+    invoke-virtual v15, v0, Landroid/content/Context;->getString(I)Ljava/lang/String;
+    move-result-object v0
+    move-object/from16 v1, v39
+    invoke-static v0, v1, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v0, Loo888oo88oooo888888oooo8oo8oooooo8oo88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o8oo8o8ooo8o88oo888o888o88888o8ooo888o(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v11
+    sget v10, Landroid/os/Build$VERSION;->SDK_INT I
+    invoke-virtual/range v51, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+    move-result-object v0
+    invoke-virtual v0, Landroid/content/pm/PackageManager;->canRequestPackageInstalls()Z
+    move-result v0
+    sget-object v2, Ljava/lang/Boolean;->FALSE Ljava/lang/Boolean;
+    invoke-static v2, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v16
+    if-nez v0, +007h
+    if-eqz v23, +003h
+    goto +3h
+    const/4 v0, 0
+    goto +2h
+    const/4 v0, 1
+    invoke-static v0, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+    move-result-object v0
+    invoke-static v0, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v24
+    if-eqz v23, +004h
+    const/4 v0, 1
+    goto +2h
+    const/4 v0, 0
+    invoke-static v0, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+    move-result-object v0
+    invoke-static v0, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v9
+    invoke-virtual/range v24, Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;->getValue()Ljava/lang/Object;
+    move-result-object v0
+    check-cast v0, Ljava/lang/Boolean;
+    invoke-virtual v0, Ljava/lang/Boolean;->booleanValue()Z
+    move-result v0
+    if-eqz v0, +023h
+    invoke-virtual/range v51, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+    move-result-object v0
+    invoke-virtual v0, Landroid/content/res/Resources;->getConfiguration()Landroid/content/res/Configuration;
+    move-result-object v0
+    iget v0, v0, Landroid/content/res/Configuration;->uiMode I
+    and-int/lit8 v0, v0, 48
+    const/16 v3, 32
+    if-ne v0, v3, +009h
+    const-string v0, "#212226"
+    invoke-static v0, Landroid/graphics/Color;->parseColor(Ljava/lang/String;)I
+    move-result v0
+    goto +4h
+    const-string v0, "#FFFFFF"
+    goto -7h
+    invoke-virtual/range v51, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+    move-result-object v3
+    invoke-virtual v3, v0, Landroid/view/Window;->setStatusBarColor(I)V
+    new-instance v18, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct/range v18, Ljava/lang/Object;-><init>()V
+    new-instance v17, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-direct/range v17, Ljava/lang/Object;-><init>()V
+    new-instance v8, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v8, Ljava/lang/Object;-><init>()V
+    invoke-static v2, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v0
+    iput-object v0, v8, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    new-instance v7, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v7, Ljava/lang/Object;-><init>()V
+    const/4 v0, 0
+    invoke-static v0, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    move-result-object v3
+    invoke-static v3, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v0
+    iput-object v0, v7, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    new-instance v6, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v6, Ljava/lang/Object;-><init>()V
+    const-wide/16 v3, 0
+    invoke-static v3, v4, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+    move-result-object v0
+    invoke-static v0, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v0
+    iput-object v0, v6, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    new-instance v19, Loooooo8888oo8ooooo88o8oooo88oo8/o888ooo88oo8o88ooo88oo8oo888oo88o;
+    invoke-direct/range v19, Ljava/lang/Object;-><init>()V
+    new-instance v5, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v5, Ljava/lang/Object;-><init>()V
+    invoke-static v2, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v0
+    iput-object v0, v5, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    new-instance v4, Loooooo8888oo8ooooo88o8oooo88oo8/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;
+    invoke-direct v4, Ljava/lang/Object;-><init>()V
+    const/4 v3, -1
+    iput v3, v4, Loooooo8888oo8ooooo88o8oooo88oo8/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo888oooo8888ooooo8888o8o88o88 I
+    new-instance v20, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-direct/range v20, Ljava/lang/Object;-><init>()V
+    new-instance v21, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-direct/range v21, Ljava/lang/Object;-><init>()V
+    new-instance v2, Landroid/os/Handler;
+    invoke-static Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
+    move-result-object v0
+    invoke-direct v2, v0, Landroid/os/Handler;-><init>(Landroid/os/Looper;)V
+    new-instance v0, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v0, Ljava/lang/Object;-><init>()V
+    new-instance v14, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v14, Ljava/lang/Object;-><init>()V
+    move-object/from16 v52, v14
+    new-instance v14, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v14, Ljava/lang/Object;-><init>()V
+    const/16 v22, 0
+    invoke-static/range v22, Ljava/lang/Float;->valueOf(F)Ljava/lang/Float;
+    move-result-object v22
+    move-object/from16 v26, v13
+    invoke-static/range v22, Lo8o8o88888888888oo88o8888ooo88o8/o888ooo88oo8o88ooo88oo8oo888oo88o;->oooo88o88888ooo888oo8o8o888oo8888o8o8o8oo8o(Ljava/lang/Object;)Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;
+    move-result-object v13
+    const v3, 2131296259
+    invoke-virtual v15, v3, Landroid/content/Context;->getString(I)Ljava/lang/String;
+    move-result-object v3
+    invoke-static v3, v1, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v3, Loo888oo88oooo888888oooo8oo8oooooo8oo88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o8oo8o8ooo8o88oo888o888o88888o8ooo888o(Ljava/lang/String;)Ljava/lang/String;
+    new-instance v3, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-direct v3, Ljava/lang/Object;-><init>()V
+    move/from16 v27, v10
+    move-object/from16 v1, v38
+    const/4 v10, 0
+    invoke-virtual v15, v1, v10, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String; I)Landroid/content/SharedPreferences;
+    move-result-object v1
+    new-instance v10, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-direct v10, Ljava/lang/Object;-><init>()V
+    move-object/from16 v28, v0
+    const-string v0, "h7j4k9m2p5r8"
+    move-object/from16 v30, v2
+    move-object/from16 v29, v9
+    const/4 v9, 0
+    invoke-interface v1, v0, v9, Landroid/content/SharedPreferences;->getBoolean(Ljava/lang/String; Z)Z
+    move-result v2
+    iput-boolean v2, v10, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;->oo888oooo8888ooooo8888o8o88o88 Z
+    invoke-static/range v51, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo88o8o8888o88o88o88o88oo88ooooo8888oo8(Landroidx/activity/oooo8oooooooooo8oo8oo88o8ooo888888;)Z
+    move-result v2
+    if-eqz v2, +010h
+    const/4 v2, 1
+    iput-boolean v2, v10, Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;->oo888oooo8888ooooo8888o8o88o88 Z
+    invoke-interface v1, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+    move-result-object v9
+    invoke-interface v9, v0, v2, Landroid/content/SharedPreferences$Editor;->putBoolean(Ljava/lang/String; Z)Landroid/content/SharedPreferences$Editor;
+    move-result-object v0
+    invoke-interface v0, Landroid/content/SharedPreferences$Editor;->apply()V
+    new-instance v9, Landroid/webkit/WebView;
+    invoke-direct v9, v15, Landroid/webkit/WebView;-><init>(Landroid/content/Context;)V
+    iput-object v9, v14, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    new-instance v2, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8888o8o88o888oo8888o8o8ooo88oo88ooo8oo;
+    invoke-direct v2, v9, v11, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8888o8o88o888oo8888o8o8ooo88oo88ooo8oo;-><init>(Landroid/webkit/WebView; Ljava/lang/String;)V
+    new-instance v0, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oooo88o8o88oo8888888o88ooooo8o;
+    move-object/from16 v31, v28
+    move-object/from16 v28, v0
+    move-object/from16 v32, v1
+    move-object/from16 v1, v20
+    move-object/from16 v33, v30
+    move-object/from16 v30, v14
+    move-object v14, v2
+    move-object/from16 v2, v21
+    move-object/from16 v34, v3
+    const/4 v15, -1
+    move-object/from16 v3, v24
+    move-object/from16 v22, v4
+    move-object/from16 v4, v31
+    move-object/from16 v35, v5
+    move-object/from16 v5, v22
+    move-object/from16 v36, v6
+    move-object/from16 v6, v16
+    move-object/from16 v38, v7
+    move-object/from16 v7, v51
+    move-object/from16 v39, v8
+    move-object v8, v13
+    invoke-direct/range v0 ... v8, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oooo88o8o88oo8888888o88ooooo8o;-><init>(Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Lydbllnjd/com/Yxoxnjs2; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;)V
+    iput-object v0, v14, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8888o8o88o888oo8888o8o8ooo88oo88ooo8oo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oooo88o8o88oo8888888o88ooooo8o;
+    new-instance v0, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;
+    invoke-direct v0, Ljava/lang/Object;-><init>()V
+    invoke-virtual v9, v0, Landroid/view/View;->setOnTouchListener(Landroid/view/View$OnTouchListener;)V
+    invoke-virtual v9, Landroid/webkit/WebView;->getSettings()Landroid/webkit/WebSettings;
+    move-result-object v0
+    const/4 v8, 1
+    invoke-virtual v0, v8, Landroid/webkit/WebSettings;->setJavaScriptEnabled(Z)V
+    invoke-virtual v9, Landroid/webkit/WebView;->getSettings()Landroid/webkit/WebSettings;
+    move-result-object v0
+    invoke-virtual v0, v8, Landroid/webkit/WebSettings;->setDomStorageEnabled(Z)V
+    invoke-virtual v9, Landroid/webkit/WebView;->getSettings()Landroid/webkit/WebSettings;
+    move-result-object v0
+    invoke-virtual v0, v8, Landroid/webkit/WebSettings;->setDatabaseEnabled(Z)V
+    new-instance v0, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v0, v14, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888oo8o8o888o88oo88o888o8;-><init>(Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8888o8o88o888oo8888o8o8ooo88oo88ooo8oo;)V
+    invoke-virtual v9, v0, Landroid/webkit/WebView;->setWebViewClient(Landroid/webkit/WebViewClient;)V
+    new-instance v0, Landroid/view/ViewGroup$LayoutParams;
+    invoke-direct v0, v15, v15, Landroid/view/ViewGroup$LayoutParams;-><init>(I I)V
+    invoke-virtual v9, v0, Landroid/webkit/WebView;->setLayoutParams(Landroid/view/ViewGroup$LayoutParams;)V
+    invoke-virtual v11, Ljava/lang/String;->length()I
+    move-result v0
+    if-lez v0, +005h
+    invoke-virtual v9, v11, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+    move-object/from16 v15, v31
+    iput-object v14, v15, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    iget-object v0, v12, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    if-eqz v0, +01eh
+    check-cast v0, Ljava/lang/Thread;
+    invoke-virtual v0, Ljava/lang/Thread;->isAlive()Z
+    move-result v0
+    if-eqz v0, +016h
+    move-object/from16 v45, v52
+    move-object/from16 v44, v13
+    move-object/from16 v25, v15
+    move-object/from16 v31, v26
+    move/from16 v42, v27
+    move-object/from16 v40, v29
+    move-object/from16 v19, v30
+    move-object/from16 v27, v10
+    move-object/from16 v29, v11
+    move-object v15, v12
+    goto +50h
+    new-instance v14, Ljava/lang/Thread;
+    new-instance v9, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;
+    move-object v0, v9
+    move-object/from16 v1, v51
+    move-object/from16 v2, v33
+    move-object/from16 v3, v19
+    move-object/from16 v4, v18
+    move-object/from16 v5, v17
+    move-object/from16 v6, v39
+    move-object/from16 v7, v38
+    move/from16 v19, v8
+    move-object v8, v10
+    move-object/from16 v41, v9
+    move-object/from16 v40, v29
+    const/16 v28, 0
+    move-object/from16 v9, v32
+    move/from16 v42, v27
+    move-object/from16 v27, v10
+    move-object/from16 v10, v24
+    move-object/from16 v29, v11
+    move-object/from16 v11, v34
+    move-object/from16 v43, v12
+    move-object/from16 v12, v26
+    move-object/from16 v44, v13
+    move-object/from16 v31, v26
+    move-object/from16 v13, v16
+    move-object/from16 v45, v52
+    move-object/from16 v46, v14
+    move-object/from16 v19, v30
+    move-object/from16 v14, v36
+    move-object/from16 v25, v15
+    move-object/from16 v15, v35
+    invoke-direct/range v0 ... v15, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o88o88888o88888o8o8ooooo88o8o8o88o8oo;-><init>(Lydbllnjd/com/Yxoxnjs2; Landroid/os/Handler; Loooooo8888oo8ooooo88o8oooo88oo8/o888ooo88oo8o88ooo88oo8oo888oo88o; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Landroid/content/SharedPreferences; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;)V
+    move-object/from16 v1, v41
+    move-object/from16 v0, v46
+    invoke-direct v0, v1, Ljava/lang/Thread;-><init>(Ljava/lang/Runnable;)V
+    move-object/from16 v15, v43
+    iput-object v0, v15, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    invoke-virtual v0, Ljava/lang/Thread;->start()V
+    const/high16 v0, 1065353216
+    invoke-static v0, Ljava/lang/Float;->valueOf(F)Ljava/lang/Float;
+    move-result-object v0
+    move-object/from16 v9, v44
+    invoke-virtual v9, v0, Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888;->setValue(Ljava/lang/Object;)V
+    new-instance v14, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;
+    invoke-direct v14, Ljava/lang/Object;-><init>()V
+    new-instance v0, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8oo8ooooo8888oo88o8oooooo888;
+    move-object/from16 v1, v33
+    move-object/from16 v10, v40
+    invoke-direct v0, v1, v10, v14, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8oo8ooooo8888oo88o8oooooo888;-><init>(Landroid/os/Handler; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;)V
+    move-object/from16 v13, v45
+    iput-object v0, v13, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    new-instance v0, Landroid/content/IntentFilter;
+    invoke-direct v0, Landroid/content/IntentFilter;-><init>()V
+    const-string v1, "ydbllnjd.com.d7k58bL36"
+    invoke-virtual v0, v1, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
+    const-string v1, "ydbllnjd.com.w8q92mK47"
+    invoke-virtual v0, v1, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
+    const/16 v1, 33
+    move/from16 v2, v42
+    if-lt v2, v1, +00dh
+    iget-object v1, v13, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    check-cast v1, Landroid/content/BroadcastReceiver;
+    const/4 v2, 4
+    move-object/from16 v12, v51
+    invoke-virtual v12, v1, v0, v2, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver; Landroid/content/IntentFilter; I)Landroid/content/Intent;
+    goto +ah
+    move-object/from16 v12, v51
+    iget-object v1, v13, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    check-cast v1, Landroid/content/BroadcastReceiver;
+    invoke-virtual v12, v1, v0, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver; Landroid/content/IntentFilter;)Landroid/content/Intent;
+    new-instance v11, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8ooo88o8ooo8oooo88oo8ooo88888ooooo888o;
+    move-object v0, v11
+    move-object/from16 v1, v24
+    move-object/from16 v2, v51
+    move-object/from16 v3, v20
+    move-object/from16 v4, v21
+    move-object/from16 v5, v25
+    move-object/from16 v6, v22
+    move-object/from16 v7, v16
+    move-object/from16 v8, v19
+    move-object/from16 v47, v11
+    move-object/from16 v11, v23
+    move-object/from16 v12, v39
+    move-object/from16 v48, v13
+    move-object/from16 v13, v17
+    move-object/from16 v49, v14
+    move-object/from16 v14, v29
+    move-object/from16 v50, v15
+    move-object/from16 v15, v38
+    move-object/from16 v16, v36
+    move-object/from16 v17, v35
+    move-object/from16 v19, v27
+    move-object/from16 v20, v32
+    move-object/from16 v21, v34
+    move-object/from16 v22, v31
+    invoke-direct/range v0 ... v22, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8ooo88o8ooo8oooo88oo8ooo88888ooooo888o;-><init>(Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Lydbllnjd/com/Yxoxnjs2; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Landroid/content/Intent; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Ljava/lang/String; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Landroid/content/SharedPreferences; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;)V
+    new-instance v0, Lo88ooo88o888o88ooo8oo88oo8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;
+    const v1, 1780696417
+    move-object/from16 v2, v47
+    const/4 v7, 1
+    invoke-direct v0, v1, v7, v2, Lo88ooo88o888o88ooo8oo88oo8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;-><init>(I Z Looo88888oo88o8o8oooo88o88o88ooo8o88o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)V
+    sget-object v1, Loo8888o88o8888888oo88o8o88o8o8o88/oooo88o8o88oo8888888o88ooooo8o;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Landroid/view/ViewGroup$LayoutParams;
+    invoke-virtual/range v51, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+    move-result-object v1
+    invoke-virtual v1, Landroid/view/Window;->getDecorView()Landroid/view/View;
+    move-result-object v1
+    const v2, 16908290
+    invoke-virtual v1, v2, Landroid/view/View;->findViewById(I)Landroid/view/View;
+    move-result-object v1
+    check-cast v1, Landroid/view/ViewGroup;
+    const/4 v2, 0
+    invoke-virtual v1, v2, Landroid/view/ViewGroup;->getChildAt(I)Landroid/view/View;
+    move-result-object v1
+    instance-of v2, v1, Landroidx/compose/ui/platform/o8o88o888oo8o88oooo8oo88oooooo8o8;
+    const/4 v3, 0
+    if-eqz v2, +005h
+    check-cast v1, Landroidx/compose/ui/platform/o8o88o888oo8o88oooo8oo88oooooo8o8;
+    goto +2h
+    move-object v1, v3
+    if-eqz v1, +00bh
+    invoke-virtual v1, v3, Landroidx/compose/ui/platform/o888oooo8ooo8oo88o8o88o88o8oo8;->setParentCompositionContext(Lo8o8o88888888888oo88o8888ooo88o8/o8888o8o88o888oo8888o8o8ooo88oo88ooo8oo;)V
+    invoke-virtual v1, v0, Landroidx/compose/ui/platform/o8o88o888oo8o88oooo8oo88oooooo8o8;->setContent(Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;)V
+    move-object/from16 v8, v51
+    goto +5bh
+    new-instance v1, Landroidx/compose/ui/platform/o8o88o888oo8o88oooo8oo88oooooo8o8;
+    move-object/from16 v8, v51
+    invoke-direct v1, v8, Landroidx/compose/ui/platform/o8o88o888oo8o88oooo8oo88oooooo8o8;-><init>(Lydbllnjd/com/Yxoxnjs2;)V
+    invoke-virtual v1, v3, Landroidx/compose/ui/platform/o888oooo8ooo8oo88o8o88o88o8oo8;->setParentCompositionContext(Lo8o8o88888888888oo88o8888ooo88o8/o8888o8o88o888oo8888o8o8ooo88oo88ooo8oo;)V
+    invoke-virtual v1, v0, Landroidx/compose/ui/platform/o8o88o888oo8o88oooo8oo88oooooo8o8;->setContent(Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;)V
+    invoke-virtual/range v51, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+    move-result-object v0
+    invoke-virtual v0, Landroid/view/Window;->getDecorView()Landroid/view/View;
+    move-result-object v0
+    invoke-static v0, Landroidx/lifecycle/o88o8oo8o8ooooo88ooo8888oooo8;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo(Landroid/view/View;)Landroidx/lifecycle/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    move-result-object v2
+    if-nez v2, +008h
+    const v2, 2131034194
+    invoke-virtual v0, v2, v8, Landroid/view/View;->setTag(I Ljava/lang/Object;)V
+    sget-object v2, Landroidx/lifecycle/o88888ooo888o888o88o8oo8oooo8oo88888o;->oo88o8o88oo8oo88o888oo8ooo8o Landroidx/lifecycle/o88888ooo888o888o88o8oo8oooo8oo88888o;
+    invoke-static v0, v2, Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o888oo8o8oo8o888o888o888888o888o88oo88o;->oooooo8o888o888oo88888o8oo88oooo88o8o88888o(Ljava/lang/Object; Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;)Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;
+    move-result-object v2
+    sget-object v3, Landroidx/lifecycle/o88888ooo888o888o88o8oo8oooo8oo88888o;->ooo88ooooo8ooo8oo8oo8888o8o88ooo8 Landroidx/lifecycle/o88888ooo888o888o88o8oo8oooo8oo88888o;
+    invoke-static v2, v3, Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o888oo8o8oo8o888o888o888888o888o88oo88o;->ooooo88oo8o888o8oo8oo8o88o88ooo88888o88888(Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo; Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;)Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;
+    move-result-object v2
+    invoke-static v2, Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o888oo8o8oo8o888o888o888888o888o88oo88o;->ooo8oooooo88o8oo8o888o888o888oo8(Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;)Ljava/lang/Object;
+    move-result-object v2
+    check-cast v2, Landroidx/lifecycle/o8o88oooo88o888888o8ooo8oo8o88ooooo8o8888oo;
+    if-nez v2, +008h
+    const v2, 2131034197
+    invoke-virtual v0, v2, v8, Landroid/view/View;->setTag(I Ljava/lang/Object;)V
+    sget-object v2, Loo8oooooo8oooooo88ooo88o88o8oo888/o888oo8o8oo8o888o888o888888o888o88oo88o;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo Loo8oooooo8oooooo88ooo88o88o8oo888/o888oo8o8oo8o888o888o888888o888o88oo88o;
+    invoke-static v0, v2, Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o888oo8o8oo8o888o888o888888o888o88oo88o;->oooooo8o888o888oo88888o8oo88oooo88o8o88888o(Ljava/lang/Object; Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;)Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;
+    move-result-object v2
+    sget-object v3, Loo8oooooo8oooooo88ooo88o88o8oo888/o888oo8o8oo8o888o888o888888o888o88oo88o;->oo88o8o8ooo88888o8oo8oo8ooo8o8888o8o88oo8o Loo8oooooo8oooooo88ooo88o88o8oo888/o888oo8o8oo8o888o888o888888o888o88oo88o;
+    invoke-static v2, v3, Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o888oo8o8oo8o888o888o888888o888o88oo88o;->ooooo88oo8o888o8oo8oo8o88o88ooo88888o88888(Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo; Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;)Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;
+    move-result-object v2
+    invoke-static v2, Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o888oo8o8oo8o888o888o888888o888o88oo88o;->ooo8oooooo88o8oo8o888o888o888oo8(Loo88888oo8o888ooo8oo888oo8oo888oo8o888o/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;)Ljava/lang/Object;
+    move-result-object v2
+    check-cast v2, Loo8oooooo8oooooo88ooo88o88o8oo888/oooooo888oooo88o88oooo8o8oo88ooo888oo;
+    if-nez v2, +008h
+    const v2, 2131034196
+    invoke-virtual v0, v2, v8, Landroid/view/View;->setTag(I Ljava/lang/Object;)V
+    sget-object v0, Loo8888o88o8888888oo88o8o88o8o8o88/oooo88o8o88oo8888888o88ooooo8o;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Landroid/view/ViewGroup$LayoutParams;
+    invoke-virtual v8, v1, v0, Landroidx/activity/oooo8oooooooooo8oo8oo88o8ooo888888;->setContentView(Landroid/view/View; Landroid/view/ViewGroup$LayoutParams;)V
+    new-instance v9, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo88ooo88888888oo88ooo888888o88o8o8o88ooo;
+    move-object/from16 v2, v34
+    invoke-direct v9, v8, v2, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo88ooo88888888oo88ooo888888o88o8o8o88ooo;-><init>(Lydbllnjd/com/Yxoxnjs2; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;)V
+    new-instance v10, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o888888ooo8oooo88o888oooo88oo;
+    move-object/from16 v3, v31
+    move-object/from16 v1, v48
+    move-object/from16 v0, v50
+    invoke-direct v10, v3, v0, v1, v8, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o888888ooo8oooo88o888oooo88oo;-><init>(Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Lydbllnjd/com/Yxoxnjs2;)V
+    new-instance v11, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo8o8oo8oooo8oo8ooo8o88o8o8oooo8o8o88;
+    move-object v0, v11
+    move-object/from16 v1, v51
+    move-object/from16 v4, v24
+    move-object/from16 v5, v27
+    move-object/from16 v6, v32
+    invoke-direct/range v0 ... v6, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo8o8oo8oooo8oo8ooo8o88o8o8oooo8o8o88;-><init>(Lydbllnjd/com/Yxoxnjs2; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8; Lo8o8o88888888888oo88o8888ooo88o8/oo8o88o888888oo888o88o88o88o88ooo8o888; Loooooo8888oo8ooooo88o8oooo88oo8/oooo8oooooooooo8oo8oo88o8ooo888888; Landroid/content/SharedPreferences;)V
+    iput-object v10, v8, Lydbllnjd/com/Yxoxnjs2;->o88o8oo888o888o8o8o88o8ooooo88o8o8oo88o Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o888888ooo8oooo88o888oooo88oo;
+    iput-object v9, v8, Lydbllnjd/com/Yxoxnjs2;->o8oo8oo8o8ooo88888o8o888o888ooo888 Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo88ooo88888888oo88ooo888888o88o8o8o88ooo;
+    iput-object v11, v8, Lydbllnjd/com/Yxoxnjs2;->o888o88o88o8o8o8ooooo8888o88oo8oooooooo Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo8o8oo8oooo8oo8ooo8o88o8o8oooo8o8o88;
+    new-instance v0, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo8o8888o88oo888o8oo8o8ooo8o8o8o888o;
+    invoke-direct v0, v7, v8, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/oo8o8888o88oo888o8oo8o8ooo8o8o8o888o;-><init>(I Ljava/lang/Object;)V
+    move-object/from16 v1, v49
+    iput-object v0, v1, Loooooo8888oo8ooooo88o8oooo88oo8/o88o88888oo8o8o888o88oo88o888o8;->oo888oooo8888ooooo8888o8o88o88 Ljava/lang/Object;
+    if-eqz v23, +012h
+    iget-boolean v0, v8, Lydbllnjd/com/Yxoxnjs2;->oo888oo88o8ooo888oooo88ooo888888o8o88 Z
+    if-nez v0, +00eh
+    invoke-virtual/range v51, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
+    move-result-object v0
+    new-instance v1, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8888oooo88888888oo8o8oooo8o8ooo8o;
+    invoke-direct v1, v8, v7, Lo8o88oo8o88o8oooo8oo88888o8oo8o8o/o8888oooo88888888oo8o8oooo8o8ooo8o;-><init>(Lydbllnjd/com/Yxoxnjs2; I)V
+    invoke-static v8, v0, v1, Loo888oo888o8ooooo888o88888oooo8888/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oo888oo88o8ooo888oooo88ooo888888o8o88(Lydbllnjd/com/Yxoxnjs2; Landroid/content/Intent; Loooo8888oo8o8888oo8o888888oo8oo88o8o8ooo8/o8ooo888o88oo888oo8ooo88ooo88ooooo;)V
+    return-void 
+
+==============================================================================
+  METHOD: Lcom/android/apksig/ApkSigner; sign (Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo; Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;)V
+  HITS: ['java/io/DataOutputStream']
+  literals: 38
+==============================================================================
+    move-object/from16 v7, v38
+    move-object/from16 v0, v39
+    move-object/from16 v15, v40
+    move-object/from16 v14, v41
+    invoke-static/range v39, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/oooooo888oooo88o88oooo8o8oo88ooo888oo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;)Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;
+    move-result-object v13
+    const-wide/16 v1, -1
+    invoke-static v0, v13, Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o888o88o88o8o8o8ooooo8888o88oo8oooooooo(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Loooo888o888oo8ooo8oo888o88oo/o888oooo8ooo8oo88o8o88o88o8oo8;)Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o888oo8o8oo8o888o888o888888o888o88oo88o;
+    move-result-object v3
+    iget-wide v4, v3, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o888oo8o8oo8o888o888o888888o888o88oo88o;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo J
+    iget-object v3, v3, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o888oo8o8oo8o888o888o888888o888o88oo88o;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;
+    goto +3h
+    move-wide v4, v1
+    const/4 v3, 0
+    cmp-long v1, v4, v1
+    if-eqz v1, +003h
+    goto +3h
+    iget-wide v4, v13, Loooo888o888oo8ooo8oo888o88oo/o888oooo8ooo8oo88o8o88o88o8oo8;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo J
+    const-wide/16 v10, 0
+    invoke-interface v0, v10, v11, v4, v5, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->slice(J J)Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;
+    move-result-object v8
+    invoke-static v0, v13, Lcom/android/apksig/ApkSigner;->getZipCentralDirectory(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;)Ljava/nio/ByteBuffer;
+    move-result-object v0
+    invoke-static v0, v13, Lcom/android/apksig/ApkSigner;->parseZipCentralDirectory(Ljava/nio/ByteBuffer; Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;)Ljava/util/List;
+    move-result-object v9
+    invoke-static v9, v8, Lcom/android/apksig/ApkSigner;->extractPinPatterns(Ljava/util/List; Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;)Ljava/util/List;
+    move-result-object v16
+    if-nez v16, +004h
+    const/4 v6, 0
+    goto +7h
+    new-instance v0, Ljava/util/ArrayList;
+    invoke-direct v0, Ljava/util/ArrayList;-><init>()V
+    move-object v6, v0
+    iget-object v0, v7, Lcom/android/apksig/ApkSigner;->mSignerEngine Lcom/android/apksig/oooooo888oooo88o88oooo8o8oo88ooo888oo;
+    if-eqz v0, +00fh
+    move-object/from16 v36, v3
+    move-object/from16 v32, v6
+    move-object/from16 v34, v8
+    move-object/from16 v35, v9
+    move-object/from16 v33, v13
+    move-object v8, v0
+    goto/16 +26ah
+    iget-object v0, v7, Lcom/android/apksig/ApkSigner;->mMinSdkVersion Ljava/lang/Integer;
+    if-eqz v0, +009h
+    invoke-virtual v0, Ljava/lang/Integer;->intValue()I
+    move-result v0
+    move/from16 v23, v0
+    goto +6h
+    invoke-static v9, v8, Lcom/android/apksig/ApkSigner;->getMinSdkVersionFromApk(Ljava/util/List; Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;)I
+    move-result v0
+    goto -7h
+    new-instance v0, Ljava/util/ArrayList;
+    iget-object v1, v7, Lcom/android/apksig/ApkSigner;->mSignerConfigs Ljava/util/List;
+    invoke-interface v1, Ljava/util/List;->size()I
+    move-result v1
+    invoke-direct v0, v1, Ljava/util/ArrayList;-><init>(I)V
+    iget-object v1, v7, Lcom/android/apksig/ApkSigner;->mSignerConfigs Ljava/util/List;
+    invoke-interface v1, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v1
+    invoke-interface v1, Ljava/util/Iterator;->hasNext()Z
+    move-result v2
+    if-eqz v2, +035h
+    invoke-interface v1, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v2
+    check-cast v2, Lcom/android/apksig/ApkSigner$SignerConfig;
+    new-instance v12, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-virtual v2, Lcom/android/apksig/ApkSigner$SignerConfig;->getName()Ljava/lang/String;
+    move-result-object v10
+    invoke-virtual v2, Lcom/android/apksig/ApkSigner$SignerConfig;->getKeyConfig()Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888;
+    move-result-object v11
+    invoke-virtual v2, Lcom/android/apksig/ApkSigner$SignerConfig;->getCertificates()Ljava/util/List;
+    move-result-object v4
+    invoke-virtual v2, Lcom/android/apksig/ApkSigner$SignerConfig;->getDeterministicDsaSigning()Z
+    move-result v5
+    invoke-direct v12, v10, v11, v4, v5, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;-><init>(Ljava/lang/String; Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888; Ljava/util/List; Z)V
+    invoke-virtual v2, Lcom/android/apksig/ApkSigner$SignerConfig;->getMinSdkVersion()I
+    move-result v4
+    invoke-virtual v2, Lcom/android/apksig/ApkSigner$SignerConfig;->getSigningCertificateLineage()Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;
+    move-result-object v2
+    if-lez v4, +005h
+    invoke-virtual v12, v2, v4, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo(Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8; I)V
+    new-instance v2, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    invoke-direct v2, v12, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;-><init>(Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;)V
+    invoke-virtual v0, v2, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+    const-wide/16 v10, 0
+    goto -38h
+    invoke-virtual v0, Ljava/util/ArrayList;->isEmpty()Z
+    move-result v1
+    if-nez v1, +87ch
+    invoke-virtual v0, Ljava/util/ArrayList;->size()I
+    new-instance v1, Ljava/util/ArrayList;
+    invoke-direct v1, v0, Ljava/util/ArrayList;-><init>(Ljava/util/Collection;)V
+    iget-boolean v0, v7, Lcom/android/apksig/ApkSigner;->mV1SigningEnabled Z
+    iget-boolean v2, v7, Lcom/android/apksig/ApkSigner;->mV2SigningEnabled Z
+    iget-boolean v4, v7, Lcom/android/apksig/ApkSigner;->mV3SigningEnabled Z
+    iget-boolean v5, v7, Lcom/android/apksig/ApkSigner;->mVerityEnabled Z
+    iget-boolean v10, v7, Lcom/android/apksig/ApkSigner;->mDebuggableApkPermitted Z
+    iget-boolean v11, v7, Lcom/android/apksig/ApkSigner;->mOtherSignersSignaturesPreserved Z
+    iget-object v12, v7, Lcom/android/apksig/ApkSigner;->mSigningCertificateLineage Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;
+    if-eqz v12, +008h
+    move-object/from16 v32, v6
+    move-object v6, v12
+    const/16 v17, 1
+    goto +6h
+    move/from16 v17, v4
+    move-object/from16 v32, v6
+    const/4 v6, 0
+    iget v12, v7, Lcom/android/apksig/ApkSigner;->mRotationMinSdkVersion I
+    move-object/from16 v33, v13
+    const/16 v13, 33
+    if-ge v12, v13, +004h
+    const/16 v12, 28
+    iget-boolean v13, v7, Lcom/android/apksig/ApkSigner;->mRotationTargetsDevRelease Z
+    iget-object v14, v7, Lcom/android/apksig/ApkSigner;->mCreatedBy Ljava/lang/String;
+    if-eqz v14, +005h
+    move-object/from16 v30, v14
+    goto +4h
+    const-string v14, "1.0 (Android)"
+    goto -5h
+    iget-object v14, v7, Lcom/android/apksig/ApkSigner;->mSourceStampSignerConfig Lcom/android/apksig/ApkSigner$SignerConfig;
+    if-eqz v14, +02fh
+    new-instance v15, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;
+    invoke-virtual v14, Lcom/android/apksig/ApkSigner$SignerConfig;->getName()Ljava/lang/String;
+    move-result-object v14
+    move-object/from16 v34, v8
+    iget-object v8, v7, Lcom/android/apksig/ApkSigner;->mSourceStampSignerConfig Lcom/android/apksig/ApkSigner$SignerConfig;
+    invoke-virtual v8, Lcom/android/apksig/ApkSigner$SignerConfig;->getKeyConfig()Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888;
+    move-result-object v8
+    move-object/from16 v35, v9
+    iget-object v9, v7, Lcom/android/apksig/ApkSigner;->mSourceStampSignerConfig Lcom/android/apksig/ApkSigner$SignerConfig;
+    invoke-virtual v9, Lcom/android/apksig/ApkSigner$SignerConfig;->getCertificates()Ljava/util/List;
+    move-result-object v9
+    move-object/from16 v36, v3
+    iget-object v3, v7, Lcom/android/apksig/ApkSigner;->mSourceStampSignerConfig Lcom/android/apksig/ApkSigner$SignerConfig;
+    invoke-virtual v3, Lcom/android/apksig/ApkSigner$SignerConfig;->getDeterministicDsaSigning()Z
+    move-result v3
+    invoke-direct v15, v14, v8, v9, v3, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;-><init>(Ljava/lang/String; Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888; Ljava/util/List; Z)V
+    new-instance v3, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    invoke-direct v3, v15, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;-><init>(Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;)V
+    iget-boolean v8, v7, Lcom/android/apksig/ApkSigner;->mSourceStampTimestampEnabled Z
+    move-object/from16 v20, v3
+    move/from16 v22, v8
+    goto +bh
+    move-object/from16 v36, v3
+    move-object/from16 v34, v8
+    move-object/from16 v35, v9
+    const/16 v20, 0
+    const/16 v22, 1
+    iget-object v3, v7, Lcom/android/apksig/ApkSigner;->mSourceStampSigningCertificateLineage Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;
+    if-eqz v3, +005h
+    move-object/from16 v21, v3
+    goto +3h
+    const/16 v21, 0
+    if-nez v4, +00dh
+    if-nez v4, +003h
+    goto +9h
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Builder configured to both enable and disable APK Signature Scheme v3 signing"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    if-nez v4, +005h
+    const/16 v26, 0
+    goto +8h
+    if-eqz v4, +005h
+    const/16 v26, 1
+    goto +3h
+    move/from16 v26, v17
+    new-instance v3, Landroidx/compose/ui/platform/oo8oooo8o8oo88o88o8oo8oo888oooooooo88;
+    const/4 v4, 1
+    invoke-direct v3, v4, Landroidx/compose/ui/platform/oo8oooo8o8oo88o88o8oo8oo888oooooooo88;-><init>(I)V
+    invoke-virtual v1, v3, Ljava/util/ArrayList;->sort(Ljava/util/Comparator;)V
+    new-instance v3, Ljava/util/ArrayList;
+    invoke-direct v3, Ljava/util/ArrayList;-><init>()V
+    const/4 v4, 0
+    invoke-virtual v1, Ljava/util/ArrayList;->size()I
+    move-result v8
+    if-ge v4, v8, +01eh
+    invoke-virtual v1, v4, Ljava/util/ArrayList;->get(I)Ljava/lang/Object;
+    move-result-object v8
+    check-cast v8, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    iget v8, v8, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->o88oo8o8o8ooo88oo8oo8888888oooooo I
+    if-lez v8, +010h
+    invoke-virtual v1, Ljava/util/ArrayList;->size()I
+    move-result v3
+    invoke-virtual v1, v4, v3, Ljava/util/ArrayList;->subList(I I)Ljava/util/List;
+    move-result-object v3
+    const/4 v8, 0
+    invoke-virtual v1, v8, v4, Ljava/util/ArrayList;->subList(I I)Ljava/util/List;
+    move-result-object v1
+    goto +6h
+    const/4 v8, 0
+    add-int/lit8 v4, v4, 1
+    goto -21h
+    const/4 v8, 0
+    if-eqz v6, +068h
+    invoke-interface v3, Ljava/util/List;->isEmpty()Z
+    move-result v4
+    if-nez v4, +01bh
+    invoke-interface v3, v8, Ljava/util/List;->get(I)Ljava/lang/Object;
+    move-result-object v4
+    check-cast v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    iget v4, v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->o88oo8o8o8ooo88oo8oo8888888oooooo I
+    if-ge v12, v4, +003h
+    goto +fh
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "The rotation-min-sdk-version, "
+    const-string v2, ", must be less than the first targeted SDK version, "
+    invoke-static v1, v12, v2, v4, Lcom/android/apksig/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo(Ljava/lang/String; I Ljava/lang/String; I)Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    invoke-virtual v6, v1, Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;->oo888oooo8888ooooo8888o8o88o88(Ljava/util/List;)Ljava/util/ArrayList;
+    move-result-object v1
+    invoke-virtual v1, Ljava/util/ArrayList;->size()I
+    move-result v4
+    const/4 v8, 1
+    sub-int/2addr v4, v8
+    invoke-virtual v1, v4, Ljava/util/ArrayList;->remove(I)Ljava/lang/Object;
+    move-result-object v4
+    check-cast v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    new-instance v8, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;
+    iget-object v9, v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Ljava/lang/String;
+    iget-object v14, v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Ljava/util/List;
+    iget-boolean v15, v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->oo888oooo8888ooooo8888o8o88o88 Z
+    iget-object v4, v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888;
+    invoke-direct v8, v9, v4, v14, v15, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;-><init>(Ljava/lang/String; Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888; Ljava/util/List; Z)V
+    invoke-virtual v8, v6, v12, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo(Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8; I)V
+    if-eqz v13, +011h
+    iget v4, v8, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;->o88oo8o8o8ooo88oo8oo8888888oooooo I
+    const/16 v6, 33
+    if-lt v4, v6, +003h
+    goto +9h
+    new-instance v0, Ljava/lang/IllegalArgumentException;
+    const-string v1, "Rotation can only target a development release for signers targeting 33 or later"
+    invoke-direct v0, v1, Ljava/lang/IllegalArgumentException;-><init>(Ljava/lang/String;)V
+    throw v0
+    iput-boolean v13, v8, Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo Z
+    new-instance v4, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    invoke-direct v4, v8, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;-><init>(Lcom/android/apksig/oooo8oooooooooo8oo8oo88o8ooo888888;)V
+    const/4 v6, 0
+    invoke-interface v3, v6, v4, Ljava/util/List;->add(I Ljava/lang/Object;)V
+    goto +bh
+    move-exception v0
+    move-object v1, v0
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v2, "Provided signer configs do not match the provided SigningCertificateLineage"
+    invoke-direct v0, v2, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v0
+    invoke-interface v3, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v4
+    const/4 v6, 0
+    const/4 v8, 0
+    invoke-interface v4, Ljava/util/Iterator;->hasNext()Z
+    move-result v9
+    if-eqz v9, +090h
+    invoke-interface v4, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v9
+    check-cast v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    iget v12, v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->o88oo8o8o8ooo88oo8oo8888888oooooo I
+    iget-object v13, v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Ljava/util/List;
+    const/16 v14, 28
+    if-lt v12, v14, +076h
+    iget-object v15, v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->oo88o8o8ooo88888o8oo8oo8ooo8o8888o8o88oo8o Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;
+    if-nez v15, +041h
+    new-instance v15, Lcom/android/apksig/ooo8o8oo8oooo8ooooo8oo8o8o88888888888oo8ooo;
+    iget-object v9, v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888;
+    const/4 v14, 0
+    invoke-interface v13, v14, Ljava/util/List;->get(I)Ljava/lang/Object;
+    move-result-object v17
+    move-object/from16 v14, v17
+    check-cast v14, Ljava/security/cert/X509Certificate;
+    move-object/from16 v17, v4
+    new-instance v4, Landroidx/lifecycle/o8o88888o8o8o8oo8o88o88o8o8o8oo888ooo8o8;
+    invoke-direct v4, v9, v14, Landroidx/lifecycle/o8o88888o8o8o8oo8o88o88o8o8o8oo888ooo8o8;-><init>(Lcom/android/apksig/o8oo8ooooo8888oo88o8oooooo888; Ljava/security/cert/X509Certificate;)V
+    invoke-direct v15, Ljava/lang/Object;-><init>()V
+    iput-object v4, v15, Lcom/android/apksig/ooo8o8oo8oooo8ooooo8oo8o8o88888888888oo8ooo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Ljava/lang/Object;
+    invoke-virtual v15, Lcom/android/apksig/ooo8o8oo8oooo8ooooo8oo8o8o88888888888oo8ooo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo()Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;
+    move-result-object v15
+    const/16 v4, 33
+    goto +23h
+    new-instance v0, Ljava/lang/IllegalStateException;
+    new-instance v1, Ljava/lang/StringBuilder;
+    const-string v2, "Unable to create a SignerConfig for signer from certificate "
+    invoke-direct v1, v2, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    const/4 v2, 0
+    invoke-interface v13, v2, Ljava/util/List;->get(I)Ljava/lang/Object;
+    move-result-object v2
+    check-cast v2, Ljava/security/cert/X509Certificate;
+    invoke-virtual v2, Ljava/security/cert/X509Certificate;->getSubjectDN()Ljava/security/Principal;
+    move-result-object v2
+    invoke-virtual v1, v2, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+    invoke-virtual v1, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    move-object/from16 v17, v4
+    goto -24h
+    if-ge v12, v4, +004h
+    const/16 v12, 28
+    if-eq v12, v8, +01eh
+    if-nez v6, +004h
+    move-object v6, v15
+    goto +5h
+    invoke-virtual v6, v15, Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo(Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;)Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;
+    move-result-object v6
+    move v8, v12
+    move-object/from16 v4, v17
+    goto -6bh
+    move-exception v0
+    move-object v1, v0
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v2, "The provided lineage targeting SDK "
+    const-string v3, " is not in the signing history of the other targeted signing configs"
+    invoke-static v2, v12, v3, Lcom/android/apksig/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; I Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v2
+    invoke-direct v0, v2, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v0
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Multiple SignerConfigs were found targeting SDK version "
+    invoke-static v1, v12, Lcom/android/apksig/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/String; I)Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Targeted signing config is not supported prior to SDK version 28; received value "
+    invoke-static v1, v12, Lcom/android/apksig/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/String; I)Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    if-eqz v6, +014h
+    if-nez v26, +024h
+    invoke-interface v1, Ljava/util/List;->size()I
+    move-result v4
+    const/4 v8, 1
+    if-gt v4, v8, +003h
+    goto +1bh
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Provided multiple signers which are part of the SigningCertificateLineage, but not signing with APK Signature Scheme v3"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    const/4 v8, 1
+    if-eqz v26, +011h
+    invoke-interface v1, Ljava/util/List;->size()I
+    move-result v4
+    if-gt v4, v8, +003h
+    goto +9h
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Multiple signing certificates provided for use with APK Signature Scheme v3 without an accompanying SigningCertificateLineage"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    new-instance v4, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;
+    move-object/from16 v17, v4
+    move-object/from16 v18, v1
+    move-object/from16 v19, v3
+    move/from16 v24, v0
+    move/from16 v25, v2
+    move/from16 v27, v5
+    move/from16 v28, v10
+    move/from16 v29, v11
+    move-object/from16 v31, v6
+    invoke-direct/range v17 ... v31, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;-><init>(Ljava/util/List; Ljava/util/List; Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888; Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8; Z I Z Z Z Z Z Z Ljava/lang/String; Lcom/android/apksig/o88o8oo8o8ooooo88ooo8888oooo8;)V
+    move-object v8, v4
+    if-eqz v36, +164h
+    move-object v0, v8
+    check-cast v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;
+    invoke-virtual v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo()V
+    invoke-interface/range v36, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v1
+    const-wide/16 v10, 0
+    cmp-long v1, v1, v10
+    if-nez v1, +005h
+    const/4 v5, 0
+    goto/16 +154h
+    iget-boolean v1, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo88o8o88oo8oo88o888oo8ooo8o Z
+    if-eqz v1, -005h
+    new-instance v1, Ljava/util/ArrayList;
+    invoke-direct v1, Ljava/util/ArrayList;-><init>()V
+    iput-object v1, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8ooooooo88o8o88oo8888o8o8oo8 Ljava/util/List;
+    invoke-static/range v36, Lcom/android/apksig/internal/apk/ApkSigningBlockUtils;->getApkSignatureBlocks(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;)Ljava/util/List;
+    move-result-object v1
+    invoke-interface v1, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v1
+    const/4 v2, 0
+    invoke-interface v1, Ljava/util/Iterator;->hasNext()Z
+    move-result v3
+    iget-boolean v4, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo Z
+    if-eqz v3, +11fh
+    invoke-interface v1, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v3
+    check-cast v3, Lcom/android/apksig/internal/util/Pair;
+    invoke-virtual v3, Lcom/android/apksig/internal/util/Pair;->getSecond()Ljava/lang/Object;
+    move-result-object v5
+    check-cast v5, Ljava/lang/Integer;
+    invoke-virtual v5, Ljava/lang/Integer;->intValue()I
+    move-result v5
+    const v6, 1896449818
+    if-ne v5, v6, +06dh
+    iget-boolean v4, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o88oo8o8o8ooo88oo8oo8888888oooooo Z
+    if-eqz v4, +062h
+    invoke-virtual v3, Lcom/android/apksig/internal/util/Pair;->getFirst()Ljava/lang/Object;
+    move-result-object v3
+    check-cast v3, [B
+    invoke-static v3, Lcom/android/apksig/internal/apk/ApkSigningBlockUtils;->getApkSignatureBlockSigners([B)Ljava/util/List;
+    move-result-object v3
+    new-instance v4, Ljava/util/ArrayList;
+    invoke-interface v3, Ljava/util/List;->size()I
+    move-result v5
+    invoke-direct v4, v5, Ljava/util/ArrayList;-><init>(I)V
+    iput-object v4, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo8ooo88o8888o8o8o88oooo8o8888888o8o888o8o8 Ljava/util/List;
+    invoke-interface v3, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v3
+    invoke-interface v3, Ljava/util/Iterator;->hasNext()Z
+    move-result v4
+    if-eqz v4, +0a8h
+    invoke-interface v3, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v4
+    check-cast v4, Lcom/android/apksig/internal/util/Pair;
+    invoke-virtual v4, Lcom/android/apksig/internal/util/Pair;->getFirst()Ljava/lang/Object;
+    move-result-object v5
+    check-cast v5, Ljava/util/List;
+    iget-object v6, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooo8oo888o8oo88oo8888o88oo888o8o Ljava/util/List;
+    invoke-interface v6, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v6
+    invoke-interface v6, Ljava/util/Iterator;->hasNext()Z
+    move-result v9
+    if-eqz v9, +012h
+    invoke-interface v6, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v9
+    check-cast v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    iget-object v9, v9, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Ljava/util/List;
+    invoke-interface v5, v9, Ljava/util/List;->containsAll(Ljava/util/Collection;)Z
+    move-result v9
+    if-eqz v9, -012h
+    const/4 v5, 1
+    goto +2h
+    const/4 v5, 0
+    if-nez v5, -02fh
+    iget-object v2, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo8ooo88o8888o8o8o88oooo8o8888888o8o888o8o8 Ljava/util/List;
+    invoke-virtual v4, Lcom/android/apksig/internal/util/Pair;->getSecond()Ljava/lang/Object;
+    move-result-object v4
+    check-cast v4, [B
+    invoke-interface v2, v4, Ljava/util/List;->add(Ljava/lang/Object;)Z
+    const/4 v2, 1
+    goto -3dh
+    move-exception v0
+    goto/16 +0bah
+    move-exception v0
+    goto/16 +0b7h
+    move-exception v0
+    goto/16 +0b4h
+    iget-object v2, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8ooooooo88o8o88oo8888o8o8oo8 Ljava/util/List;
+    invoke-interface v2, v3, Ljava/util/List;->add(Ljava/lang/Object;)Z
+    const/4 v2, 1
+    goto +5fh
+    invoke-virtual v3, Lcom/android/apksig/internal/util/Pair;->getSecond()Ljava/lang/Object;
+    move-result-object v5
+    check-cast v5, Ljava/lang/Integer;
+    invoke-virtual v5, Ljava/lang/Integer;->intValue()I
+    move-result v5
+    const v6, -262969152
+    if-ne v5, v6, +07ch
+    if-eqz v4, +072h
+    invoke-virtual v3, Lcom/android/apksig/internal/util/Pair;->getFirst()Ljava/lang/Object;
+    move-result-object v3
+    check-cast v3, [B
+    invoke-static v3, Lcom/android/apksig/internal/apk/ApkSigningBlockUtils;->getApkSignatureBlockSigners([B)Ljava/util/List;
+    move-result-object v3
+    invoke-interface v3, Ljava/util/List;->size()I
+    move-result v4
+    const/4 v5, 1
+    if-gt v4, v5, +041h
+    invoke-interface v3, Ljava/util/List;->size()I
+    move-result v4
+    if-ne v4, v5, +038h
+    const/4 v5, 0
+    invoke-interface v3, v5, Ljava/util/List;->get(I)Ljava/lang/Object;
+    move-result-object v3
+    check-cast v3, Lcom/android/apksig/internal/util/Pair;
+    invoke-virtual v3, Lcom/android/apksig/internal/util/Pair;->getFirst()Ljava/lang/Object;
+    move-result-object v3
+    check-cast v3, Ljava/util/List;
+    iget-object v4, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooo8oo888o8oo88oo8888o88oo888o8o Ljava/util/List;
+    invoke-interface v4, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v4
+    invoke-interface v4, Ljava/util/Iterator;->hasNext()Z
+    move-result v6
+    if-eqz v6, +012h
+    invoke-interface v4, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v6
+    check-cast v6, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;
+    iget-object v6, v6, Lcom/android/apksig/ooo88oo88o8oo8o88o88o8oo8o88ooo88o8o88o888;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Ljava/util/List;
+    invoke-interface v3, v6, Ljava/util/List;->containsAll(Ljava/util/Collection;)Z
+    move-result v6
+    if-eqz v6, -012h
+    const/4 v3, 1
+    goto +2h
+    move v3, v5
+    if-eqz v3, +004h
+    goto/16 -0dch
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "The V3 signature scheme only supports one signer; a request was made to preserve the existing V3 signature, but the engine is configured to sign with a different signer"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    const/4 v5, 0
+    goto/16 -0e7h
+    new-instance v0, Ljava/lang/IllegalArgumentException;
+    new-instance v1, Ljava/lang/StringBuilder;
+    invoke-direct v1, Ljava/lang/StringBuilder;-><init>()V
+    const-string v2, "The provided APK signing block contains "
+    invoke-virtual v1, v2, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-interface v3, Ljava/util/List;->size()I
+    move-result v2
+    invoke-virtual v1, v2, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+    const-string v2, " V3 signers; the V3 signature scheme only supports one signer"
+    invoke-virtual v1, v2, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual v1, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/IllegalArgumentException;-><init>(Ljava/lang/String;)V
+    throw v0
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Preserving an existing V3 signature is not supported"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    const/4 v5, 0
+    sget-object v4, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8ooooo888oo8o88o88o8o8o88oo8ooo8o88o88o888 Ljava/util/HashSet;
+    invoke-virtual v3, Lcom/android/apksig/internal/util/Pair;->getSecond()Ljava/lang/Object;
+    move-result-object v6
+    invoke-virtual v4, v6, Ljava/util/HashSet;->contains(Ljava/lang/Object;)Z
+    move-result v4
+    if-nez v4, -11ch
+    iget-object v4, v0, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8ooooooo88o8o88oo8888o8o8oo8 Ljava/util/List;
+    invoke-interface v4, v3, Ljava/util/List;->add(Ljava/lang/Object;)Z
+    goto/16 -123h
+    const/4 v5, 0
+    if-eqz v4, +018h
+    if-nez v2, +003h
+    goto +14h
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Signature scheme V3+ only supports a single signer and cannot be appended to the existing signature scheme blocks"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    new-instance v1, Ljava/lang/IllegalArgumentException;
+    const-string v2, "Unable to parse the provided signing block"
+    invoke-direct v1, v2, v0, Ljava/lang/IllegalArgumentException;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v1
+    const/4 v5, 0
+    const-wide/16 v10, 0
+    new-instance v0, Ljava/util/ArrayList;
+    move-object/from16 v9, v35
+    invoke-direct v0, v9, Ljava/util/ArrayList;-><init>(Ljava/util/Collection;)V
+    sget-object v1, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->BY_LOCAL_FILE_HEADER_OFFSET_COMPARATOR Ljava/util/Comparator;
+    invoke-static v0, v1, Ljava/util/Collections;->sort(Ljava/util/List; Ljava/util/Comparator;)V
+    new-instance v12, Ljava/util/HashMap;
+    invoke-interface v9, Ljava/util/List;->size()I
+    move-result v1
+    invoke-direct v12, v1, Ljava/util/HashMap;-><init>(I)V
+    invoke-virtual v0, Ljava/util/ArrayList;->iterator()Ljava/util/Iterator;
+    move-result-object v13
+    move-wide v1, v10
+    move-wide/from16 v17, v1
+    const/4 v3, 0
+    const/4 v6, -1
+    const/4 v15, -1
+    invoke-interface v13, Ljava/util/Iterator;->hasNext()Z
+    move-result v0
+    if-eqz v0, +23bh
+    invoke-interface v13, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v0
+    move-object v4, v0
+    check-cast v4, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;
+    invoke-virtual v4, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getName()Ljava/lang/String;
+    move-result-object v0
+    const-string v5, "pinlist.meta"
+    invoke-virtual v5, v0, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v5
+    if-eqz v5, +004h
+    const/4 v5, 0
+    goto -1ah
+    const-string v5, "stamp-cert-sha256"
+    invoke-virtual v5, v0, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v5
+    if-eqz v5, +01ah
+    invoke-interface/range v34, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v10
+    move-object/from16 v5, v34
+    invoke-static v5, v4, v10, v11, Lcom/android/apksig/internal/zip/LocalFileRecord;->getUncompressedData(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/zip/CentralDirectoryRecord; J)[B
+    move-result-object v3
+    move-object/from16 v34, v5
+    const/4 v5, 0
+    const-wide/16 v10, 0
+    goto -32h
+    new-instance v0, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o8ooo888o88oo888oo8ooo88ooo88ooooo;
+    const-string v1, "Bad source stamp entry"
+    invoke-direct v0, v1, Ljava/lang/Exception;-><init>(Ljava/lang/String;)V
+    throw v0
+    move-object/from16 v5, v34
+    move-object v10, v8
+    check-cast v10, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;
+    invoke-virtual v10, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo()V
+    iget-object v11, v10, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo888oo88o8ooo888oooo88ooo888888o8o88 Ljava/util/Set;
+    invoke-interface v11, v0, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
+    move-result v11
+    if-eqz v11, +004h
+    const/4 v11, 3
+    goto +fh
+    iget-boolean v11, v10, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo88o8o88oo8oo88o888oo8ooo8o Z
+    if-nez v11, +00bh
+    invoke-static v0, Lcom/android/apksig/internal/apk/v1/V1SchemeSigner;->isJarEntryDigestNeededInManifest(Ljava/lang/String;)Z
+    move-result v11
+    if-eqz v11, +003h
+    goto +3h
+    const/4 v11, 1
+    goto +2h
+    const/4 v11, 2
+    invoke-static v11, Looooooooo888o8o8ooooo8o8oooo88o88ooooooo/oo88ooo88888888oo88ooo888888o88o8o8o88ooo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o(I)I
+    move-result v14
+    if-eqz v14, +04ch
+    move-object/from16 v22, v3
+    const/4 v3, 1
+    if-eq v14, v3, +03bh
+    const/4 v3, 2
+    if-ne v14, v3, +028h
+    const-string v3, "META-INF/MANIFEST.MF"
+    invoke-virtual v3, v0, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v3
+    if-eqz v3, +015h
+    new-instance v3, Lcom/android/apksig/o888888ooo8oooo88o888oooo88oo;
+    invoke-direct v3, v0, Lcom/android/apksig/o888888ooo8oooo88o888oooo88oo;-><init>(Ljava/lang/String;)V
+    iput-object v3, v10, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o88o88o8oo8o88ooooo888oooo88oo8oo Lcom/android/apksig/o888888ooo8oooo88o888oooo88oo;
+    new-instance v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;
+    const/4 v14, 0
+    move-object/from16 v23, v0
+    const/4 v0, 3
+    invoke-direct v11, v0, v3, v14, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;-><init>(I Ljava/lang/Object; I)V
+    const/4 v3, 1
+    const/4 v14, 0
+    goto +34h
+    move-object/from16 v23, v0
+    const/4 v0, 3
+    new-instance v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;
+    const/4 v3, 0
+    const/4 v14, 0
+    invoke-direct v11, v0, v14, v3, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;-><init>(I Ljava/lang/Object; I)V
+    goto -dh
+    new-instance v0, Ljava/lang/RuntimeException;
+    invoke-static v11, Lcom/android/apksig/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8oo88o8888o888oo8o88o8o8oo(I)Ljava/lang/String;
+    move-result-object v1
+    const-string v2, "Unsupported output policy: "
+    invoke-virtual v2, v1, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/RuntimeException;-><init>(Ljava/lang/String;)V
+    throw v0
+    move-object/from16 v23, v0
+    new-instance v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;
+    const/4 v0, 0
+    const/4 v3, 2
+    const/4 v14, 0
+    invoke-direct v11, v3, v14, v0, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;-><init>(I Ljava/lang/Object; I)V
+    const/4 v3, 1
+    goto +dh
+    move-object/from16 v23, v0
+    move-object/from16 v22, v3
+    const/4 v14, 0
+    new-instance v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;
+    const/4 v0, 0
+    const/4 v3, 1
+    invoke-direct v11, v3, v14, v0, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;-><init>(I Ljava/lang/Object; I)V
+    iget v0, v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o I
+    invoke-static v0, Looooooooo888o8o8ooooo8o8oooo88o88ooooooo/oo88ooo88888888oo88ooo888888o88o8o8o88ooo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o(I)I
+    move-result v0
+    if-eqz v0, +01dh
+    if-eq v0, v3, +018h
+    const/4 v3, 2
+    if-ne v0, v3, +003h
+    goto +16h
+    new-instance v0, Ljava/lang/RuntimeException;
+    iget v1, v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o I
+    invoke-static v1, Lcom/android/apksig/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8oo88o8888o888oo8o88o8o8oo(I)Ljava/lang/String;
+    move-result-object v1
+    const-string v2, "Unknown output policy: "
+    invoke-virtual v2, v1, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/lang/RuntimeException;-><init>(Ljava/lang/String;)V
+    throw v0
+    const/16 v20, 1
+    goto +3h
+    const/16 v20, 0
+    invoke-virtual v4, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getLocalFileHeaderOffset()J
+    move-result-wide v24
+    cmp-long v0, v24, v1
+    if-lez v0, +019h
+    sub-long v26, v24, v1
+    move-object/from16 v3, v23
+    move-object v0, v5
+    move-object v14, v3
+    move-object/from16 v39, v13
+    move-object v13, v4
+    move-wide/from16 v3, v26
+    move-object/from16 v34, v5
+    move-object/from16 v5, v40
+    invoke-interface/range v0 ... v5, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->feed(J J Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)V
+    add-long v17, v17, v26
+    move-wide/from16 v1, v24
+    goto +8h
+    move-object/from16 v34, v5
+    move-object/from16 v39, v13
+    move-object/from16 v14, v23
+    move-object v13, v4
+    invoke-interface/range v34, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v3
+    move-object/from16 v0, v34
+    invoke-static v0, v13, v3, v4, Lcom/android/apksig/internal/zip/LocalFileRecord;->getRecord(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/zip/CentralDirectoryRecord; J)Lcom/android/apksig/internal/zip/LocalFileRecord;
+    move-result-object v5
+    invoke-virtual v5, Lcom/android/apksig/internal/zip/LocalFileRecord;->getSize()J
+    move-result-wide v3
+    add-long v23, v3, v1
+    iget-object v1, v11, Lcom/android/apksig/o8oooo8oooo88o8oooooo8o8ooooooo888o8o8oo8o8;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Ljava/lang/Object;
+    check-cast v1, Lcom/android/apksig/o888888ooo8oooo88o888oooo88oo;
+    if-eqz v1, +005h
+    invoke-static v0, v5, v1, Lcom/android/apksig/ApkSigner;->fulfillInspectInputJarEntryRequest(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/zip/LocalFileRecord; Lcom/android/apksig/oooo88o8o88oo8888888o88ooooo8o;)V
+    if-eqz v20, +0ech
+    invoke-virtual v13, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getLastModificationDate()I
+    move-result v1
+    invoke-virtual v13, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getLastModificationTime()I
+    move-result v2
+    const/4 v3, -1
+    if-eq v6, v3, +00bh
+    if-gt v1, v6, +009h
+    if-ne v1, v6, +005h
+    if-le v2, v15, +003h
+    goto +3h
+    move v11, v6
+    goto +3h
+    move v11, v1
+    move v15, v2
+    invoke-virtual v10, v14, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o888888ooo8o8oo888ooooo88oo8(Ljava/lang/String;)Lcom/android/apksig/oooo88o8o88oo8888888o88ooooo8o;
+    move-result-object v1
+    if-eqz v1, +005h
+    invoke-static v0, v5, v1, Lcom/android/apksig/ApkSigner;->fulfillInspectInputJarEntryRequest(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/zip/LocalFileRecord; Lcom/android/apksig/oooo88o8o88oo8888888o88ooooo8o;)V
+    move-object/from16 v1, v38
+    move-object v2, v0
+    move-object v3, v5
+    move-wide/from16 v20, v17
+    move-object/from16 v4, v40
+    move-object/from16 v17, v5
+    move-object/from16 v10, v32
+    move-wide/from16 v5, v20
+    invoke-direct/range v1 ... v6, Lcom/android/apksig/ApkSigner;->outputInputJarEntryLfhRecord(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/zip/LocalFileRecord; Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo; J)Lcom/android/apksig/ApkSigner$OutputSizeAndDataOffset;
+    move-result-object v1
+    iget-wide v2, v1, Lcom/android/apksig/ApkSigner$OutputSizeAndDataOffset;->outputBytes J
+    move-wide/from16 v4, v20
+    add-long/2addr v2, v4
+    iget-wide v6, v1, Lcom/android/apksig/ApkSigner$OutputSizeAndDataOffset;->dataOffsetBytes J
+    add-long/2addr v6, v4
+    if-eqz v16, +08ah
+    invoke-interface/range v16, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v1
+    const/16 v18, 0
+    invoke-interface v1, Ljava/util/Iterator;->hasNext()Z
+    move-result v20
+    if-eqz v20, +067h
+    invoke-interface v1, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v20
+    move-object/from16 v21, v1
+    move-object/from16 v1, v20
+    check-cast v1, Lcom/android/apksig/o88o88888oo8o8o888o88oo88o888o8;
+    move/from16 v20, v11
+    invoke-virtual v13, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getName()Ljava/lang/String;
+    move-result-object v11
+    move/from16 v25, v15
+    iget-object v15, v1, Lcom/android/apksig/o88o88888oo8o8o888o88oo88o888o8;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Ljava/util/regex/Pattern;
+    invoke-virtual v15, v11, Ljava/util/regex/Pattern;->matcher(Ljava/lang/CharSequence;)Ljava/util/regex/Matcher;
+    move-result-object v11
+    invoke-virtual v11, Ljava/util/regex/Matcher;->matches()Z
+    move-result v11
+    if-eqz v11, +032h
+    sub-long v26, v2, v6
+    move-object v11, v8
+    move-object/from16 v35, v9
+    iget-wide v8, v1, Lcom/android/apksig/o88o88888oo8o8o888o88oo88o888o8;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o J
+    cmp-long v15, v26, v8
+    if-gez v15, +00ah
+    move-wide/from16 v28, v2
+    move-object/from16 v27, v11
+    move-object/from16 v26, v12
+    const/4 v3, 0
+    goto +16h
+    add-long/2addr v8, v6
+    move-object/from16 v27, v11
+    move-object/from16 v26, v12
+    sub-long v11, v2, v8
+    move-wide/from16 v28, v2
+    iget-wide v1, v1, Lcom/android/apksig/o88o88888oo8o8o888o88oo88o888o8;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo J
+    invoke-static v11, v12, v1, v2, Ljava/lang/Math;->min(J J)J
+    move-result-wide v1
+    new-instance v3, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;
+    add-long/2addr v1, v8
+    invoke-direct v3, v8, v9, v1, v2, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;-><init>(J J)V
+    if-eqz v3, +010h
+    invoke-interface v10, v3, Ljava/util/List;->add(Ljava/lang/Object;)Z
+    const/16 v18, 1
+    goto +9h
+    move-wide/from16 v28, v2
+    move-object/from16 v27, v8
+    move-object/from16 v35, v9
+    move-object/from16 v26, v12
+    move/from16 v11, v20
+    move-object/from16 v1, v21
+    move/from16 v15, v25
+    move-object/from16 v12, v26
+    move-object/from16 v8, v27
+    move-wide/from16 v2, v28
+    move-object/from16 v9, v35
+    goto -6ah
+    move-wide/from16 v28, v2
+    move-object/from16 v27, v8
+    move-object/from16 v35, v9
+    move/from16 v20, v11
+    move-object/from16 v26, v12
+    move/from16 v25, v15
+    if-eqz v18, +017h
+    new-instance v1, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;
+    invoke-direct v1, v4, v5, v6, v7, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;-><init>(J J)V
+    invoke-interface v10, v1, Ljava/util/List;->add(Ljava/lang/Object;)Z
+    goto +dh
+    move-wide/from16 v28, v2
+    move-object/from16 v27, v8
+    move-object/from16 v35, v9
+    move/from16 v20, v11
+    move-object/from16 v26, v12
+    move/from16 v25, v15
+    invoke-virtual/range v17, Lcom/android/apksig/internal/zip/LocalFileRecord;->getStartOffsetInArchive()J
+    move-result-wide v1
+    cmp-long v1, v4, v1
+    if-nez v1, +006h
+    move-object v4, v13
+    move-object/from16 v7, v26
+    goto +6h
+    invoke-virtual v13, v4, v5, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->createWithModifiedLocalFileHeaderOffset(J)Lcom/android/apksig/internal/zip/CentralDirectoryRecord;
+    move-result-object v4
+    goto -7h
+    invoke-virtual v7, v14, v4, Ljava/util/HashMap;->put(Ljava/lang/Object; Ljava/lang/Object;)Ljava/lang/Object;
+    move/from16 v6, v20
+    move/from16 v15, v25
+    move-wide/from16 v17, v28
+    goto +ah
+    move-object/from16 v27, v8
+    move-object/from16 v35, v9
+    move-object v7, v12
+    move-wide/from16 v4, v17
+    move-object/from16 v10, v32
+    move-object/from16 v13, v39
+    move-object/from16 v34, v0
+    move-object v12, v7
+    move-object/from16 v32, v10
+    move-object/from16 v3, v22
+    move-wide/from16 v1, v23
+    move-object/from16 v8, v27
+    move-object/from16 v9, v35
+    const/4 v5, 0
+    const-wide/16 v10, 0
+    move-object/from16 v7, v38
+    goto/16 -224h
+    move-exception v0
+    new-instance v1, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o8ooo888o88oo888oo8ooo88ooo88ooooo;
+    new-instance v2, Ljava/lang/StringBuilder;
+    const-string v3, "Malformed ZIP entry: "
+    invoke-direct v2, v3, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-virtual v13, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getName()Ljava/lang/String;
+    move-result-object v3
+    invoke-virtual v2, v3, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual v2, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    move-result-object v2
+    invoke-direct v1, v2, v0, Ljava/lang/Exception;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v1
+    move-object/from16 v22, v3
+    move-object/from16 v27, v8
+    move-object/from16 v35, v9
+    move-object v7, v12
+    move-object/from16 v10, v32
+    move-object/from16 v0, v34
+    invoke-interface v0, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v3
+    cmp-long v5, v1, v3
+    if-gez v5, +00ch
+    sub-long v8, v3, v1
+    move-wide v3, v8
+    move-object/from16 v5, v40
+    invoke-interface/range v0 ... v5, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->feed(J J Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)V
+    add-long v17, v17, v8
+    new-instance v0, Ljava/util/ArrayList;
+    invoke-interface/range v35, Ljava/util/List;->size()I
+    move-result v1
+    add-int/lit8 v1, v1, 10
+    invoke-direct v0, v1, Ljava/util/ArrayList;-><init>(I)V
+    invoke-interface/range v35, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v1
+    invoke-interface v1, Ljava/util/Iterator;->hasNext()Z
+    move-result v2
+    if-eqz v2, +018h
+    invoke-interface v1, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v2
+    check-cast v2, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;
+    invoke-virtual v2, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getName()Ljava/lang/String;
+    move-result-object v2
+    invoke-virtual v7, v2, Ljava/util/HashMap;->get(Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v2
+    check-cast v2, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;
+    if-eqz v2, -016h
+    invoke-virtual v0, v2, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+    goto -1bh
+    const/4 v2, -1
+    if-ne v6, v2, +006h
+    const/16 v6, 14881
+    const/4 v5, 0
+    goto +2h
+    move v5, v15
+    move-object/from16 v7, v27
+    check-cast v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;
+    invoke-virtual v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo88o8o88oo8oo88o888oo8ooo8o()Z
+    move-result v1
+    if-eqz v1, +039h
+    invoke-virtual v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o888ooooo888o88o888888o888ooo()[B
+    move-result-object v9
+    move-object/from16 v3, v38
+    iget-boolean v1, v3, Lcom/android/apksig/ApkSigner;->mForceSourceStampOverwrite Z
+    if-nez v1, +015h
+    if-eqz v22, +013h
+    move-object/from16 v1, v22
+    invoke-static v9, v1, Ljava/util/Arrays;->equals([B [B)Z
+    move-result v1
+    if-eqz v1, +003h
+    goto +9h
+    new-instance v0, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o8ooo888o88oo888oo8ooo88ooo88ooooo;
+    const-string v1, "Cannot generate SourceStamp. APK contains an existing entry with the name: stamp-cert-sha256, and it is different than the provided source stamp certificate"
+    invoke-direct v0, v1, Ljava/lang/Exception;-><init>(Ljava/lang/String;)V
+    throw v0
+    const-string v8, "stamp-cert-sha256"
+    move-object v4, v10
+    const-wide/16 v1, 0
+    move-wide/from16 v10, v17
+    const/4 v15, 0
+    move-object v12, v0
+    move-object/from16 v14, v33
+    move v13, v5
+    move-object/from16 v37, v14
+    move v14, v6
+    move-object/from16 v15, v40
+    invoke-static/range v8 ... v15, Lcom/android/apksig/ApkSigner;->outputDataToOutputApk(Ljava/lang/String; [B J Ljava/util/List; I I Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)J
+    move-result-wide v8
+    add-long v17, v17, v8
+    move-wide/from16 v14, v17
+    goto +9h
+    const-wide/16 v1, 0
+    move-object/from16 v3, v38
+    move-object v4, v10
+    move-object/from16 v37, v33
+    goto -ah
+    const-wide/32 v12, 2147483647
+    if-eqz v4, +07bh
+    new-instance v8, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;
+    const-wide v9, 9223372036854775807
+    invoke-direct v8, v14, v15, v9, v10, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;-><init>(J J)V
+    invoke-interface v4, v8, Ljava/util/List;->add(Ljava/lang/Object;)Z
+    new-instance v8, Ljava/io/ByteArrayOutputStream;
+    invoke-interface v4, Ljava/util/List;->size()I
+    move-result v9
+    mul-int/lit8 v9, v9, 8
+    invoke-direct v8, v9, Ljava/io/ByteArrayOutputStream;-><init>(I)V
+    new-instance v9, Ljava/io/DataOutputStream;
+    invoke-direct v9, v8, Ljava/io/DataOutputStream;-><init>(Ljava/io/OutputStream;)V
+    invoke-interface v4, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v4
+    invoke-interface v4, Ljava/util/Iterator;->hasNext()Z
+    move-result v10
+    if-eqz v10, +033h
+    invoke-interface v4, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v10
+    check-cast v10, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;
+    iget-wide v1, v10, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo J
+    invoke-static v1, v2, v12, v13, Ljava/lang/Math;->min(J J)J
+    move-result-wide v1
+    const-wide/16 v12, 0
+    invoke-static v12, v13, v1, v2, Ljava/lang/Math;->max(J J)J
+    move-result-wide v1
+    long-to-int v1, v1
+    invoke-virtual v9, v1, Ljava/io/DataOutputStream;->writeInt(I)V
+    iget-wide v1, v10, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o J
+    iget-wide v10, v10, Lcom/android/apksig/o888ooo88oo8o88ooo88oo8oo888oo88o;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo J
+    sub-long/2addr v1, v10
+    const-wide/32 v12, 2147483647
+    invoke-static v1, v2, v12, v13, Ljava/lang/Math;->min(J J)J
+    move-result-wide v1
+    const-wide/16 v10, 0
+    invoke-static v10, v11, v1, v2, Ljava/lang/Math;->max(J J)J
+    move-result-wide v1
+    long-to-int v1, v1
+    invoke-virtual v9, v1, Ljava/io/DataOutputStream;->writeInt(I)V
+    const-wide/16 v1, 0
+    goto -34h
+    move-exception v0
+    goto +1ah
+    invoke-virtual v8, Ljava/io/ByteArrayOutputStream;->toByteArray()[B
+    move-result-object v9
+    const-string v8, "pinlist.meta"
+    invoke-static v7, v8, v9, Lcom/android/apksig/ApkSigner;->requestOutputEntryInspection(Lcom/android/apksig/oooooo888oooo88o88oooo8o8oo88ooo888oo; Ljava/lang/String; [B)V
+    move-wide v10, v14
+    move-wide v1, v12
+    move-object v12, v0
+    move v13, v5
+    move-wide/from16 v17, v14
+    move v14, v6
+    move-object/from16 v15, v40
+    invoke-static/range v8 ... v15, Lcom/android/apksig/ApkSigner;->outputDataToOutputApk(Ljava/lang/String; [B J Ljava/util/List; I I Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)J
+    move-result-wide v8
+    add-long v14, v17, v8
+    goto +ch
+    new-instance v1, Ljava/lang/AssertionError;
+    const-string v2, "impossible"
+    invoke-direct v1, v2, v0, Ljava/lang/AssertionError;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v1
+    move-wide v1, v12
+    move-wide/from16 v17, v14
+    invoke-virtual v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooo8oo888o8oo88oo8888o88oo888o8o()Lcom/android/apksig/ooo888o8o8ooo8oo8888ooo8oooo8o8oo;
+    move-result-object v4
+    if-eqz v4, +038h
+    iget-object v8, v4, Lcom/android/apksig/ooo888o8o8ooo8oo8888ooo8oooo8o8oo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Ljava/util/List;
+    invoke-interface v8, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v16
+    move-wide/from16 v17, v14
+    invoke-interface/range v16, Ljava/util/Iterator;->hasNext()Z
+    move-result v8
+    if-eqz v8, +026h
+    invoke-interface/range v16, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v8
+    check-cast v8, Lcom/android/apksig/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;
+    iget-object v9, v8, Lcom/android/apksig/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo Ljava/lang/String;
+    iget-object v8, v8, Lcom/android/apksig/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o [B
+    invoke-virtual v8, [B->clone()Ljava/lang/Object;
+    move-result-object v8
+    move-object v10, v8
+    check-cast v10, [B
+    invoke-static v7, v9, v10, Lcom/android/apksig/ApkSigner;->requestOutputEntryInspection(Lcom/android/apksig/oooooo888oooo88o88oooo8o8oo88ooo888oo; Ljava/lang/String; [B)V
+    move-object v8, v9
+    move-object v9, v10
+    move-wide/from16 v10, v17
+    move-object v12, v0
+    move v13, v5
+    move v14, v6
+    move-object/from16 v15, v40
+    invoke-static/range v8 ... v15, Lcom/android/apksig/ApkSigner;->outputDataToOutputApk(Ljava/lang/String; [B J Ljava/util/List; I I Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)J
+    move-result-wide v8
+    add-long v17, v17, v8
+    goto -29h
+    const/4 v8, 1
+    iput-boolean v8, v4, Lcom/android/apksig/ooo888o8o8ooo8oo8888ooo8oooo8o8oo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o Z
+    goto +4h
+    const/4 v8, 1
+    move-wide/from16 v17, v14
+    invoke-virtual v0, Ljava/util/ArrayList;->iterator()Ljava/util/Iterator;
+    move-result-object v4
+    const-wide/16 v10, 0
+    invoke-interface v4, Ljava/util/Iterator;->hasNext()Z
+    move-result v5
+    if-eqz v5, +00fh
+    invoke-interface v4, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v5
+    check-cast v5, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;
+    invoke-virtual v5, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->getSize()I
+    move-result v5
+    int-to-long v5, v5
+    add-long/2addr v10, v5
+    goto -12h
+    cmp-long v1, v10, v1
+    if-gtz v1, +11fh
+    long-to-int v1, v10
+    invoke-static v1, Ljava/nio/ByteBuffer;->allocate(I)Ljava/nio/ByteBuffer;
+    move-result-object v1
+    invoke-virtual v0, Ljava/util/ArrayList;->iterator()Ljava/util/Iterator;
+    move-result-object v2
+    invoke-interface v2, Ljava/util/Iterator;->hasNext()Z
+    move-result v4
+    if-eqz v4, +00ch
+    invoke-interface v2, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v4
+    check-cast v4, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;
+    invoke-virtual v4, v1, Lcom/android/apksig/internal/zip/CentralDirectoryRecord;->copyTo(Ljava/nio/ByteBuffer;)V
+    goto -fh
+    invoke-virtual v1, Ljava/nio/ByteBuffer;->flip()Ljava/nio/Buffer;
+    move-result-object v2
+    check-cast v2, Ljava/nio/ByteBuffer;
+    new-instance v2, Lcom/android/apksig/internal/util/ByteBufferDataSource;
+    invoke-direct v2, v1, Lcom/android/apksig/internal/util/ByteBufferDataSource;-><init>(Ljava/nio/ByteBuffer;)V
+    invoke-virtual v0, Ljava/util/ArrayList;->size()I
+    move-result v10
+    move-object/from16 v0, v37
+    iget-object v9, v0, Loooo888o888oo8ooo8oo888o88oo/o888oooo8ooo8oo88o8o88o88o8oo8;->o88oo8o8o8ooo88oo8oo8888888oooooo Ljava/nio/ByteBuffer;
+    invoke-interface v2, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v11
+    move-wide/from16 v13, v17
+    invoke-static/range v9 ... v14, Lcom/android/apksig/internal/zip/EocdRecord;->createWithModifiedCentralDirectoryInfo(Ljava/nio/ByteBuffer; I J J)Ljava/nio/ByteBuffer;
+    move-result-object v0
+    invoke-virtual v0, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    new-instance v4, Lcom/android/apksig/internal/util/ByteBufferDataSource;
+    invoke-direct v4, v0, Lcom/android/apksig/internal/util/ByteBufferDataSource;-><init>(Ljava/nio/ByteBuffer;)V
+    move-object/from16 v6, v41
+    invoke-virtual v7, v6, v2, v4, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o888o8o8ooooo8o8888o8oo88ooo8o888o(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/util/ByteBufferDataSource; Lcom/android/apksig/internal/util/ByteBufferDataSource;)Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;
+    move-result-object v4
+    if-eqz v4, +067h
+    iget v5, v4, Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o I
+    iget-object v9, v4, Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo [B
+    invoke-virtual v9, [B->clone()Ljava/lang/Object;
+    move-result-object v9
+    check-cast v9, [B
+    iput-boolean v8, v4, Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Z
+    invoke-interface v2, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v10
+    add-long v10, v10, v17
+    int-to-long v12, v5
+    add-long/2addr v10, v12
+    array-length v4, v9
+    int-to-long v14, v4
+    add-long/2addr v10, v14
+    invoke-virtual v0, Ljava/nio/Buffer;->remaining()I
+    move-result v4
+    int-to-long v14, v4
+    add-long/2addr v10, v14
+    iget-boolean v4, v3, Lcom/android/apksig/ApkSigner;->mAlignFileSize Z
+    if-eqz v4, +02dh
+    const-wide/16 v14, 4096
+    rem-long/2addr v10, v14
+    const-wide/16 v19, 0
+    cmp-long v4, v10, v19
+    if-eqz v4, +024h
+    sub-long/2addr v14, v10
+    long-to-int v4, v14
+    invoke-static v0, v4, Lcom/android/apksig/internal/zip/EocdRecord;->createWithPaddedComment(Ljava/nio/ByteBuffer; I)Ljava/nio/ByteBuffer;
+    move-result-object v0
+    new-instance v4, Lcom/android/apksig/internal/util/ByteBufferDataSource;
+    invoke-direct v4, v1, Lcom/android/apksig/internal/util/ByteBufferDataSource;-><init>(Ljava/nio/ByteBuffer;)V
+    invoke-virtual v0, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    new-instance v1, Lcom/android/apksig/internal/util/ByteBufferDataSource;
+    invoke-direct v1, v0, Lcom/android/apksig/internal/util/ByteBufferDataSource;-><init>(Ljava/nio/ByteBuffer;)V
+    invoke-virtual v7, v6, v4, v1, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o888o8o8ooooo8o8888o8oo88ooo8o888o(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/util/ByteBufferDataSource; Lcom/android/apksig/internal/util/ByteBufferDataSource;)Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;
+    move-result-object v1
+    iget-object v4, v1, Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo [B
+    invoke-virtual v4, [B->clone()Ljava/lang/Object;
+    move-result-object v4
+    move-object v9, v4
+    check-cast v9, [B
+    iput-boolean v8, v1, Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Z
+    invoke-static v5, Ljava/nio/ByteBuffer;->allocate(I)Ljava/nio/ByteBuffer;
+    move-result-object v1
+    move-object/from16 v8, v40
+    invoke-interface v8, v1, Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;->consume(Ljava/nio/ByteBuffer;)V
+    array-length v1, v9
+    const/4 v10, 0
+    invoke-interface v8, v9, v10, v1, Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;->consume([B I I)V
+    add-long v17, v17, v12
+    array-length v1, v9
+    int-to-long v4, v1
+    add-long v4, v17, v4
+    invoke-static v0, v4, v5, Lcom/android/apksig/internal/zip/ZipUtils;->setZipEocdCentralDirectoryOffset(Ljava/nio/ByteBuffer; J)V
+    move-object v9, v0
+    goto +5h
+    move-object/from16 v8, v40
+    const/4 v10, 0
+    goto -5h
+    const-wide/16 v4, 0
+    invoke-interface v2, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->size()J
+    move-result-wide v11
+    move-object v0, v2
+    move-wide v1, v4
+    move-object v13, v3
+    move-wide v3, v11
+    move-object/from16 v5, v40
+    invoke-interface/range v0 ... v5, Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8;->feed(J J Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;)V
+    invoke-interface v8, v9, Lo888o8o88888o888ooo88o8oo88oo88888o/o8ooo888o88oo888oo8ooo88ooo88ooooo;->consume(Ljava/nio/ByteBuffer;)V
+    invoke-virtual v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo()V
+    invoke-virtual v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo()V
+    iget-boolean v0, v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o888ooo88oo8ooooo8o888o8oo8oo888o8ooo8o Z
+    if-nez v0, +007h
+    iget-boolean v0, v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8oo8o88ooo8o8oo88o8o8o8o8o8o Z
+    if-nez v0, +003h
+    goto +10h
+    iget-object v0, v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooo88o8o8888o88o88o88o88oo88ooooo8888oo8 Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;
+    if-eqz v0, +043h
+    iget-boolean v0, v0, Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo Z
+    if-eqz v0, +037h
+    const/4 v0, 0
+    iput-object v0, v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->ooo88o8o8888o88o88o88o88oo88ooooo8888oo8 Lcom/android/apksig/o88o88888o88888o8o8ooooo88o8o8o88o8oo;
+    iput-boolean v10, v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o888ooo88oo8ooooo8o888o8oo8oo888o8ooo8o Z
+    iput-boolean v10, v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->o8oo8o88ooo8o8oo88o8o8o8o8o8o Z
+    iget-boolean v0, v13, Lcom/android/apksig/ApkSigner;->mV4SigningEnabled Z
+    if-eqz v0, +02bh
+    iget-object v0, v13, Lcom/android/apksig/ApkSigner;->mOutputV4File Ljava/io/File;
+    iget-boolean v1, v13, Lcom/android/apksig/ApkSigner;->mV4ErrorReportingEnabled Z
+    if-nez v0, +00dh
+    if-nez v1, +003h
+    goto +21h
+    new-instance v0, Ljava/security/SignatureException;
+    const-string v1, "Missing V4 output file."
+    invoke-direct v0, v1, Ljava/security/SignatureException;-><init>(Ljava/lang/String;)V
+    throw v0
+    invoke-virtual v7, Lcom/android/apksig/ooo8o8ooo8o8oo8oo8ooo88oooo8o8o8oooo;->oo88o8o8ooo88888o8oo8oo8ooo8o8888o8o88oo8o()Lcom/android/apksig/internal/apk/v4/V4SchemeSigner$SignerConfig;
+    move-result-object v2
+    invoke-static v6, v2, v0, Lcom/android/apksig/internal/apk/v4/V4SchemeSigner;->generateV4Signature(Lo888o8o88888o888ooo88o8oo88oo88888o/o888oooo8ooo8oo88o8o88o88o8oo8; Lcom/android/apksig/internal/apk/v4/V4SchemeSigner$SignerConfig; Ljava/io/File;)V
+    goto +11h
+    move-exception v0
+    goto +4h
+    move-exception v0
+    goto +2h
+    move-exception v0
+    if-nez v1, +003h
+    goto +9h
+    new-instance v1, Ljava/security/SignatureException;
+    const-string v2, "V4 signing failed"
+    invoke-direct v1, v2, v0, Ljava/security/SignatureException;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v1
+    return-void 
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "APK Signing Block addition of signature(s) requested by outputZipSections() hasn't been fulfilled yet"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    new-instance v0, Ljava/lang/IllegalStateException;
+    const-string v1, "Signed APK Signing BLock not yet generated. Skipped outputZipSections()?"
+    invoke-direct v0, v1, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+    throw v0
+    move-object v13, v3
+    new-instance v0, Ljava/io/IOException;
+    new-instance v1, Ljava/lang/StringBuilder;
+    const-string v2, "Output ZIP Central Directory too large: "
+    invoke-direct v1, v2, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-virtual v1, v10, v11, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    const-string v2, " bytes"
+    invoke-virtual v1, v2, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual v1, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    move-result-object v1
+    invoke-direct v0, v1, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
+    throw v0
+    move-object v13, v7
+    new-instance v0, Ljava/lang/IllegalArgumentException;
+    const-string v1, "At least one signer config must be provided"
+    invoke-direct v0, v1, Ljava/lang/IllegalArgumentException;-><init>(Ljava/lang/String;)V
+    throw v0
+    move-exception v0
+    move-object v13, v7
+    move-object v1, v0
+    new-instance v0, Lo888o88ooo88oo8o88o8ooooo8888o8ooo8o/o8ooo888o88oo888oo8ooo88ooo88ooooo;
+    const-string v2, "Malformed APK: not a ZIP archive"
+    invoke-direct v0, v2, v1, Ljava/lang/Exception;-><init>(Ljava/lang/String; Ljava/lang/Throwable;)V
+    throw v0
+
+==============================================================================
+  METHOD: Lo888ooo8ooo88888o888oo8o888o8o88/o8ooo888o88oo888oo8ooo88ooo88ooooo; ooo8o88ooooo8ooo88o8o8888o88o8 (Lydbllnjd/com/Yxoxnjs2;)Z
+  HITS: ['Runtime;->exec']
+  literals: 46
+==============================================================================
+    const-string v0, "ps"
+    const-string v9, "/data/local/su"
+    const-string v10, "/su/bin/su"
+    const-string v1, "/system/app/Superuser.apk"
+    const-string v2, "/sbin/su"
+    const-string v3, "/system/bin/su"
+    const-string v4, "/system/xbin/su"
+    const-string v5, "/data/local/xbin/su"
+    const-string v6, "/data/local/bin/su"
+    const-string v7, "/system/sd/xbin/su"
+    const-string v8, "/system/bin/failsafe/su"
+    filled-new-array/range v1 ... v10, [Ljava/lang/String;
+    move-result-object v1
+    const/4 v2, 0
+    move v3, v2
+    const/4 v4, 1
+    const/16 v5, 10
+    if-ge v3, v5, +013h
+    aget-object v6, v1, v3
+    new-instance v7, Ljava/io/File;
+    invoke-direct v7, v6, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-virtual v7, Ljava/io/File;->exists()Z
+    move-result v6
+    if-eqz v6, +003h
+    goto +59h
+    add-int/lit8 v3, v3, 1
+    goto -15h
+    const-string v16, "com.zhiqupk.root.global"
+    const-string v17, "com.alephzain.framaroot"
+    const-string v6, "com.noshufou.android.su"
+    const-string v7, "com.noshufou.android.su.elite"
+    const-string v8, "eu.chainfire.supersu"
+    const-string v9, "com.koushikdutta.superuser"
+    const-string v10, "com.thirdparty.superuser"
+    const-string v11, "com.yellowes.su"
+    const-string v12, "com.topjohnwu.magisk"
+    const-string v13, "com.kingroot.kinguser"
+    const-string v14, "com.kingo.root"
+    const-string v15, "com.smedialink.oneclickroot"
+    filled-new-array/range v6 ... v17, [Ljava/lang/String;
+    move-result-object v1
+    move v3, v2
+    const/16 v6, 12
+    if-ge v3, v6, +00fh
+    aget-object v6, v1, v3
+    invoke-virtual/range v18, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+    move-result-object v7
+    invoke-virtual v7, v6, v2, Landroid/content/pm/PackageManager;->getPackageInfo(Ljava/lang/String; I)Landroid/content/pm/PackageInfo;
+    goto +2bh
+    add-int/lit8 v3, v3, 1
+    goto -10h
+    invoke-static Ljava/lang/Runtime;->getRuntime()Ljava/lang/Runtime;
+    move-result-object v1
+    const-string v3, "which su"
+    invoke-virtual v1, v3, Ljava/lang/Runtime;->exec(Ljava/lang/String;)Ljava/lang/Process;
+    move-result-object v1
+    new-instance v3, Ljava/io/BufferedReader;
+    new-instance v6, Ljava/io/InputStreamReader;
+    invoke-virtual v1, Ljava/lang/Process;->getInputStream()Ljava/io/InputStream;
+    move-result-object v1
+    invoke-direct v6, v1, Ljava/io/InputStreamReader;-><init>(Ljava/io/InputStream;)V
+    invoke-direct v3, v6, Ljava/io/BufferedReader;-><init>(Ljava/io/Reader;)V
+    invoke-virtual v3, Ljava/io/BufferedReader;->readLine()Ljava/lang/String;
+    move-result-object v1
+    invoke-virtual v3, Ljava/io/BufferedReader;->close()V
+    if-eqz v1, +00ah
+    invoke-virtual v1, Ljava/lang/String;->length()I
+    move-result v1
+    if-lez v1, +004h
+    move v1, v4
+    goto +2h
+    move v1, v2
+    const/4 v3, 6
+    const/16 v6, 8
+    invoke-static Ljava/lang/Runtime;->getRuntime()Ljava/lang/Runtime;
+    move-result-object v7
+    invoke-virtual v7, v0, Ljava/lang/Runtime;->exec(Ljava/lang/String;)Ljava/lang/Process;
+    move-result-object v7
+    new-instance v8, Ljava/io/BufferedReader;
+    new-instance v9, Ljava/io/InputStreamReader;
+    invoke-virtual v7, Ljava/lang/Process;->getInputStream()Ljava/io/InputStream;
+    move-result-object v7
+    invoke-direct v9, v7, Ljava/io/InputStreamReader;-><init>(Ljava/io/InputStream;)V
+    invoke-direct v8, v9, Ljava/io/BufferedReader;-><init>(Ljava/io/Reader;)V
+    invoke-virtual v8, Ljava/io/BufferedReader;->readLine()Ljava/lang/String;
+    move-result-object v7
+    if-eqz v7, +017h
+    sget-object v9, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oo88o8o88oo8oo88o888oo8ooo8o [Ljava/lang/String;
+    move v10, v2
+    if-ge v10, v6, -009h
+    aget-object v11, v9, v10
+    invoke-static v7, v11, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v11
+    if-eqz v11, +007h
+    invoke-virtual v8, Ljava/io/BufferedReader;->close()V
+    goto/16 +093h
+    add-int/lit8 v10, v10, 1
+    goto -11h
+    invoke-virtual v8, Ljava/io/BufferedReader;->close()V
+    sget-object v7, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo88ooooo8ooo8oo8oo8888o8o88ooo8 [Ljava/lang/Integer;
+    move v8, v2
+    if-ge v8, v5, +013h
+    aget-object v9, v7, v8
+    invoke-virtual v9, Ljava/lang/Number;->intValue()I
+    move-result v9
+    new-instance v10, Ljava/net/ServerSocket;
+    invoke-direct v10, v9, Ljava/net/ServerSocket;-><init>(I)V
+    invoke-virtual v10, Ljava/net/ServerSocket;->close()V
+    add-int/lit8 v8, v8, 1
+    goto -12h
+    invoke-static Landroid/os/Debug;->isDebuggerConnected()Z
+    move-result v5
+    if-nez v5, +071h
+    invoke-static Landroid/os/Debug;->waitingForDebugger()Z
+    move-result v5
+    if-eqz v5, +003h
+    goto +69h
+    sget-object v5, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o888888ooo8o8oo888ooooo88oo8 [Ljava/lang/String;
+    move v7, v2
+    if-ge v7, v6, +013h
+    aget-object v8, v5, v7
+    new-instance v9, Ljava/io/File;
+    invoke-direct v9, v8, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-virtual v9, Ljava/io/File;->exists()Z
+    move-result v8
+    if-eqz v8, +003h
+    goto +56h
+    add-int/lit8 v7, v7, 1
+    goto -12h
+    new-instance v5, Ljava/io/File;
+    const-string v6, "/proc/self/maps"
+    invoke-direct v5, v6, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-virtual v5, Ljava/io/File;->exists()Z
+    move-result v6
+    if-eqz v6, +039h
+    new-instance v6, Ljava/io/BufferedReader;
+    new-instance v7, Ljava/io/FileReader;
+    invoke-direct v7, v5, Ljava/io/FileReader;-><init>(Ljava/io/File;)V
+    invoke-direct v6, v7, Ljava/io/BufferedReader;-><init>(Ljava/io/Reader;)V
+    invoke-virtual v6, Ljava/io/BufferedReader;->readLine()Ljava/lang/String;
+    move-result-object v5
+    if-eqz v5, +026h
+    const-string v7, "frida"
+    invoke-static v5, v7, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v7
+    if-nez v7, +01ah
+    const-string v7, "gadget"
+    invoke-static v5, v7, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v7
+    if-nez v7, +012h
+    const-string v7, "substrate"
+    invoke-static v5, v7, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v7
+    if-nez v7, +00ah
+    const-string v7, "xposed"
+    invoke-static v5, v7, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v5
+    if-eqz v5, -024h
+    invoke-virtual v6, Ljava/io/BufferedReader;->close()V
+    goto +12h
+    invoke-virtual v6, Ljava/io/BufferedReader;->close()V
+    sget-object v5, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooo8oo888o8oo88oo8888o88oo888o8o [Ljava/lang/String;
+    move v6, v2
+    if-ge v6, v3, +010h
+    aget-object v7, v5, v6
+    invoke-virtual/range v18, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+    move-result-object v8
+    invoke-virtual v8, v7, v2, Landroid/content/pm/PackageManager;->getPackageInfo(Ljava/lang/String; I)Landroid/content/pm/PackageInfo;
+    move v5, v4
+    goto +5h
+    add-int/lit8 v6, v6, 1
+    goto -fh
+    move v5, v2
+    const-string v6, "FINGERPRINT"
+    const/4 v7, 2
+    const/4 v8, 5
+    const/4 v9, 4
+    sget-object v10, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->ooooo8oo8o888o88888o88oo8oooo88888o88oooooo [Ljava/lang/String;
+    move v11, v2
+    if-ge v11, v9, +01ah
+    aget-object v12, v10, v11
+    sget-object v13, Landroid/os/Build;->FINGERPRINT Ljava/lang/String;
+    invoke-static v13, v6, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v13, v12, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v14
+    if-nez v14, +121h
+    invoke-static v13, v12, v2, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v12
+    if-eqz v12, +004h
+    goto/16 +119h
+    add-int/lit8 v11, v11, 1
+    goto -19h
+    sget-object v6, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o88oo8ooooooooo88o8oo88o88o8oo88oooo888o [Ljava/lang/String;
+    move v10, v2
+    const/4 v11, 7
+    if-ge v10, v11, +016h
+    aget-object v11, v6, v10
+    sget-object v12, Landroid/os/Build;->MODEL Ljava/lang/String;
+    const-string v13, "MODEL"
+    invoke-static v12, v13, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v12, v11, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v11
+    if-eqz v11, +004h
+    goto/16 +0ffh
+    add-int/lit8 v10, v10, 1
+    goto -16h
+    sget-object v6, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oooooo8oo8o88o8o8o8oo888o8o8oo8o888o888ooo [Ljava/lang/String;
+    move v10, v2
+    if-ge v10, v8, +016h
+    aget-object v11, v6, v10
+    sget-object v12, Landroid/os/Build;->MANUFACTURER Ljava/lang/String;
+    const-string v13, "MANUFACTURER"
+    invoke-static v12, v13, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v12, v11, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v11
+    if-eqz v11, +004h
+    goto/16 +0e6h
+    add-int/lit8 v10, v10, 1
+    goto -15h
+    const-string v6, "BRAND"
+    sget-object v10, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oo888oooo8888ooooo8888o8o88o88 [Ljava/lang/String;
+    move v11, v2
+    if-ge v11, v7, +01ah
+    aget-object v12, v10, v11
+    sget-object v13, Landroid/os/Build;->BRAND Ljava/lang/String;
+    invoke-static v13, v6, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v13, v12, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v14
+    if-nez v14, +0cfh
+    invoke-static v13, v12, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v12
+    if-eqz v12, +004h
+    goto/16 +0c7h
+    add-int/lit8 v11, v11, 1
+    goto -19h
+    const-string v6, "DEVICE"
+    sget-object v10, Landroid/os/Build;->DEVICE Ljava/lang/String;
+    invoke-static v10, v6, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    const-string v6, "generic"
+    invoke-static v10, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oooo8oooooooooo8oo8oo88o8ooo888888;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v6
+    if-nez v6, +0b5h
+    const-string v6, "emulator"
+    invoke-static v10, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v6
+    if-eqz v6, +004h
+    goto/16 +0abh
+    sget-object v6, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o88oo8o8o8ooo88oo8oo8888888oooooo [Ljava/lang/String;
+    move v10, v2
+    if-ge v10, v3, +016h
+    aget-object v11, v6, v10
+    sget-object v12, Landroid/os/Build;->PRODUCT Ljava/lang/String;
+    const-string v13, "PRODUCT"
+    invoke-static v12, v13, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v12, v11, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v11
+    if-eqz v11, +004h
+    goto/16 +095h
+    add-int/lit8 v10, v10, 1
+    goto -15h
+    sget-object v3, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o8o8o8o88ooooooo88oo8ooo8oooooo8o88oo [Ljava/lang/String;
+    move v6, v2
+    if-ge v6, v9, +016h
+    aget-object v10, v3, v6
+    sget-object v11, Landroid/os/Build;->HARDWARE Ljava/lang/String;
+    const-string v12, "HARDWARE"
+    invoke-static v11, v12, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v11, v10, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v10
+    if-eqz v10, +004h
+    goto/16 +07ch
+    add-int/lit8 v6, v6, 1
+    goto -15h
+    sget-object v3, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->oo88o8o8ooo88888o8oo8oo8ooo8o8888o8o88oo8o [Ljava/lang/String;
+    move v6, v2
+    if-ge v6, v7, +015h
+    aget-object v9, v3, v6
+    sget-object v10, Landroid/os/Build;->HOST Ljava/lang/String;
+    const-string v11, "HOST"
+    invoke-static v10, v11, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v10, v9, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v9
+    if-eqz v9, +003h
+    goto +63h
+    add-int/lit8 v6, v6, 1
+    goto -14h
+    sget-object v3, Lo88o8o88o8888ooo88oo888oo88oooo8oo8o8oo/o8ooo888o88oo888oo8ooo88ooo88ooooo;->o888ooooo888o88o888888o888ooo [Ljava/lang/String;
+    move v6, v2
+    if-ge v6, v7, +015h
+    aget-object v9, v3, v6
+    sget-object v10, Landroid/os/Build;->BOARD Ljava/lang/String;
+    const-string v11, "BOARD"
+    invoke-static v10, v11, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-static v10, v9, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v9
+    if-eqz v9, +003h
+    goto +4bh
+    add-int/lit8 v6, v6, 1
+    goto -14h
+    invoke-static Ljava/lang/Runtime;->getRuntime()Ljava/lang/Runtime;
+    move-result-object v3
+    invoke-virtual v3, v0, Ljava/lang/Runtime;->exec(Ljava/lang/String;)Ljava/lang/Process;
+    move-result-object v0
+    new-instance v3, Ljava/io/BufferedReader;
+    new-instance v6, Ljava/io/InputStreamReader;
+    invoke-virtual v0, Ljava/lang/Process;->getInputStream()Ljava/io/InputStream;
+    move-result-object v0
+    invoke-direct v6, v0, Ljava/io/InputStreamReader;-><init>(Ljava/io/InputStream;)V
+    invoke-direct v3, v6, Ljava/io/BufferedReader;-><init>(Ljava/io/Reader;)V
+    invoke-virtual v3, Ljava/io/BufferedReader;->readLine()Ljava/lang/String;
+    move-result-object v0
+    if-eqz v0, +02fh
+    const-string v6, "qemu"
+    invoke-static v0, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v6
+    if-nez v6, +022h
+    const-string v6, "vbox"
+    invoke-static v0, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v6
+    if-nez v6, +01ah
+    const-string v6, "genymotion"
+    invoke-static v0, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v6
+    if-nez v6, +012h
+    const-string v6, "andy"
+    invoke-static v0, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v6
+    if-nez v6, +00ah
+    const-string v6, "ttVM_"
+    invoke-static v0, v6, v4, Loooooo8o8ooooo88o8888oo8oo8oo8o88oo8/oo8o8oo8888oo88o88o88ooo8ooo8o8o88o8ooo;->o88oo8o8o8ooo88oo8oo8888888oooooo(Ljava/lang/String; Ljava/lang/String; Z)Z
+    move-result v0
+    if-eqz v0, -02ch
+    invoke-virtual v3, Ljava/io/BufferedReader;->close()V
+    move v0, v4
+    goto +5h
+    invoke-virtual v3, Ljava/io/BufferedReader;->close()V
+    move v0, v2
+    invoke-static Landroid/os/SystemClock;->elapsedRealtime()J
+    move-result-wide v9
+    const-wide/32 v11, 900000
+    cmp-long v3, v9, v11
+    if-gez v3, +004h
+    move v3, v4
+    goto +2h
+    move v3, v2
+    invoke-virtual/range v18, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+    move-result-object v6
+    const/16 v9, 128
+    invoke-virtual v6, v9, Landroid/content/pm/PackageManager;->getInstalledApplications(I)Ljava/util/List;
+    move-result-object v6
+    const-string v9, "getInstalledApplications(...)"
+    invoke-static v6, v9, Loooooo8888oo8ooooo88o8oooo88oo8/o888o888oo88o8oo88o8o888888o8o8o88;->oo888oooo8888ooooo8888o8o88o88(Ljava/lang/Object; Ljava/lang/String;)V
+    invoke-interface v6, Ljava/util/List;->iterator()Ljava/util/Iterator;
+    move-result-object v6
+    move v9, v2
+    invoke-interface v6, Ljava/util/Iterator;->hasNext()Z
+    move-result v10
+    if-eqz v10, +015h
+    invoke-interface v6, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    move-result-object v10
+    check-cast v10, Landroid/content/pm/ApplicationInfo;
+    iget v10, v10, Landroid/content/pm/ApplicationInfo;->flags I
+    and-int/lit8 v11, v10, 1
+    if-nez v11, -010h
+    and-int/lit16 v10, v10, 128
+    if-nez v10, -014h
+    add-int/lit8 v9, v9, 1
+    goto -18h
+    if-ge v9, v8, +004h
+    move v6, v4
+    goto +2h
+    move v6, v2
+    if-nez v1, +00bh
+    if-nez v5, +009h
+    if-nez v0, +007h
+    if-nez v3, +005h
+    if-nez v6, +003h
+    return v4
+    const-class v0, Lydbllnjd/com/Yxoxnjs2;
+    invoke-virtual/range v18, Landroid/content/Context;->getPackageName()Ljava/lang/String;
+    move-result-object v1
+    invoke-virtual v0, Ljava/lang/Class;->getName()Ljava/lang/String;
+    move-result-object v0
+    new-instance v3, Landroid/content/ComponentName;
+    invoke-direct v3, v1, v0, Landroid/content/ComponentName;-><init>(Ljava/lang/String; Ljava/lang/String;)V
+    invoke-virtual/range v18, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+    move-result-object v0
+    invoke-virtual v0, v3, v7, v4, Landroid/content/pm/PackageManager;->setComponentEnabledSetting(Landroid/content/ComponentName; I I)V
+    invoke-virtual/range v18, Landroid/app/Activity;->finish()V
+    invoke-static Landroid/os/Process;->myPid()I
+    move-result v0
+    invoke-static v0, Landroid/os/Process;->killProcess(I)V
+    invoke-static v4, Ljava/lang/System;->exit(I)V
+    return v2

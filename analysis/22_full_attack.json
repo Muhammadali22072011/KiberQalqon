@@ -1,0 +1,58 @@
+[
+  {
+    "file": "02cce475f26041e8.data",
+    "sample": "RASMLAR_18",
+    "score": 5388,
+    "method": "KPA(DEX-035) key_repeats_at=8",
+    "key_hex": "c854313920952d29",
+    "key_preview": "�T19 �-)"
+  },
+  {
+    "file": "zejcc.spe",
+    "sample": "RASMLAR_18",
+    "score": 5384,
+    "method": "KPA(DEX-039) key_repeats_at=8",
+    "key_hex": "bbe9490592d8f302",
+    "key_preview": "��I\u0005���\u0002"
+  },
+  {
+    "file": "cqivytyakr.spe",
+    "sample": "RASMLAR_8",
+    "score": 5379,
+    "method": "KPA(ZIP_LFH) key_repeats_at=10",
+    "key_hex": "89c5376b716dc9c60610",
+    "key_preview": "��7kqm��\u0006\u0010"
+  },
+  {
+    "file": "d55abfda1195fb77.bak",
+    "sample": "RASMLAR_8",
+    "score": 5385,
+    "method": "KPA(ZIP_LFH) key_repeats_at=10",
+    "key_hex": "5193ca6af1dd61c34659",
+    "key_preview": "Q��j��a�FY"
+  },
+  {
+    "file": "5c8d3cf99f5cf4ac.dat",
+    "sample": "toydanfotolar9jpg_10",
+    "score": 5397,
+    "method": "KPA(DEX-035) key_repeats_at=8",
+    "key_hex": "2e05c954aca9faab",
+    "key_preview": ".\u0005�T����"
+  },
+  {
+    "file": "oiprcd.sps",
+    "sample": "toydanfotolar9jpg_10",
+    "score": 5387,
+    "method": "KPA(DEX-037) key_repeats_at=8",
+    "key_hex": "bbea48685dcaf997",
+    "key_preview": "��Hh]���"
+  },
+  {
+    "file": "nhondpu.sps",
+    "sample": "VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
+    "score": 5388,
+    "method": "KPA(DEX-036) key_repeats_at=8",
+    "key_hex": "bbeb476453cef7dc",
+    "key_preview": "��GdS���"
+  }
+]

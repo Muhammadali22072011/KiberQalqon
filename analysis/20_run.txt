@@ -1,0 +1,284 @@
+﻿
+========================================================================
+[+] RASMLAR_18_fixed.apk
+========================================================================
+  asset-IO + xor methods: 1
+
+  ----- LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lvpvaggzk/com/Ss0l4nz5aqo2wfg; Ljava/lang/String;)V -----
+  string literals: ['KyonJAd+DF5U', 'eWhsckQAXAYJWj5PQCw5HHphDGN1OTkgPQkxACADXns=', 'LTwgAwpECEAZQlZYXg==', 'LDA4JEkfQhxQAhwEGAI1GlVBKlREZA==', 'PjwsNVxYGV5d', 'Hw0SbEs=']
+    const-string v0, "KyonJAd+DF5U"
+    invoke-static v0, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-static v11, v0, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Hdtsjbvgjmggnrwhmfroy(Ljava/lang/Object; Ljava/lang/String;)V
+    const-string v0, "eWhsckQAXAYJWj5PQCw5HHphDGN1OTkgPQkxACADXns="
+    invoke-static v0, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v0, v1, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v0
+    const-string v1, "LTwgAwpECEAZQlZYXg=="
+    invoke-static v1, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    invoke-static v0, v1, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    new-instance v1, Ljava/io/BufferedInputStream;
+    invoke-virtual v10, Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;
+    move-result-object v10
+    invoke-virtual v10, v11, Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;
+    move-result-object v10
+    const/high16 v11, 65536
+    invoke-direct v1, v10, v11, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream; I)V
+    invoke-static v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Avpmmjcpuycbjupdqkxyqbhmddpxcflb(Ljava/io/FilterInputStream;)[B
+    move-result-object v10
+    const/4 v11, 0
+    invoke-static v1, v11, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    array-length v11, v10
+    new-array v11, v11, [B
+    array-length v1, v10
+    const/4 v2, 0
+    if-ge v2, v1, +010h
+    aget-byte v3, v10, v2
+    array-length v4, v0
+    rem-int v4, v2, v4
+    aget-byte v4, v0, v4
+    xor-int/2addr v3, v4
+    int-to-byte v3, v3
+    aput-byte v3, v11, v2
+    add-int/lit8 v2, v2, 1
+    goto -fh
+    new-instance v5, Ljava/lang/String;
+    sget-object v10, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v5, v11, v10, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    const-string v4, "LDA4JEkfQhxQAhwEGAI1GlVBKlREZA=="
+    invoke-static v4, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v4
+    const-string v6, "PjwsNVxYGV5d"
+    invoke-static v6, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v6
+    const-string v7, "Hw0SbEs="
+    invoke-static v7, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v7
+    const/4 v8, 0
+    move-object v3, v9
+    invoke-virtual/range v3 ... v8, Landroid/webkit/WebView;->loadDataWithBaseURL(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String;)V
+    goto +8h
+    move-exception v9
+    throw v9
+    move-exception v10
+    invoke-static v1, v9, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    throw v10
+    return-void 
+
+  DexClassLoader users: 0
+
+========================================================================
+[+] RASMLAR_8_fixed.apk
+========================================================================
+  asset-IO + xor methods: 1
+
+  ----- LQaisbdemxxfuimvjnplpszmmjigzylnkk/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lfysrzn/com/Ei1v1lrc7; Ljava/lang/String;)V -----
+  string literals: ['NB4ePAUYMx8u', 'YFhcbkBkZEt4UEQfEQkyIHpgcSI3egQEMTBtdQp3QGE=', 'MggZGwgiNwFjGhhafw==', 'MwQBPEt5fV0qWlIGORElGFQjNzMhZg==', 'IQgVLV4+Jh8n', 'ADkrdEk=']
+    const-string v0, "NB4ePAUYMx8u"
+    invoke-static v0, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-static v11, v0, LInnybpxotjiwcrtrphierbskyjmenppu/Lvykjdzgpnpmedglwtypvjkqvdudx;->Hdtsjbvgjmggnrwhmfroy(Ljava/lang/Object; Ljava/lang/String;)V
+    const-string v0, "YFhcbkBkZEt4UEQfEQkyIHpgcSI3egQEMTBtdQp3QGE="
+    invoke-static v0, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    sget-object v1, LFacnfgjstfsyraerfvizkydoth/Gquesyvnltekgxdkymmis;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v0, v1, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v0
+    const-string v1, "MggZGwgiNwFjGhhafw=="
+    invoke-static v1, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    invoke-static v0, v1, LInnybpxotjiwcrtrphierbskyjmenppu/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    new-instance v1, Ljava/io/BufferedInputStream;
+    invoke-virtual v10, Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;
+    move-result-object v10
+    invoke-virtual v10, v11, Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;
+    move-result-object v10
+    const/high16 v11, 65536
+    invoke-direct v1, v10, v11, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream; I)V
+    invoke-static v1, LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;->Avpmmjcpuycbjupdqkxyqbhmddpxcflb(Ljava/io/FilterInputStream;)[B
+    move-result-object v10
+    const/4 v11, 0
+    invoke-static v1, v11, LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    array-length v11, v10
+    new-array v11, v11, [B
+    array-length v1, v10
+    const/4 v2, 0
+    if-ge v2, v1, +010h
+    aget-byte v3, v10, v2
+    array-length v4, v0
+    rem-int v4, v2, v4
+    aget-byte v4, v0, v4
+    xor-int/2addr v3, v4
+    int-to-byte v3, v3
+    aput-byte v3, v11, v2
+    add-int/lit8 v2, v2, 1
+    goto -fh
+    new-instance v5, Ljava/lang/String;
+    sget-object v10, LFacnfgjstfsyraerfvizkydoth/Gquesyvnltekgxdkymmis;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v5, v11, v10, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    const-string v4, "MwQBPEt5fV0qWlIGORElGFQjNzMhZg=="
+    invoke-static v4, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v4
+    const-string v6, "IQgVLV4+Jh8n"
+    invoke-static v6, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v6
+    const-string v7, "ADkrdEk="
+    invoke-static v7, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v7
+    const/4 v8, 0
+    move-object v3, v9
+    invoke-virtual/range v3 ... v8, Landroid/webkit/WebView;->loadDataWithBaseURL(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String;)V
+    goto +8h
+    move-exception v9
+    throw v9
+    move-exception v10
+    invoke-static v1, v9, LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    throw v10
+    return-void 
+
+  DexClassLoader users: 0
+
+========================================================================
+[+] toydanfotolar9jpg_10_fixed.apk
+========================================================================
+  asset-IO + xor methods: 1
+
+  ----- LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lujsfgsyu/com/Nrenxflb5odtk; Ljava/lang/String;)V -----
+  string literals: ['ICURCAweWC4r', 'cmJVW0FiAXt4PRcrMUVOPl49WHEzbkhbcCUvJRIhe3c=', 'JjMWLwEkXDBmQn90ew==', 'Jz8OCEJ/FmwvAjUoPRseKQ85GyMDFg==', 'NTMaGVc4TS4i', 'FAIkQEA=']
+    const-string v0, "ICURCAweWC4r"
+    invoke-static v0, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-static v11, v0, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Hdtsjbvgjmggnrwhmfroy(Ljava/lang/Object; Ljava/lang/String;)V
+    const-string v0, "cmJVW0FiAXt4PRcrMUVOPl49WHEzbkhbcCUvJRIhe3c="
+    invoke-static v0, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v0, v1, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v0
+    const-string v1, "JjMWLwEkXDBmQn90ew=="
+    invoke-static v1, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    invoke-static v0, v1, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    new-instance v1, Ljava/io/BufferedInputStream;
+    invoke-virtual v10, Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;
+    move-result-object v10
+    invoke-virtual v10, v11, Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;
+    move-result-object v10
+    const/high16 v11, 65536
+    invoke-direct v1, v10, v11, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream; I)V
+    invoke-static v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Avpmmjcpuycbjupdqkxyqbhmddpxcflb(Ljava/io/FilterInputStream;)[B
+    move-result-object v10
+    const/4 v11, 0
+    invoke-static v1, v11, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    array-length v11, v10
+    new-array v11, v11, [B
+    array-length v1, v10
+    const/4 v2, 0
+    if-ge v2, v1, +010h
+    aget-byte v3, v10, v2
+    array-length v4, v0
+    rem-int v4, v2, v4
+    aget-byte v4, v0, v4
+    xor-int/2addr v3, v4
+    int-to-byte v3, v3
+    aput-byte v3, v11, v2
+    add-int/lit8 v2, v2, 1
+    goto -fh
+    new-instance v5, Ljava/lang/String;
+    sget-object v10, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v5, v11, v10, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    const-string v4, "Jz8OCEJ/FmwvAjUoPRseKQ85GyMDFg=="
+    invoke-static v4, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v4
+    const-string v6, "NTMaGVc4TS4i"
+    invoke-static v6, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v6
+    const-string v7, "FAIkQEA="
+    invoke-static v7, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v7
+    const/4 v8, 0
+    move-object v3, v9
+    invoke-virtual/range v3 ... v8, Landroid/webkit/WebView;->loadDataWithBaseURL(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String;)V
+    goto +8h
+    move-exception v9
+    throw v9
+    move-exception v10
+    invoke-static v1, v9, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    throw v10
+    return-void 
+
+  DexClassLoader users: 0
+
+========================================================================
+[+] VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_fixed.apk
+========================================================================
+  asset-IO + xor methods: 1
+
+  ----- LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lzrtssr/com/Rt28pxjh06wm39; Ljava/lang/String;)V -----
+  string literals: ['IkdKHDV2CTU8', 'cAEBS3EIX2trHQpyDAAPRyY8MQ1FDCE1DBgvHBtCABE=', 'JFFNOzhMDStxWF0bSg==', 'JV1VHHsXR3c4GBdHDBNTKCYWNj1DTA==', 'N1FBDW5QHDU1', 'FmB/VHk=']
+    const-string v0, "IkdKHDV2CTU8"
+    invoke-static v0, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-static v11, v0, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Hdtsjbvgjmggnrwhmfroy(Ljava/lang/Object; Ljava/lang/String;)V
+    const-string v0, "cAEBS3EIX2trHQpyDAAPRyY8MQ1FDCE1DBgvHBtCABE="
+    invoke-static v0, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v0, v1, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v0
+    const-string v1, "JFFNOzhMDStxWF0bSg=="
+    invoke-static v1, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    invoke-static v0, v1, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    new-instance v1, Ljava/io/BufferedInputStream;
+    invoke-virtual v10, Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;
+    move-result-object v10
+    invoke-virtual v10, v11, Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;
+    move-result-object v10
+    const/high16 v11, 65536
+    invoke-direct v1, v10, v11, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream; I)V
+    invoke-static v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Avpmmjcpuycbjupdqkxyqbhmddpxcflb(Ljava/io/FilterInputStream;)[B
+    move-result-object v10
+    const/4 v11, 0
+    invoke-static v1, v11, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    array-length v11, v10
+    new-array v11, v11, [B
+    array-length v1, v10
+    const/4 v2, 0
+    if-ge v2, v1, +010h
+    aget-byte v3, v10, v2
+    array-length v4, v0
+    rem-int v4, v2, v4
+    aget-byte v4, v0, v4
+    xor-int/2addr v3, v4
+    int-to-byte v3, v3
+    aput-byte v3, v11, v2
+    add-int/lit8 v2, v2, 1
+    goto -fh
+    new-instance v5, Ljava/lang/String;
+    sget-object v10, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v5, v11, v10, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    const-string v4, "JV1VHHsXR3c4GBdHDBNTKCYWNj1DTA=="
+    invoke-static v4, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v4
+    const-string v6, "N1FBDW5QHDU1"
+    invoke-static v6, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v6
+    const-string v7, "FmB/VHk="
+    invoke-static v7, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v7
+    const/4 v8, 0
+    move-object v3, v9
+    invoke-virtual/range v3 ... v8, Landroid/webkit/WebView;->loadDataWithBaseURL(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String;)V
+    goto +8h
+    move-exception v9
+    throw v9
+    move-exception v10
+    invoke-static v1, v9, LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/io/Closeable; Ljava/lang/Throwable;)V
+    throw v10
+    return-void 
+
+  DexClassLoader users: 0

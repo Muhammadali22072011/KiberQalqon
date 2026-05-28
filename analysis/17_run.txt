@@ -1,0 +1,227 @@
+﻿
+========================================================================
+[+] RASMLAR_18  base=JYTAs0m31lxvwkQE42Y10Ktm  top=3183701586F97GhYNSURErMMwPeAS33H
+========================================================================
+  URLs:0  domains:3  IPs:0  TG_BOTS:0  TG_USERS:0  TG_CHATS:0
+    DOM  : android.app
+    DOM  : android.net
+    DOM  : vpvaggzk.com
+  --- juicy plaintexts ---
+    Only 'https' origins are accepted. Ignoring extra origin: 
+    launchUrl scheme must be 'https'
+    file:///android_asset/
+
+========================================================================
+[+] RASMLAR_8  base=UmmYqVRrK46tVxAG5PDVUI5rSF72a6p1  top=551712693drkGqsgO05tb31vbvZGkA0P
+========================================================================
+  URLs:1  domains:3  IPs:0  TG_BOTS:0  TG_USERS:5  TG_CHATS:0
+    URL  : https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+    DOM  : android.app
+    DOM  : android.net
+    DOM  : fysrzn.com
+    USER : @kotlinx
+    USER : @qPJxVbj
+    USER : @ve448d
+    USER : @xPTeI
+    USER : @xPTeIaw
+  --- juicy plaintexts ---
+    file:///android_asset/
+    io.ktor.client.plugins.HttpRequestRetry
+    https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+
+========================================================================
+[+] VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ  base=C49yA8hXYvs5cz7wGeEX7cQLTzYn  top=358200732kyGoz80aYtUropyXbvrXv9h
+========================================================================
+  URLs:0  domains:3  IPs:0  TG_BOTS:0  TG_USERS:4  TG_CHATS:0
+    DOM  : android.app
+    DOM  : android.net
+    DOM  : zrtssr.com
+    USER : @Ri8Npi
+    USER : @ZBh1
+    USER : @etKyi
+    USER : @ioba1
+  --- juicy plaintexts ---
+
+========================================================================
+[+] toydanfotolar9jpg_10  base=AVbmxP9CNlQZRrzvnJhFw92n  top=347692886QFqc74H0w07DWz51sMHjqB4
+========================================================================
+  URLs:0  domains:3  IPs:0  TG_BOTS:0  TG_USERS:6  TG_CHATS:0
+    DOM  : android.app
+    DOM  : android.net
+    DOM  : ujsfgsyu.com
+    USER : @RmksV8BA
+    USER : @SerializedName
+    USER : @UmixZ2OH
+    USER : @ansman
+    USER : @long_value
+    USER : @openai
+  --- juicy plaintexts ---
+    HttpCookies
+    file:///android_asset/
+    paymentBannerLastShownAt
+
+========================================================================
+[+] Trying XOR decrypt on encrypted assets (.spe, .sps, .data, .bak)
+========================================================================
+
+----- RASMLAR_18 -----
+  ✘ 02cce475f26041e8.data key=base  head: e6681d726396751a059bfab01cef8c25  (no match)
+  ✘ 02cce475f26041e8.data key=top  head: 9f0071002796291c0cc1c4ff5cc3b539  (no match)
+  ✘ ahihasm.sps key=base  head: 4549283d075405564c7a563b2d400716  (no match)
+  ✔ ahihasm.sps sz=19636  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_RASMLAR_18_ahihasm.sps.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Install</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #212226;
+            --bg-light: #FFFFFF;
+            --text: #FFFFFF;
+            --text-light: #000000;
+            --accent: #39816B;
+  
+  ✘ titmtilhmof.spe key=base  head: 4549283d075405564c7a563b2d400716  (no match)
+  ✔ titmtilhmof.spe sz=23706  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_RASMLAR_18_titmtilhmof.spe.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Update</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            p
+  ✘ zejcc.spe key=base  head: 95d5654ed1dba73175c1d966d2058a10  (no match)
+  ✘ zejcc.spe key=top  head: ecbd093c95dbfb377c9be7299229b30c  (no match)
+
+----- RASMLAR_8 -----
+  ✘ cqivytyakr.spe key=base  head: 8ce35936143b93bc4524c39f599ea654  (no match)
+  ✘ cqivytyakr.spe key=top  head: ecbb0558545ff7f73d74878048979474  (no match)
+  ✘ d55abfda1195fb77.bak key=base  head: 54b5a437948b3bb9056dc20d0ef22291  (no match)
+  ✘ d55abfda1195fb77.bak key=top  head: 34edf859d4ef5ff27d3d86121ffb10b1  (no match)
+  ✘ daafypkct.spe key=base  head: 5c79182103303d1b3d702c6b7c650c2a  (no match)
+  ✔ daafypkct.spe sz=19636  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_RASMLAR_8_daafypkct.spe.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Install</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #212226;
+            --bg-light: #FFFFFF;
+            --text: #FFFFFF;
+            --text-light: #000000;
+            --accent: #39816B;
+  
+  ✘ esqvay.sps key=base  head: 5c79182103303d1b3d702c6b7c650c2a  (no match)
+  ✔ esqvay.sps sz=23706  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_RASMLAR_8_esqvay.sps.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Update</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            p
+
+----- toydanfotolar9jpg_10 -----
+  ✘ 5c8d3cf99f5cf4ac.dat key=base  head: 0b36d333e4caf6e8cd35b7274af3b3bc  (no match)
+  ✘ 5c8d3cf99f5cf4ac.dat key=top  head: 79548668a5a8f793b508a00c7bb6fd82  (no match)
+  ✘ njwi.spe key=base  head: 4e4311140236582b3d1d7f5f5c297034  (no match)
+  ✔ njwi.spe sz=23706  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_toydanfotolar9jpg_10_njwi.spe.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Update</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            p
+  ✘ oiprcd.sps key=base  head: 9ed9520f15a9f7d4a3d93b7a304cdc1a  (no match)
+  ✘ oiprcd.sps key=top  head: ecbb075454cbf6afdbe42c5101099224  (no match)
+  ✘ wefa.sps key=base  head: 4e4311140236582b3d1d7f5f5c297034  (no match)
+  ✔ wefa.sps sz=19636  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_toydanfotolar9jpg_10_wefa.sps.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Install</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #212226;
+            --bg-light: #FFFFFF;
+            --text: #FFFFFF;
+            --text-light: #000000;
+            --accent: #39816B;
+  
+
+----- VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ -----
+  ✘ nhondpu.sps key=base  head: 9cba061722c5a9847667e5cf44972967  (no match)
+  ✘ nhondpu.sps key=top  head: ecbb075c53cdf6ef1d7aefbd48972620  (no match)
+  ✘ npxtowvrif.spe key=base  head: 4c204504325c063b2e3d6206616c314d  (no match)
+  ✔ npxtowvrif.spe sz=23706  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_npxtowvrif.spe.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Update</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            p
+  ✘ skxnubh.sps key=base  head: 4c204504325c063b2e3d6206616c314d  (no match)
+  ✔ skxnubh.sps sz=19636  key=top  -> TEXT  head: 3c21444f43545950452068746d6c3e0a
+     saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_skxnubh.sps.bin
+     preview: <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#212226">
+    <title>Install</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #212226;
+            --bg-light: #FFFFFF;
+            --text: #FFFFFF;
+            --text-light: #000000;
+            --accent: #39816B;
+  

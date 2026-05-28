@@ -1,0 +1,600 @@
+﻿[+] Raw string: b'sqsmlH2NOLPXeaDIFGnMEOdG6Uc2mVingetSecretKey'  len=44
+
+[+] VIDEO.mp4 cvsmcn.json best decryption attempts:
+  score=    0  ECB key=k32_first32
+    pt: b'\x99\x19\xcft \xf2\xc2QR"\xd2\xa0\x00@\x08\x8c\x83{\xbdb\xf1\xefX\x1f\xceR\xe1&OKE6\xae\x98\x07\xa5\xe0Y\x03\xcd\x159[\x174\x9382\xe1\x9cPHW\x7f\xe6?\x12\x8b+S\xd2\xc0\xe0\xaaBX^\xdb\x16\xfc\x14i\x10hl\xa0\xf1tc\xde#-\'\xb5aZRv[r\xfc\xdf\xe0m\xf2N`\xed\x85e\x1d\x8fZ\xc7)\xc1!\xb1\x7f!9\xbf\xffp\x8e\xf8\xb0 \x8b9\x1e\x91\x0e:\x8f=\xd7\t\t\xdb,\xeeO\xe7v\xab\xa0\xca<\xb4?\xb4CZ8^(Q\x1a\xd0\n\xb1\xea\xbc\xd9\xae\x9d\xc2\x02\x1d\x867\xb4)P\xa4ZI/\x83\xd6T5\xca\x8a\xad]\xb2\x86G\xaaDA\x11\xd4A\x9du\xbdY8\xfe\x166\x00:rN\xac\x92'
+  score=    0  CBC key=k32_first32 iv=ct[:16]
+    pt: b'\x8c\x90\xbb[\xc9\xf8\xbe\xa6\xd4\xba\n\xc5\x11\xad\x98~\x89\x97\xf8\x06\xf1\xac\xe0\x18M\xeal\x9f:\xadI\xe6\x87}51~]LP\xf8\x86\xeae^\xe7N\x06\xf3\xa3\xdf\xa9\x9c\x8c\x9fsM\xe2\xb4|\xc5\xc5\xd4\xe3\xab \xa3\xbf\xa2g\x14\xec%\xa0\x93\xfe9|(\xb7\xc4\x1a\xd5\xdb\xd3\xde\xff\x94f\xe8Q\xfc&\xbf\xf3\xb8\xa6\x1b5\x9cv\x02\x90v=\x00\x03c<2\xc3o8\xbbjc\xcc\x7f\xdb\xe9\x9c\xef\xaf4\xd4X\xf25\xe7\x12g8+uDS\x04&\xb7 \xba\xbd\x18\xba\xde\x06\x84Z[\x9d\xe0\xe4\x1b\xea\xf2\xfc\xda6\xf9i,i\xf1\xc0Dp\xd0\x9c\xf8\xc0o~8M\xc9\xd6%\xaf\xafF:NHO\xf7\x12y\xafs\x9c\xfeX72#\x15$\xb6\x0f\xc6'
+  score=    0  CBC key=k32_first32 iv=zeros
+    pt: b'\x99\x19\xcft \xf2\xc2QR"\xd2\xa0\x00@\x08\x8c\x8c\x90\xbb[\xc9\xf8\xbe\xa6\xd4\xba\n\xc5\x11\xad\x98~\x89\x97\xf8\x06\xf1\xac\xe0\x18M\xeal\x9f:\xadI\xe6\x87}51~]LP\xf8\x86\xeae^\xe7N\x06\xf3\xa3\xdf\xa9\x9c\x8c\x9fsM\xe2\xb4|\xc5\xc5\xd4\xe3\xab \xa3\xbf\xa2g\x14\xec%\xa0\x93\xfe9|(\xb7\xc4\x1a\xd5\xdb\xd3\xde\xff\x94f\xe8Q\xfc&\xbf\xf3\xb8\xa6\x1b5\x9cv\x02\x90v=\x00\x03c<2\xc3o8\xbbjc\xcc\x7f\xdb\xe9\x9c\xef\xaf4\xd4X\xf25\xe7\x12g8+uDS\x04&\xb7 \xba\xbd\x18\xba\xde\x06\x84Z[\x9d\xe0\xe4\x1b\xea\xf2\xfc\xda6\xf9i,i\xf1\xc0Dp\xd0\x9c\xf8\xc0o~8M\xc9\xd6%\xaf\xafF:NHO'
+  score=    0  CTR key=k32_first32 nonce=ct[:16]
+    pt: b"$\xc9K\xcaF\xfd\x01s\xcd'e\t\xb0\x97#K\x82\xc6\xdd\xb1\xb7~r\xae\xbc\xc3\x0c\xb6]\x17\xa5\x87d\xf5<\x16x\x03\x1c\xae\x98\xb3\x85\xa4\xe6DD$\x84\xd9\xb2\xa6%\x9eV\r\xd3l\xbf\xec\xe8\xae'\x1c\xa5(\xe3\x8d\xf2\xe4X\xd0\x85r\x14\xc3\xa9\xa4\x93X=\xd4\xd0\xc0}\xcd\xcf\x0cp M8\xb1\x9d\x96(\xeb\xb2_\xca'`\x94\xb2.>\xbcJ\xa88vG\xe0\xe8\xef\xea\x8ed]^fo\xeczQ\xf1fSP\xfcf%*\xdd\x96\x93c\x18\xa3/\xb4\xc9}\xb2d~\xa9\xc1*S\xa0\t^+\x8d\x9a\xf0q\xb3\xc0\xc5\xba\xac\x95\x8a\xcd!\xd1S\x0eH\x1d4\x9f\x95o\x91\xce\xfc\x9c\xb0\x8f\xed\xec\xbf\xff%|\xf2)UfsE8\x1fq\xbe\xb1\r"
+  score=    0  ECB key=k32_pad
+    pt: b'\x9c\x8f\xbb\x1e\xc5\xc6\x08\xdb\x1b\xe8\xd7\xe9U\xd13\xed\xdeX\xf4\x14\x1ea\xad\'v\x8et\x90\xfe\xc9\xaa\xdb?\x13\xab\x0c)\x1d\xc8=\xe4\xe0\xf7\xcb\xd2gZZ\xe4\x88\x1c\xaf\xc5,\x9a`\x01\x83e\x04\xa6vd\xfd|\x1e\x88}\x87 \xb5nw?oT\x1am\x19\xd7\xe3\xc96\xd7\x1e&\x84\x97b\x82eBB-\xc5d\xcb #\x122\xad\xf2\x05\xff\t\x0c\x0c\xa1U1@%Z\x1d\x1c\xb2"\x96]\xd6\x8cY\x1c\xe8\xf8!\xe9C%\xf0\xcf\xe7m\x102\x1fK\x8e\xf2.D\xf5c\x92\xa9_m\x07\xcf\xfc8\x1b#BB\xa2y\x1a\xb8X\xdf\xd9\xf5\xff\xb6\xc8\xff\x9f\x05\xf0\x1an\xa1\x01(\xb5\xbf2\xc6cB?\xfcO\x1ai\x014\xc1\x8f\xa9\xb4/Vj\x01\xe5W\x0e'
+  score=    0  CBC key=k32_pad iv=ct[:16]
+    pt: b"\xd1\xb3\xf2-&vK\x9elf\x9fs\xa0/w\x93\x18\x1cT\xaf8\xe8+\xe8\xbc3\xc0C\xdcY+\x8e\x82iy\xd6\xec\x0e0\x0f\xeb\x8e\xa42*Q\xcaQ\xcd\xe5\t\x0f\rP>t*\xb5\xb7\x88.\xdc\xae\xeak\xc4\xb2\xdd\xdd\x1b\xc2\r\x1cP\nc\x9b<\x1f\x9do\xd7s\xac\xfc\xfcWV\xb0 |A\xf8\xcb\xfbG|1\xa6xt\x00\x8d\x12\xf5\x1dTE[\xf75\x8frE\xb6Bd\xf5\xbdp#n\x1dr\xc5\xa8D\x0cM\xe5\x10\x046j\xb2\xda\xf5\xb9,\xcc\x85\x06\x00\x1f\x00\xee\xe9\x86\xf4\x8frR\xabl\xd4\xb2\x81]r\xec\xc4dEA\x8dv\xaeqc\x9b\x9b\n\xb1\xd5~\x81\x87\xb6\xf9\x16I\xe5\xb3\xd3\x94\xdb\xac\xe4M3\xb480\xb5\xbe\xd2\xee'\x96'"
+  score=    0  CBC key=k32_pad iv=zeros
+    pt: b'\x9c\x8f\xbb\x1e\xc5\xc6\x08\xdb\x1b\xe8\xd7\xe9U\xd13\xed\xd1\xb3\xf2-&vK\x9elf\x9fs\xa0/w\x93\x18\x1cT\xaf8\xe8+\xe8\xbc3\xc0C\xdcY+\x8e\x82iy\xd6\xec\x0e0\x0f\xeb\x8e\xa42*Q\xcaQ\xcd\xe5\t\x0f\rP>t*\xb5\xb7\x88.\xdc\xae\xeak\xc4\xb2\xdd\xdd\x1b\xc2\r\x1cP\nc\x9b<\x1f\x9do\xd7s\xac\xfc\xfcWV\xb0 |A\xf8\xcb\xfbG|1\xa6xt\x00\x8d\x12\xf5\x1dTE[\xf75\x8frE\xb6Bd\xf5\xbdp#n\x1dr\xc5\xa8D\x0cM\xe5\x10\x046j\xb2\xda\xf5\xb9,\xcc\x85\x06\x00\x1f\x00\xee\xe9\x86\xf4\x8frR\xabl\xd4\xb2\x81]r\xec\xc4dEA\x8dv\xaeqc\x9b\x9b\n\xb1\xd5~\x81\x87\xb6\xf9\x16I\xe5\xb3\xd3'
+  score=    0  CTR key=k32_pad nonce=ct[:16]
+    pt: b'\x17\xea\x9e\xd4-\x9f\x18\xf0\xb15\x10\xe5\xfeWG\xb0\xda$e\x12\x8e\x13/\xc9t\xc0\xe5r \x8c|\x865\xd5x\x19b\xad\x16\xd4\x03\xce\x90Nr\xf4\xbeO\x83w\xda\x871\xdci\x1e\xc0@\x85 \xd5\x0c\x13\xd3\xbc\xf4\xc8k+R\xd4\xcc*\xef\xea^\x8b\xc9c\xa2\x81\xefR\x87\xbb\x0fj\xaf<\xec;\n?]\x16\x06P\xa7\xba\xdfC\xcfP\x03\x93\xbf\xf8\xccD\x96\xbd\xcf\\\xb0\x15\xe5OV\xc6\x8d\xe9\xc8\xa0\xf1!\x82\x89\xc1k\xfc+P\xd1KV\xa3\xd9 \x93h"U\xa2\x9c\xa4\x19\xc6d\xce\x0f\x89\xd3\x19L\x1a3t{\x1e\x19\x83\x9c\x00\x16|\xbc\xae\x9b\xd4E\x00\x83\x88\xa3OI\x04>5\x13?\x94\x96n\xb1\x02(\xb89t\xa9\\\x12\xfdy\xd9v\x03XD'
+  score=    0  ECB key=k24
+    pt: b'M\xd9?\xd7\x17\x9b%wbz\xfbBv<ZOj]Q6@yM\xd4\xc5\xc2\x7f\xb5\x1c\xac\x92k\x8de>S\rN\x12\x0b\x1c\x14\x8a\x8a\xe0\xd3^\x1c($z\x97U\xd3\xd6<\xb1T\xf7\xe5\xb3]\xda\x19#\x04\x93\x1b\xdc\xaf\xd5\x06=\xe0V\xc5\x98\xdd\x833\x9dP\xe99\xe9-K\xef\xfc)K\x02\x88\xe2\xdf\xb2wL\nj\x07\xc3d>Z\xeb\xb4E\xa3m\x01\xd9\x85\x81\xc6u]\x0e[\x01\xcf\r6\x1c\xc9\x83Ya\xd6M6j\xed\x12\xe9\x1d\xfe\x17\x1c\xe4AE\xc8v\xf2\xbbJ\xcc\'\xd4\xc7-L\xc5\xcd\xfd4g}B \xdc\x97\xc9.\x9b>|\x87_\x84\x08\xcd\xfc\xfb\x98j\x1b9\x01f\xed\x91a\xd9i" \xa7\r\xa8"y\x1c\xf1\xff\x9a\xd4rg'
+  score=    0  CBC key=k24 iv=ct[:16]
+    pt: b'e\xb6W\x0fxn\xabm\xdf*\x94VBJO#\xaaj\xc1\xf0\x1c\xbb\xf1\xdeD\xc7\xbd\x02\xee\xed/\xc8N\xc5\x1f\xee|\xf1|S[Y6\xd3?zt\xb5\x92\xff\x12iV\xdf^\x1c`j\x8e\x19\xacl4\x0e\x15]m3*\x10\ru\x82\xfb$#Q\xf3\x05K\xd3\xbbZ\xd4\xc9\x92\xc1m\x15\xc2\xc4\x08\xfa\xf3\xcb\xde\xdc\xea}\x11\x9b,@N\xec\x9c;Ez\x8cM\x07\xe7-p\xe7n\x8aD_\xc22\x8fd\xaa\xa9y\x19-\xf7\x05\xa5\x16q\x89\xcf\xa2_\xa3s\x13\x18g\xe5x\xed\xa7\xba%\xa2\x84\xd1\xb36\xa0\xa0"\x00\x88\\\x1b\xc0N\x86\x88\xd9\x00\xec\xf5\xe8\xd0+"\x19Y\nJ\x85^\x83\xd2\xd4\x96\xba\x10\xa1f\x9c\x00\xec\x93 \xf0V\x92\xcc>\xfa\xaa\xa1'
+  score=    0  CBC key=k24 iv=zeros
+    pt: b'M\xd9?\xd7\x17\x9b%wbz\xfbBv<ZOe\xb6W\x0fxn\xabm\xdf*\x94VBJO#\xaaj\xc1\xf0\x1c\xbb\xf1\xdeD\xc7\xbd\x02\xee\xed/\xc8N\xc5\x1f\xee|\xf1|S[Y6\xd3?zt\xb5\x92\xff\x12iV\xdf^\x1c`j\x8e\x19\xacl4\x0e\x15]m3*\x10\ru\x82\xfb$#Q\xf3\x05K\xd3\xbbZ\xd4\xc9\x92\xc1m\x15\xc2\xc4\x08\xfa\xf3\xcb\xde\xdc\xea}\x11\x9b,@N\xec\x9c;Ez\x8cM\x07\xe7-p\xe7n\x8aD_\xc22\x8fd\xaa\xa9y\x19-\xf7\x05\xa5\x16q\x89\xcf\xa2_\xa3s\x13\x18g\xe5x\xed\xa7\xba%\xa2\x84\xd1\xb36\xa0\xa0"\x00\x88\\\x1b\xc0N\x86\x88\xd9\x00\xec\xf5\xe8\xd0+"\x19Y\nJ\x85^\x83\xd2\xd4\x96\xba'
+  score=    0  CTR key=k24 nonce=ct[:16]
+    pt: b'\xd7\x15\xe2\xfe-\x13]\xf3\x89\xa8\x08\xffC2\xb6\xf44\x88\x9b\x9e\xc1bS+F\xc5\xa7D\xbaC\x14\xec\x08%$q\x9e\x01\xd4\xa1k[]j9F\xdb\x1b5hT\x8aW}\xd6uv\xd53\xe5\x84\xf8P\xc6\xd5\x963\xa2\x04\xbe|\xe9\x1f\x90\x8b\xabV\n\xa6\xdb\xff\xac}~\x14\xbce\x0c\xe5\xb7\xa2\xf1\xd47>\xbfJ;u[\xcd\xe2A\x8e\xb1\x993\x0e\xba\x91\xa2i\xee\xe2]\x14\xf0\x81W,Z\xd7y\xb2\x19\x16Y\xe2\xfc\x02\x11&\x9f%|\x18\xf0.!\t\xed\x18\x1cYS\x10\x021\x9d\xca\x85\xf8\xfe\x10\x85c\x17^\xc0\xfeMeR-\x81\x1d\xd8c\xa4\xcf\xde\xd7}\xaf\x97\xb8\x93\x0c\x12`(\x87r~\x86\x85Z$o\xf3\xef\x97\xc87\xe8\xd99\xb4/\x03'
+  score=    0  ECB key=k16
+    pt: b'\xa2\xb4\xfcO\xd7K\xcd\xac\xf8\xd5;\x08\xdf\x85xO8\x1d\xc4\x88\xbb_|[\x02\x0el\xea\'\xb5\x9c\xe4\xe2\xecs8h\xe5\xd1\x8f!\xed\xc1X-"\xdcR\xd9\xbf\x82\xe2\x1c$*\xbe@\x0c\x1e^\xbe5J\n\'2C\x0f\xc0\xab\x18\xf3\xf00\xce\xca\xa2@\x96\x88pl\xe5}g\xc5\xf7.!\xb4ke\xe6`\xb49W\xabJ\xab)ER9G<X\x90\x01\x1c\xad\xde\xb3I\xc9\xfa\xc5\xdb\x9a\x7f3H4b\x03\xc6j8\xea?\xd8A\x8b\xad\\\x8f\tf\xb4\x14\xa4\xdb\x8fyE\x0c9\x94i\x1f\xa6\xc4")It\x11\tD\xee?\x80C9\x98\x86\xf7\xaa\x90\x96\x81\xc5P\xfd\x92\x12\x05H\x7f\x8e\x16\xa7\x8f\x0fzB\xf8\xe2:\xfd\xcb\x8d\x02|\xf8\x11\xdf5\xb3\x96'
+  score=    0  CBC key=k16 iv=ct[:16]
+    pt: b'7\xf6\xc2\xb1\x83H\x9a\xe2\x18\xe6\x87\tySA\xac\xc5\xe3\x8c\x9by\x102Zy>\xf6\xd0#\x1c\xad\x86\xbf^\xe7\x9b5\x06\x80\xd1\xaa\x01\xdfh2\x12\xe4\xa6\x96\xc9\xc2}J\xdb\x93\xe9\xad\xba\x16\x16\x96\xf1!\xb5\xf8aaw\xa4\xf8\xb1\xb4_f\x04D?qn\xc0\xf3\\\x1a\x15\xe7\x14\xf7j\x08\x15(\xddX\x82g\xd9\xea"r\x9e\x03\xf9\x810\x10\xd99;\xb0\xc9~^\xdb_\x9e\xcc\x085\xf1\xcd5C\'\x94O7>\x16\x9a@v\xfdX\xba\xe8&\xcc\xb3\'\xfa6v^Ig\xb1sJ\x93\xbfM\x07\xa4\xff\xa5m\xbf\x01\xe1\xd6t\x93\x08\t\xf8\x93\x1e\x82V\xc3\n\xe9\xbf\xe9:\xa51\xe5Wm\x975WK\x80\xa9\x9f\xeaz\xeb \x83[\x86\xd6\x81NY\x9fA'
+  score=    0  CBC key=k16 iv=zeros
+    pt: b'\xa2\xb4\xfcO\xd7K\xcd\xac\xf8\xd5;\x08\xdf\x85xO7\xf6\xc2\xb1\x83H\x9a\xe2\x18\xe6\x87\tySA\xac\xc5\xe3\x8c\x9by\x102Zy>\xf6\xd0#\x1c\xad\x86\xbf^\xe7\x9b5\x06\x80\xd1\xaa\x01\xdfh2\x12\xe4\xa6\x96\xc9\xc2}J\xdb\x93\xe9\xad\xba\x16\x16\x96\xf1!\xb5\xf8aaw\xa4\xf8\xb1\xb4_f\x04D?qn\xc0\xf3\\\x1a\x15\xe7\x14\xf7j\x08\x15(\xddX\x82g\xd9\xea"r\x9e\x03\xf9\x810\x10\xd99;\xb0\xc9~^\xdb_\x9e\xcc\x085\xf1\xcd5C\'\x94O7>\x16\x9a@v\xfdX\xba\xe8&\xcc\xb3\'\xfa6v^Ig\xb1sJ\x93\xbfM\x07\xa4\xff\xa5m\xbf\x01\xe1\xd6t\x93\x08\t\xf8\x93\x1e\x82V\xc3\n\xe9\xbf\xe9:\xa51\xe5Wm\x975WK'
+
+========================================================================
+[+] Searching banker DEX for Cipher.doFinal / Base64.decode methods
+========================================================================
+
+----- RASMLAR_18_fixed.apk -----
+  found 3 candidate methods
+
+  ----- LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v7, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v7, ""
+    return-object v7
+    const/4 v0, 2
+    invoke-static v7, v0, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v0
+    const-string v1, "eWhsckQAXAYJWj5PQCw5HHphDGN1OTkgPQkxACADXns="
+    invoke-static v1, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    sget-object v2, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v1, v2, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v1
+    const-string v2, "LTwgAwpECEAZQlZYXg=="
+    invoke-static v2, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v2
+    nop 
+    invoke-static v1, v2, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    array-length v2, v0
+    new-array v2, v2, [B
+    array-length v3, v0
+    const/4 v4, 0
+    nop 
+    if-ge v4, v3, +011h
+    aget-byte v5, v0, v4
+    array-length v6, v1
+    rem-int v6, v4, v6
+    aget-byte v6, v1, v6
+    xor-int/2addr v5, v6
+    int-to-byte v5, v5
+    aput-byte v5, v2, v4
+    nop 
+    add-int/lit8 v4, v4, 1
+    goto -10h
+    new-instance v0, Ljava/lang/String;
+    nop 
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v0, v2, v1, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    move-object v7, v0
+    return-object v7
+
+  ----- Lcom/android/apksig/internal/util/X509CertificateUtils; haxwcpwn (Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;  cipher=False b64=True -----
+    if-eqz v4, +0a8h
+    invoke-virtual v4, Ljava/nio/Buffer;->remaining()I
+    move-result v0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v1, v1
+    if-ge v0, v1, +003h
+    return-object v4
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->mark()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    const/4 v0, 0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v2, v1
+    if-ge v0, v2, +014h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v2
+    aget-byte v1, v1, v0
+    if-eq v2, v1, +009h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->reset()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    return-object v4
+    add-int/lit8 v0, v0, 1
+    goto -16h
+    new-instance v0, Ljava/lang/StringBuilder;
+    invoke-direct v0, Ljava/lang/StringBuilder;-><init>()V
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v1
+    if-eqz v1, +017h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v1
+    int-to-char v1, v1
+    const/16 v2, 45
+    if-ne v1, v2, +003h
+    goto +ch
+    invoke-static v1, Ljava/lang/Character;->isWhitespace(C)Z
+    move-result v2
+    if-eqz v2, +003h
+    goto -16h
+    invoke-virtual v0, v1, Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;
+    goto -1ah
+    const/4 v1, 1
+    sget-object v2, Lcom/android/apksig/internal/util/X509CertificateUtils;->END_CERT_FOOTER [B
+    array-length v3, v2
+    if-ge v1, v3, +02bh
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v3
+    if-eqz v3, +019h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v3
+    aget-byte v2, v2, v1
+    if-ne v3, v2, +005h
+    add-int/lit8 v1, v1, 1
+    goto -15h
+    new-instance v4, Ljava/security/cert/CertificateException;
+    const-string v0, "HjExYQNCAkVYCB0SVwI/NUFGeVJfJQAMIzcnYQdYCBNhKTVWFA4jMV1UMFJRPxFNIjw1JRZCTURYGBAZAh9xJBREOF1ZL1QOLysgKBVZDlJFCVgQGAQlIEY="
+    invoke-static v0, Lizbhposedczokv/ffpmuejysxtpa;->bxwmmwxospk(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-direct v4, v0, Ljava/security/cert/CertificateException;-><init>(Ljava/lang/String;)V
+    throw v4
+
+  ----- Lizbhposedczokv/ffpmuejysxtpa; bxwmmwxospk (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v9, ""
+    return-object v9
+    const/4 v1, 2
+    invoke-static v9, v1, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v2
+    const-string v3, "JYTAs0m31lxvwkQE42Y10Ktm"
+    sget-object v8, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-virtual v3, v8, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v4
+    array-length v0, v2
+    new-array v5, v0, [B
+    const/4 v6, 0
+    if-ge v6, v0, +011h
+    aget-byte v7, v2, v6
+    array-length v8, v4
+    rem-int v8, v6, v8
+    aget-byte v8, v4, v8
+    xor-int v7, v7, v8
+    int-to-byte v7, v7
+    aput-byte v7, v5, v6
+    add-int/lit16 v6, v6, 1
+    goto -10h
+    new-instance v8, Ljava/lang/String;
+    sget-object v6, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-direct v8, v5, v6, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    return-object v8
+
+----- RASMLAR_8_fixed.apk -----
+  found 3 candidate methods
+
+  ----- LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v7, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v7, ""
+    return-object v7
+    const/4 v0, 2
+    invoke-static v7, v0, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v0
+    const-string v1, "YFhcbkBkZEt4UEQfEQkyIHpgcSI3egQEMTBtdQp3QGE="
+    invoke-static v1, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    sget-object v2, LFacnfgjstfsyraerfvizkydoth/Gquesyvnltekgxdkymmis;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v1, v2, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v1
+    const-string v2, "MggZGwgiNwFjGhhafw=="
+    invoke-static v2, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v2
+    invoke-static v1, v2, LInnybpxotjiwcrtrphierbskyjmenppu/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    array-length v2, v0
+    new-array v2, v2, [B
+    array-length v3, v0
+    const/4 v4, 0
+    if-ge v4, v3, +010h
+    aget-byte v5, v0, v4
+    array-length v6, v1
+    rem-int v6, v4, v6
+    aget-byte v6, v1, v6
+    xor-int/2addr v5, v6
+    int-to-byte v5, v5
+    aput-byte v5, v2, v4
+    add-int/lit8 v4, v4, 1
+    goto -fh
+    new-instance v0, Ljava/lang/String;
+    sget-object v1, LFacnfgjstfsyraerfvizkydoth/Gquesyvnltekgxdkymmis;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v0, v2, v1, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    move-object v7, v0
+    return-object v7
+
+  ----- Lcom/android/apksig/internal/util/X509CertificateUtils; rknjkwsveqpal (Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;  cipher=False b64=True -----
+    if-eqz v4, +0a8h
+    invoke-virtual v4, Ljava/nio/Buffer;->remaining()I
+    move-result v0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v1, v1
+    if-ge v0, v1, +003h
+    return-object v4
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->mark()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    const/4 v0, 0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v2, v1
+    if-ge v0, v2, +014h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v2
+    aget-byte v1, v1, v0
+    if-eq v2, v1, +009h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->reset()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    return-object v4
+    add-int/lit8 v0, v0, 1
+    goto -16h
+    new-instance v0, Ljava/lang/StringBuilder;
+    invoke-direct v0, Ljava/lang/StringBuilder;-><init>()V
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v1
+    if-eqz v1, +017h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v1
+    int-to-char v1, v1
+    const/16 v2, 45
+    if-ne v1, v2, +003h
+    goto +ch
+    invoke-static v1, Ljava/lang/Character;->isWhitespace(C)Z
+    move-result v2
+    if-eqz v2, +003h
+    goto -16h
+    invoke-virtual v0, v1, Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;
+    goto -1ah
+    const/4 v1, 1
+    sget-object v2, Lcom/android/apksig/internal/util/X509CertificateUtils;->END_CERT_FOOTER [B
+    array-length v3, v2
+    if-ge v1, v3, +02bh
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v3
+    if-eqz v3, +019h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v3
+    aget-byte v2, v2, v1
+    if-ne v3, v2, +005h
+    add-int/lit8 v1, v1, 1
+    goto -15h
+    new-instance v4, Ljava/security/cert/CertificateException;
+    const-string v0, "AQUIeQEkPQQiUFMQdhEvN0AkZDU6J0ETOihEEhVeFREFKCB5EjMgBiJSXxc3DCRnXTUlMjA7FQU6Ml9dFEJQUHUbDDUYMnIRLkZCHTARIiZBNWQwOiZBFyE="
+    invoke-static v0, Lcvzyd/nnuynj;->ejpwqplfj(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-direct v4, v0, Ljava/security/cert/CertificateException;-><init>(Ljava/lang/String;)V
+    throw v4
+
+  ----- Lcvzyd/nnuynj; ejpwqplfj (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v9, ""
+    return-object v9
+    const/4 v1, 2
+    invoke-static v9, v1, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v2
+    nop 
+    const-string v3, "UmmYqVRrK46tVxAG5PDVUI5rSF72a6p1"
+    sget-object v8, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-virtual v3, v8, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v4
+    array-length v0, v2
+    new-array v5, v0, [B
+    const/4 v6, 0
+    nop 
+    if-ge v6, v0, +012h
+    aget-byte v7, v2, v6
+    array-length v8, v4
+    rem-int v8, v6, v8
+    nop 
+    aget-byte v8, v4, v8
+    xor-int v7, v7, v8
+    int-to-byte v7, v7
+    aput-byte v7, v5, v6
+    add-int/lit16 v6, v6, 1
+    goto -11h
+    new-instance v8, Ljava/lang/String;
+    nop 
+    sget-object v6, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-direct v8, v5, v6, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    return-object v8
+
+----- toydanfotolar9jpg_10_fixed.apk -----
+  found 3 candidate methods
+
+  ----- LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v7, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v7, ""
+    return-object v7
+    const/4 v0, 2
+    invoke-static v7, v0, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v0
+    const-string v1, "cmJVW0FiAXt4PRcrMUVOPl49WHEzbkhbcCUvJRIhe3c="
+    invoke-static v1, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    sget-object v2, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v1, v2, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v1
+    const-string v2, "JjMWLwEkXDBmQn90ew=="
+    invoke-static v2, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v2
+    invoke-static v1, v2, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    array-length v2, v0
+    new-array v2, v2, [B
+    array-length v3, v0
+    const/4 v4, 0
+    if-ge v4, v3, +010h
+    aget-byte v5, v0, v4
+    array-length v6, v1
+    rem-int v6, v4, v6
+    aget-byte v6, v1, v6
+    xor-int/2addr v5, v6
+    int-to-byte v5, v5
+    aput-byte v5, v2, v4
+    add-int/lit8 v4, v4, 1
+    goto -fh
+    new-instance v0, Ljava/lang/String;
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v0, v2, v1, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    move-object v7, v0
+    return-object v7
+
+  ----- Lcom/android/apksig/internal/util/X509CertificateUtils; olnljunvo (Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;  cipher=False b64=True -----
+    if-eqz v4, +0a8h
+    invoke-virtual v4, Ljava/nio/Buffer;->remaining()I
+    move-result v0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v1, v1
+    if-ge v0, v1, +003h
+    return-object v4
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->mark()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    const/4 v0, 0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v2, v1
+    if-ge v0, v2, +014h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v2
+    aget-byte v1, v1, v0
+    if-eq v2, v1, +009h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->reset()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    return-object v4
+    add-int/lit8 v0, v0, 1
+    goto -16h
+    new-instance v0, Ljava/lang/StringBuilder;
+    invoke-direct v0, Ljava/lang/StringBuilder;-><init>()V
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v1
+    if-eqz v1, +017h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v1
+    int-to-char v1, v1
+    const/16 v2, 45
+    if-ne v1, v2, +003h
+    goto +ch
+    invoke-static v1, Ljava/lang/Character;->isWhitespace(C)Z
+    move-result v2
+    if-eqz v2, +003h
+    goto -16h
+    invoke-virtual v0, v1, Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;
+    goto -1ah
+    const/4 v1, 1
+    sget-object v2, Lcom/android/apksig/internal/util/X509CertificateUtils;->END_CERT_FOOTER [B
+    array-length v3, v2
+    if-ge v1, v3, +02bh
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v3
+    if-eqz v3, +019h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v3
+    aget-byte v2, v2, v1
+    if-ne v3, v2, +005h
+    add-int/lit8 v1, v1, 1
+    goto -15h
+    new-instance v4, Ljava/security/cert/CertificateException;
+    const-string v0, "FT4HTQgiVjUnCDQ+chsUBhs+SCUYV0YPKDgRTQw4XGMeKRx6MRcIAgcsASUWTVdOKTMDCR0iGTQnGDk1JwZaF048CSoeXRINJCQWBB45WiI6CXE8PR0OExw="
+    invoke-static v0, Lzsfniessjsztphp/sytchwgjrpro;->trtobhtalyz(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-direct v4, v0, Ljava/security/cert/CertificateException;-><init>(Ljava/lang/String;)V
+    throw v4
+
+  ----- Lzsfniessjsztphp/sytchwgjrpro; trtobhtalyz (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +005h
+    const-string v9, ""
+    return-object v9
+    const/4 v1, 2
+    invoke-static v9, v1, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v2
+    const-string v3, "AVbmxP9CNlQZRrzvnJhFw92n"
+    sget-object v8, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-virtual v3, v8, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v4
+    array-length v0, v2
+    new-array v5, v0, [B
+    const/4 v6, 0
+    if-ge v6, v0, +011h
+    aget-byte v7, v2, v6
+    array-length v8, v4
+    rem-int v8, v6, v8
+    aget-byte v8, v4, v8
+    xor-int v7, v7, v8
+    int-to-byte v7, v7
+    aput-byte v7, v5, v6
+    add-int/lit16 v6, v6, 1
+    goto -10h
+    new-instance v8, Ljava/lang/String;
+    sget-object v6, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-direct v8, v5, v6, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    return-object v8
+
+----- VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_fixed.apk -----
+  found 3 candidate methods
+
+  ----- LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v7, Ljava/lang/String;->length()I
+    move-result v0
+    nop 
+    if-nez v0, +005h
+    const-string v7, ""
+    return-object v7
+    const/4 v0, 2
+    nop 
+    invoke-static v7, v0, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v0
+    const-string v1, "cAEBS3EIX2trHQpyDAAPRyY8MQ1FDCE1DBgvHBtCABE="
+    nop 
+    invoke-static v1, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    sget-object v2, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-virtual v1, v2, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v1
+    const-string v2, "JFFNOzhMDStxWF0bSg=="
+    invoke-static v2, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v2
+    invoke-static v1, v2, LXlfrxdgmaeaewauhricbny/Lvykjdzgpnpmedglwtypvjkqvdudx;->Dbtlffbpbggmfwrlastdefhhglvkfshm(Ljava/lang/Object; Ljava/lang/String;)V
+    nop 
+    array-length v2, v0
+    new-array v2, v2, [B
+    nop 
+    array-length v3, v0
+    const/4 v4, 0
+    if-ge v4, v3, +010h
+    aget-byte v5, v0, v4
+    array-length v6, v1
+    rem-int v6, v4, v6
+    aget-byte v6, v1, v6
+    xor-int/2addr v5, v6
+    int-to-byte v5, v5
+    aput-byte v5, v2, v4
+    add-int/lit8 v4, v4, 1
+    goto -fh
+    new-instance v0, Ljava/lang/String;
+    nop 
+    sget-object v1, LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;->Tnbvjiexzjuayqthripayhscknbauxf Ljava/nio/charset/Charset;
+    invoke-direct v0, v2, v1, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    move-object v7, v0
+    nop 
+    return-object v7
+
+  ----- Lcom/android/apksig/internal/util/X509CertificateUtils; brgduca (Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;  cipher=False b64=True -----
+    if-eqz v4, +0a8h
+    invoke-virtual v4, Ljava/nio/Buffer;->remaining()I
+    move-result v0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v1, v1
+    if-ge v0, v1, +003h
+    return-object v4
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->mark()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    const/4 v0, 0
+    sget-object v1, Lcom/android/apksig/internal/util/X509CertificateUtils;->BEGIN_CERT_HEADER [B
+    array-length v2, v1
+    if-ge v0, v2, +014h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v2
+    aget-byte v1, v1, v0
+    if-eq v2, v1, +009h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->reset()Ljava/nio/Buffer;
+    move-result-object v0
+    check-cast v0, Ljava/nio/ByteBuffer;
+    return-object v4
+    add-int/lit8 v0, v0, 1
+    goto -16h
+    new-instance v0, Ljava/lang/StringBuilder;
+    invoke-direct v0, Ljava/lang/StringBuilder;-><init>()V
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v1
+    if-eqz v1, +017h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v1
+    int-to-char v1, v1
+    const/16 v2, 45
+    if-ne v1, v2, +003h
+    goto +ch
+    invoke-static v1, Ljava/lang/Character;->isWhitespace(C)Z
+    move-result v2
+    if-eqz v2, +003h
+    goto -16h
+    invoke-virtual v0, v1, Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;
+    goto -1ah
+    const/4 v1, 1
+    sget-object v2, Lcom/android/apksig/internal/util/X509CertificateUtils;->END_CERT_FOOTER [B
+    array-length v3, v2
+    if-ge v1, v3, +02bh
+    invoke-virtual v4, Ljava/nio/Buffer;->hasRemaining()Z
+    move-result v3
+    if-eqz v3, +019h
+    invoke-virtual v4, Ljava/nio/ByteBuffer;->get()B
+    move-result v3
+    aget-byte v2, v2, v1
+    if-ne v3, v2, +005h
+    add-int/lit8 v1, v1, 1
+    goto -15h
+    new-instance v4, Ljava/security/cert/CertificateException;
+    const-string v0, "F1xcWTFKBy4wEhZRQxNZBzIRZTtYDSUtPRQqTjdcXFkRfSV4OhMBQQocXhQmESB4XwYwKDEIeRkqQFEWNExIOXkAElkKHhcUIhcxMVEKMi0gH3kILFtNHDM="
+    invoke-static v0, Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn;->uzrkycnrf(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v0
+    invoke-direct v4, v0, Ljava/security/cert/CertificateException;-><init>(Ljava/lang/String;)V
+    throw v4
+
+  ----- Luhfvys/fnzbf/unmqqniflp/tfrlkmqqxcn; uzrkycnrf (Ljava/lang/String;)Ljava/lang/String;  cipher=False b64=True -----
+    invoke-virtual v9, Ljava/lang/String;->length()I
+    move-result v0
+    if-nez v0, +007h
+    const-string v9, ""
+    nop 
+    return-object v9
+    nop 
+    const/4 v1, 2
+    invoke-static v9, v1, Landroid/util/Base64;->decode(Ljava/lang/String; I)[B
+    move-result-object v2
+    const-string v3, "C49yA8hXYvs5cz7wGeEX7cQLTzYn"
+    sget-object v8, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    nop 
+    invoke-virtual v3, v8, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
+    move-result-object v4
+    nop 
+    array-length v0, v2
+    nop 
+    new-array v5, v0, [B
+    const/4 v6, 0
+    if-ge v6, v0, +014h
+    aget-byte v7, v2, v6
+    array-length v8, v4
+    nop 
+    rem-int v8, v6, v8
+    nop 
+    aget-byte v8, v4, v8
+    nop 
+    xor-int v7, v7, v8
+    int-to-byte v7, v7
+    aput-byte v7, v5, v6
+    add-int/lit16 v6, v6, 1
+    goto -13h
+    new-instance v8, Ljava/lang/String;
+    sget-object v6, Ljava/nio/charset/StandardCharsets;->UTF_8 Ljava/nio/charset/Charset;
+    invoke-direct v8, v5, v6, Ljava/lang/String;-><init>([B Ljava/nio/charset/Charset;)V
+    return-object v8

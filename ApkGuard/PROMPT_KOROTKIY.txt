@@ -1,0 +1,47 @@
+🔍 ПРОБЛЕМА: Android приложение не находит APK файлы
+
+КОНТЕКСТ:
+Android антивирус на Kotlin. Должен находить все APK файлы на устройстве.
+
+ПРОБЛЕМА:
+- Поиск зависает или возвращает пустой список
+- "Topilgan APK: 0" хотя файлы есть
+- Android 11+ (API 30+), Scoped Storage
+- Разрешение MANAGE_EXTERNAL_STORAGE получено
+
+КОД:
+```kotlin
+fun findApkFiles(context: Context): List<ApkItem> {
+    val result = mutableListOf<ApkItem>()
+    val storage = Environment.getExternalStorageDirectory()
+    
+    val folders = listOf(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+        File(storage, "Telegram/Telegram Documents"),
+        File(storage, "WhatsApp/Media")
+    )
+    
+    for (folder in folders) {
+        if (folder?.exists() == true) {
+            folder.listFiles()?.forEach { file ->
+                if (file.isFile && file.name.endsWith(".apk", ignoreCase = true)) {
+                    result.add(ApkItem(file, file.name, file.absolutePath, file.length()))
+                }
+            }
+        }
+    }
+    
+    return result
+}
+```
+
+ВОПРОСЫ:
+1. Почему не находит APK файлы?
+2. Как правильно искать на Android 11+?
+3. Нужно ли использовать MediaStore API?
+4. Как избежать зависаний?
+
+ЦЕЛЬ:
+Надёжно находить ВСЕ APK файлы на устройстве за < 10 секунд.
+
+Помоги исправить код! 🙏

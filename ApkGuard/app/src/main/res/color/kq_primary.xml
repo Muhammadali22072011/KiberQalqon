@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Color state list backed by `?attr/kqPrimary`. Three theme overlays in themes.xml
+  bind that attribute to different base colors (kq_anor / kq_feruz / kq_zafaron),
+  so every `@color/kq_primary` usage in layouts and drawables retints when the
+  user changes accent in Settings.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/kqPrimary" />
+</selector>

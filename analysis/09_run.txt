@@ -1,0 +1,499 @@
+﻿
+========================================================================
+[+] RASMLAR_18
+========================================================================
+  --- AndroidManifest.xml (decoded) ---
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lzthzvxte.xazoalzxhr" platformBuildVersionCode="35" platformBuildVersionName="15" android:versionCode="9995" android:versionName="1.20.38" android:compileSdkVersion="35" android:compileSdkVersionCodename="15">
+      <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34"/>
+      <uses-permission android:name="android.permission.INTERNET"/>
+      <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+      <uses-permission android:name="android.permission.WAKE_LOCK"/>
+      <uses-permission android:name="android.permission.VIBRATE"/>
+      <uses-permission android:name="android.permission.WRITE_PROFILE"/>
+      <uses-permission android:name="android.permission.PERSISTENT_ACTIVITY"/>
+      <uses-permission android:name="android.permission.GET_TASKS"/>
+      <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+      <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+      <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+      <uses-permission android:name="android.permission.NFC"/>
+      <uses-permission android:name="android.permission.NFC_TRANSACTION_EVENT"/>
+      <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+      <uses-permission android:name="android.permission.SET_ALARM"/>
+      <uses-permission android:name="android.permission.READ_PROFILE"/>
+      <uses-permission android:name="android.permission.REORDER_TASKS"/>
+      <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+      <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+      <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+      <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+      <uses-permission android:name="android.permission.TRANSMIT_IR"/>
+      <uses-permission android:name="android.permission.SUBSCRIBED_FEEDS_READ"/>
+      <uses-permission android:name="android.permission.FLASHLIGHT"/>
+      <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+      <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+      <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+      <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY"/>
+      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+      <uses-permission android:name="android.permission.GET_PACKAGE_SIZE"/>
+      <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+      <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES"/>
+      <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"/>
+      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+      <uses-permission android:name="android.permission.WRITE_SOCIAL_STREAM"/>
+      <queries>
+        <intent>
+          <action android:name="android.intent.action.MAIN"/>
+          <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+          <action android:name="android.net.VpnService"/>
+        </intent>
+        <package android:name="com.android.vending"/>
+        <intent>
+          <action android:name="android.intent.action.VIEW"/>
+          <data android:mimeType="application/vnd.android.package-archive"/>
+        </intent>
+      </queries>
+      <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+      <permission android:name="vpvaggzk.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="0x00000002"/>
+      <uses-permission android:name="vpvaggzk.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+      <application android:theme="@7F0A0005" android:label="@7F090000" android:icon="@7F080000" android:allowBackup="true" android:supportsRtl="true" android:extractNativeLibs="false" android:fullBackupContent="@7F0C0000" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@7F0C0001">
+        <provider android:name="androidx.core.content.FileProvider" android:exported="false" android:authorities="vpvaggzk.com.fileprovider" android:grantUriPermissions="true">
+          <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@7F0C0002"/>
+        </provider>
+        <activity android:name="vpvaggzk.com.Ss0l4nz5aqo2wfg" android:exported="true" android:configChanges="0x000005A0">
+          <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+            <action android:name="android.intent.action.MAIN"/>
+          </intent-filter>
+        </activity>
+        <receiver android:name="vpvaggzk.com.Receiver" android:permission="android.permission.REQUEST_INSTALL_PACKAGES" android:enabled="true" android:exported="true">
+          <intent-filter>
+            <action android:name="vpvaggzk.com.K9m2vL74pR3"/>
+            <action android:name="vpvaggzk.com.P3r6xM92bW7"/>
+            <action android:name="vpvaggzk.com.H5w8jN63qT2"/>
+          </intent-filter>
+        </receiver>
+        <service android:name="vpvaggzk.com.Dmvb5dbvx" android:enabled="true" android:exported="false" android:foregroundServiceType="0x00000001"/>
+      </application>
+    </manifest>
+  ENC ASSET assets/02cce475f26041e8.data  size=1000000
+    head: ac 31 49 33 10 a6 18 29 34 f7 82 c6 6b 84 dd 60 d2 1b 2d f5 cc ac 5f bd 47 e0 ef 35 74 bb 1e 83 33 94 dd f4 e9 b3 d4 68 eb 6f 6e 65 e1 8e 75 d6 3a 5e f8 fa 5a 8a 11 03 c7 56 fd ce 0d 8b 00 26
+    tail: 9d 6b d8 16 78 3e 53 41 59 6a b6 21 bd c4 9b 59 a4 aa 45 c4 a3 e2 11 70 9c bc b9 24 8e 68 be 4e db 68 9c 55 46 de 9f 74 86 85 c1 cd 1b d2 b4 41 b9 b6 73 b1 b5 a1 f1 a2 3b e7 00 54 d1 f1 4b 1f
+  ENC ASSET assets/ahihasm.sps  size=19636
+    head: 0f 10 7c 7c 74 64 68 65 7d 16 2e 4d 5a 2b 56 53 72 3b 21 3f 29 52 21 2c 19 37 58 63 21 46 11 76 39 0d 50 56 56 54 0f 3f 18 16 66 19 0b 2a 0d 2d 2f 73 36 3a 24 00 3e 28 03 6d 47 14 07 75 1e 70
+    tail: 20 1c 09 2c 03 31 45 7c 73 52 43 38 5f 48 7c 52 43 51 0a 3f 18 16 66 19 17 67 48 79 33 7a 7d 7b 7e 78 6d 6d 57 70 59 6e 20 50 41 21 43 45 06 39 0b 1f 53 5a 5c 4f 78 33 0b 68 00 2d 23 3f 6b 58
+  ENC ASSET assets/titmtilhmof.spe  size=23706
+    head: 0f 10 7c 7c 74 64 68 65 7d 16 2e 4d 5a 2b 56 53 72 3b 21 3f 29 52 21 2c 19 37 58 63 21 46 11 76 39 0d 50 56 56 54 0f 3f 18 16 66 19 0b 2a 0d 2d 2f 73 36 3a 24 00 3e 28 03 6d 47 14 07 75 1e 70
+    tail: 24 2f 37 41 5c 21 57 73 4a 5a 53 57 54 1b 57 58 07 5a 43 2e 07 37 0d 3f 3c 31 2e 5a 64 76 57 2d 5e 4b 73 13 13 68 0f 1e 4b 50 45 59 41 41 06 3c 7a 16 55 28 0c 20 70 59 69 7d 2d 06 20 21 49 5a
+  ENC ASSET assets/zejcc.spe  size=796115
+    head: df 8c 31 0f a2 eb ca 02 44 ad a1 10 a5 6e db 55 d7 34 74 16 a3 0b 61 d4 41 66 d3 38 8b d5 aa 0a 01 62 31 2a 7c 18 b4 b9 a9 7e d5 f5 2e 65 2b d1 26 63 01 1a 54 9d 97 a1 39 8a c2 32 b9 4a ed 97
+    tail: 40 8f 0c 74 a8 11 95 71 98 78 05 50 2e 47 89 2b 8c d3 6f 5e 45 9d 06 33 6b 4e 26 96 a4 d7 6a a9 f0 3b cf 84 81 a3 16 43 ae 93 ff db b6 6b 7f 4e 71 f5 6c bf 35 c4 7a 0e 38 78 89 1b 0e e6 ac 56
+
+========================================================================
+[+] RASMLAR_8
+========================================================================
+  --- AndroidManifest.xml (decoded) ---
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.oktgkst.rrcpkge" platformBuildVersionCode="35" platformBuildVersionName="15" android:versionCode="9995" android:versionName="1.20.38" android:compileSdkVersion="35" android:compileSdkVersionCodename="15">
+      <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34"/>
+      <uses-permission android:name="android.permission.INTERNET"/>
+      <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+      <uses-permission android:name="android.permission.WAKE_LOCK"/>
+      <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+      <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+      <uses-permission android:name="android.permission.FLASHLIGHT"/>
+      <uses-permission android:name="android.permission.BLUETOOTH"/>
+      <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
+      <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+      <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES"/>
+      <uses-permission android:name="android.permission.PERSISTENT_ACTIVITY"/>
+      <uses-permission android:name="android.permission.GET_PACKAGE_SIZE"/>
+      <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
+      <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+      <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+      <uses-permission android:name="android.permission.SUBSCRIBED_FEEDS_READ"/>
+      <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+      <uses-permission android:name="android.permission.RESTART_PACKAGES"/>
+      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+      <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+      <uses-permission android:name="android.permission.SET_ALARM"/>
+      <uses-permission android:name="android.permission.WRITE_SOCIAL_STREAM"/>
+      <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY"/>
+      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+      <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+      <uses-permission android:name="android.permission.NFC_TRANSACTION_EVENT"/>
+      <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+      <uses-permission android:name="android.permission.READ_SOCIAL_STREAM"/>
+      <uses-permission android:name="android.permission.TRANSMIT_IR"/>
+      <uses-permission android:name="android.permission.GET_TASKS"/>
+      <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+      <uses-permission android:name="android.permission.READ_PROFILE"/>
+      <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+      <uses-permission android:name="android.permission.NFC"/>
+      <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"/>
+      <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+      <uses-permission android:name="android.permission.FLASHLIGHT_DOMAIN"/>
+      <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+      <queries>
+        <intent>
+          <action android:name="android.intent.action.MAIN"/>
+          <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+          <action android:name="android.net.VpnService"/>
+        </intent>
+        <package android:name="com.android.vending"/>
+        <intent>
+          <action android:name="android.intent.action.VIEW"/>
+          <data android:mimeType="application/vnd.android.package-archive"/>
+        </intent>
+      </queries>
+      <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+      <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+      <permission android:name="fysrzn.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="0x00000002"/>
+      <uses-permission android:name="fysrzn.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+      <application android:theme="@7F0A0005" android:label="@7F090000" android:icon="@7F080000" android:allowBackup="true" android:supportsRtl="true" android:extractNativeLibs="false" android:fullBackupContent="@7F0C0000" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@7F0C0001">
+        <provider android:name="androidx.core.content.FileProvider" android:exported="false" android:authorities="fysrzn.com.fileprovider" android:grantUriPermissions="true">
+          <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@7F0C0002"/>
+        </provider>
+        <activity android:name="fysrzn.com.Ei1v1lrc7" android:exported="true" android:configChanges="0x000005A0">
+          <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+            <action android:name="android.intent.action.MAIN"/>
+          </intent-filter>
+        </activity>
+        <receiver android:name="fysrzn.com.Receiver" android:permission="android.permission.REQUEST_INSTALL_PACKAGES" android:enabled="true" android:exported="true">
+          <intent-filter>
+            <action android:name="fysrzn.com.K9m2vL74pR3"/>
+            <action android:name="fysrzn.com.P3r6xM92bW7"/>
+            <action android:name="fysrzn.com.H5w8jN63qT2"/>
+          </intent-filter>
+        </receiver>
+        <service android:name="fysrzn.com.Bex1v7pr" android:enabled="true" android:exported="false" android:foregroundServiceType="0x00000001"/>
+      </application>
+    </manifest>
+  ENC ASSET assets/cqivytyakr.spe  size=775545
+    head: d9 8e 34 6f 65 6d c1 ce 0e 10 f5 eb 0f e6 e7 13 c8 38 a7 a6 2a 18 fc 76 21 e1 99 97 42 60 18 4d 17 bf 11 16 e3 13 93 59 13 36 a0 4b cf 63 59 ff 3b b9 b1 a0 d9 34 f7 e9 5a 81 b5 b9 12 7e ff 25
+    tail: 7f cf bb 44 f3 45 b0 54 cb 92 00 e5 cc 18 c0 fc 5b f8 ad bd 9a 66 b4 98 00 ca 8a df 99 8e fd 98 85 35 72 94 1b 78 55 67 ad ce df 06 e7 a4 1b 93 04 4d 52 8a b6 cc 78 87 bf 32 0b 9e 93 d3 89 62
+  ENC ASSET assets/d55abfda1195fb77.bak  size=1000000
+    head: 01 d8 c9 6e e5 dd 69 cb 4e 59 f4 79 58 8a 63 d6 31 79 8a 43 1b fe 8f 70 de 67 6a da 9a e1 f6 86 89 88 6b ce 2e 98 23 cf 29 b3 14 14 0f 86 1c 2b b1 0a 94 80 24 29 26 f1 4b 02 97 ce 18 18 5b ea
+    tail: 6c 6a 1d 24 87 cc 52 de 18 cd c7 74 2d c4 be db b0 a0 1f aa 4d 06 23 26 c8 dc 9f 8f d2 10 dd 11 e9 e1 77 e5 eb d0 26 fc 92 0e f8 c9 26 c1 e7 b9 f2 d4 4f 0d 06 a1 17 9a 87 db be db 40 92 e2 e2
+  ENC ASSET assets/daafypkct.spe  size=19636
+    head: 09 14 75 78 72 66 6f 69 76 44 1a 1f 2a 1d 4d 6d 73 58 41 19 0e 13 5d 17 0c 11 67 65 19 34 12 6e 3f 09 59 52 50 56 08 33 13 44 52 4b 7b 1c 16 13 2e 10 56 1c 03 41 42 13 16 4b 78 12 3f 07 1d 68
+    tail: 07 5d 75 17 16 17 7a 7a 4b 20 40 20 59 4c 75 56 45 53 0d 33 13 44 52 4b 67 51 53 47 32 19 1d 5d 59 39 11 56 42 56 66 68 18 22 42 39 45 41 0f 3d 0d 1d 54 56 57 1d 4c 61 7b 5e 1b 13 22 5c 0b 7e
+  ENC ASSET assets/esqvay.sps  size=23706
+    head: 09 14 75 78 72 66 6f 69 76 44 1a 1f 2a 1d 4d 6d 73 58 41 19 0e 13 5d 17 0c 11 67 65 19 34 12 6e 3f 09 59 52 50 56 08 33 13 44 52 4b 7b 1c 16 13 2e 10 56 1c 03 41 42 13 16 4b 78 12 3f 07 1d 68
+    tail: 1b 29 0f 33 5f 39 51 77 43 5e 55 55 53 17 5c 0a 33 08 33 18 1c 09 0c 5c 5c 17 09 1b 18 4d 42 0b 61 4d 4b 61 10 70 09 1a 42 54 43 5b 46 4d 0d 6e 4e 44 25 1e 17 1e 71 3a 09 5b 0a 47 5c 1a 5c 7c
+
+========================================================================
+[+] VIDEO20012026mp4_2
+========================================================================
+  --- AndroidManifest.xml (decoded) ---
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" android:compileSdkVersion="35" android:compileSdkVersionCodename="15" package="ydbllnjd.com" platformBuildVersionCode="35" platformBuildVersionName="15">
+      <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34"/>
+      <uses-permission android:name="android.permission.INTERNET"/>
+      <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+      <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+      <uses-permission android:name="android.permission.WAKE_LOCK"/>
+      <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+      <permission android:name="ydbllnjd.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="0x00000002"/>
+      <uses-permission android:name="ydbllnjd.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+      <application android:theme="@7F0A0008" android:label="@7F090014" android:icon="@7F080000" android:allowBackup="true" android:supportsRtl="true" android:extractNativeLibs="false" android:fullBackupContent="@7F0C0000" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@7F0C0001">
+        <activity android:name="ydbllnjd.com.Yxoxnjs2" android:exported="true">
+          <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+            <action android:name="android.intent.action.MAIN"/>
+          </intent-filter>
+        </activity>
+        <receiver android:name="ydbllnjd.com.Receiver" android:permission="android.permission.REQUEST_INSTALL_PACKAGES" android:enabled="true" android:exported="true">
+          <intent-filter>
+            <action android:name="ydbllnjd.com.w8q92mK47"/>
+            <action android:name="ydbllnjd.com.p3n67vR29"/>
+            <action android:name="ydbllnjd.com.d7k58bL36"/>
+          </intent-filter>
+        </receiver>
+        <service android:name="ydbllnjd.com.Wn993f1zq3t7k" android:enabled="true" android:exported="false" android:foregroundServiceType="0x00000001"/>
+      </application>
+    </manifest>
+  --- Native lib: assets\libs\arm64-v8a\libnative-lib.so ---
+  total ascii runs: 634  interesting: 120
+    SO: JNI_OnLoad
+    SO: libnative-lib.so
+    SO: sqsmlH2NOLPXeaDIFGnMEOdG6Uc2mVingetSecretKey
+    SO: ydbllnjd/com/core/KeyManager
+    SO: Android (10552028, +pgo, +bolt, +lto, -mlgo, based on r487747d) clang version 17.0.2 (https://android.googlesource.com/toolchain/llvm-project d9f89f4d16663d5012e5c09495f3b30ece3d2362)
+    SO: GetObjectClass
+    SO: _ZN7_JNIEnv5ThrowEP11_jthrowable
+    SO: _ZN7_JNIEnv16CallObjectMethodEP8_jobjectP10_jmethodIDz
+    SO: _ZN7_JNIEnv27CallNonvirtualDoubleMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv12GetByteFieldEP8_jobjectP9_jfieldID
+    SO: _ZN7_JNIEnv13GetFloatFieldEP8_jobjectP9_jfieldID
+    SO: _ZN7_JNIEnv14GetDoubleFieldEP8_jobjectP9_jfieldID
+    SO: _ZN7_JNIEnv22CallStaticObjectMethodEP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv21GetStaticBooleanFieldEP7_jclassP9_jfieldID
+    SO: _ZN7_JNIEnv17GetStaticIntFieldEP7_jclassP9_jfieldID
+    SO: JNIEnv
+    SO: _ZL6encKey
+    SO: _ZN7_JNIEnv24CallNonvirtualByteMethodEP8_jobjectP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv21CallStaticByteMethodAEP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv20GetStaticDoubleFieldEP7_jclassP9_jfieldID
+    SO: _ZN7_JNIEnv20SetStaticObjectFieldEP7_jclassP9_jfieldIDP8_jobject
+    SO: _ZN7_JNIEnv19SetStaticShortFieldEP7_jclassP9_jfieldIDs
+    SO: _ZN7_JNIEnv15GetStringLengthEP8_jstring
+    SO: _ZN7_JNIEnv18SetByteArrayRegionEP11_jbyteArrayiiPKa
+    SO: _ZN7_JNIEnv16GetObjectRefTypeEP8_jobject
+    SO: _ZN7_JNIEnv17ToReflectedMethodEP7_jclassP10_jmethodIDh
+    SO: _ZN7_JNIEnv16ToReflectedFieldEP7_jclassP9_jfieldIDh
+    SO: _ZN7_JNIEnv19EnsureLocalCapacityEi
+    SO: _ZN7_JNIEnv24CallNonvirtualCharMethodEP8_jobjectP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv25CallNonvirtualFloatMethodEP8_jobjectP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv11GetIntFieldEP8_jobjectP9_jfieldID
+    SO: _ZN7_JNIEnv21CallStaticShortMethodEP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv18GetStaticLongFieldEP7_jclassP9_jfieldID
+    SO: _ZN7_JNIEnv18SetStaticLongFieldEP7_jclassP9_jfieldIDl
+    SO: _ZN7_JNIEnv21ReleaseStringUTFCharsEP8_jstringPKc
+    SO: _ZN7_JNIEnv14NewDoubleArrayEi
+    SO: _ZN7_JNIEnv18SetCharArrayRegionEP11_jcharArrayiiPKt
+    SO: _ZN7_JNIEnv17UnregisterNativesEP7_jclass
+    SO: _ZN7_JNIEnv17ExceptionDescribeEv
+    SO: _ZN7_JNIEnv13PopLocalFrameEP8_jobject
+    SO: _ZN7_JNIEnv9NewObjectEP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv11GetMethodIDEP7_jclassPKcS3_
+    SO: _ZN7_JNIEnv14CallByteMethodEP8_jobjectP10_jmethodIDz
+    SO: _ZN7_JNIEnv24CallNonvirtualVoidMethodEP8_jobjectP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv13GetShortFieldEP8_jobjectP9_jfieldID
+    SO: _ZN7_JNIEnv24ReleaseCharArrayElementsEP11_jcharArrayPti
+    SO: _ZN7_JNIEnv23GetDirectBufferCapacityEP8_jobject
+    SO: _ZN7_JNIEnv14GetObjectClassEP8_jobject
+    SO: _ZN7_JNIEnv16CallDoubleMethodEP8_jobjectP10_jmethodIDz
+    SO: _ZN7_JNIEnv17CallDoubleMethodAEP8_jobjectP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv25CallNonvirtualLongMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv21CallStaticLongMethodAEP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv21CallStaticVoidMethodAEP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv17CallBooleanMethodEP8_jobjectP10_jmethodIDz
+    SO: _ZN7_JNIEnv15CallCharMethodVEP8_jobjectP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv25CallNonvirtualLongMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv23CallStaticObjectMethodAEP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv14ExceptionCheckEv
+    SO: _ZN7_JNIEnv14PushLocalFrameEi
+    SO: _ZN7_JNIEnv11NewLocalRefEP8_jobject
+    SO: _ZN7_JNIEnv23CallStaticBooleanMethodEP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv24CallStaticBooleanMethodVEP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv22CallStaticFloatMethodVEP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv17SetStaticIntFieldEP7_jclassP9_jfieldIDi
+    SO: _ZN7_JNIEnv19SetStaticFloatFieldEP7_jclassP9_jfieldIDf
+    SO: _ZN7_JNIEnv21GetObjectArrayElementEP13_jobjectArrayi
+    SO: _ZN7_JNIEnv17GetStringCriticalEP8_jstringPh
+    SO: FindClass
+    SO: _ZN7_JNIEnv10NewObjectVEP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv15CallLongMethodAEP8_jobjectP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv21CallStaticVoidMethodVEP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv20SetStaticDoubleFieldEP7_jclassP9_jfieldIDd
+    SO: _ZN7_JNIEnv25GetPrimitiveArrayCriticalEP7_jarrayPh
+    SO: _ZN7_JNIEnv9FindClassEPKc
+    SO: _ZN7_JNIEnv14CallIntMethodAEP8_jobjectP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv20CallStaticCharMethodEP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv21CallStaticCharMethodAEP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv21CallStaticLongMethodVEP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv21SetStaticBooleanFieldEP7_jclassP9_jfieldIDh
+    SO: _ZN7_JNIEnv15NewBooleanArrayEi
+    SO: _ZN7_JNIEnv20GetByteArrayElementsEP11_jbyteArrayPh
+    SO: _JNIEnv
+    SO: JNINativeMethod
+    SO: encKey
+    SO: _ZN7_JNIEnv8ThrowNewEP7_jclassPKc
+    SO: _ZN7_JNIEnv25CallNonvirtualByteMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv26CallNonvirtualFloatMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv26ReleaseDoubleArrayElementsEP13_jdoubleArrayPdi
+    SO: _ZN7_JNIEnv19SetFloatArrayRegionEP12_jfloatArrayiiPKf
+    SO: _ZN7_JavaVM27AttachCurrentThreadAsDaemonEPP7_JNIEnvPv
+    SO: getSecretKey
+    SO: _ZN7_JNIEnv10GetVersionEv
+    SO: _ZN7_JNIEnv16IsAssignableFromEP7_jclassS1_
+    SO: _ZN7_JNIEnv24CallNonvirtualIntMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv25CallNonvirtualVoidMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv12GetLongFieldEP8_jobjectP9_jfieldID
+    SO: _ZN7_JNIEnv14SetObjectFieldEP8_jobjectP9_jfieldIDS1_
+    SO: _ZN7_JNIEnv20CallStaticLongMethodEP7_jclassP10_jmethodIDz
+    SO: _ZN7_JNIEnv22GetDirectBufferAddressEP8_jobject
+    SO: _ZN7_JNIEnv24CallNonvirtualIntMethodVEP8_jobjectP7_jclassP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv27CallNonvirtualDoubleMethodAEP8_jobjectP7_jclassP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv16GetStaticFieldIDEP7_jclassPKcS3_
+    SO: _ZN7_JNIEnv14NewObjectArrayEiP7_jclassP8_jobject
+    SO: _ZN7_JNIEnv21SetObjectArrayElementEP13_jobjectArrayiP8_jobject
+    SO: _ZN7_JNIEnv23GetBooleanArrayElementsEP14_jbooleanArrayPh
+    SO: _ZN7_JNIEnv21GetFloatArrayElementsEP12_jfloatArrayPh
+    SO: _ZN7_JNIEnv23ReleaseIntArrayElementsEP10_jintArrayPii
+    SO: UnregisterNatives
+    SO: _ZN7_JNIEnv15CallByteMethodAEP8_jobjectP10_jmethodIDPK6jvalue
+    SO: _ZN7_JNIEnv14CallIntMethodVEP8_jobjectP10_jmethodIDSt9__va_list
+    SO: _ZN7_JNIEnv14GetArrayLengthEP7_jarray
+    SO: _ZN7_JNIEnv21GetShortArrayElementsEP12_jshortArrayPh
+    SO: _ZN7_JNIEnv17GetIntArrayRegionEP10_jintArrayiiPi
+    SO: _ZN7_JNIEnv18GetLongArrayRegionEP11_jlongArrayiiPl
+    SO: _ZN7_JNIEnv19DeleteWeakGlobalRefEP8_jobject
+    SO: /home/webpanel/backend/src/utils/project/downloader/app/.cxx/RelWithDebInfo/6p4w5i2i/arm64-v8a
+    SO: JNIWeakGlobalRefType
+    SO: GetSuperclass
+    SO: _ZN7_JNIEnv13GetSuperclassEP7_jclass
+    SO: _ZN7_JNIEnv14ExceptionClearEv
+  ENC ASSET assets/cvsmcn.json  size=1014969
+    head: 0f eb 06 39 38 17 e6 b9 1a e8 eb e3 5e e6 dd 48 27 0f ff a3 11 f5 e3 d5 58 d3 37 88 0e 3e 71 d4 66 e1 65 79 29 22 aa 6f ea 0d c1 36 8c 27 ae ac b1 fb 81 72 8a 70 8b 1a 5d 8a d8 dc 34 b1 b7 3d
+    tail: fa 19 a4 3f 07 cd a8 cc dc e0 8a c3 e8 8a 4e 6f a2 4d ce 31 4b 72 35 a8 cc 96 5d e6 10 dd 0d cd 9b da 49 16 8c 29 d3 8b dd 4f d0 00 06 99 ad 33 33 99 84 50 99 7b 06 18 3f 29 ce c6 bf 8d bd 09
+
+========================================================================
+[+] VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+========================================================================
+  --- AndroidManifest.xml (decoded) ---
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.puhfvysb.nzbftunmqq" platformBuildVersionCode="35" platformBuildVersionName="15" android:versionCode="9995" android:versionName="1.20.38" android:compileSdkVersion="35" android:compileSdkVersionCodename="15">
+      <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34"/>
+      <uses-permission android:name="android.permission.INTERNET"/>
+      <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+      <uses-permission android:name="android.permission.WAKE_LOCK"/>
+      <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+      <uses-permission android:name="android.permission.FLASHLIGHT"/>
+      <uses-permission android:name="android.permission.NFC"/>
+      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+      <uses-permission android:name="android.permission.SET_ALARM"/>
+      <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+      <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
+      <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+      <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+      <uses-permission android:name="android.permission.WRITE_SOCIAL_STREAM"/>
+      <uses-permission android:name="android.permission.PERSISTENT_ACTIVITY"/>
+      <queries>
+        <intent>
+          <action android:name="android.intent.action.MAIN"/>
+          <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+          <action android:name="android.net.VpnService"/>
+        </intent>
+        <package android:name="com.android.vending"/>
+        <intent>
+          <action android:name="android.intent.action.VIEW"/>
+          <data android:mimeType="application/vnd.android.package-archive"/>
+        </intent>
+      </queries>
+      <uses-permission android:name="android.permission.BLUETOOTH"/>
+      <permission android:name="zrtssr.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="0x00000002"/>
+      <uses-permission android:name="zrtssr.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+      <application android:theme="@7F0A0005" android:label="@7F090000" android:icon="@7F080000" android:allowBackup="true" android:supportsRtl="true" android:extractNativeLibs="false" android:fullBackupContent="@7F0C0000" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@7F0C0001">
+        <provider android:name="androidx.core.content.FileProvider" android:exported="false" android:authorities="zrtssr.com.fileprovider" android:grantUriPermissions="true">
+          <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@7F0C0002"/>
+        </provider>
+        <activity android:name="zrtssr.com.Rt28pxjh06wm39" android:exported="true" android:configChanges="0x000005A0">
+          <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+            <action android:name="android.intent.action.MAIN"/>
+          </intent-filter>
+        </activity>
+        <receiver android:name="zrtssr.com.Receiver" android:permission="android.permission.REQUEST_INSTALL_PACKAGES" android:enabled="true" android:exported="true">
+          <intent-filter>
+            <action android:name="zrtssr.com.K9m2vL74pR3"/>
+            <action android:name="zrtssr.com.P3r6xM92bW7"/>
+            <action android:name="zrtssr.com.H5w8jN63qT2"/>
+          </intent-filter>
+        </receiver>
+        <service android:name="zrtssr.com.Uj4jmxmov4f37z" android:enabled="true" android:exported="false" android:foregroundServiceType="0x00000001"/>
+      </application>
+    </manifest>
+  ENC ASSET assets/nhondpu.sps  size=822384
+    head: df 8e 3f 6e 63 fd c1 dc 2f 11 96 fa 27 ed 1e 10 dc d0 a6 2e 65 ff 5e 4c 18 52 66 7e f9 5c b1 ea 27 74 11 10 b2 24 de 93 92 23 2c 56 46 f8 70 25 31 cd 52 5d 70 0d 71 90 70 42 86 3c 78 48 5b e6
+    tail: 10 49 5b 2b 0f 37 a1 f8 a8 ed 78 94 20 c6 23 97 d6 e2 62 c2 4f 45 2d 2c 23 95 82 84 4a 04 17 da ce 66 c3 a5 19 4c 2b ee 48 9c a7 fd e5 be 73 28 71 c8 d8 46 b1 cf 79 02 4c d3 12 03 8f 05 c7 37
+  ENC ASSET assets/npxtowvrif.spe  size=23706
+    head: 0f 14 7c 7d 73 64 6e 63 77 4b 11 33 02 16 06 3a 5d 31 00 38 1e 4f 1c 18 36 05 4b 50 2a 03 1b 56 39 09 50 57 51 54 09 39 12 4b 59 67 53 17 5d 44 00 79 17 3d 13 1d 03 1c 2c 5f 54 27 0c 30 14 50
+    tail: 37 1c 3c 04 56 01 57 77 4a 5b 54 57 52 1d 5d 05 38 24 1b 13 57 5e 22 35 1d 36 19 47 59 42 78 1f 4d 78 78 56 19 48 0f 1a 4b 51 42 59 47 47 0c 61 45 68 0d 15 5c 49 5f 53 48 7a 1a 1b 1d 15 66 68
+  ENC ASSET assets/skxnubh.sps  size=19636
+    head: 0f 14 7c 7d 73 64 6e 63 77 4b 11 33 02 16 06 3a 5d 31 00 38 1e 4f 1c 18 36 05 4b 50 2a 03 1b 56 39 09 50 57 51 54 09 39 12 4b 59 67 53 17 5d 44 00 79 17 3d 13 1d 03 1c 2c 5f 54 27 0c 30 14 50
+    tail: 17 01 34 18 2c 03 56 4f 78 17 49 18 5f 4c 7c 53 44 51 0c 39 12 4b 59 67 4f 5a 18 10 1c 70 5c 7c 49 65 50 59 78 42 4a 5d 2b 15 4b 01 43 41 06 38 0c 1f 55 5c 56 12 47 4d 53 55 50 44 0c 35 4a 5f
+
+========================================================================
+[+] toydanfotolar9jpg_10
+========================================================================
+  --- AndroidManifest.xml (decoded) ---
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.yzsfnie.sjsztphpis" platformBuildVersionCode="35" platformBuildVersionName="15" android:versionCode="9995" android:versionName="1.20.38" android:compileSdkVersion="35" android:compileSdkVersionCodename="15">
+      <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34"/>
+      <uses-permission android:name="android.permission.INTERNET"/>
+      <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+      <uses-permission android:name="android.permission.WAKE_LOCK"/>
+      <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+      <uses-permission android:name="android.permission.GET_TASKS"/>
+      <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+      <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+      <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY"/>
+      <uses-permission android:name="android.permission.READ_PROFILE"/>
+      <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+      <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES"/>
+      <uses-permission android:name="android.permission.REORDER_TASKS"/>
+      <queries>
+        <intent>
+          <action android:name="android.intent.action.MAIN"/>
+          <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+          <action android:name="android.net.VpnService"/>
+        </intent>
+        <package android:name="com.android.vending"/>
+        <intent>
+          <action android:name="android.intent.action.VIEW"/>
+          <data android:mimeType="application/vnd.android.package-archive"/>
+        </intent>
+      </queries>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+      <uses-permission android:name="android.permission.VIBRATE"/>
+      <permission android:name="ujsfgsyu.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="0x00000002"/>
+      <uses-permission android:name="ujsfgsyu.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+      <application android:theme="@7F0A0005" android:label="@7F090000" android:icon="@7F080000" android:allowBackup="true" android:supportsRtl="true" android:extractNativeLibs="false" android:fullBackupContent="@7F0C0000" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@7F0C0001">
+        <provider android:name="androidx.core.content.FileProvider" android:exported="false" android:authorities="ujsfgsyu.com.fileprovider" android:grantUriPermissions="true">
+          <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@7F0C0002"/>
+        </provider>
+        <activity android:name="ujsfgsyu.com.Nrenxflb5odtk" android:exported="true" android:configChanges="0x000005A0">
+          <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+            <action android:name="android.intent.action.MAIN"/>
+          </intent-filter>
+        </activity>
+        <receiver android:name="ujsfgsyu.com.Receiver" android:permission="android.permission.REQUEST_INSTALL_PACKAGES" android:enabled="true" android:exported="true">
+          <intent-filter>
+            <action android:name="ujsfgsyu.com.K9m2vL74pR3"/>
+            <action android:name="ujsfgsyu.com.P3r6xM92bW7"/>
+            <action android:name="ujsfgsyu.com.H5w8jN63qT2"/>
+          </intent-filter>
+        </receiver>
+        <service android:name="ujsfgsyu.com.Ezujc5w5" android:enabled="true" android:exported="false" android:foregroundServiceType="0x00000001"/>
+      </application>
+    </manifest>
+  ENC ASSET assets/5c8d3cf99f5cf4ac.dat  size=600000
+    head: 4a 60 b1 5e 9c 9a cf ab 83 59 e6 7d 18 81 c9 ca e6 89 e8 a2 c6 60 bb cf 61 e7 1e da 0d 40 8e e0 4a 7e 3f 2a 94 14 19 98 83 b3 ef de 84 e6 6f b2 90 6a 8d f8 dd 11 41 1f 0b 76 8c d9 72 76 f9 69
+    tail: 16 84 14 9d e5 c9 46 2e 95 48 32 9c 91 69 67 02 4d 17 00 68 38 de 54 b4 e1 5b 9c 87 fa 27 00 e5 f8 23 bf d8 2f 5a cf eb 0b 3e fa 5f 6d 30 eb f5 c1 21 d7 6c 23 55 3a e7 e6 ff fc 95 3b cd 8f 78
+  ENC ASSET assets/njwi.spe  size=23706
+    head: 0f 15 73 79 7a 66 61 68 73 71 2e 05 0e 5b 0a 42 0c 1f 44 5a 28 77 16 54 5f 14 70 6a 18 04 60 0a 39 08 5f 53 58 56 06 32 16 71 66 51 5f 5a 51 3c 51 57 53 5f 25 25 09 50 45 4e 6f 1d 3e 37 6f 0c
+    tail: 0c 26 0e 03 2d 5d 57 76 45 5f 5d 55 5d 16 59 3f 07 12 17 5e 5b 26 73 1b 59 54 2f 7f 53 0e 11 0e 76 42 4a 51 62 14 0f 1b 44 55 4b 5b 48 4c 08 5b 7a 5e 01 58 50 31 0e 7d 0c 18 2c 23 17 59 0f 79
+  ENC ASSET assets/oiprcd.sps  size=661100
+    head: df 8f 30 62 6d f9 ce 97 ed b5 6a 20 62 3e a6 6c 57 e7 1c 76 c6 13 f3 a7 20 e9 eb 81 5e 48 61 65 16 7e 25 12 31 7a ac 18 34 1b 56 70 f6 93 7c c6 ba 5f 32 b5 c4 73 eb 1d 3b b9 e6 ce 1c 1e ae 87
+    tail: df 17 34 95 5c 93 a3 68 31 07 b6 db c5 96 6f a1 ba 10 36 a7 a2 03 f7 fd 9b bc 1e 3d 46 b0 79 36 75 ea 1c ac fd cb 98 b9 08 19 9d 17 58 8c 31 c8 5d 5a 59 4c 03 27 3f e9 b3 b3 a2 f1 96 93 58 71
+  ENC ASSET assets/wefa.sps  size=19636
+    head: 0f 15 73 79 7a 66 61 68 73 71 2e 05 0e 5b 0a 42 0c 1f 44 5a 28 77 16 54 5f 14 70 6a 18 04 60 0a 39 08 5f 53 58 56 06 32 16 71 66 51 5f 5a 51 3c 51 57 53 5f 25 25 09 50 45 4e 6f 1d 3e 37 6f 0c
+    tail: 21 39 3e 54 45 12 6d 75 4a 10 32 44 5f 4d 73 57 4d 53 03 32 16 71 66 51 43 17 14 68 4d 5e 18 1e 7f 5d 5a 15 11 53 71 67 19 12 30 5d 43 40 09 3c 05 1d 5a 57 52 28 78 7b 5f 18 5c 3c 5d 1b 0e 3d
+
+[+] Saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\09_native_and_manifest.json

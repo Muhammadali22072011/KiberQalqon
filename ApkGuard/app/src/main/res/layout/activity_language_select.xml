@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Til tanlash ekrani (birinchi ochilishda) / Экран выбора языка (первый запуск).
+  Matn ataylab ikki tilda — foydalanuvchi hali tilni tanlamagan.
+  IDs: btnUzbek, btnRussian (LanguageSelectActivity.kt).
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp"
+        android:paddingVertical="48dp">
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/kq_shield_mark" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:letterSpacing="0.08"
+            android:text="KIBER QALQON"
+            android:textColor="@color/kq_ink"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <!-- background points at ?attr/kqPrimary (a plain color), NOT @color/kq_primary:
+             the latter is a <selector> ColorStateList, and using one as android:background
+             crashes on API < 29 (ColorStateListDrawable was added in API 29). -->
+        <View
+            android:layout_width="44dp"
+            android:layout_height="3dp"
+            android:layout_marginTop="20dp"
+            android:background="?attr/kqPrimary" />
+
+        <!-- Bilingual heading -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Tilni tanlang"
+            android:textColor="@color/kq_ink"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Выберите язык"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="16sp" />
+
+        <!-- Uzbek -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUzbek"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:text="🇺🇿   O'zbekcha"
+            android:textAllCaps="false"
+            android:textColor="@color/kq_on_primary"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/kq_primary"
+            app:cornerRadius="18dp" />
+
+        <!-- Russian -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRussian"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="14dp"
+            android:text="🇷🇺   Русский"
+            android:textAllCaps="false"
+            android:textColor="@color/kq_ink"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:cornerRadius="18dp"
+            app:strokeColor="@color/kq_hairline_strong"
+            app:strokeWidth="1dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:alpha="0.7"
+            android:gravity="center"
+            android:text="Keyinroq Sozlamalardan o'zgartirishingiz mumkin\nМожно изменить позже в Настройках"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>

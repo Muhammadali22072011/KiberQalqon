@@ -1,0 +1,115 @@
+﻿[+] C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\unpacked\VIDEO20012026mp4_2\assets\libs\arm64-v8a\libnative-lib.so  size=47,056
+
+  marker=b'encKey' @ 0x5f99
+    bytes [0x5f59:0x5fff]:
+      hex:   005f5a4e375f4a4e49456e763137476574537461746963496e744669656c644550375f6a636c61737350395f6a6669656c644944004a4e49456e76005f5a4c36656e634b657900756e7369676e656420696e74005f6a6669656c644944005f5f76725f6f6666730043616c6c436861724d6574686f64560043616c6c4e6f6e7669727475616c427974654d6574686f64410043616c6c4e6f6e7669727475616c4c6f6e674d65
+      ascii: ._ZN7_JNIEnv17GetStaticIntFieldEP7_jclassP9_jfieldID.JNIEnv._ZL6encKey.unsigned int._jfieldID.__vr_offs.CallCharMethodV.CallNonvirtualByteMethodA.CallNonvirtualLongMe
+
+  marker=b'encKey' @ 0x71ff
+    bytes [0x71bf:0x7265]:
+      hex:   7261795068005f4a4e49456e76005f5a4e375f4a617661564d313344657374726f794a617661564d4576006e616d65004a4e494e61746976654d6574686f6400656e634b6579006a6f626a656374005f5f67725f6f666673006a63686172006a6c6f6e670043616c6c4e6f6e7669727475616c426f6f6c65616e4d6574686f640043616c6c4e6f6e7669727475616c426f6f6c65616e4d6574686f64410043616c6c4e6f6e76
+      ascii: rayPh._JNIEnv._ZN7_JavaVM13DestroyJavaVMEv.name.JNINativeMethod.encKey.jobject.__gr_offs.jchar.jlong.CallNonvirtualBooleanMethod.CallNonvirtualBooleanMethodA.CallNonv
+
+  marker=b'getSecretKey' @ 0x570
+    bytes [0x530:0x5dc]:
+      hex:   0000000000000000b84a000000000000020400000400000000000000000000007371736d6c48324e4f4c50586561444946476e4d454f6447365563326d56696e6765745365637265744b65790028294c6a6176612f6c616e672f537472696e673b007964626c6c6e6a642f636f6d2f636f72652f4b65794d616e616765720000011b033b4c0000000800000040010000640000005001000078000000580100008c00000060010000a0000000
+      ascii: .........J......................sqsmlH2NOLPXeaDIFGnMEOdG6Uc2mVingetSecretKey.()Ljava/lang/String;.ydbllnjd/com/core/KeyManager.....;L.......@...d...P...x...X.......`.......
+
+  marker=b'getSecretKey' @ 0x7432
+    bytes [0x73f2:0x749e]:
+      hex:   005f5a4e375f4a617661564d323741747461636843757272656e7454687265616441734461656d6f6e455050375f4a4e49456e765076006e4d6574686f6473006765745365637265744b65790066756e6374696f6e73005f5f696e74385f74004e65774f626a6563740043616c6c4e6f6e7669727475616c53686f72744d6574686f640043616c6c4e6f6e7669727475616c53686f72744d6574686f6441004765744669656c644944004361
+      ascii: ._ZN7_JavaVM27AttachCurrentThreadAsDaemonEPP7_JNIEnvPv.nMethods.getSecretKey.functions.__int8_t.NewObject.CallNonvirtualShortMethod.CallNonvirtualShortMethodA.GetFieldID.Ca
+
+  marker=b'getSecretKey' @ 0x85aa
+    bytes [0x856a:0x8616]:
+      hex:   74686f6469005f5a4e375f4a4e49456e76394765744a617661564d455050375f4a617661564d0044657461636843757272656e74546872656164005f5a4c31326765745365637265744b657950375f4a4e49456e7650385f6a6f626a65637400756e7369676e65642063686172005f6a7468726f7761626c65004e65774f626a6563745600737464004765745374617469634d6574686f6449440043616c6c53746174696353686f72744d65
+      ascii: thodi._ZN7_JNIEnv9GetJavaVMEPP7_JavaVM.DetachCurrentThread._ZL12getSecretKeyP7_JNIEnvP8_jobject.unsigned char._jthrowable.NewObjectV.std.GetStaticMethodID.CallStaticShortMe
+
+  marker=b'getSecretKey' @ 0xaf36
+    bytes [0xaef6:0xafa2]:
+      hex:   73696f6e006e646b5f6275696c645f6e756d626572006e61746976652d6c69622e6370700024782e30005f5a4c376d6574686f64730024642e31005f5a4c31326765745365637265744b657950375f4a4e49456e7650385f6a6f626a6563740024782e320024642e330024642e340024642e350024642e360024642e370024642e380024642e390024642e31300024642e31310024642e3132005f5f4652414d455f454e445f5f0024642e31
+      ascii: sion.ndk_build_number.native-lib.cpp.$x.0._ZL7methods.$d.1._ZL12getSecretKeyP7_JNIEnvP8_jobject.$x.2.$d.3.$d.4.$d.5.$d.6.$d.7.$d.8.$d.9.$d.10.$d.11.$d.12.__FRAME_END__.$d.1
+
+  marker=b'_ZL6encKey' @ 0x5f95
+    bytes [0x5f55:0x5fff]:
+      hex:   6c644944005f5a4e375f4a4e49456e763137476574537461746963496e744669656c644550375f6a636c61737350395f6a6669656c644944004a4e49456e76005f5a4c36656e634b657900756e7369676e656420696e74005f6a6669656c644944005f5f76725f6f6666730043616c6c436861724d6574686f64560043616c6c4e6f6e7669727475616c427974654d6574686f64410043616c6c4e6f6e7669727475616c4c6f6e674d65
+      ascii: ldID._ZN7_JNIEnv17GetStaticIntFieldEP7_jclassP9_jfieldID.JNIEnv._ZL6encKey.unsigned int._jfieldID.__vr_offs.CallCharMethodV.CallNonvirtualByteMethodA.CallNonvirtualLongMe
+
+  marker=b'KeyManager' @ 0x5a4
+    bytes [0x564:0x60e]:
+      hex:   454f6447365563326d56696e6765745365637265744b65790028294c6a6176612f6c616e672f537472696e673b007964626c6c6e6a642f636f6d2f636f72652f4b65794d616e616765720000011b033b4c0000000800000040010000640000005001000078000000580100008c00000060010000a000000074010000b400000090010000c8000000a0010000e00000005402000010010000000000001000000000000000017a5200017c
+      ascii: EOdG6Uc2mVingetSecretKey.()Ljava/lang/String;.ydbllnjd/com/core/KeyManager.....;L.......@...d...P...x...X.......`.......t.......................T....................zR..|
+
+[+] Hex blob candidates (32 hex digits = 16-byte AES key):
+    @ 0xb7a: d9f89f4d16663d5012e5c09495f3b30ece3d2362
+    @ 0x79bd: d9f89f4d16663d5012e5c09495f3b30ece3d2362
+
+[+] All Base64-looking strings of length 22/24/32/44/64:
+    len=44 @ 0x550: sqsmlH2NOLPXeaDIFGnMEOdG6Uc2mVingetSecretKey
+    len=24 @ 0x5e88: JNIEnv13GetFloatFieldEP8
+    len=32 @ 0x5f27: JNIEnv21GetStaticBooleanFieldEP7
+    len=24 @ 0x5feb: CallNonvirtualLongMethod
+    len=22 @ 0x603f: CallStaticFloatMethodA
+    len=22 @ 0x60a6: GetDirectBufferAddress
+    len=32 @ 0x610a: JNIEnv21CallStaticByteMethodAEP7
+    len=22 @ 0x63f3: JNIEnv11GetIntFieldEP8
+    len=32 @ 0x6422: JNIEnv21CallStaticShortMethodEP7
+    len=32 @ 0x64c8: JNIEnv21ReleaseStringUTFCharsEP8
+    len=24 @ 0x64f9: JNIEnv14NewDoubleArrayEi
+    len=24 @ 0x665b: JNIEnv13PopLocalFrameEP8
+    len=22 @ 0x66af: JNIEnv11GetMethodIDEP7
+    len=24 @ 0x6755: JNIEnv13GetShortFieldEP8
+    len=32 @ 0x6940: JNIEnv21CallStaticLongMethodAEP7
+    len=32 @ 0x6983: JNIEnv21CallStaticVoidMethodAEP7
+    len=24 @ 0x6a32: ReleaseCharArrayElements
+    len=24 @ 0x6b73: JNIEnv14ExceptionCheckEv
+    len=24 @ 0x6b9f: CallNonvirtualIntMethodV
+    len=24 @ 0x6beb: JNIEnv14PushLocalFrameEi
+    len=22 @ 0x6c09: JNIEnv11NewLocalRefEP8
+    len=32 @ 0x6ece: JNIEnv21CallStaticVoidMethodVEP7
+    len=32 @ 0x70b6: JNIEnv21CallStaticCharMethodAEP7
+    len=32 @ 0x70f9: JNIEnv21CallStaticLongMethodVEP7
+    len=32 @ 0x713f: JNIEnv21SetStaticBooleanFieldEP7
+    len=32 @ 0x7197: JNIEnv20GetByteArrayElementsEP11
+    len=22 @ 0x76d4: CallStaticObjectMethod
+    len=24 @ 0x7d1a: JNIEnv13GetSuperclassEP7
+    len=24 @ 0x7d3f: JNIEnv14ExceptionClearEv
+    len=22 @ 0x7df7: JNIEnv11SetIntFieldEP8
+    len=32 @ 0x7e27: JNIEnv21CallStaticFloatMethodEP7
+    len=22 @ 0x82d5: CallStaticDoubleMethod
+    len=24 @ 0x830d: ReleaseByteArrayElements
+    len=32 @ 0x8492: JNIEnv20GetCharArrayElementsEP11
+    len=22 @ 0x8605: CallStaticShortMethodA
+    len=24 @ 0x87fd: JNIEnv13SetFloatFieldEP8
+    len=22 @ 0x88fb: GetDoubleArrayElements
+    len=22 @ 0x8955: JNIEnv12NewCharArrayEi
+    len=22 @ 0x8a13: CallStaticFloatMethodV
+    len=24 @ 0x8c90: CallNonvirtualIntMethodA
+    len=24 @ 0x8ccf: CallStaticBooleanMethodA
+    len=22 @ 0x8eb1: JNIEnv12NewLongArrayEi
+    len=32 @ 0x8ecd: JNIEnv20GetLongArrayElementsEP11
+    len=24 @ 0x8fe5: CallNonvirtualByteMethod
+    len=32 @ 0x9337: JNIEnv21CallStaticByteMethodVEP7
+    len=24 @ 0x954f: CallStaticBooleanMethodV
+    len=22 @ 0x95e2: JNIEnv11AllocObjectEP7
+    len=32 @ 0x9857: JNIEnv20SetDoubleArrayRegionEP13
+    len=24 @ 0x9c23: JNIEnv13CallIntMethodEP8
+    len=22 @ 0x9dba: JNIEnv11MonitorExitEP8
+    len=24 @ 0x9e62: CallNonvirtualCharMethod
+    len=22 @ 0x9eba: JNIEnv10FatalErrorEPKc
+    len=24 @ 0x9f62: JNIEnv12NewStringUTFEPKc
+    len=22 @ 0x9ffc: CallStaticShortMethodV
+    len=24 @ 0xa01f: ReleaseLongArrayElements
+    len=64 @ 0xa1c3: /home/webpanel/backend/src/utils/project/downloader/app/src/main
+    len=24 @ 0xa243: CallNonvirtualVoidMethod
+    len=24 @ 0xa292: JNIEnv13SetShortFieldEP8
+    len=32 @ 0xa2c4: JNIEnv21CallStaticCharMethodVEP7
+    len=22 @ 0xa30a: JNIEnv12NewByteArrayEi
+    len=32 @ 0xa5c9: JNIEnv20GetDoubleArrayRegionEP13
+    len=32 @ 0xa636: JNIEnv21ReleaseStringCriticalEP8
+    len=22 @ 0xa70f: 64/sysroot/usr/include
+
+========================================================================
+[+] DEX bytecode hunt — find methods that call Cipher.doFinal and Base64.decode
+========================================================================
+  found 0 methods using javax/crypto/Cipher

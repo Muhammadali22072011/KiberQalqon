@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 28×28 accent swatch — Za'faron (Suzani saffron). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#CC9442" />
+    <corners android:radius="8dp" />
+</shape>

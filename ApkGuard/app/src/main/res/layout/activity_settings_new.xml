@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings — §3.7 of the redesign. Spec-ready scaffold; this is the layout the
+  README expects SettingsActivity to migrate to. Today the wired layout is
+  activity_settings.xml, which keeps its own (different) field set. Once
+  SettingsActivity is rewired, deletion of that legacy file is safe.
+
+  Stable IDs kept for forward compatibility with SettingsActivity.kt:
+    btnBack, toolbar, switchBackground, switchUpload, etServerUrl,
+    switchPhishing, btnEnableAccess, radioUzbek, radioRussian, radioGroupLanguage
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/kq_icon_btn"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/kq_ink" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="92dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp">
+
+            <!-- Header: eyebrow + title + sub -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/settings_eyebrow"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/settings_header_title"
+                android:textColor="@color/kq_ink"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="18dp"
+                android:text="@string/settings_header_subtitle"
+                android:textColor="@color/kq_ink_2"
+                android:textSize="13sp" />
+
+            <!-- ╔════ PROFILE CARD ════╗ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/kq_profile_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="14dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/kq_brand_tile">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/kq_shield_mark_white" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_pro_title"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"
+                        android:text="@string/settings_pro_version"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/kq_sev_safe"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.08"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="@string/settings_pro_active"
+                    android:textColor="@color/kq_safe_ink"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- ╔════ HIMOYA ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/settings_section_protection"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        layout="@layout/inc_settings_toggle_row"
+                        android:id="@+id/rowAutoScan" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/kq_hairline" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <include
+                            layout="@layout/inc_settings_toggle_row"
+                            android:id="@+id/rowAutoDelete" />
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_toggle_row"
+                        android:id="@+id/rowPhishing" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_toggle_row"
+                        android:id="@+id/rowBackground" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ╔════ SERVER ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/settings_section_server"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        layout="@layout/inc_settings_toggle_row"
+                        android:id="@+id/rowUpload" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/kq_hairline" />
+
+                    <LinearLayout
+                        android:id="@+id/rowServerUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="14dp">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/kq_icon_tile_primary">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_globe"
+                                app:tint="@color/kq_primary" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/settings_server_url_label"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/etServerUrl"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="monospace"
+                                android:text="@string/settings_server_url_example"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="11.5sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="@color/kq_ink_3" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ╔════ KO'RINISH ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/kq_settings_appearance"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Tema row: title + sub + segmented Kun/Tun -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/settings_theme_label"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/settings_theme_desc"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="11.5sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:background="@drawable/kq_seg_track"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="3dp">
+
+                            <TextView
+                                android:id="@+id/segThemeLight"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/kq_seg_active"
+                                android:gravity="center"
+                                android:minWidth="56dp"
+                                android:paddingHorizontal="14dp"
+                                android:text="@string/kq_theme_day"
+                                android:textColor="@color/kq_on_primary"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/segThemeDark"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:minWidth="56dp"
+                                android:paddingHorizontal="14dp"
+                                android:text="@string/kq_theme_night"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="14dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Asosiy rang -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/kq_accent"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/settings_accent_label"
+                        android:textColor="@color/kq_ink_2"
+                        android:textSize="11.5sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/accentTurquoise"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/kq_accent_selected"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <View
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:background="@drawable/kq_swatch_turquoise" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="@string/kq_accent_turquoise"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/accentSaffron"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <View
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:background="@drawable/kq_swatch_saffron" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="@string/kq_accent_saffron"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/accentPomegranate"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <View
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:background="@drawable/kq_swatch_pomegranate" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="@string/kq_accent_pomegranate"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ╔════ TIL ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/settings_section_language"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <RadioGroup
+                    android:id="@+id/radioGroupLanguage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radioUzbek"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:button="@null"
+                        android:checked="true"
+                        android:drawableEnd="@drawable/ic_check_circle"
+                        android:drawablePadding="12dp"
+                        android:gravity="center_vertical"
+                        android:padding="14dp"
+                        android:text="@string/language_uzbek"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp"
+                        app:drawableTint="@color/kq_primary" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <RadioButton
+                        android:id="@+id/radioRussian"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:button="@null"
+                        android:drawableEnd="@drawable/ic_chevron_right"
+                        android:drawablePadding="12dp"
+                        android:gravity="center_vertical"
+                        android:padding="14dp"
+                        android:text="@string/language_russian"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp"
+                        app:drawableTint="@color/kq_ink_3" />
+                </RadioGroup>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ╔════ HAQIDA ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/settings_section_about"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        layout="@layout/inc_settings_chevron_row"
+                        android:id="@+id/rowAbout" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="20dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_chevron_row"
+                        android:id="@+id/rowHelp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="20dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_chevron_row"
+                        android:id="@+id/rowPrivacy" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Footer -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:letterSpacing="0.08"
+                android:text="@string/settings_footer"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="10.5sp" />
+
+            <!-- Hidden compat fields. -->
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchBackground"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchUpload"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchPhishing"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEnableAccess"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Единая нижняя нав. KqBottomNav.attach(this, SETTINGS) в SettingsActivity.onCreate. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <include layout="@layout/view_kq_bottom_nav" />
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Simplified ProtectionMeter. We can't draw the 36-tick arc + gradient stroke
+  the SVG renders without code, so this is a stroked ring (hairline track
+  underneath, primary stroke on top via FrameLayout). Acceptable approximation
+  of the design's "circular gauge" for static onboarding context.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#00000000" />
+    <stroke android:width="10dp" android:color="@color/kq_hairline" />
+</shape>

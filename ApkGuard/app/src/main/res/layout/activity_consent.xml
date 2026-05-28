@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Foydalanish shartlari + Maxfiylik siyosati — KiberQalqon §3 palette.
+
+  ConsentActivity inflates this layout, then populates tvTermsBody / tvPrivacyBody
+  with the long Uzbek text strings stored in code. In first-run mode the bottom
+  consent bar is visible (3 checkboxes + Accept/Decline). In review mode (opened
+  from Settings) only btnClose is shown.
+
+  Stable hooks the Activity expects:
+    btnBack, tvTermsBody, tvPrivacyBody,
+    cardConsent, cbTerms, cbPrivacy, cbCommunity, btnAccept, btnDecline, btnClose
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/kq_bg"
+        android:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/kq_icon_btn"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/kq_ink" />
+
+            <TextView
+                android:id="@+id/tvScreenTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/terms_breadcrumb"
+                android:textColor="@color/kq_ink"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="220dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp">
+
+            <!-- Brand header card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/kq_profile_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/kq_brand_tile">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/kq_shield_mark_white" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvHeaderTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/terms_intro_title"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"
+                        android:text="@string/terms_last_update"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ╔════ TERMS ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/terms_section_terms"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:id="@+id/tvTermsBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingMultiplier="1.5"
+                    android:padding="16dp"
+                    android:textColor="@color/kq_ink"
+                    android:textIsSelectable="true"
+                    android:textSize="13sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ╔════ PRIVACY ════╗ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/terms_section_privacy"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:id="@+id/tvPrivacyBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingMultiplier="1.5"
+                    android:padding="16dp"
+                    android:textColor="@color/kq_ink"
+                    android:textIsSelectable="true"
+                    android:textSize="13sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ╔════ STICKY BOTTOM BAR ════╗
+         Visible only on first launch; holds 3 mandatory checkboxes + Accept/Decline. -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardConsent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="12dp"
+        app:cardBackgroundColor="@color/kq_bg_elev"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="8dp"
+        app:strokeColor="@color/kq_hairline_strong"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <CheckBox
+                android:id="@+id/cbTerms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/kq_primary"
+                android:paddingStart="6dp"
+                android:text="@string/consent_terms_chk"
+                android:textColor="@color/kq_ink"
+                android:textSize="13sp" />
+
+            <CheckBox
+                android:id="@+id/cbPrivacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/kq_primary"
+                android:paddingStart="6dp"
+                android:text="@string/consent_privacy_chk"
+                android:textColor="@color/kq_ink"
+                android:textSize="13sp" />
+
+            <CheckBox
+                android:id="@+id/cbCommunity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/kq_primary"
+                android:paddingStart="6dp"
+                android:text="@string/consent_community_chk"
+                android:textColor="@color/kq_ink"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDecline"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/consent_reject"
+                    android:textAllCaps="false"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="13sp"
+                    app:cornerRadius="999dp"
+                    app:strokeColor="@color/kq_hairline_strong"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAccept"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1.4"
+                    android:enabled="false"
+                    android:text="@string/consent_accept"
+                    android:textAllCaps="false"
+                    android:textColor="@color/kq_on_primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/kq_primary"
+                    app:cornerRadius="999dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Review-mode close button (replaces cardConsent when ConsentActivity is
+         opened from Settings via openForReview()). Activity toggles visibility. -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:text="@string/btn_close"
+        android:textAllCaps="false"
+        android:textColor="@color/kq_on_primary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:backgroundTint="@color/kq_primary"
+        app:cornerRadius="999dp"
+        app:icon="@drawable/ic_check_simple"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconSize="18dp"
+        app:iconTint="@color/kq_on_primary" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

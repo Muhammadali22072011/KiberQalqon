@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vertical bar in the 7-day chart (threat day). Top-rounded danger. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/kq_danger" />
+    <corners
+        android:topLeftRadius="6dp"
+        android:topRightRadius="6dp" />
+</shape>

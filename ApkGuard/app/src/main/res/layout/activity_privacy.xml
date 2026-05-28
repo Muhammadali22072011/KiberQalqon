@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Maxfiylik siyosati — redesigned to match the KiberQalqon §3 palette.
+  Stable IDs preserved: toolbar, btnBack, btnAccept.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/kq_icon_btn"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/kq_ink" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/privacy_title"
+                android:textColor="@color/kq_ink"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp">
+
+            <!-- Header card: brand tile + title + sub -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/kq_profile_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/kq_brand_tile">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_lock_cyber"
+                        app:tint="#FFFFFF" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/privacy_title"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"
+                        android:text="OXIRGI YANGILANISH · 2026 · 02 · 07"
+                        android:textAllCaps="true"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Intro -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:lineSpacingMultiplier="1.5"
+                android:text="KIBER QALQON sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma'lumotlar yig'ilishi va ishlatilishini tushuntiradi."
+                android:textColor="@color/kq_ink"
+                android:textSize="14sp" />
+
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec1" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec2" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec3" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec4" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec5" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec6" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec7" />
+            <include
+                layout="@layout/inc_doc_section"
+                android:id="@+id/sec8" />
+
+            <!-- Accept CTA -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAccept"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="22dp"
+                android:letterSpacing="0.01"
+                android:text="@string/btn_understand"
+                android:textAllCaps="false"
+                android:textColor="@color/kq_on_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/kq_primary"
+                app:cornerRadius="999dp"
+                app:icon="@drawable/ic_check_simple"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/kq_on_primary" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

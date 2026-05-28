@@ -1,0 +1,18 @@
+﻿[+] key: b'sqsmlH2NOLPXeaDIFGnMEOdG6Uc2mVin'  len=32
+[+] C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\unpacked\VIDEO20012026mp4_2\assets\cvsmcn.json  size=1,014,969
+  head: 0feb06393817e6b91ae8ebe35ee6dd48270fffa311f5e3d558d337880e3e71d4
+  decrypted head 32: b'|\x9auTT_\xd4\xf7U\xa4\xbb\xbb;\x87\x99\x01aH\x91\xeeT\xba\x87\x92n\x86T\xbach\x18\xba'
+  decrypted head hex: 7c9a7554545fd4f755a4bbbb3b879901614891ee54ba87926e8654ba636818ba
+  saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\DECRYPTED_VIDEO_cvsmcn.bin
+  ?? first 64: b'|\x9auTT_\xd4\xf7U\xa4\xbb\xbb;\x87\x99\x01aH\x91\xeeT\xba\x87\x92n\x86T\xbach\x18\xba\x15\x90\x16\x14Ej\x98!\xa5A\x91n\xe9F\xea\xe5\xf7\xbc\xef?\xcf?\xef]k\xdf\xbb\xeeY\xe7\xdeS'
+
+======================================================================
+[+] Testing same key on banker large encrypted assets:
+  ✘ RASMLAR_18/02cce475f26041e8.data  head: df403a5e7cee2a677bbbd29e0ee59929
+  ✘ RASMLAR_18/zejcc.spe  head: acfd4262cea3f84c0be1f148c00f9f1c
+  ✘ RASMLAR_8/cqivytyakr.spe  head: aaff47020925f380415ca5b36a87a35a
+  ✘ RASMLAR_8/d55abfda1195fb77.bak  head: 72a9ba0389955b850115a4213deb279f
+  ✘ VIDEO20012026mp4_2/cvsmcn.json  head: 7c9a7554545fd4f755a4bbbb3b879901
+  ✘ VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤ/nhondpu.sps  head: acff4c030fb5f392605dc6a2428c5a59
+  ✘ toydanfotolar9jpg_10/5c8d3cf99f5cf4ac.dat  head: 3911c233f0d2fde5cc15b6257de08d83
+  ✘ toydanfotolar9jpg_10/oiprcd.sps  head: acfe430f01b1fcd9a2f93a78075fe225

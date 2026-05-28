@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Single onboarding slide. Mirrors `Onboarding` body in screens-onboarding.jsx:
+    - upper half: visual (ProtectionMeter / threat grid / alert card) over a tiled
+      8-point star background. Adapter shows exactly one of the three visuals.
+    - lower half: mono eyebrow + 28sp title + 15sp body
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- VISUAL AREA — tiled star background + one of three centered visuals -->
+    <FrameLayout
+        android:id="@+id/visualArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- subtle ornament: 4x7 star grid baked into the vector itself
+             (BitmapDrawable + vector src crashes on API 28). Stretched to
+             the visual area; mild distortion is fine at this opacity. -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:contentDescription="@null"
+            android:scaleType="fitXY"
+            android:src="@drawable/kq_star_tile" />
+
+        <!-- (1) ProtectionMeter — 92% gauge, shield mark + percentage label -->
+        <FrameLayout
+            android:id="@+id/visualMeter"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/kq_meter_ring" />
+
+            <!-- Arc approximation: a ring tinted with the active stroke; the design's
+                 92% partial fill + tick marks need code-drawn graphics, this static
+                 ring is the closest faithful XML stand-in. -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.85"
+                android:background="@drawable/kq_meter_ring_active" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginBottom="6dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/kq_shield_mark" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="-0.02"
+                        android:text="92"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginStart="2dp"
+                        android:text="%"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:text="@string/onb_meter_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/kq_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- (2) Threat grid — 2×2 cards in a 240dp grid -->
+        <GridLayout
+            android:id="@+id/visualThreats"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:visibility="gone">
+
+            <!-- KRIT: Ajina.Banker -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="5dp"
+                android:background="@drawable/kq_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/kq_threat_tile_crit" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/kq_sev_crit"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/onb_sev_crit"
+                        android:textColor="@color/kq_danger_ink"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/onb_threat_1"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- KRIT: RoundRift -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="5dp"
+                android:background="@drawable/kq_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/kq_threat_tile_crit" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/kq_sev_crit"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/onb_sev_crit"
+                        android:textColor="@color/kq_danger_ink"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/onb_threat_2"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- YUQORI: SMS Stealer -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="5dp"
+                android:background="@drawable/kq_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/kq_threat_tile_high" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/kq_sev_high"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/onb_sev_high"
+                        android:textColor="@color/kq_warn_ink"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/onb_threat_3"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- YUQORI: Phish Overlay -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="5dp"
+                android:background="@drawable/kq_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/kq_threat_tile_high" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/kq_sev_high"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/onb_sev_high"
+                        android:textColor="@color/kq_warn_ink"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/onb_threat_4"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </GridLayout>
+
+        <!-- (3) Alert preview card — "Xavfli APK aniqlandi" + RASMLAR (18).apk -->
+        <LinearLayout
+            android:id="@+id/visualAlert"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/kq_card"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <!-- header: danger alert icon + title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_alert_triangle"
+                    app:tint="@color/kq_danger"
+                    xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/onb_alert_title"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/onbAlertBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/onb_alert_body"
+                android:textColor="@color/kq_ink_2"
+                android:textSize="12sp" />
+
+            <!-- buttons row: filled "O'chirish" + ghost "Batafsil" -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="14dp"
+                    android:text="@string/onb_alert_delete"
+                    android:textAllCaps="false"
+                    android:textColor="@color/kq_on_primary"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/kq_primary"
+                    app:cornerRadius="999dp"
+                    xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="14dp"
+                    android:text="@string/onb_alert_details"
+                    android:textAllCaps="false"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="13sp"
+                    app:cornerRadius="999dp"
+                    app:strokeColor="@color/kq_hairline_strong"
+                    xmlns:app="http://schemas.android.com/apk/res-auto" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Compat icon kept so any old references to ivIcon don't NPE. Hidden by default. -->
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <!-- TEXT BLOCK — eyebrow + title + body, design uses 28dp side padding -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvEyebrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.12"
+            android:textAllCaps="true"
+            android:textColor="@color/kq_primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            tools:text="01 · BOSHLASH" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:letterSpacing="-0.02"
+            android:lineSpacingMultiplier="1.18"
+            android:textColor="@color/kq_ink"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="Avtomatik himoya — 24/7" />
+
+        <TextView
+            android:id="@+id/tvDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingMultiplier="1.5"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="15sp"
+            tools:text="KiberQalqon Telegram, Yuklab olishlar va boshqa papkalarni har 15 daqiqada tekshirib turadi." />
+    </LinearLayout>
+</LinearLayout>

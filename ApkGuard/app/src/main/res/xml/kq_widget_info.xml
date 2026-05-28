@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  KiberQalqon AppWidget metadata.
+
+  minWidth/minHeight: 250x110dp ≈ 4x2 panjara (eng odatiy android launcher).
+  resizeMode: foydalanuvchi xohlasa kengaytirsin.
+  updatePeriodMillis: 0 — biz manual update qilamiz (skan tugagach), system'ga
+    kerakli minimum 30 daqiqa, lekin biz batareya saqlash uchun system periodic
+    update'ni o'chiramiz.
+  widgetCategory: home_screen — bosh ekran uchun.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="220dp"
+    android:minResizeHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_kq_status"
+    android:previewImage="@mipmap/ic_launcher"
+    android:previewLayout="@layout/widget_kq_status"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:description="@string/widget_description" />

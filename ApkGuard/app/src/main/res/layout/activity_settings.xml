@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Sozlamalar (SettingsActivity) — KiberQalqon §3.7 palette adapted to the
+  legacy field set this Activity actually wires. All IDs preserved:
+    btnBack, toolbar (gone),
+    rgAutoDelete + rbDelete/rbAsk/rbWarn,
+    rgSensitivity + rbLow/rbMedium/rbHigh,
+    switchSound, switchVibration, switchAutoUpdate, btnUpdateNow,
+    tvStatsScanned, tvStatsBlocked, btnClearStats,
+    btnWhitelist, btnSave.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/kq_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/kq_icon_btn"
+                android:contentDescription="Back"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/kq_ink" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header: eyebrow + title + sub (matches the design's settings header) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="SOZLAMALAR"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Boshqaruv"
+                android:textColor="@color/kq_ink"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="18dp"
+                android:text="Himoya darajasini moslashtiring"
+                android:textColor="@color/kq_ink_2"
+                android:textSize="13sp" />
+
+            <!-- AVTOMATIK O'CHIRISH -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/auto_delete_title"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <RadioGroup
+                    android:id="@+id/rgAutoDelete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp">
+
+                    <RadioButton
+                        android:id="@+id/rbDelete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/kq_primary"
+                        android:padding="10dp"
+                        android:text="@string/auto_delete_delete"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbAsk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/kq_primary"
+                        android:padding="10dp"
+                        android:text="@string/auto_delete_ask"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbWarn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/kq_primary"
+                        android:padding="10dp"
+                        android:text="@string/auto_delete_warn"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+                </RadioGroup>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- SEZGIRLIK -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/sensitivity_title"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <RadioGroup
+                    android:id="@+id/rgSensitivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp">
+
+                    <RadioButton
+                        android:id="@+id/rbLow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/kq_primary"
+                        android:padding="10dp"
+                        android:text="@string/sensitivity_low"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbMedium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/kq_primary"
+                        android:padding="10dp"
+                        android:text="@string/sensitivity_medium"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbHigh"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/kq_primary"
+                        android:padding="10dp"
+                        android:text="@string/sensitivity_high"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+                </RadioGroup>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- TOVUSH VA TEBRANISH -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/notifications_title"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchSound"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sound_enabled"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchVibration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/vibration_enabled"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BAZA -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/database_title"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchAutoUpdate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_update"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnUpdateNow"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/update_now"
+                        android:textAllCaps="false"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="13sp"
+                        app:cornerRadius="999dp"
+                        app:strokeColor="@color/kq_hairline_strong"
+                        app:strokeWidth="1dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- STATISTIKA -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/statistics_title"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/kq_bg_elev"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/kq_hairline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:id="@+id/tvStatsScanned"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="@string/stats_scanned"
+                        android:textColor="@color/kq_ink"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/tvStatsBlocked"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="monospace"
+                        android:text="@string/stats_blocked"
+                        android:textColor="@color/kq_danger"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearStats"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/clear_stats"
+                        android:textAllCaps="false"
+                        android:textColor="@color/kq_ink_2"
+                        android:textSize="13sp"
+                        app:cornerRadius="999dp"
+                        app:strokeColor="@color/kq_hairline_strong"
+                        app:strokeWidth="1dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- WHITELIST -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/whitelist_title"
+                android:textAllCaps="true"
+                android:textColor="@color/kq_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWhitelist"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/manage_whitelist"
+                android:textAllCaps="false"
+                android:textColor="@color/kq_ink"
+                android:textSize="14sp"
+                app:cornerRadius="999dp"
+                app:strokeColor="@color/kq_hairline_strong"
+                app:strokeWidth="1dp" />
+
+            <!-- SAVE -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="28dp"
+                android:text="@string/save"
+                android:textAllCaps="false"
+                android:textColor="@color/kq_on_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/kq_primary"
+                app:cornerRadius="999dp"
+                app:icon="@drawable/ic_check_simple"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/kq_on_primary" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Единая нижняя нав — KqBottomNav.attach в onCreate активирует SETTINGS. -->
+    <include layout="@layout/view_kq_bottom_nav" />
+</LinearLayout>

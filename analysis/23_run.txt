@@ -1,0 +1,174 @@
+﻿========================================================================
+GREP for CRYPTO / URL / ASSET / BANK keywords in decrypted plaintexts
+========================================================================
+
+----- RASMLAR_18 (1040 plaintexts) -----
+  [CRYPTO] 29 hits
+    MD5withRSA
+    MD5 with RSA
+    Cannot generate SourceStamp. APK contains an existing entry with the name: stamp-cert-sha256, and it is different than the provided source stamp certificate
+    RSA_PKCS1_V1_5_WITH_SHA512
+    RSA_PKCS1_V1_5_WITH_SHA256
+    RSA_PSS_WITH_SHA512
+    RSA_PSS_WITH_SHA256
+    SHA-256-Digest-Manifest
+    SHA-256 is not found
+    SHA-1 with RSA
+    SHA-1 with DSA
+    SHA224withRSA
+    SHA224withECDSA
+    SHA224withDSA
+    SHA256withRSA
+    SHA256withRSA/PSS
+    SHA256withECDSA
+    SHA256withDSA
+    SHA1withECDSA
+    SHA1-Digest-Manifest
+    SHA384withRSA
+    SHA384withECDSA
+    SHA512withRSA
+    SHA512withRSA/PSS
+    SHA512withECDSA
+    getBytes(...)
+    stamp-cert-sha256
+     MessageDigest not available
+
+----- RASMLAR_8 (1195 plaintexts) -----
+  [CRYPTO] 47 hits
+    SHA224withRSA
+    SHA224withDSA
+    SHA224withECDSA
+    SHA256withRSA/PSS
+    SHA256withRSA
+    SHA256withDetDSA
+    SHA256withDSA
+    SHA256withECDSA
+    SHA1withECDSA
+    SHA1withDSA
+    SHA1withRSA
+    SHA1-Digest
+    SHA1-Digest-Manifest
+    SHA384withRSA
+    SHA384withECDSA
+    SHA512withRSA/PSS
+    SHA512withRSA
+    SHA512withECDSA
+    SHA-1 with RSA
+    SHA-1 with DSA
+    SHA-1 with ECDSA
+    SHA-384 with RSA
+    SHA-384 with ECDSA
+    SHA-384 with DSA
+    SHA-256-Digest-Manifest
+    SHA-256 with RSA
+    SHA-256 with ECDSA
+    SHA-256 with DSA
+    SHA-256 is not found
+    SHA-224 with RSA
+    SHA-224 with ECDSA
+    SHA-224 with DSA
+    SHA-512 with RSA
+    SHA-512 with ECDSA
+    SHA-512 with DSA
+    RSA_PSS_WITH_SHA512
+    RSA_PSS_WITH_SHA256
+    RSA_PKCS1_V1_5_WITH_SHA256
+    RSA_PKCS1_V1_5_WITH_SHA512
+    Cannot generate SourceStamp. APK contains an existing entry with the name: stamp-cert-sha256, and it is different than the provided source stamp certificate
+    MD5withRSA
+    MD5 with RSA
+    stamp-cert-sha256
+    gcm.n.image
+    getBytes(...)
+     MessageDigest not available
+  [URL] 1 hits
+    https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+
+----- VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ (1202 plaintexts) -----
+  [CRYPTO] 35 hits
+    Cannot generate SourceStamp. APK contains an existing entry with the name: stamp-cert-sha256, and it is different than the provided source stamp certificate
+    MD5 with RSA
+    SHA224withRSA
+    SHA224withDSA
+    SHA256withRSA
+    SHA256withRSA/PSS
+    SHA256withDetDSA
+    SHA256withDSA
+    SHA1withRSA
+    SHA1withECDSA
+    SHA1withDSA
+    SHA1-Digest
+    SHA384withRSA
+    SHA512withRSA
+    SHA512withRSA/PSS
+    SHA-1 with ECDSA
+    SHA-384 with RSA
+    SHA-384 with DSA
+    SHA-384 with ECDSA
+    SHA-224 with RSA
+    SHA-224 with DSA
+    SHA-224 with ECDSA
+    SHA-256 with RSA
+    SHA-256 with DSA
+    SHA-256 with ECDSA
+    SHA-512 with RSA
+    SHA-512 with DSA
+    SHA-512 with ECDSA
+    RSA_PSS_WITH_SHA512
+    RSA_PSS_WITH_SHA256
+    RSA_PKCS1_V1_5_WITH_SHA256
+    RSA_PKCS1_V1_5_WITH_SHA512
+    getBytes(...)
+    stamp-cert-sha256
+     MessageDigest not available
+
+----- toydanfotolar9jpg_10 (1222 plaintexts) -----
+  [CRYPTO] 45 hits
+    Cannot generate SourceStamp. APK contains an existing entry with the name: stamp-cert-sha256, and it is different than the provided source stamp certificate
+    MD5 with RSA
+    SHA-512 with RSA
+    SHA-512 with DSA
+    SHA-512 with ECDSA
+    SHA-1 with RSA
+    SHA-1 with DSA
+    SHA-1 with ECDSA
+    SHA-224 with RSA
+    SHA-224 with DSA
+    SHA-224 with ECDSA
+    SHA-256 with RSA
+    SHA-256 with DSA
+    SHA-256 with ECDSA
+    SHA-256 is not found
+    SHA-384 with RSA
+    SHA-384 with DSA
+    SHA-384 with ECDSA
+    SHA512withRSA/PSS
+    SHA512withRSA
+    SHA512withECDSA
+    SHA256withRSA/PSS
+    SHA256withRSA
+    SHA256withECDSA
+    SHA256withDetDSA
+    SHA256withDSA
+    SHA224withRSA
+    SHA224withECDSA
+    SHA224withDSA
+    SHA1withDSA
+    SHA1withECDSA
+    SHA1withRSA
+    SHA1-Digest
+    SHA1-Digest-Manifest
+    SHA384withRSA
+    SHA384withECDSA
+    RSA_PSS_WITH_SHA512
+    RSA_PSS_WITH_SHA256
+    RSA_PKCS1_V1_5_WITH_SHA512
+    RSA_PKCS1_V1_5_WITH_SHA256
+    getBytes(...)
+    stamp-cert-sha256
+     MessageDigest not available
+     cipherSuite=
+
+========================================================================
+XOR with prefix-as-key (assume file = [16-byte key][rest XOR-encrypted with key])
+========================================================================

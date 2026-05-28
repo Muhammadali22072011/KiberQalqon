@@ -1,0 +1,437 @@
+﻿
+========================================================================
+[+] RASMLAR_18_fixed.apk
+========================================================================
+  total classes=1050  user=663
+  package=com.lzthzvxte.xazoalzxhr  main=vpvaggzk.com.Ss0l4nz5aqo2wfg
+  services=['vpvaggzk.com.Dmvb5dbvx']  receivers=['vpvaggzk.com.Receiver']
+  --- HITS ---
+    [ACCESSIBILITY] 2 hits — methods:['AccessibilityEvent']
+        S: AccessibilityEvent -> Landroid/view/accessibility/AccessibilityEvent;
+    [EXEC] 2 hits — methods:['Ljava/lang/ProcessBuilder']
+        S: Ljava/lang/ProcessBuilder -> Ljava/lang/ProcessBuilder;
+    [BASE64] 6 hits — methods:['Landroid/util/Base64', 'Ljava/util/Base64']
+        S: Landroid/util/Base64 -> Landroid/util/Base64;
+        S: Ljava/util/Base64 -> Ljava/util/Base64$Decoder;
+    [BANKING_UZ] 11 hits — methods:['tbc']
+        S: tbc -> CTg6YR1fGRNBCQoQGBk8ZUBaMEIQKhcZIzY6YRJWGVZDTBcYJAonIH1cKkVRJRcIGS01NRY=
+        S: tbc -> Czo3JABDTVpCTBcDA0s+IxRQNkReL1hNJT8yMhZEVxM=
+    [JS_INJECT] 2 hits — methods:['evaluateJavascript']
+        S: evaluateJavascript -> evaluateJavascript
+  URLs found: []
+  TG bots: []
+  suspect domains: []
+  user classes (first 60):
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Aropxvumbrnhdbnkzgxngszsogljvvth;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Cwirfqyahbjtyclklnanwcl;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Glvkdrnwiajjhjntemxnlycu;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Hlsaltfwkucztpgaslhililvsfxdebmpcd;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Irofilwecjwcceeatcfg;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Jlmnoqodhxlxuwtffkeyqu;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Mpedksrsyiwjclyizqswstz;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Pbeattyedjvrpkezmbxio;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Qtrldrygcwywqscuyrjvmwxtfdadrqsxsxhdq;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Uwwhnpelrspnpzdqdkdadbytxugaqrnktlgjydmp;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Gquesyvnltekgxdkymmis;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Igmmzymaazkvykdianvycnkljes;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Irofilwecjwcceeatcfg;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Mpedksrsyiwjclyizqswstz;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Pbeattyedjvrpkezmbxio;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Gquesyvnltekgxdkymmis;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Irofilwecjwcceeatcfg;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mpedksrsyiwjclyizqswstz;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Pbeattyedjvrpkezmbxio;
+     LCpmujyoyjuaqxijtrpcrowss/Gquesyvnltekgxdkymmis;
+     LCpmujyoyjuaqxijtrpcrowss/Igmmzymaazkvykdianvycnkljes;
+     LDnrxowpqexjqcsrironaxwneksuprizumtvri/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Igmmzymaazkvykdianvycnkljes;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Irofilwecjwcceeatcfg;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Mpedksrsyiwjclyizqswstz;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Pbeattyedjvrpkezmbxio;
+     LEkhovsyarulupbtgjmclox/Cwirfqyahbjtyclklnanwcl;
+     LEkhovsyarulupbtgjmclox/Gquesyvnltekgxdkymmis;
+     LEkhovsyarulupbtgjmclox/Igmmzymaazkvykdianvycnkljes;
+     LEkhovsyarulupbtgjmclox/Irofilwecjwcceeatcfg;
+     LEkhovsyarulupbtgjmclox/Jlmnoqodhxlxuwtffkeyqu;
+     LEkhovsyarulupbtgjmclox/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LEkhovsyarulupbtgjmclox/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEkhovsyarulupbtgjmclox/Mpedksrsyiwjclyizqswstz;
+     LEkhovsyarulupbtgjmclox/Pbeattyedjvrpkezmbxio;
+     LExozolscragydhxidpxomklajxiblntlyhnzm/Gquesyvnltekgxdkymmis;
+     LFepvpdmlpvpleyyoxjzjwbyygojyfqpclqlj/Gquesyvnltekgxdkymmis;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Cwirfqyahbjtyclklnanwcl;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Gquesyvnltekgxdkymmis;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Irofilwecjwcceeatcfg;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Mpedksrsyiwjclyizqswstz;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Pbeattyedjvrpkezmbxio;
+     LHumqbwjkhfexxuajywzw/Gquesyvnltekgxdkymmis;
+     LHumqbwjkhfexxuajywzw/Igmmzymaazkvykdianvycnkljes;
+     LHumqbwjkhfexxuajywzw/Irofilwecjwcceeatcfg;
+     LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis;
+     LIseuppwugjhonodijheafguovxxuoimcybwxnj/Gquesyvnltekgxdkymmis;
+     LIseuppwugjhonodijheafguovxxuoimcybwxnj/Igmmzymaazkvykdianvycnkljes;
+
+========================================================================
+[+] RASMLAR_8_fixed.apk
+========================================================================
+  total classes=1953  user=1532
+  package=com.oktgkst.rrcpkge  main=fysrzn.com.Ei1v1lrc7
+  services=['fysrzn.com.Bex1v7pr']  receivers=['fysrzn.com.Receiver']
+  --- HITS ---
+    [ACCESSIBILITY] 2 hits — methods:['AccessibilityEvent']
+        S: AccessibilityEvent -> Landroid/view/accessibility/AccessibilityEvent;
+    [EXEC] 2 hits — methods:['Ljava/lang/ProcessBuilder']
+        S: Ljava/lang/ProcessBuilder -> Ljava/lang/ProcessBuilder;
+    [BASE64] 6 hits — methods:['Landroid/util/Base64', 'Ljava/util/Base64']
+        S: Landroid/util/Base64 -> Landroid/util/Base64;
+        S: Ljava/util/Base64 -> Ljava/util/Base64$Decoder;
+    [BANKING_UZ] 11 hits — methods:['tbc']
+        S: tbc -> FD0meSI/NRwiWlFUFBQuJF5wJTIxIEEbPCgXXQcWA1gyAwwtBCQ3WjgdFgYzCTQiRiQhMnUrTFI8M0NCFEIqWCU+CDoFPz0cOBwfVD4ZMikSJGQ0MCxbUjUzW1QIWhxUMU0UPAU=
+        S: tbc -> LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Afbqkmzutxdqdrbqwudbizfdscbjgnj;
+    [JS_INJECT] 2 hits — methods:['evaluateJavascript']
+        S: evaluateJavascript -> evaluateJavascript
+  URLs found: []
+  TG bots: []
+  suspect domains: []
+  user classes (first 60):
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Gquesyvnltekgxdkymmis;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Afbqkmzutxdqdrbqwudbizfdscbjgnj;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Ajcecdmehxewnyxusznavjeflbmxghx;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Aropxvumbrnhdbnkzgxngszsogljvvth;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Cfhwhtrlyabjxpaavvtbbsjfgt;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Cwirfqyahbjtyclklnanwcl;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Fjxflqmjyfcqxgfnhemba;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Glvkdrnwiajjhjntemxnlycu;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Gquesyvnltekgxdkymmis;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Hlsaltfwkucztpgaslhililvsfxdebmpcd;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igcbsyywcscmsardmlfwevsitdb;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Irofilwecjwcceeatcfg;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Jlmnoqodhxlxuwtffkeyqu;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Kboufhfjzbpmzouhqmyaavevbhhzjofsceqhxm;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Kwfnasuefeebqavfuoxibrslnrnkxkicyw;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mdjmxmjttzfvhmswvipglanlcc;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mnwlotinfdsvygdeqvfxchpfpnfck;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mpedksrsyiwjclyizqswstz;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mquxzophtybauvqtbbekepemesstcwhhoweaxnpw;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Pbeattyedjvrpkezmbxio;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Qtrldrygcwywqscuyrjvmwxtfdadrqsxsxhdq;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Slfbqhtpzjkuedhypdbbgguzyypfm;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Tukuwvdnpyhzxrwxilqfbfdtbuujirwitpyaqxn;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Uwwhnpelrspnpzdqdkdadbytxugaqrnktlgjydmp;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Vihzvzzovnineldbzoixcovronwzyziecqyixnm;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Vzxodsprsfoimurelgsoungejgidyfhdavmrdaqf;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Wahbbayoubpmvkbdgzhqhbyeyaqzujejeupgfpya;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Wbxdyreuxrlgdxlzyikqbjlgbmsejxdyasjeq;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Ydxxstcdmpfbvuogthhb;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Yfsttkthcfkqsjijvnkzjwnxarfsjvdlylmua;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Yhagvvxvffurjfwfcoxhdhrevbjpvsbmjwehxr;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Yqkqxubfueavgptilazbbuwlzkejhrbih;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Zhblwlibaztuhycgucusbd;
+     LCpmujyoyjuaqxijtrpcrowss/Gquesyvnltekgxdkymmis;
+     LCpmujyoyjuaqxijtrpcrowss/Igmmzymaazkvykdianvycnkljes;
+     LDnrxowpqexjqcsrironaxwneksuprizumtvri/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Igmmzymaazkvykdianvycnkljes;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Irofilwecjwcceeatcfg;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Mpedksrsyiwjclyizqswstz;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Pbeattyedjvrpkezmbxio;
+     LEkhovsyarulupbtgjmclox/Gquesyvnltekgxdkymmis;
+     LExozolscragydhxidpxomklajxiblntlyhnzm/Gquesyvnltekgxdkymmis;
+     LExozolscragydhxidpxomklajxiblntlyhnzm/Igmmzymaazkvykdianvycnkljes;
+     LExozolscragydhxidpxomklajxiblntlyhnzm/Irofilwecjwcceeatcfg;
+     LFacnfgjstfsyraerfvizkydoth/Aropxvumbrnhdbnkzgxngszsogljvvth;
+     LFacnfgjstfsyraerfvizkydoth/Cwirfqyahbjtyclklnanwcl;
+     LFacnfgjstfsyraerfvizkydoth/Gquesyvnltekgxdkymmis;
+     LFacnfgjstfsyraerfvizkydoth/Hlsaltfwkucztpgaslhililvsfxdebmpcd;
+     LFacnfgjstfsyraerfvizkydoth/Igmmzymaazkvykdianvycnkljes;
+     LFacnfgjstfsyraerfvizkydoth/Irofilwecjwcceeatcfg;
+     LFacnfgjstfsyraerfvizkydoth/Jlmnoqodhxlxuwtffkeyqu;
+     LFacnfgjstfsyraerfvizkydoth/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LFacnfgjstfsyraerfvizkydoth/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LFacnfgjstfsyraerfvizkydoth/Mpedksrsyiwjclyizqswstz;
+
+========================================================================
+[+] VIDEO20012026mp4_2_fixed.apk
+========================================================================
+  total classes=2381  user=1726
+  package=ydbllnjd.com  main=ydbllnjd.com.Yxoxnjs2
+  services=['ydbllnjd.com.Wn993f1zq3t7k']  receivers=['ydbllnjd.com.Receiver']
+  --- HITS ---
+    [ACCESSIBILITY] 12 hits — methods:['AccessibilityNodeInfo', 'AccessibilityEvent']
+        S: AccessibilityNodeInfo -> AccessibilityNodeInfo.roleDescription
+        S: AccessibilityEvent -> Landroid/view/accessibility/AccessibilityEvent;
+    [EXEC] 2 hits — methods:['Ljava/lang/ProcessBuilder']
+        S: Ljava/lang/ProcessBuilder -> Ljava/lang/ProcessBuilder;
+    [INSTALL_APK] 5 hits — methods:['PackageInstaller']
+        S: PackageInstaller -> Landroid/content/pm/PackageInstaller$SessionInfo;
+        S: PackageInstaller -> Landroid/content/pm/PackageInstaller;
+    [CLIPBOARD] 2 hits — methods:['getPrimaryClip']
+        S: getPrimaryClip -> getPrimaryClipDescription
+    [BASE64] 6 hits — methods:['Landroid/util/Base64', 'Ljava/util/Base64']
+        S: Landroid/util/Base64 -> Landroid/util/Base64;
+        S: Ljava/util/Base64 -> Ljava/util/Base64$Decoder;
+    [HIDE_ICON] 2 hits — methods:['setComponentEnabledSetting']
+        S: setComponentEnabledSetting -> setComponentEnabledSetting
+    [JS_INJECT] 2 hits — methods:['evaluateJavascript']
+        S: evaluateJavascript -> evaluateJavascript
+    [ROOT_CHECK] 2 hits — methods:[]
+        S: /system/bin/su -> /system/bin/su
+        S: /system/xbin/su -> /system/xbin/su
+  URLs found: ['http://schemas.android.com/apk/res/android', 'https://goo.gle/compose-feedback', 'https://www.google.com', 'https://youtrack.jetbrains.com/issue/KT-55980']
+  TG bots: []
+  suspect domains: ['java.io', 'kotlinx.coroutines.io', 'ydbllnjd.com']
+  user classes (first 60):
+     Lcom/android/apksig/ApkSigner$1;
+     Lcom/android/apksig/ApkSigner$Builder;
+     Lcom/android/apksig/ApkSigner$OutputSizeAndDataOffset;
+     Lcom/android/apksig/ApkSigner$SignerConfig$Builder;
+     Lcom/android/apksig/ApkSigner$SignerConfig;
+     Lcom/android/apksig/ApkSigner;
+     Lcom/android/apksig/ApkSignerHelper$KeyGenParams;
+     Lcom/android/apksig/ApkSignerHelper$KeyStoreData;
+     Lcom/android/apksig/ApkSignerHelper$OrgData;
+     Lcom/android/apksig/ApkSignerHelper;
+     Lcom/android/apksig/ApkVerifier$IssueWithParams;
+     Lcom/android/apksig/CertificateGenerator;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser$1;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser$Attribute;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser$Chunk;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser$ResourceMap;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser$StringPool;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser$XmlParserException;
+     Lcom/android/apksig/internal/apk/AndroidBinXmlParser;
+     Lcom/android/apksig/internal/apk/ApkSigResult;
+     Lcom/android/apksig/internal/apk/ApkSignerInfo;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$1;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$ChunkDigester;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$ChunkDigests;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$ChunkSupplier$Chunk;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$ChunkSupplier;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$NoSupportedSignaturesException;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$Result$SignerInfo$AdditionalAttribute;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$Result$SignerInfo$ContentDigest;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$Result$SignerInfo$Signature;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$Result$SignerInfo;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$Result;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$SignatureNotFoundException;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$SignerConfig;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$SigningSchemeBlockAndDigests;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$SupportedSignature;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils$VerityTreeAndDigest;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtils;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtilsLite$1;
+     Lcom/android/apksig/internal/apk/ApkSigningBlockUtilsLite;
+     Lcom/android/apksig/internal/apk/ApkSupportedSignature;
+     Lcom/android/apksig/internal/apk/ContentDigestAlgorithm;
+     Lcom/android/apksig/internal/apk/NoApkSupportedSignaturesException;
+     Lcom/android/apksig/internal/apk/SignatureAlgorithm;
+     Lcom/android/apksig/internal/apk/SignatureInfo;
+     Lcom/android/apksig/internal/apk/SignatureNotFoundException;
+     Lcom/android/apksig/internal/apk/o8ooo888o88oo888oo8ooo88ooo88ooooo;
+     Lcom/android/apksig/internal/apk/stamp/SourceStampCertificateLineage$SigningCertificateNode;
+     Lcom/android/apksig/internal/apk/stamp/SourceStampCertificateLineage;
+     Lcom/android/apksig/internal/apk/stamp/SourceStampConstants;
+     Lcom/android/apksig/internal/apk/stamp/V1SourceStampSigner$1;
+     Lcom/android/apksig/internal/apk/stamp/V1SourceStampSigner$SourceStampBlock;
+     Lcom/android/apksig/internal/apk/stamp/V1SourceStampSigner;
+     Lcom/android/apksig/internal/apk/stamp/V2SourceStampSigner$1;
+     Lcom/android/apksig/internal/apk/stamp/V2SourceStampSigner$Builder;
+     Lcom/android/apksig/internal/apk/stamp/V2SourceStampSigner$SourceStampBlock;
+     Lcom/android/apksig/internal/apk/stamp/V2SourceStampSigner;
+     Lcom/android/apksig/internal/apk/v1/DigestAlgorithm$1;
+     Lcom/android/apksig/internal/apk/v1/DigestAlgorithm$StrengthComparator;
+     Lcom/android/apksig/internal/apk/v1/DigestAlgorithm;
+
+========================================================================
+[+] toydanfotolar9jpg_10_fixed.apk
+========================================================================
+  total classes=1702  user=1286
+  package=com.yzsfnie.sjsztphpis  main=ujsfgsyu.com.Nrenxflb5odtk
+  services=['ujsfgsyu.com.Ezujc5w5']  receivers=['ujsfgsyu.com.Receiver']
+  --- HITS ---
+    [ACCESSIBILITY] 2 hits — methods:['AccessibilityEvent']
+        S: AccessibilityEvent -> Landroid/view/accessibility/AccessibilityEvent;
+    [EXEC] 2 hits — methods:['Ljava/lang/ProcessBuilder']
+        S: Ljava/lang/ProcessBuilder -> Ljava/lang/ProcessBuilder;
+    [BASE64] 6 hits — methods:['Landroid/util/Base64', 'Ljava/util/Base64']
+        S: Landroid/util/Base64 -> Landroid/util/Base64;
+        S: Ljava/util/Base64 -> Ljava/util/Base64$Decoder;
+    [SOCKET] 4 hits — methods:['Ljava/net/Socket']
+        S: Ljava/net/Socket -> Ljava/net/Socket;
+        S: Ljava/net/Socket -> Ljava/net/SocketAddress;
+    [BANKING_UZ] 9 hits — methods:['tbc']
+        S: alif -> DDcOCxciVCYqTAsTAlIfGBo4EXxX
+        S: alif -> FDgRGAggVjE6CTV6MRobBA8pHCMFGQIWZGdGXUooGSogTAsTAlIfGBo4EWYZWF8LYXRHX1wjGw==
+    [JS_INJECT] 2 hits — methods:['evaluateJavascript']
+        S: evaluateJavascript -> evaluateJavascript
+  URLs found: []
+  TG bots: []
+  suspect domains: []
+  user classes (first 60):
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Aropxvumbrnhdbnkzgxngszsogljvvth;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Cwirfqyahbjtyclklnanwcl;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Glvkdrnwiajjhjntemxnlycu;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Hlsaltfwkucztpgaslhililvsfxdebmpcd;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Irofilwecjwcceeatcfg;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Jlmnoqodhxlxuwtffkeyqu;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Mpedksrsyiwjclyizqswstz;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Pbeattyedjvrpkezmbxio;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Qtrldrygcwywqscuyrjvmwxtfdadrqsxsxhdq;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Uwwhnpelrspnpzdqdkdadbytxugaqrnktlgjydmp;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Gquesyvnltekgxdkymmis;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Igmmzymaazkvykdianvycnkljes;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Irofilwecjwcceeatcfg;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Mpedksrsyiwjclyizqswstz;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Pbeattyedjvrpkezmbxio;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Gquesyvnltekgxdkymmis;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Irofilwecjwcceeatcfg;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mpedksrsyiwjclyizqswstz;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Pbeattyedjvrpkezmbxio;
+     LCpmujyoyjuaqxijtrpcrowss/Gquesyvnltekgxdkymmis;
+     LCpmujyoyjuaqxijtrpcrowss/Igmmzymaazkvykdianvycnkljes;
+     LDnrxowpqexjqcsrironaxwneksuprizumtvri/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Igmmzymaazkvykdianvycnkljes;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Irofilwecjwcceeatcfg;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Mpedksrsyiwjclyizqswstz;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Pbeattyedjvrpkezmbxio;
+     LEkhovsyarulupbtgjmclox/Cwirfqyahbjtyclklnanwcl;
+     LEkhovsyarulupbtgjmclox/Gquesyvnltekgxdkymmis;
+     LEkhovsyarulupbtgjmclox/Igmmzymaazkvykdianvycnkljes;
+     LEkhovsyarulupbtgjmclox/Irofilwecjwcceeatcfg;
+     LEkhovsyarulupbtgjmclox/Jlmnoqodhxlxuwtffkeyqu;
+     LEkhovsyarulupbtgjmclox/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LEkhovsyarulupbtgjmclox/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEkhovsyarulupbtgjmclox/Mpedksrsyiwjclyizqswstz;
+     LEkhovsyarulupbtgjmclox/Pbeattyedjvrpkezmbxio;
+     LExozolscragydhxidpxomklajxiblntlyhnzm/Gquesyvnltekgxdkymmis;
+     LFepvpdmlpvpleyyoxjzjwbyygojyfqpclqlj/Gquesyvnltekgxdkymmis;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Cwirfqyahbjtyclklnanwcl;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Gquesyvnltekgxdkymmis;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Irofilwecjwcceeatcfg;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Mpedksrsyiwjclyizqswstz;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Pbeattyedjvrpkezmbxio;
+     LHumqbwjkhfexxuajywzw/Gquesyvnltekgxdkymmis;
+     LHumqbwjkhfexxuajywzw/Igmmzymaazkvykdianvycnkljes;
+     LHumqbwjkhfexxuajywzw/Irofilwecjwcceeatcfg;
+     LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis;
+     LIseuppwugjhonodijheafguovxxuoimcybwxnj/Gquesyvnltekgxdkymmis;
+     LIseuppwugjhonodijheafguovxxuoimcybwxnj/Igmmzymaazkvykdianvycnkljes;
+
+========================================================================
+[+] VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_fixed.apk
+========================================================================
+  total classes=1890  user=1427
+  package=com.puhfvysb.nzbftunmqq  main=zrtssr.com.Rt28pxjh06wm39
+  services=['zrtssr.com.Uj4jmxmov4f37z']  receivers=['zrtssr.com.Receiver']
+  --- HITS ---
+    [ACCESSIBILITY] 10 hits — methods:['AccessibilityNodeInfo', 'AccessibilityEvent', 'Landroid/accessibilityservice/AccessibilityService']
+        S: Landroid/accessibilityservice/AccessibilityService -> Landroid/accessibilityservice/AccessibilityServiceInfo;
+        S: AccessibilityEvent -> Landroid/view/accessibility/AccessibilityEvent;
+    [EXEC] 2 hits — methods:['Ljava/lang/ProcessBuilder']
+        S: Ljava/lang/ProcessBuilder -> Ljava/lang/ProcessBuilder;
+    [CAMERA] 7 hits — methods:['Landroid/hardware/Camera']
+        S: Landroid/hardware/Camera -> Landroid/hardware/camera2/CameraCaptureSession$CaptureCallback;
+        S: Landroid/hardware/Camera -> Landroid/hardware/camera2/CameraCaptureSession;
+    [BASE64] 6 hits — methods:['Landroid/util/Base64', 'Ljava/util/Base64']
+        S: Landroid/util/Base64 -> Landroid/util/Base64;
+        S: Ljava/util/Base64 -> Ljava/util/Base64$Decoder;
+    [BANKING_UZ] 11 hits — methods:['tbc', 'anor']
+        S: tbc -> DkFVDShIBD15JRpSDR9FNCgLIzFQEHE7MQg8TiVbTBclGBw5KxEWQQoUUFcUIQ54QQYjPz0VN04=
+        S: tbc -> LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Gquesyvnltekgxdkymmis;
+    [JS_INJECT] 2 hits — methods:['evaluateJavascript']
+        S: evaluateJavascript -> evaluateJavascript
+  URLs found: []
+  TG bots: []
+  suspect domains: []
+  user classes (first 60):
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Aropxvumbrnhdbnkzgxngszsogljvvth;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Cwirfqyahbjtyclklnanwcl;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Glvkdrnwiajjhjntemxnlycu;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Hlsaltfwkucztpgaslhililvsfxdebmpcd;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Igmmzymaazkvykdianvycnkljes;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Irofilwecjwcceeatcfg;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Jlmnoqodhxlxuwtffkeyqu;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Mpedksrsyiwjclyizqswstz;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Pbeattyedjvrpkezmbxio;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Qtrldrygcwywqscuyrjvmwxtfdadrqsxsxhdq;
+     LAkqqrtawztlximfrgctizmkfnmfykxvk/Uwwhnpelrspnpzdqdkdadbytxugaqrnktlgjydmp;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Gquesyvnltekgxdkymmis;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Igmmzymaazkvykdianvycnkljes;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Irofilwecjwcceeatcfg;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Mpedksrsyiwjclyizqswstz;
+     LBfbbkiopnryrgvjdsnjkfxnvuatgpluiuwjk/Pbeattyedjvrpkezmbxio;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Gquesyvnltekgxdkymmis;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Irofilwecjwcceeatcfg;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Mpedksrsyiwjclyizqswstz;
+     LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Pbeattyedjvrpkezmbxio;
+     LCpmujyoyjuaqxijtrpcrowss/Gquesyvnltekgxdkymmis;
+     LCpmujyoyjuaqxijtrpcrowss/Igmmzymaazkvykdianvycnkljes;
+     LDnrxowpqexjqcsrironaxwneksuprizumtvri/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Gquesyvnltekgxdkymmis;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Igmmzymaazkvykdianvycnkljes;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Irofilwecjwcceeatcfg;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Mpedksrsyiwjclyizqswstz;
+     LEgxiomgqbsmoaykvihlfohsbigevp/Pbeattyedjvrpkezmbxio;
+     LEkhovsyarulupbtgjmclox/Cwirfqyahbjtyclklnanwcl;
+     LEkhovsyarulupbtgjmclox/Gquesyvnltekgxdkymmis;
+     LEkhovsyarulupbtgjmclox/Igmmzymaazkvykdianvycnkljes;
+     LEkhovsyarulupbtgjmclox/Irofilwecjwcceeatcfg;
+     LEkhovsyarulupbtgjmclox/Jlmnoqodhxlxuwtffkeyqu;
+     LEkhovsyarulupbtgjmclox/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LEkhovsyarulupbtgjmclox/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LEkhovsyarulupbtgjmclox/Mpedksrsyiwjclyizqswstz;
+     LEkhovsyarulupbtgjmclox/Pbeattyedjvrpkezmbxio;
+     LExozolscragydhxidpxomklajxiblntlyhnzm/Gquesyvnltekgxdkymmis;
+     LFepvpdmlpvpleyyoxjzjwbyygojyfqpclqlj/Gquesyvnltekgxdkymmis;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Cwirfqyahbjtyclklnanwcl;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Gquesyvnltekgxdkymmis;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Irofilwecjwcceeatcfg;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Mpedksrsyiwjclyizqswstz;
+     LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Pbeattyedjvrpkezmbxio;
+     LHumqbwjkhfexxuajywzw/Gquesyvnltekgxdkymmis;
+     LHumqbwjkhfexxuajywzw/Igmmzymaazkvykdianvycnkljes;
+     LHumqbwjkhfexxuajywzw/Irofilwecjwcceeatcfg;
+     LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis;
+     LIseuppwugjhonodijheafguovxxuoimcybwxnj/Gquesyvnltekgxdkymmis;
+     LIseuppwugjhonodijheafguovxxuoimcybwxnj/Igmmzymaazkvykdianvycnkljes;
+
+[+] Saved -> C:\Users\Muhammadali\Desktop\APK Virus Analysis\analysis\08_unpacked_apk.json

@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_hex_pattern">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/bg_uz_flag_chip" />
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Back"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/primary_glow" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.05"
+                        android:text="@string/terms_title"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.25"
+                        android:text="MILLIY KIBER HIMOYA"
+                        android:textColor="@color/primary_glow"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Info"
+                    android:src="@drawable/ic_info_cyber" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Header card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <FrameLayout
+                    android:layout_width="100dp"
+                    android:layout_height="100dp">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_icon_circle_cyan" />
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Terms"
+                        android:src="@drawable/ic_info_cyber" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:letterSpacing="0.1"
+                    android:text="@string/terms_title"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/primary_neon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:letterSpacing="0.05"
+                    android:text="Oxirgi yangilanish: 2026 yil 7-fevral"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="1 · KIRISH"
+                    android:textColor="@color/primary_neon"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:lineSpacingExtra="5dp"
+                android:padding="20dp"
+                android:text="@string/terms_terms_body"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <!-- 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="2 · ILOVA MAQSADI"
+                    android:textColor="@color/primary_neon"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:lineSpacingExtra="5dp"
+                android:padding="20dp"
+                android:text="KIBER QALQON telefoningizni zararli APK fayllardan himoya qiladi:\n\n• Yuklab olingan APK fayllarni tekshiradi\n• Xavfli fayllarni bloklaydi va o'chiradi\n• Fishing bildirishnomalarini aniqlaydi\n• Serverga xavfli fayllarni yuboradi (ixtiyoriy)"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <!-- 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="3 · FOYDALANUVCHI MAJBURIYATLARI"
+                    android:textColor="@color/primary_neon"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:lineSpacingExtra="5dp"
+                android:padding="20dp"
+                android:text="Siz quyidagilarni qilmaslikka majbursiz:\n\n• Ilovani noqonuniy maqsadlarda ishlatish\n• Ilova kodini o'zgartirish yoki dekompilatsiya qilish\n• Ilovani boshqa shaxslarga sotish\n• Ilova orqali zararli dasturlar tarqatish"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <!-- 4 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="4 · CHEKLOVLAR VA JAVOBGARLIK"
+                    android:textColor="@color/danger_glow"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_warning_item"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="Warning"
+                    android:src="@drawable/ic_warning_alert" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:lineSpacingExtra="5dp"
+                    android:text="MUHIM: KIBER QALQON 100% himoya kafolatini bermaydi. Ilova faqat ma'lum xavflarni aniqlaydi.\n\nIshlab chiquvchilar javobgar emaslar:\n• Ma'lumotlar yo'qolishi\n• Qurilmaga zarar\n• Moliyaviy yo'qotishlar\n• Uchinchi tomon xizmatlari"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 5 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="5 · KERAKLI RUXSATLAR"
+                    android:textColor="@color/primary_neon"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:lineSpacingExtra="5dp"
+                android:padding="20dp"
+                android:text="• Fayllar va media — APK topish uchun\n• Bildirishnomalar — fishing aniqlash uchun\n• Internet — serverga yuklash (ixtiyoriy)\n\nBu ruxsatlar faqat ilova funksiyalari uchun ishlatiladi."
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <!-- 6 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="6 · O'ZGARISHLAR"
+                    android:textColor="@color/primary_neon"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:lineSpacingExtra="5dp"
+                android:padding="20dp"
+                android:text="@string/terms_changes_body"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <!-- 7 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_section_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.2"
+                    android:text="7 · ALOQA"
+                    android:textColor="@color/primary_neon"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_cyber"
+                android:lineSpacingExtra="5dp"
+                android:padding="20dp"
+                android:text="Savollar yoki takliflar bo'lsa, GitHub orqali murojaat qiling:\n\ngithub.com/KiberQalqon"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAccept"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="20dp"
+                android:letterSpacing="0.15"
+                android:text="@string/btn_accept"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_check_simple"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconTint="@color/white"
+                app:strokeColor="@color/primary_neon"
+                app:strokeWidth="1dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

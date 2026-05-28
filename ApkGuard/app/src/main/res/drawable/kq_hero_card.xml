@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dashboard hero card. Linear gradient from kq_bg_elev (top-left) to
+  kq_primary_soft (bottom-right) with a 1dp hairline glow border tinted
+  toward kq_primary. Approximates the CSS:
+    linear-gradient(160deg, kq_bg_elev 0%, kq_primary_soft 130%)
+    border: color-mix(kq_primary 18%, kq_hairline)
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:startColor="@color/kq_bg_elev"
+        android:endColor="@color/kq_primary_soft"
+        android:type="linear" />
+    <stroke android:width="1dp" android:color="@color/kq_hairline_strong" />
+    <corners android:radius="28dp" />
+</shape>

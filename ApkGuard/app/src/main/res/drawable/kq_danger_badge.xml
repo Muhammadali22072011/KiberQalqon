@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 96dp danger badge circle. Solid kq_danger with a slight halo via stroke. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#33D74536" />
+        </shape>
+    </item>
+    <item
+        android:bottom="10dp"
+        android:left="10dp"
+        android:right="10dp"
+        android:top="10dp">
+        <shape android:shape="oval">
+            <solid android:color="#D74536" />
+        </shape>
+    </item>
+</layer-list>

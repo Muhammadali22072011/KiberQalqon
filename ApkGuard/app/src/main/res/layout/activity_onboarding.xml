@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  KiberQalqon onboarding shell. Mirrors `Onboarding` in screens-onboarding.jsx:
+    - skip button top-right ("O'tkazib yuborish")
+    - ViewPager2 with star-tile background, swipes through 3 slides
+    - pager dots (active dot is a 22dp pill in primary)
+    - full-width primary pill button ("Davom etish" / "Boshlash · Himoyani yoqish")
+  IDs kept stable so OnboardingActivity.kt rewire stays small:
+    viewPager, layoutIndicator, btnSkip, btnNext
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg">
+
+    <!-- skip — top-right -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSkip"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="12dp"
+        android:text="@string/btn_skip"
+        android:textAllCaps="false"
+        android:textColor="@color/kq_ink_3"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ViewPager2 fills the area above the dots+button block -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutIndicator"
+        app:layout_constraintTop_toBottomOf="@id/btnSkip" />
+
+    <!-- pager dots -->
+    <LinearLayout
+        android:id="@+id/layoutIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/btnNext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- full-width primary pill -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="30dp"
+        android:letterSpacing="0.01"
+        android:text="@string/btn_next"
+        android:textAllCaps="false"
+        android:textColor="@color/kq_on_primary"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:backgroundTint="@color/kq_primary"
+        app:cornerRadius="999dp"
+        app:icon="@drawable/ic_chevron_right"
+        app:iconGravity="end"
+        app:iconPadding="8dp"
+        app:iconSize="16dp"
+        app:iconTint="@color/kq_on_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

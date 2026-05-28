@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KIBER QALQON</string>
+    <string name="widget_description">KiberQalqon himoya holatini va oxirgi tekshiruvni ko\'rsatadi. Bir bosish bilan tezkor skan.</string>
+
+    <!-- Milliy slogans -->
+    <string name="national_brand">MILLIY KIBER HIMOYA</string>
+    <string name="national_country">O\'ZBEKISTON RESPUBLIKASI</string>
+    <string name="national_full">O\'ZBEKISTON · MILLIY KIBER HIMOYA</string>
+    <string name="system_online">TIZIM YONIQ</string>
+
+    <!-- Onboarding (design copy from screens-onboarding.jsx) -->
+    <string name="onb_eyebrow_1">01 · BOSHLASH</string>
+    <string name="onb_eyebrow_2">02 · ANIQLASH</string>
+    <string name="onb_eyebrow_3">03 · NAZORAT</string>
+    <string name="onboarding_title_1">Avtomatik himoya — 24/7</string>
+    <string name="onboarding_desc_1">KiberQalqon Telegram, Yuklab olishlar va boshqa papkalarni har 15 daqiqada tekshirib turadi. Zararli APK fayl topilsa — darhol bloklanadi.</string>
+    <string name="onboarding_title_2">5 ta zararli oilani aniqlaymiz</string>
+    <string name="onboarding_desc_2">Ajina.Banker, RoundRift va boshqa Markaziy Osiyo bank troyanlarining yangi avlodlari sizning telefoningizgacha yetib bormaydi.</string>
+    <string name="onboarding_title_3">Sodda til, kuchli himoya</string>
+    <string name="onboarding_desc_3">O\'zbek tilida tushuntirilgan natijalar. Hech qachon shifrlangan kalitlar va texnik atamalarda yo\'qolib qolmaysiz.</string>
+    <string name="btn_next">Davom etish</string>
+    <string name="btn_skip">O\'tkazib yuborish</string>
+    <string name="btn_start">Boshlash · Himoyani yoqish</string>
+
+    <!-- Onboarding visuals -->
+    <string name="onb_meter_label">Faol</string>
+    <string name="onb_sev_crit">KRIT</string>
+    <string name="onb_sev_high">YUQORI</string>
+    <string name="onb_threat_1">Ajina.Banker</string>
+    <string name="onb_threat_2">RoundRift</string>
+    <string name="onb_threat_3">SMS Stealer</string>
+    <string name="onb_threat_4">Phish Overlay</string>
+    <string name="onb_alert_title">Xavfli APK aniqlandi</string>
+    <string name="onb_alert_body">Fayl <b>RASMLAR (18).apk</b> Telegram orqali yuklandi.\nSMS o\'qish ruxsatini so\'raydi.</string>
+    <string name="onb_alert_delete">O\'chirish</string>
+    <string name="onb_alert_details">Batafsil</string>
+
+    <!-- Dashboard - redesign §3.3 -->
+    <string name="status_protected">Himoyalangan</string>
+    <string name="last_scan_subtitle">So\'nggi tekshiruv 12 daqiqa oldin</string>
+    <string name="kq_scan_now">Hozir tekshirish</string>
+    <string name="kq_threats_today">Bugungi topilmalar</string>
+    <string name="kq_modules">O\'rnatilgan ilovalar</string>
+    <string name="kq_sev_crit">XAVFLI</string>
+    <string name="kq_sev_high">SHUBHALI</string>
+    <string name="kq_sev_safe">XAVFSIZ</string>
+    <string name="stats_quarantine">Karantin</string>
+    <string name="nav_home">Asosiy</string>
+    <string name="nav_scan">Skaner</string>
+    <string name="nav_stats">Statistika</string>
+    <string name="nav_settings">Sozlamalar</string>
+
+    <!-- Dashboard - simple -->
+    <string name="dashboard_title">Asosiy oyna</string>
+    <string name="status_safe">XAVFSIZ</string>
+    <string name="status_warning">SHUBHALI</string>
+    <string name="status_danger">XAVFLI</string>
+    <string name="phone_status">Telefon holati:</string>
+    <string name="protection_status">HIMOYA HOLATI</string>
+    <string name="last_scan">Oxirgi tekshirish:</string>
+    <string name="last_scan_now">Hozirgina tekshirildi</string>
+    <string name="minutes_ago">%d daqiqa oldin</string>
+    <string name="hours_ago">%d soat oldin</string>
+    <string name="just_now">Hozirgina</string>
+    <string name="btn_quick_scan">TEZKOR TEKSHIRISH</string>
+    <string name="btn_full_scan">TO\'LIQ TEKSHIRISH</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">STATISTIKA</string>
+    <string name="stats_scanned">Tekshirildi</string>
+    <string name="stats_blocked">Bloklandi</string>
+    <string name="stats_last_check">Oxirgi marta</string>
+
+    <!-- Quick access -->
+    <string name="quick_access_title">TEZKOR KIRISH</string>
+    <string name="menu_apk_list">APK fayllar</string>
+    <string name="menu_apk_list_desc">Tekshirilgan ilovalar ro\'yxati</string>
+    <string name="menu_settings">Sozlamalar</string>
+    <string name="menu_settings_desc">Himoya parametrlarini boshqarish</string>
+    <string name="menu_server">Server</string>
+    <string name="menu_notifications">Bildirishnomalar</string>
+    <string name="menu_statistics">Statistika</string>
+
+    <!-- APK List -->
+    <string name="apk_list_title">APK fayllar</string>
+    <string name="filter_all">Hammasi</string>
+    <string name="filter_dangerous">Xavfli</string>
+    <string name="filter_suspicious">Shubhali</string>
+    <string name="filter_safe">Xavfsiz</string>
+    <string name="filter_all_count">Hammasi 8</string>
+    <string name="filter_dangerous_count">Xavfli 5</string>
+    <string name="filter_safe_count">Xavfsiz 3</string>
+    <string name="apk_list_rescan">Hammasi qayta tekshirilsin</string>
+    <string name="btn_check">Tekshirish</string>
+    <string name="btn_delete">O\'chirish</string>
+    <string name="btn_details">Batafsil</string>
+    <string name="empty_apk_list">APK fayl topilmadi</string>
+    <string name="empty_apk_desc">Yuklab olingan APK fayllar bu yerda ko\'rinadi</string>
+
+    <!-- Auto Scan Alert -->
+    <string name="scanning">Tekshirilmoqda...</string>
+    <string name="scanning_desc">Viruslar va yomon dasturlar qidirilmoqda</string>
+    <string name="alert_danger_title">⚠️ XAVFLI</string>
+    <string name="alert_danger_desc">Yomon dastur topildi. Bu faylni o\'rnatmang!</string>
+    <string name="alert_auto_delete">5 soniyadan keyin avtomatik o\'chiriladi</string>
+    <string name="alert_warning_title">⚠️ SHUBHALI</string>
+    <string name="alert_warning_desc">Shubhali belgilar topildi. O\'chirish tavsiya etiladi.</string>
+    <string name="alert_safe_title">✓ XAVFSIZ</string>
+    <string name="alert_safe_desc">Faylda hech qanday xavfli narsa topilmadi.</string>
+    <string name="btn_delete_now">Hozir o\'chirish</string>
+    <string name="btn_cancel">Bekor qilish</string>
+
+    <!-- Scan Result -->
+    <string name="scan_result_title">Tekshirish natijasi</string>
+    <string name="file_name">Fayl nomi:</string>
+    <string name="file_size">Hajmi:</string>
+    <string name="file_path">Joylashuvi:</string>
+    <string name="found_threats">Topilgan xavflar:</string>
+    <string name="recommendation">Tavsiyamiz:</string>
+    <string name="recommend_delete">Faylni o\'chirish tavsiya etiladi</string>
+    <string name="recommend_safe">Fayl xavfsiz ko\'rinadi</string>
+    <string name="btn_delete_file">Faylni o\'chirish</string>
+    <string name="btn_upload_server">Serverga yuborish</string>
+    <string name="btn_recheck">Qayta tekshirish</string>
+    <string name="delete_success">✓ Fayl muvaffaqiyatli o\'chirildi</string>
+    <string name="delete_failed">❌ Faylni o\'chirib bo\'lmadi</string>
+    <string name="delete_hint">O\'chirish bu APKning o\'rnatilishiga to\'sqinlik qiladi</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Sozlamalar</string>
+    <string name="section_protection">🛡 Himoya</string>
+    <string name="setting_background">Doimiy himoya</string>
+    <string name="setting_background_desc">Har 15 daqiqada avtomatik tekshirish</string>
+    <string name="section_server">📡 Server</string>
+    <string name="setting_upload">Serverga yuborish</string>
+    <string name="setting_upload_desc">Xavfli APK fayllarni serverga jo\'natish</string>
+    <string name="setting_server_url">Server manzili</string>
+    <string name="setting_server_url_hint">http://server.com:5000</string>
+    <string name="section_notifications">🚫 Bildirishnomalar</string>
+    <string name="setting_block_phishing">Aldamchi bildirishnomalarni bloklash</string>
+    <string name="setting_block_phishing_desc">Shubhali bildirishnomalarni avtomatik yashirish</string>
+    <string name="btn_enable_access">Ruxsat berish</string>
+    <string name="section_language">🌐 Til</string>
+    <string name="setting_language">Ilova tili</string>
+    <string name="language_uzbek">O\'zbekcha</string>
+    <string name="language_russian">Русский</string>
+    <string name="section_about">ℹ Loyiha haqida</string>
+    <string name="setting_version">Versiya</string>
+    <string name="version_number">7.6</string>
+
+    <!-- Notifications -->
+    <string name="notif_virus_found">🔴 Virus topildi!</string>
+    <string name="notif_virus_blocked">%s fayl bloklandi va o\'chirildi</string>
+    <string name="notif_suspicious">🟠 Shubhali fayl</string>
+    <string name="notif_suspicious_desc">%s faylda shubhali belgilar bor</string>
+    <string name="notif_safe">✓ Fayl xavfsiz</string>
+    <string name="notif_safe_desc">%s fayl tekshirildi, xavfsiz</string>
+    <string name="notif_stats" formatted="false">Tekshirildi: %d | Bloklandi: %d</string>
+
+    <!-- Permissions -->
+    <string name="permission_needed">Ruxsat kerak</string>
+    <string name="permission_storage">Fayllarni tekshirish uchun ruxsat bering</string>
+    <string name="permission_notification">Bildirishnomalar uchun ruxsat bering</string>
+    <string name="btn_grant">Ruxsat berish</string>
+
+    <!-- Common -->
+    <string name="btn_close">Yopish</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Saqlash</string>
+    <string name="loading">Yuklanmoqda...</string>
+    <string name="error">Xatolik</string>
+    <string name="success">Muvaffaqiyatli</string>
+
+    <!-- Welcome Screen - simple Uzbek -->
+    <string name="welcome_title">Xush kelibsiz!</string>
+    <string name="welcome_subtitle">Davom etish uchun ma\'lumotlaringizni kiriting</string>
+    <string name="welcome_tagline">Telefoningizni biz himoya qilamiz</string>
+    <string name="hint_first_name">Ismingiz</string>
+    <string name="hint_last_name">Familiyangiz</string>
+    <string name="agree_terms">Foydalanish shartlari bilan tanishdim</string>
+    <string name="btn_continue">Davom etish</string>
+    <string name="about_project">ℹ Loyiha haqida</string>
+
+    <!-- Terms & Privacy -->
+    <string name="terms_title">Foydalanish shartlari</string>
+    <string name="privacy_title">Maxfiylik siyosati</string>
+    <string name="about_title">Loyiha haqida</string>
+    <string name="btn_accept">✓ Qabul qilaman</string>
+    <string name="btn_understand">✓ Tushundim</string>
+
+    <!-- Old strings for compatibility -->
+    <string name="subtitle">APK ni o\'rnatishdan oldin tekshirish</string>
+    <string name="scan_apks">APK fayllarni topish va tekshirish</string>
+    <string name="permission_required">Fayllarga kirish kerak</string>
+    <string name="permission_reason">Telegram va Downloads dan APK topish uchun</string>
+    <string name="grant">Ruxsat berish</string>
+    <string name="result_safe">Xavfsiz</string>
+    <string name="result_suspicious">Shubhali</string>
+    <string name="result_danger">Xavfli</string>
+    <string name="delete_apk">Faylni o\'chirish</string>
+    <string name="deleted">Fayl o\'chirildi</string>
+    <string name="not_deleted">O\'chirib bo\'lmadi</string>
+    <string name="danger_reason">Yomon dastur topildi. O\'rnatmang.</string>
+    <string name="suspicious_reason">Xavfli ruxsatlar yoki shubhali belgilar.</string>
+    <string name="safe_reason">Jiddiy belgilar topilmadi.</string>
+    <string name="settings">Sozlamalar</string>
+    <string name="language">Til</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_uz">O\'zbekcha</string>
+    <string name="background_guard">Fonda himoya</string>
+    <string name="background_guard_hint">Yangi APK ni avtomatik tekshirish, xavflilarni o\'chirish va o\'rnatishni oldini olish</string>
+    <string name="upload_to_server">Xavfli APK ni serverga jo\'natish</string>
+    <string name="upload_to_server_hint">Topilgan yomon fayllarni serveringizga yuklash</string>
+    <string name="server_url">Server manzili</string>
+    <string name="server_url_hint">https://your-server.com</string>
+    <string name="phishing_blocker">Aldamchi bildirishnomalarni bloklash</string>
+    <string name="phishing_blocker_hint">Kod, havola, bank haqidagi bildirishnomalarni yashirish (tizim sozlamalarida yoqing)</string>
+    <string name="save">Saqlash</string>
+    <string name="cancel">Bekor qilish</string>
+    <string name="enable_notification_access">Bildirishnomalar ruxsatini yoqing</string>
+    <string name="open_settings">Sozlamalarni ochish</string>
+    <string name="check_btn">Tekshirish</string>
+    <string name="delete_confirm_title">Faylni o\'chirilsinmi?</string>
+    <string name="delete_confirm_message">APK telefondan o\'chiriladi va boshqa o\'rnatib bo\'lmaydi. Davom etilsinmi?</string>
+    <string name="result_title">Tekshirish natijasi</string>
+    <string name="apk_count">Topilgan APK: %d</string>
+    <string name="scanning_text">Tekshirilmoqda...</string>
+
+    <!-- New Settings -->
+    <string name="auto_delete_title">Avtomatik o\'chirish</string>
+    <string name="auto_delete_delete">Darhol o\'chirish (tavsiya etiladi)</string>
+    <string name="auto_delete_ask">O\'chirishdan oldin so\'rash</string>
+    <string name="auto_delete_warn">Faqat ogohlantirish</string>
+
+    <string name="sensitivity_title">Sezgirlik darajasi</string>
+    <string name="sensitivity_low">Past (faqat aniq viruslar)</string>
+    <string name="sensitivity_medium">O\'rta (tavsiya etiladi)</string>
+    <string name="sensitivity_high">Yuqori (barcha shubhalilarni bloklash)</string>
+
+    <string name="notifications_title">Tovush va tebranish</string>
+    <string name="sound_enabled">Virus topilganda tovush</string>
+    <string name="vibration_enabled">Tebranish</string>
+
+    <string name="database_title">Bazalarni yangilash</string>
+    <string name="auto_update">Virus bazasini avtomatik yangilash</string>
+    <string name="update_now">Hozir yangilash</string>
+
+    <string name="statistics_title">Statistika</string>
+    <string name="stats_scanned_count">Tekshirildi: %d APK</string>
+    <string name="stats_blocked_count">Bloklandi: %d virus</string>
+    <string name="clear_stats">Statistikani tozalash</string>
+
+    <string name="whitelist_title">Oq ro\'yxat</string>
+    <string name="manage_whitelist">Oq ro\'yxatni boshqarish</string>
+
+    <string name="first_run_title">Himoyani sozlang</string>
+    <string name="first_run_message">Xavfsizligingiz uchun asosiy parametrlarni sozlang!</string>
+    <string name="btn_go_settings">Sozlamalarga o\'tish</string>
+    <string name="btn_later">Keyinroq</string>
+    <!-- Auto-synced from values/strings.xml (2026-05-26 fix) -->
+    <string name="perm_storage_title">Fayllarga ruxsat</string>
+    <string name="perm_storage_msg">KiberQalqon barcha fayllaringizni tekshirishi uchun ruxsat kerak.\n\nOK bosib ruxsat bering.</string>
+    <string name="perm_overlay_title">Boshqa oynalar ustida ruxsat</string>
+    <string name="perm_overlay_msg">Virus topilganda darhol ogohlantirish chiqarish uchun ruxsat kerak.\n\nOK bosing.</string>
+    <string name="perm_required_title">Ruxsat kerak</string>
+    <string name="perm_required_msg">Fayllarga kirmay turib KiberQalqon qurilmangizni himoya qila olmaydi.</string>
+    <string name="btn_retry">Qayta urinish</string>
+    <string name="btn_exit">Chiqish</string>
+    <string name="toast_init_error">Ishga tushirishda xato: %1$s</string>
+    <string name="toast_grant_storage_first">Avval fayllarga ruxsat bering</string>
+    <string name="toast_enable_background">Fon himoyasini yoqing</string>
+    <string name="toast_scan_failed">Faylni tekshirib bo\'lmadi</string>
+    <string name="toast_scan_timeout">Tekshirish juda uzoq cho\'zildi</string>
+    <string name="toast_error_generic">Xato: %1$s</string>
+    <string name="theme_dialog_title">Mavzu tanlash</string>
+    <string name="theme_system">Tizim</string>
+    <string name="theme_light">Yorug\'</string>
+    <string name="theme_dark">Qorong\'i</string>
+    <string name="btn_cancel_generic">Bekor qilish</string>
+    <string name="share_result">DO\'STLARGA OGOHLANTIRISH</string>
+    <string name="share_subject">⚠️ Diqqat: zararli APK aniqlandi</string>
+    <string name="share_text_danger">⚠️ DIQQAT! KiberQalqon zararli faylni aniqladi:\n\n📦 %1$s\n\n❌ Bu fayl viruslar tarkibida — uni telefoningizga O\'RNATMANG!\n\n🛡️ KiberQalqon orqali tekshiring: t.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_suspicious">⚠️ KiberQalqon shubhali fayl aniqladi:\n\n📦 %1$s\n\nO\'rnatishdan oldin yaxshilab tekshiring.\n\nt.me/kiberqalqon_alerts_bot</string>
+    <string name="share_via">Yuborish</string>
+    <string name="autoscan_install">O\'RNATISH</string>
+    <string name="autoscan_open">OCHISH</string>
+    <string name="autoscan_safe_subtitle">Bu faylda xavf topilmadi. O\'rnatishingiz mumkin.</string>
+    <string name="autoscan_already_installed_subtitle">Bu ilova allaqachon o\'rnatilgan. Ochish uchun pastdagi tugmani bosing.</string>
+    <string name="autoscan_launch_failed">Ilovani ochib bo\'lmadi.</string>
+    <string name="autoscan_close">Yopish</string>
+    <string name="autoscan_scanning">Tekshirilmoqda…</string>
+    <string name="autoscan_delete_cancelled">O\'chirish bekor qilindi. Fayl hali ham qurilmada.</string>
+    <string name="autoscan_no_path">Fayl yo\'li ko\'rsatilmagan.</string>
+    <string name="autoscan_self_refused">Bu KiberQalqonning o\'zi — himoyachini o\'chirish taqiqlangan.</string>
+    <string name="filedel_no_permission">Faylni o\'chirib bo\'lmadi — ruxsat yo\'q. Qo\'lda o\'chiring.</string>
+    <string name="filedel_not_in_mediastore">Fayl topildi, lekin MediaStore orqali o\'chirib bo\'lmaydi.</string>
+    <string name="filedel_request_failed">Ruxsat so\'rab bo\'lmadi.</string>
+    <string name="filedel_security">Faylni o\'chirishga ruxsat yo\'q.</string>
+    <string name="filedel_generic">O\'chirishda xato.</string>
+    <string name="kq_settings_appearance">Ko\'rinish</string>
+    <string name="kq_theme_day">Kun</string>
+    <string name="kq_theme_night">Tun</string>
+    <string name="kq_accent">Asosiy rang</string>
+    <string name="kq_accent_turquoise">Feruz</string>
+    <string name="kq_accent_saffron">Za\'faron</string>
+    <string name="kq_accent_pomegranate">Anor</string>
+    <string name="kq_new_apk_scanning">Yangi APK tekshirilmoqda</string>
+    <string name="kq_auto_delete_5s">5 soniyadan keyin avtomatik o\'chiriladi…</string>
+    <string name="kq_delete_now">Hozir o\'chirish</string>
+    <string name="kq_details">Batafsil</string>
+    <string name="tile_label">APK tekshirish</string>
+    <string name="tile_description">Telefondagi xavfli APK fayllarni tekshirish</string>
+    <string name="share_no_file">Fayl qabul qilinmadi</string>
+    <string name="share_copy_failed">Faylni o\'qib bo\'lmadi</string>
+    <string name="history_title">Tekshirish tarixi</string>
+    <string name="history_empty">Hozircha tekshirish yo\'q. Tekshirgan fayllar bu yerda ko\'rinadi.</string>
+    <string name="history_reason_danger">Xavfli deb belgilandi — %s</string>
+    <string name="history_reason_suspicious">Shubhali deb belgilandi — %s</string>
+    <string name="history_reason_safe">Hech qanday xavf topilmadi</string>
+    <string name="history_clear">Tarixni tozalash</string>
+    <string name="ctx_from_telegram">Bu APK Telegram orqali keldi. Videolar hech qachon APK shaklida yuborilmaydi — ehtiyot bo\'ling.</string>
+    <string name="ctx_from_whatsapp">Bu APK WhatsApp orqali keldi. Haqiqiy ilovalar faqat Play Store dan o\'rnatiladi.</string>
+    <string name="ctx_from_download">Bu APK yuklab olingan. O\'rnatishdan oldin manbaiga ishonch hosil qiling.</string>
+    <string name="ctx_from_share">Siz bu APKni KiberQalqonga tekshirish uchun yubordingiz.</string>
+    <string name="toast_apk_found_count">✅ %1$d ta APK fayl topildi</string>
+    <string name="toast_apk_not_found">APK fayllar topilmadi</string>
+    <string name="toast_search_timeout">Qidiruv juda ko\'p vaqt oldi. Qaytadan urinib ko\'ring.</string>
+    <string name="toast_observer_started">🛡️ Barcha papkalar kuzatuvi faol</string>
+    <string name="toast_observer_error">Kuzatuv xatosi: %1$s</string>
+    <string name="toast_permission_required">Ishlash uchun ruxsat kerak</string>
+
+    <!-- Dashboard new redesign extras -->
+    <string name="dash_brand">KiberQalqon</string>
+    <string name="dash_protection_on">HIMOYA · FAOL</string>
+    <string name="dash_your_phone">SIZNING TELEFONINGIZ</string>
+    <string name="dash_recent_threats">SO\'NGGI XAVFLAR</string>
+    <string name="dash_view_all">Hammasi  ›</string>
+    <string name="dash_apps">ILOVALAR</string>
+
+    <string name="scanner_eyebrow">SKANER</string>
+    <string name="scanner_searching">APK fayllar qidirilmoqda...</string>
+    <string name="scanner_found_count">Topilgan APK: %1$d</string>
+
+    <string name="settings_eyebrow">SOZLAMALAR</string>
+    <string name="settings_header_title">Boshqaruv</string>
+    <string name="settings_header_subtitle">Himoya darajasini moslashtiring</string>
+    <string name="settings_pro_title">KiberQalqon Pro</string>
+    <string name="settings_pro_version">VERSIYA 7.8 · NAVOIY</string>
+    <string name="settings_pro_active">✓ FAOL</string>
+    <string name="settings_section_protection">HIMOYA</string>
+    <string name="settings_section_server">SERVER</string>
+    <string name="settings_server_url_label">Server manzili</string>
+    <string name="settings_server_url_example">https://api.kiberqalqon.uz</string>
+    <string name="settings_theme_label">Mavzu</string>
+    <string name="settings_theme_desc">Yorug\' yoki tungi rejim</string>
+    <string name="settings_accent_label">Brendning asosiy rangi</string>
+    <string name="settings_section_language">TIL</string>
+    <string name="settings_section_about">HAQIDA</string>
+    <string name="settings_footer">KIBERQALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
+
+    <string name="about_intro">KIBER QALQON — bu O\'zbekiston uchun ishlab chiqilgan zamonaviy kiber-himoya ilovasi. Telefoningizni zararli APK fayllar, viruslar va aldamchi (fishing) hujumlardan asraydi.</string>
+    <string name="about_section_features">IMKONIYATLAR</string>
+    <string name="about_features_body">🛡 Fonda avtomatik himoya\n  • Har 15 daqiqada tekshirish\n  • Xavfli fayllarni o\'chirish\n\n🔍 Qo\'lda tekshirish\n  • Barcha APK fayllar ro\'yxati\n  • Batafsil tahlil natijalari\n\n📡 Serverga yuklash\n  • Xavflilarni tahlil uchun yuborish\n\n🚫 Aldamchi bildirishnomalar himoyasi\n  • Shubhalilarni bloklash\n  • Bank va to\'lov xavfsizligi\n\n🌐 Ikki til\n  • O\'zbekcha (asosiy)\n  • Русский</string>
+    <string name="about_tech_body">• Kotlin — zamonaviy dasturlash tili\n• Material Design 3 — chiroyli dizayn\n• Android Jetpack — ishonchli komponentlar\n• WorkManager — fonda ishlash\n• ProGuard — kod himoyasi\n• OkHttp — xavfsiz tarmoq</string>
+    <string name="about_section_tech">TEXNOLOGIYALAR</string>
+    <string name="about_section_author">MUALLIF</string>
+    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/KiberQalqon\nEmail: support@KiberQalqon.uz</string>
+    <string name="about_section_license">LITSENZIYA</string>
+    <string name="about_license_body">Bu loyiha ochiq kodli va o\'quv maqsadlarida ishlatilishi mumkin.\n\n© 2026 KIBER QALQON. Barcha huquqlar himoyalangan.</string>
+    <string name="about_section_project">LOYIHA HAQIDA</string>
+    <string name="about_version">VERSION 7.6</string>
+
+    <string name="terms_breadcrumb">Foydalanish shartlari</string>
+    <string name="terms_intro_title">Foydalanishni boshlashdan oldin</string>
+    <string name="terms_last_update">OXIRGI YANGILANISH · 2026 · 05 · 22</string>
+    <string name="terms_section_terms">FOYDALANISH SHARTLARI</string>
+    <string name="terms_section_privacy">MAXFIYLIK SIYOSATI</string>
+    <string name="terms_terms_body">KIBER QALQON ilovasidan foydalanish orqali siz ushbu shartlarga rozilik bildirasiz. Agar shartlar bilan rozi bo\'lmasangiz, ilovadan foydalanmang.</string>
+    <string name="terms_privacy_body">KIBER QALQON sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
+    <string name="terms_changes_body">Biz ushbu shartlarni istalgan vaqtda o\'zgartirish huquqini saqlab qolamiz. O\'zgarishlar ilovada e\'lon qilinadi.</string>
+
+    <string name="consent_terms_chk">Foydalanish shartlarini o\'qib chiqdim *</string>
+    <string name="consent_privacy_chk">Maxfiylik siyosatiga roziman *</string>
+    <string name="consent_community_chk">Jamoatchilik xavfsizligi uchun ma\'lumot ulashish *</string>
+    <string name="consent_reject">Rad etish</string>
+    <string name="consent_accept">Qabul qilaman</string>
+
+    <string name="welcome_terms_chk">Men shartlar va maxfiylik siyosati bilan tanishdim</string>
+
+    <string name="initial_scan_eyebrow">BIRINCHI TEKSHIRUV</string>
+    <string name="initial_scan_title">Telefon skanerlanmoqda</string>
+    <string name="initial_scan_desc">Zararli APK fayllar qidirilmoqda. Bu bir necha soniya oladi.</string>
+    <string name="initial_scan_found">TOPILDI</string>
+    <string name="initial_scan_danger">XAVFLI</string>
+    <string name="initial_scan_dangerous_found">Xavfli APK fayllar topildi</string>
+    <string name="initial_scan_delete_all">Hammasini o\'chirish</string>
+    <string name="initial_scan_section_threats">TOPILGAN XAVFLAR</string>
+    <string name="initial_scan_continue">Davom etish</string>
+    <string name="initial_scan_skip">O\'tkazib yuborish</string>
+    <string name="initial_scan_scanning_files">APK fayllar qidirilmoqda...</string>
+    <string name="initial_scan_count_recommend">%1$d ta fayl o\'chirilishi tavsiya etiladi</string>
+    <string name="initial_scan_scanned_count">%1$d ta fayl tekshirildi</string>
+
+    <string name="auto_scan_dangerous_title">XAVFLI APK!</string>
+    <string name="auto_scan_dangerous_body">Yuklab olingan fayl Ajina.Banker bank troyani oilasiga tegishli.</string>
+    <string name="auto_scan_label_file">FAYL</string>
+    <string name="auto_scan_label_size">HAJM</string>
+    <string name="auto_scan_label_source">MANBA</string>
+    <string name="auto_scan_label_detected">ANIQLANGAN</string>
+    <string name="auto_scan_dangerous_perms">XAVFLI RUXSATLAR</string>
+
+    <string name="splash_logo_title">KIBER QALQON</string>
+
+    <string name="apk_list_eyebrow">APK fayllar</string>
+
+    <string name="scan_result_eyebrow">TEKSHIRISH NATIJASI</string>
+
+    <string name="history_today">Bugun</string>
+    <string name="history_yesterday">Kecha</string>
+    <string name="history_week">Hafta ▾</string>
+
+    <!-- Scan history hardcoded -->
+    <string name="hist_section_stats">STATISTIKA</string>
+    <string name="hist_period_last_7_days">So\'nggi 7 kun</string>
+    <string name="hist_subtitle_protection">Sizning telefoningiz himoyasi</string>
+    <string name="hist_label_total">JAMI</string>
+    <string name="hist_unit_checked_apks">tekshirilgan APK</string>
+    <string name="hist_label_blocked">BLOKLANDI</string>
+    <string name="hist_unit_malware_families">zararli oilalar</string>
+    <string name="hist_section_activity">FAOLLIK</string>
+    <string name="hist_subtitle_checks_per_day">Tekshiruvlar / kun</string>
+    <string name="hist_dropdown_week">Hafta ▾</string>
+    <string name="hist_subtitle_detected_threats">Aniqlangan tahdidlar</string>
+    <string name="hist_subtitle_threat_comparison">Topilgan tahdidlar solishtirmasi</string>
+    <string name="hist_subtitle_analysis_date">2026-05-21 da tahlil qilingan APK\'lar</string>
+    <string name="hist_subtitle_c2_addresses">C2 manzillar</string>
+    <string name="hist_label_city_navoiy">NAVOIY</string>
+    <string name="hist_button_refresh_report">Hisobotni yangilash</string>
+
+    <!-- Scan result hardcoded -->
+    <string name="sr_source_downloaded">TELEGRAM · YUKLAB OLINGAN</string>
+    <string name="sr_section_summary">QISQACHA</string>
+    <string name="sr_threat_description_example">Bu fayl Ajina.Banker oilasiga tegishli bank troyani. SMS-OTP kodlarini o\'g\'irlash uchun ishlatiladi.</string>
+    <string name="sr_label_size">HAJM</string>
+    <string name="sr_label_source">MANBA</string>
+    <string name="sr_label_detected">ANIQLANGAN</string>
+    <string name="sr_time_detected">12 daq oldin</string>
+    <string name="sr_label_status">STATUS</string>
+    <string name="sr_status_blocked">Bloklandi</string>
+    <string name="sr_section_evasion">ANTI-TAHLIL HIYLALARI</string>
+    <string name="sr_section_keys">XOR/AES KALITLARI</string>
+    <string name="sr_section_network_ioc">TARMOQ IOC</string>
+    <string name="sr_section_html_overlay">HTML OVERLAY</string>
+    <string name="sr_overlay_title">← FAYK OVERLAY (*.spe)</string>
+    <string name="sr_overlay_update_available">Yangilanish mavjud</string>
+    <string name="sr_overlay_update_message">Ilovadan foydalanish uchun yangilanishni o\'rnatishingiz kerak. Hajmi: 1.6 MB.</string>
+    <string name="sr_button_install">O\'rnatish</string>
+    <string name="sr_button_details">Batafsil</string>
+    <string name="sr_overlay_description">3 tilda (O\'zbek · Русский · Français) tayyorlangan. WebView ↔ Java ko\'prigi orqali bosish bankerni ishga tushiradi.</string>
+    <string name="sr_button_delete">Telefondan o\'chirish</string>
+    <string name="sr_button_recheck">Serverga yuborish (tahlil)</string>
+
+    <!-- Skaner (MainActivity) — redesign 2026-05-27 -->
+    <string name="scan_hero_eyebrow">TIZIM HOLATI</string>
+    <string name="scan_hero_status_clean">Tizim toza</string>
+    <string name="scan_hero_status_idle">Tekshirishga tayyor</string>
+    <string name="scan_hero_subtitle">Anor qalqon kuzatib turibdi</string>
+    <string name="scan_live_chip">JONLI</string>
+    <string name="scan_stat_all">Hammasi</string>
+    <string name="scan_stat_danger">Xavfli</string>
+    <string name="scan_stat_warn">Shubhali</string>
+    <string name="scan_stat_safe">Xavfsiz</string>
+    <string name="scan_now_cta">Hozir tekshirish</string>
+    <string name="scan_section_found">TOPILGAN APK</string>
+    <string name="scan_empty_title">Tizim toza</string>
+    <string name="scan_empty_desc">APK fayl topilmadi. Yangilarini avtomatik kuzatamiz.</string>
+    <string name="scan_guard_active">Avto-himoya yoniq</string>
+
+    <!-- ═══ Ruxsat tahlili (ScanResultActivity) ═══ -->
+    <string name="perm_status_title">Tahdid darajasi</string>
+    <string name="perm_count">%1$d ta ruxsat</string>
+    <string name="perm_section_dangerous">Xavfli ruxsatlar</string>
+    <string name="perm_section_others">Boshqa ruxsatlar (%1$d)</string>
+    <string name="perm_none_dangerous">Xavfli ruxsat topilmadi</string>
+    <string name="perm_sev_critical">KRITIK</string>
+    <string name="perm_sev_warning">DIQQAT</string>
+    <string name="reason_danger_default">Bu ilova xavfli. Quyidagi ruxsatlar maxfiy ma\'lumotlaringizga — SMS, qo\'ng\'iroq, joylashuv — kirishi mumkin. O\'rnatishdan oldin diqqat bilan ko\'rib chiqing.</string>
+
+    <string name="perm_record_audio">Mikrofon</string>
+    <string name="perm_fg_microphone">Fonda mikrofon</string>
+    <string name="perm_fine_location">Aniq joylashuv</string>
+    <string name="perm_bg_location">Fonda joylashuv</string>
+    <string name="perm_coarse_location">Taxminiy joylashuv</string>
+    <string name="perm_camera">Kamera</string>
+    <string name="perm_read_contacts">Kontaktlar</string>
+    <string name="perm_write_contacts">Kontaktlarni o\'zgartirish</string>
+    <string name="perm_get_accounts">Akkauntlar</string>
+    <string name="perm_send_sms">SMS yuborish</string>
+    <string name="perm_receive_sms">SMS qabul qilish</string>
+    <string name="perm_read_sms">SMS o\'qish</string>
+    <string name="perm_receive_mms">MMS qabul qilish</string>
+    <string name="perm_call_phone">Qo\'ng\'iroq qilish</string>
+    <string name="perm_answer_calls">Qo\'ng\'iroqqa javob berish</string>
+    <string name="perm_outgoing_calls">Chiquvchi qo\'ng\'iroqlar</string>
+    <string name="perm_read_call_log">Qo\'ng\'iroqlar tarixi</string>
+    <string name="perm_write_call_log">Qo\'ng\'iroqlar tarixini o\'zgartirish</string>
+    <string name="perm_phone_state">Telefon holati</string>
+    <string name="perm_phone_numbers">Telefon raqami</string>
+    <string name="perm_overlay">Boshqa oynalar ustida</string>
+    <string name="perm_install_packages">Ilova o\'rnatish</string>
+    <string name="perm_accessibility">Maxsus imkoniyatlar</string>
+    <string name="perm_device_admin">Qurilma administratori</string>
+    <string name="perm_all_files">Barcha fayllar</string>
+    <string name="perm_read_storage">Fayllar va media</string>
+    <string name="perm_write_storage">Xotiraga yozish</string>
+    <string name="perm_media_images">Rasmlar</string>
+    <string name="perm_media_video">Videolar</string>
+    <string name="perm_media_audio">Audio fayllar</string>
+    <string name="perm_read_calendar">Taqvim</string>
+    <string name="perm_write_calendar">Taqvimni o\'zgartirish</string>
+    <string name="perm_body_sensors">Tana sensorlari</string>
+    <string name="uninstall_app">Ilovani o\'chirish</string>
+
+    <!-- ═══ Localization pass 2026-05-28: AutoScanActivity hardcoded UI ═══ -->
+    <string name="autoscan_unknown_file">Noma\'lum fayl</string>
+    <string name="autoscan_need_write_perm">Faylni o\'chirish uchun \"Saqlash\" ruxsati kerak.\n\nSozlamalar → Ilovalar → KiberQalqon → Ruxsatlar → Saqlash</string>
+    <string name="autoscan_open_settings_btn">SOZLAMALARNI OCHISH</string>
+    <string name="autoscan_permission_granted_deleting">Ruxsat berildi — o\'chirilmoqda…</string>
+    <string name="autoscan_cannot_show_result">Natijani ko\'rsatib bo\'lmadi: %1$s</string>
+    <string name="autoscan_danger_body">Zararli dastur belgilari topildi. Bu faylni o\'rnatmang.</string>
+    <string name="autoscan_auto_deleting">Avtomatik o\'chirilmoqda…</string>
+    <string name="autoscan_suspicious_title">SHUBHALI APK</string>
+    <string name="autoscan_suspicious_body">Shubhali belgilar topildi:</string>
+    <string name="autoscan_suspicious_recommend">Faylni o\'chirish tavsiya etiladi.</string>
+    <string name="autoscan_file_not_found">Fayl topilmadi</string>
+    <string name="autoscan_install_failed">O\'rnatib bo\'lmadi: %1$s</string>
+    <string name="autoscan_requesting_write_perm">Saqlash ruxsati so\'ralmoqda…</string>
+    <string name="autoscan_confirm_in_system_dialog">Hozir ochiladigan tizim oynasida o\'chirishni tasdiqlang.</string>
+    <string name="autoscan_need_all_files">Faylni o\'chirish uchun \"Barcha fayllarga kirish\" ruxsati kerak.\n\nPastdagi tugmani bosing va tugmachani yoqing.</string>
+    <string name="autoscan_grant_btn">RUXSAT BERISH</string>
+    <string name="autoscan_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida.\n\nFaylni faqat \"%1$s\" ilovasi orqali o\'chirish mumkin (masalan: Telegram → Sozlamalar → Ma\'lumotlarni tozalash).</string>
+    <string name="autoscan_delete_btn">O\'CHIRISH</string>
+    <string name="autoscan_delete_hint_done">O\'chirish bu APK ni telefoningizga o\'rnatishga imkon bermaydi</string>
+
+    <!-- Localization pass: InitialScanActivity hardcoded UI -->
+    <string name="is_header_safe">Telefoningiz xavfsiz</string>
+    <string name="is_header_done">Tekshiruv yakunlandi</string>
+    <string name="is_sub_no_threats">Hech qanday xavfli APK fayl topilmadi.</string>
+    <string name="is_sub_threats_found">%1$d ta zararli yoki shubhali APK topildi.</string>
+    <string name="is_summary_no_threat">Xavf aniqlanmadi</string>
+    <string name="is_summary_no_threat_sub">KiberQalqon endi fonda yangi APK fayllarni avtomatik tekshirib turadi.</string>
+    <string name="is_go_main">Asosiy ekranga o\'tish</string>
+    <string name="is_dangerous_found_count">%1$d ta xavfli APK topildi</string>
+    <string name="is_recommend_delete">Quyidagi fayllarni o\'chirish tavsiya etiladi.</string>
+    <string name="is_need_all_files">Faylni o\'chirish uchun \"Barcha fayllarga kirish\" ruxsati kerak.</string>
+    <string name="is_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida. Faqat o\'sha ilova orqali o\'chirish mumkin.</string>
+    <string name="is_dangerous_remaining_count">%1$d ta xavfli APK qoldi</string>
+    <string name="is_all_deleted">Barcha xavfli fayllar o\'chirildi.</string>
+    <string name="is_delete_n_files_title">%1$d ta faylni o\'chirish?</string>
+    <string name="is_delete_all_message">Quyidagi fayllar telefondan butunlay o\'chiriladi va qaytarib bo\'lmaydi.</string>
+    <string name="is_yes_delete">Ha, o\'chirish</string>
+
+    <!-- Localization pass: ScanHistoryActivity hardcoded UI -->
+    <string name="hist_no_threat">Tahdid yo\'q</string>
+    <string name="hist_no_threat_detected">Hech qanday xavf aniqlanmagan</string>
+    <string name="hist_unknown">Noma\'lum</string>
+    <string name="hist_no_samples_yet">Hozircha namuna yo\'q</string>
+    <string name="hist_no_threats_yet">Hozircha tahdid topilmadi</string>
+    <string name="hist_analysis_date_fmt">%1$s da tahlil qilingan APK\'lar</string>
+
+    <!-- Localization pass: SettingsActivity hardcoded UI -->
+    <string name="set_row_autoscan_title">Avtomatik skaner</string>
+    <string name="set_row_autoscan_sub">Har 15 daqiqada papkalarni tekshiradi</string>
+    <string name="set_row_autodelete_title">Xavfli APK\'ni o\'chirish</string>
+    <string name="set_row_autodelete_sub">Topilgan zararli fayl 5 sekunddan keyin avtomatik o\'chiriladi</string>
+    <string name="set_row_phishing_title">Fishing bildirishnomalari</string>
+    <string name="set_row_phishing_sub">OTP kodli shubhali xabarlarni yashiradi</string>
+    <string name="set_row_background_title">Fon xizmati</string>
+    <string name="set_row_background_sub">WorkManager · har 15 daqiqada</string>
+    <string name="set_row_upload_title">Bulutga yuklash</string>
+    <string name="set_row_upload_sub">Tahlil uchun xavfli APK\'ni serverga yuborish</string>
+    <string name="set_help_center">Yordam markazi</string>
+    <string name="set_about_dialog_title">KiberQalqon</string>
+    <string name="set_about_dialog_message">KiberQalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nMarkaziy Osiyo bank troyanlariga qarshi milliy himoya. Ajina.Banker, RoundRift va boshqa zararli oilalarni aniqlaydi.</string>
+    <string name="set_help_dialog_message">Savol yoki muammomi? Bizga aloqada bo\'ling:\n\n• Telegram: @kiberqalqon_uz\n• Email: support@kiberqalqon.uz\n• Web: https://kiberqalqon.uz</string>
+    <string name="set_help_send_problem">Muammoni yuborish</string>
+    <!-- Muammoni yuborish ekrani -->
+    <string name="rp_eyebrow">YORDAM</string>
+    <string name="rp_title">Muammoni yuborish</string>
+    <string name="rp_subtitle">Xato yoki muammoni to\'g\'ridan-to\'g\'ri dasturchiga yuboring</string>
+    <string name="rp_section_desc">Muammo tavsifi</string>
+    <string name="rp_hint">Nima bo\'ldi? Muammoni shu yerda yozing…</string>
+    <string name="rp_info_title">Nima yuboriladi?</string>
+    <string name="rp_info_items">• Qurilma va Android versiyasi\n• Ilova versiyasi\n• Ruxsatlar holati\n• Oxirgi xato (crash) jurnali</string>
+    <string name="rp_info_privacy">Shaxsiy ma\'lumotlar (ism, raqam, boshqa ilovalar) yuborilmaydi.</string>
+    <string name="rp_send">Yuborish</string>
+    <string name="rp_sending">Yuborilmoqda…</string>
+    <string name="rp_sent">Yuborildi ✓</string>
+    <string name="rp_sent_toast">✅ Rahmat! Muammo dasturchiga yuborildi.</string>
+    <string name="rp_error_toast">❌ Yuborib bo\'lmadi. Internetni tekshiring.</string>
+    <string name="rp_not_configured">Telegram kanal sozlanmagan.</string>
+    <string name="rp_empty">Iltimos, muammoni qisqacha yozing.</string>
+    <string name="set_consent_given_at">Rozilik berilgan: %1$s</string>
+    <string name="set_consent_not_given">Rozilik berilmagan</string>
+    <string name="set_privacy_eyebrow">MAXFIYLIK</string>
+    <string name="set_community_label">Jamoatchilik xavfsizligi (faqat hash + paket)</string>
+    <string name="set_revoke_consent">Rozilikni qaytarib olish</string>
+    <string name="set_revoke_confirm_title">Rozilikni bekor qilish?</string>
+    <string name="set_revoke_confirm_message">Bu Telegram telemetriyani o\'chiradi va keyingi ishga tushirishda KiberQalqon sizdan qayta rozilik so\'raydi.\n\nDavom etamizmi?</string>
+    <string name="set_yes_revoke">Ha, bekor qilish</string>
+    <string name="set_consent_revoked">Rozilik bekor qilindi.</string>
+    <string name="set_no">Yo\'q</string>
+
+    <!-- Localization pass: SplashActivity hardcoded UI -->
+    <string name="splash_subtitle">TELEFON HIMOYASI · V %1$s</string>
+    <string name="splash_version">VERSION %1$s</string>
+    <string name="splash_oem_extra_setting_title">%1$s qo\'shimcha sozlamasi</string>
+    <string name="splash_oem_guide_message">Sizning telefoningiz fon ilovalarini avtomatik o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun bir martagina qo\'shimcha sozlash kerak.</string>
+    <string name="splash_open_setting">Sozlamani ochish</string>
+    <string name="splash_later">Keyinroq</string>
+    <string name="splash_dont_show">Ko\'rsatma</string>
+    <string name="splash_battery_title">Doimiy himoya uchun ruxsat</string>
+    <string name="splash_battery_message">Xiaomi, Huawei, Samsung va boshqalar \'batareya tejash\' uchun fon ilovalarini o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun ruxsat bering.\n\nRuxsat bermasangiz: skan har 2-3 soatda emas, balki kuniga 1 marta ishlaydi.</string>
+    <string name="splash_storage_title">Fayllarga kirish uchun ruxsat</string>
+    <string name="splash_storage_message">KIBER QALQON ga APK fayllarni topish va tekshirish uchun barcha fayllarga kirish kerak.\n\nOK ni bosing va ruxsat bering.</string>
+    <string name="splash_overlay_title">Boshqa oynalar ustida ko\'rsatish uchun ruxsat</string>
+    <string name="splash_overlay_message">KIBER QALQON viruslarni aniqlaganda boshqa ilovalar ustida ogohlantirish ko\'rsatishi kerak.\n\nOK ni bosing va ruxsat bering.</string>
+    <string name="splash_oem_overlay_title">%1$s: qo\'shimcha sozlama</string>
+    <string name="splash_oem_overlay_message">Standart \'Display over other apps\' yetarli emas. Sizning telefoningizda alohida sozlamalar bor.</string>
+    <string name="splash_storage_denied_message">Fayllarga kirish bo\'lmasa, KIBER QALQON qurilmangizni himoya qila olmaydi.</string>
+    <string name="splash_retry">Qaytarish</string>
+    <string name="splash_subtitle2">Zararli APK fayllardan himoyalanish</string>
+    <string name="hist_found_threats">Topilgan tahdidlar</string>
+    <string name="widget_status_protected_bg">Himoyalangan · fon faol</string>
+    <string name="widget_suspicious_count">%1$d ta shubhali fayl</string>
+    <string name="widget_danger_count">%1$d ta xavfli fayl!</string>
+    <string name="widget_last_scan">Oxirgi skan: %1$s</string>
+    <string name="widget_last_scan_never">Oxirgi skan: hali yo\'q</string>
+    <string name="widget_ago_now">hozirgina</string>
+    <string name="widget_ago_min">%1$d daq oldin</string>
+    <string name="widget_ago_hour">%1$d soat oldin</string>
+    <string name="widget_ago_day">%1$d kun oldin</string>
+    <string name="widget_scan_btn">Skan</string>
+    <string name="notif_dangerous_apk_title">🛡️ Xavfli APK topildi</string>
+    <string name="notif_tap_to_check">%1$s — bosing va tekshiring</string>
+    <string name="notif_new_apk_big">Yangi APK fayli aniqlandi:\n%1$s\n\nBildirishnoma ustiga bosing — KiberQalqon to\'liq tekshiruv natijasini ko\'rsatadi va xavfli bo\'lsa o\'chirish tugmasini chiqaradi.</string>
+    <string name="notif_installed_danger_title">🔴 Xavfli ilova o\'rnatildi: %1$s</string>
+    <string name="notif_verdict_danger">Xavfli APK topildi</string>
+    <string name="notif_verdict_suspicious">Shubhali APK topildi</string>
+    <string name="notif_verdict_found">APK topildi</string>
+    <string name="notif_kill_title">⚠️ Himoya o\'chirilgan edi</string>
+    <string name="notif_kill_text">%1$d soat davomida KIBER QALQON ishlamadi</string>
+    <string name="notif_kill_big">Sizning %1$s qurilmangiz KIBER QALQON jarayonini %2$d soat oldin o\'ldirib qo\'ygan edi. Doimiy himoya uchun qo\'shimcha sozlash zarur.\n\nBosib, %3$s\'ni oching.</string>
+    <string name="notif_kill_center_miui">MIUI Security Center</string>
+    <string name="notif_kill_center_default">tizim sozlamasi</string>
+    <string name="notif_welcome_title">✓ Himoyangiz yoqildi</string>
+    <string name="notif_welcome_text">KIBER QALQON endi telefoningizni 24/7 himoya qiladi</string>
+    <string name="notif_welcome_big">Barcha standart sozlamalar avtomatik yoqildi:\n• Fon skani har 15 daqiqada\n• Yangi APK darhol tekshiriladi\n• Tovushli va tebranishli ogohlantirish\n• Avtomatik baza yangilanishi\n\nHech narsa o\'zgartirmasdan, telefoningiz himoyalangan.</string>
+    <string name="notif_installed_suspicious_title">🟠 Shubhali ilova: %1$s</string>
+</resources>

@@ -1,0 +1,71 @@
+# ============================================================
+#  SECRETS — NEVER commit (signing keys, tokens, SDK paths)
+# ============================================================
+local.properties
+keystore.properties
+*.keystore
+*.jks
+release.keystore*
+**/.env
+**/.env.local
+**/.env.*.local
+
+# ============================================================
+#  MALWARE SAMPLES & APKs — keep OFF GitHub
+#  (live malware violates GitHub ToS and can get the account
+#   banned; built APKs are regenerable)
+# ============================================================
+*.apk
+*.dex
+*.smali
+*.bin
+*.zip
+/вирусы/
+/новые вирусы/
+/VIRUS_ANALYSIS/
+/VIRUS_DECOMPILED/
+/apk_decoded/
+/apk_extracted/
+/apk_unpacked/
+/design_extracted/
+/sources/
+/resources/
+/competitor_cyberhimoya/
+**/unpacked/
+
+# ============================================================
+#  BUNDLED TOOLING — large & regenerable
+# ============================================================
+/jdk/
+/jadx_tool/
+apktool_*.jar
+
+# ============================================================
+#  BUILD OUTPUTS
+# ============================================================
+build/
+**/build/
+.gradle/
+.cxx/
+captures/
+node_modules/
+.vercel/
+__pycache__/
+*.pyc
+*.class
+
+# ============================================================
+#  IDE / OS
+# ============================================================
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ============================================================
+#  LOGS & LARGE GENERATED REPORTS
+# ============================================================
+*.log
+scan_report_*.txt
+result_analiza.txt

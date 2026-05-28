@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Auto-scan result (DANGER) — dark red gradient. §3.5 phase B. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#1B0A0D"
+        android:endColor="#0B0608"
+        android:type="linear" />
+</shape>

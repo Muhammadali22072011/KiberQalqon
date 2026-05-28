@@ -1,0 +1,152 @@
+﻿
+##############################################################################
+# RASMLAR_18
+##############################################################################
+  pkgs: ['vpvaggzk.com']
+  string pool: 5 strings
+    [   0] 'res/4j.xml'
+    [   1] 'res/8K.xml'
+    [   2] 'res/Qq.xml'
+    [   3] 'res/Rx.png'
+    [   4] 'RASMLAR'
+
+##############################################################################
+# RASMLAR_8
+##############################################################################
+  pkgs: ['fysrzn.com']
+  string pool: 5 strings
+    [   0] 'res/4j.xml'
+    [   1] 'res/8K.xml'
+    [   2] 'res/Qq.xml'
+    [   3] 'res/Rx.png'
+    [   4] 'RASMLAR'
+
+##############################################################################
+# VIDEO20012026mp4_2
+##############################################################################
+  pkgs: ['ydbllnjd.com']
+  string pool: 103 strings
+    [   0] 'res/4j.xml'
+    [   1] 'res/4z.xml'
+    [   2] 'res/Qq.xml'
+    [   3] 'res/color/vector_tint_color.xml'
+    [   4] 'res/color/vector_tint_theme_color.xml'
+    [   5] 'res/cr.xml'
+    [   6] 'res/oJ.webp'
+    [   7] 'res/ro.xml'
+    [   8] 'res/Rx.png'
+    [   9] '%1$d percent.'
+    [  10] 'EAcAAA8mHCQ8Iz4='
+    [  11] 'In progress'
+    [  12] 'KhAdCgUkUyAmPzh4CAAyIzMj'
+    [  13] 'KhAdCgUkUyAoLT54FgAqKHxnX3poPAEpQjQBQEF2W15BRF4UBSQ='
+    [  14] 'KhAdCgUkUz0n'
+    [  15] 'MRAHDAo7WyI='
+    [  16] 'Not selected'
+    [  17] 'Off'
+    [  18] 'Oh0cGw0sUyBvKj8hAQAoKCguHSVlOgcvQztDSww4DgcfEB0EHyBcJ28jdyoLADAgNS8HIyImHmddMBFTBg=='
+    [  20] 'OxAZAAVyEn9henAVJw=='
+    [  21] 'PFYBAw08Wz0n'
+    [  22] 'PFYBAw08Wz0nbCU7DRQqaTQyFj4kO0QsUycCWQ=='
+    [  23] 'PRgeDEwxUyAoJQ=='
+    [  24] 'Partially checked'
+    [  25] 'Range end'
+    [  26] 'Range start'
+    [  27] 'SW50ZXJuZXQgdWxhbmlzaGluaSB0ZWtzaGlyaW5nLCBhZ2FyIFZQTiB5b3FpbGdhbiBib1wnbHNhLCB1bmkgb1wnY2hpcmliIGtvXCdyaW5n'
+    [  28] 'SWxvdmFuaSB5dWtsYXNo'
+    [  29] 'Selected'
+    [  30] 'Switch'
+    [  31] 'Tab'
+    [  32] 'UWF5dGEgdXJpbmlzaA=='
+    [  33] 'VIDEO.20.01.2026.mp4'
+    [  34] 'Z2FsbGVyeQ=='
+    [  35] 'ZWxyeHp4LmNvbQ=='
+    [  36] 'aHR0cHM6Ly9pbG92ZWtra3NmbS5jb20vdmlkZW8vZHJvcHBlci5odG1s'
+    [  37] 'show tooltip'
+    [  38] 'tooltip'
+    [  39] '%1$d\xa0pour cent.'
+    [  40] 'Activé'
+    [  41] "Afficher l'info-bulle"
+    [  42] 'Changer'
+    [  43] 'Début de plage'
+    [  44] 'Désactivé'
+    [  45] 'En cours'
+    [  46] 'Fin de plage'
+    [  47] 'Info-bulle'
+    [  48] 'Ix0GHkwsFSchKj8r'
+    [  49] 'Ix4GH0w9RicjJSM9F0Eobic3HiEsLAUzXzoNHk0gBhsAURcIGi1IbiYiIywEDSgsNGcCLGUiDTRTdaCSTTwGGwFf'
+    [  50] 'JxAaAQAtEnRvfX5uRSwr'
+    [  51] 'MgQHAh4hQS87JT82RQVjICg0GiwpIwUzXzoNEh8zGBsaAhZD'
+    [  52] 'Non sélectionné'
+    [  53] 'NxAHCEwsV24iJSM9RaLkaSwoGz9ldUR0B3UH8cQ1DAMRAxZNXngAew=='
+    [  54] 'Oh8AGQ0kXis9'
+    [  55] 'Onglet'
+    [  56] 'PR4GGwkpRzqM5SM='
+    [  57] 'Partiellement coché'
+    [  58] 'PhQHGR4tEo3vbDo3EBM='
+    [  59] 'PhgACEyLkm4lIyUqRQUtOjYoACQnIwE='
+    [  60] 'Sélectionné'
+    [  61] 'UsOpZXNzYXllcg=='
+    [  62] 'VMOpbMOpY2hhcmdlbWVudCBkZSBsJ2FwcGxpY2F0aW9u'
+    [  63] 'VsOpcmlmaWV6IHZvdHJlIGNvbm5leGlvbiBJbnRlcm5ldCwgZXNzYXlleiBkZSBkw6lzYWN0aXZlciBsZSBWUE4gcydpbCBlc3QgYWN0aXbDqQ=='
+    [  64] '0J/QvtCy0YLQvtGA0LjRgtGM'
+    [  65] '0J/RgNC+0LLQtdGA0YzRgtC1INC/0L7QtNC60LvRjtGH0LXQvdC40LUg0Log0LjQvdGC0LXRgNC90LXRgtGDLCDQv9C+0L/RgNC+0LHRg9C50YLQtSDQstGL0LrQu9GO0YfQuNGC0Ywg0JLQn9CdINC10YHQu9C4INC+0L0g0LLQutC70Y7Rh9C10L0='
+    [  66] '0JfQsNCz0YDRg9C30LrQsCDQv9GA0LjQu9C+0LbQtdC90LjRjw=='
+    [  67] 'o++j3Lz14vCf/oDgtOOVxQ=='
+    [  68] 'o+6j07z8486f8oDptdyU/Jby'
+    [  69] 'o+Wj073J48yez4DntdyU92aX0J30n9mXiIXR4taG3L7Oocu92Q=='
+    [  70] 'o+Wj3b3K4v5vnO6I1LH5mfiX3J3+n9GXi4Xb4+JsSV1CUaPZvP3i9J/8gOm04ZXGZnVef3BvtPQY'
+    [  71] 'o9Gj3bz/4vKf+YHYX0F1Z3BnvtGV3g=='
+    [  72] 'o9Ki7L3K4v6f8YDmtdOU8ZfFv8E='
+    [  73] 'o9Oi7bz94v+ez4DttOOVyJfITpzFn9SXgYTj4tiH4b7Goc691JiHbp/xgOhFsMeYx5bsnfWf2ZeIhdHi14fqQA=='
+    [  74] 'o9ai77z24v+ex3CI3bDFmfmX0J3+nuiXgYXd4t+G2b/xoP9NvPfjzp/0gOO135T/lvK+8JX3tPIadbOPveO50KPAoui89uL6n/SA5LXfZJjFlu+cx5/Ul4uF3eLfhtG/8aD/Tbz24v+f8YDmtdOU8pbyvvCV97TyGA=='
+    [  75] 'o9ai77z2Ep7ynO6I17H6mfWX0A=='
+    [  76] 'Вкладка'
+    [  77] 'Включено'
+    [  78] 'Выбрано'
+    [  79] 'Выполняется'
+    [  80] 'Конец диапазона'
+    [  81] 'Начало диапазона'
+    [  82] 'Не выбрано'
+    [  83] 'Отключено'
+    [  84] 'Отмечено частично'
+    [  85] 'Переключатель'
+    [  86] 'Подсказка'
+    [  87] 'Показать подсказку'
+    [  88] 'Процентов: %1$d.'
+    [  89] '%1$d foiz.'
+    [  90] 'Almashtirish'
+    [  91] 'Bajarilmoqda'
+    [  92] 'KhAdCgUkUyAoLT54FgAqKHxnXXxoKwEsVzcRHk1kWVxGXAoEAA=='
+    [  93] 'Oraliq boshi'
+    [  94] 'Oraliq oxiri'
+    [  95] 'Oʻchiq'
+    [  96] 'Qisman belgilandi'
+    [  97] 'Tanlangan'
+    [  98] 'Tanlanmagan'
+    [  99] 'Varaq'
+    [ 100] 'Yoniq'
+    [ 101] 'maslahat oynasini koʻrsatish'
+    [ 102] 'qalqib chiquvchi maslahat oynasi'
+
+##############################################################################
+# VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+##############################################################################
+  pkgs: ['zrtssr.com']
+  string pool: 5 strings
+    [   0] 'res/4j.xml'
+    [   1] 'res/8K.xml'
+    [   2] 'res/Qq.xml'
+    [   3] 'res/Rx.png'
+    [   4] 'VID_23856_21052026'
+
+##############################################################################
+# toydanfotolar9jpg_10
+##############################################################################
+  pkgs: ['ujsfgsyu.com']
+  string pool: 5 strings
+    [   0] 'res/4j.xml'
+    [   1] 'res/8K.xml'
+    [   2] 'res/Qq.xml'
+    [   3] 'res/Rx.png'
+    [   4] 'toydanfotolar(9.jpg)'

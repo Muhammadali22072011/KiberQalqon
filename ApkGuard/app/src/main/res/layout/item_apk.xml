@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  APK row inside the list card. §3.4 li-row:
+    44dp danger/safe icon tile + title (display 14.5sp 600) + package (mono
+    12sp kq_ink_3) + sev chip & "size · source" mono 10.5sp on the line below.
+  Kept stable IDs: iconApk, tvName, tvPath, tvSize, chipStatus, btnCheck, btnDelete
+  so MainActivity's existing adapter wires up unchanged.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="14dp">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/kq_icon_tile_danger">
+
+            <ImageView
+                android:id="@+id/iconApk"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_apk_box"
+                app:tint="@color/kq_danger_ink" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="example.apk"
+                android:textColor="@color/kq_ink"
+                android:textSize="14.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvPath"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="middle"
+                android:fontFamily="monospace"
+                android:singleLine="true"
+                android:text="com.example.pkg"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="12sp" />
+
+            <!-- sev chip + " size · source" line -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipStatus"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:minHeight="0dp"
+                    android:text="@string/kq_sev_crit"
+                    android:textColor="@color/kq_danger_ink"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    app:chipBackgroundColor="@color/kq_danger_bg"
+                    app:chipMinHeight="22dp"
+                    app:chipMinTouchTargetSize="0dp"
+                    app:chipStartPadding="8dp"
+                    app:chipEndPadding="8dp"
+                    app:chipStrokeWidth="0dp" />
+
+                <TextView
+                    android:id="@+id/tvSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="monospace"
+                    android:text="1.6 MB · Telegram"
+                    android:textColor="@color/kq_ink_3"
+                    android:textSize="10.5sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="@color/kq_ink_3" />
+
+        <!-- Hidden action buttons kept so MainActivity's adapter binding doesn't NPE.
+             The new design uses tap-on-row → ScanResult, but legacy code may still
+             reach for these IDs. -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCheck"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDelete"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="gone" />
+    </LinearLayout>
+</FrameLayout>

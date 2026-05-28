@@ -1,0 +1,503 @@
+﻿
+########################################################################
+# RASMLAR_18_fixed.apk
+########################################################################
+  3961 non-external methods
+
+  [DEX_LOADER] 0 methods
+
+  [FILE_IO] 40 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Avpmmjcpuycbjupdqkxyqbhmddpxcflb (Ljava/io/FilterInputStream;)[B
+      decrypted literals:
+        base->toByteArray(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Czbuzjwfbqdnznzwboqaha (Ljava/io/File;)V
+      literals (1): ['OC4=']
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Duocbzatzfgomjasxpdynjqcleemuvykqqgqpm (Ljava/io/File; Lvpvaggzk/com/Ss0l4nz5aqo2wfg; Ljava/lang/String;)V
+      decrypted literals:
+        base->getName(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dzblbgpgmfdsgrneexit (Ljava/io/File; Ljava/io/File;)Z
+      literals (0): []
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Plnxfmcthmtonaulpktnpilizof (Ljava/io/File; Ljava/lang/String;)V
+      decrypted literals:
+        base->getBytes(...)
+        base->charset
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Qfdgpihwcioffpslhrijbtlnbswbvwjfhx (Ljava/io/File; Ljava/io/File; Ljava/util/zip/ZipOutputStream; I)I
+      decrypted literals:
+        base->substring(...)
+        base->replace(...)
+
+  [HTTP] 0 methods
+
+  [REFLECTION] 30 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Abfgbyshltimylhijahlqcvcnuobmu (Lvpvaggzk/com/Ss0l4nz5aqo2wfg; Ljava/lang/Object;)Ljava/lang/CharSequence;
+      decrypted literals:
+        base->getApplicationLabel
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dbtlffbpbggmfwrlastdefhhglvkfshm (Ljava/io/Closeable; Ljava/lang/Throwable;)V
+      decrypted literals:
+        base-><this>
+        base->exception
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dcruwkoixmnxtrazsjwxohvtiyboehylbzdhzr (Lvpvaggzk/com/Ss0l4nz5aqo2wfg; Ljava/lang/String;)LEkhovsyarulupbtgjmclox/Igmmzymaazkvykdianvycnkljes;
+      decrypted literals:
+        base->packageName
+        base->null cannot be cast to non-null type kotlin.Any
+        base->android.settings.SETTINGS
+        base->android.intent.action.VIEW
+        base->android.media.action.IMAGE_CAPTURE
+        base->android.net.VpnService
+        base->queryIntentServices
+        base->serviceInfo
+        base->android.content.pm.ApplicationInfo
+        base->FLAG_SYSTEM
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Eglowoeygiiusamtfphehhsqyntjmlgboff (Lvpvaggzk/com/Ss0l4nz5aqo2wfg; Ljava/lang/Object;)Landroid/graphics/drawable/Drawable;
+      decrypted literals:
+        base->getApplicationIcon
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Lvpvaggzk/com/Ss0l4nz5aqo2wfg;)Z
+      decrypted literals:
+        base->m6n9k3q8r2t5v1
+        base->p2q6m9k4r7s1u8
+        base->getPackageInfo
+        base->getLaunchIntentForPackage
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Grnjutqtbjdlcmhegeprszhojexek (Landroidx/activity/Aropxvumbrnhdbnkzgxngszsogljvvth;)Z
+      decrypted literals:
+        base->ctx
+        base->getPackageInstaller
+        base->mySessions
+        base->isActive
+
+  [EXEC] 2 methods
+    method: Lcom/android/apksig/ApkSignerHelper; generateKeyStoreWithKeytool (Lcom/android/apksig/ApkSignerHelper$KeyGenParams; Ljava/lang/String;)Ljava/security/KeyStore;
+      decrypted literals:
+        base->CN=
+        base->, OU=
+        base->, O=
+        base->, L=
+        base->, S=
+        base->, C=
+        base->-storetype
+        base->JKS
+        base->keytool
+        base->-genkeypair
+    method: Lvpvaggzk/com/Ss0l4nz5aqo2wfg; onCreate (Landroid/os/Bundle;)V
+      decrypted literals:
+        base->getWindow(...)
+        base->f2n9m5k7q3p6c4
+        base->j9p4m7k2r6t1g5
+        base->intentPackageLaunched
+        base->intentPackage
+        base->/proc/self/maps
+        base->frida
+        base->gadget
+        base->substrate
+        base->xposed
+
+  [WEBSOCKET] 0 methods
+
+  [BYTE_XOR] 21 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dodkzdklftszwqtqxwdikwxkgvzuudrqfr ([B)[B
+      decrypted literals:
+        base->3183701586F97GhYNSURErMMwPeAS33H
+        base->getBytes(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;
+      decrypted literals:
+        base->3183701586F97GhYNSURErMMwPeAS33H
+        base->getBytes(...)
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes; hashCode ()I
+      literals (0): []
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr; hashCode ()I
+      decrypted literals:
+        base->This container does not support retaining Map.Entry objects
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx; hashCode ()I
+      literals (0): []
+    method: LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lvpvaggzk/com/Ss0l4nz5aqo2wfg; Ljava/lang/String;)V
+      decrypted literals:
+        base->assetName
+        base->3183701586F97GhYNSURErMMwPeAS33H
+        base->getBytes(...)
+        base->file:///android_asset/
+        base->text/html
+        base->UTF-8
+
+  [CIPHER_LIKELY] 0 methods
+
+########################################################################
+# RASMLAR_8_fixed.apk
+########################################################################
+  3759 non-external methods
+
+  [DEX_LOADER] 0 methods
+
+  [FILE_IO] 40 methods
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Cwirfqyahbjtyclklnanwcl; run ()V
+      decrypted literals:
+        base->.apk
+        base->getAbsolutePath(...)
+        base->VkRYQUhGT1hYFlwYNxQ=
+        base->_dxr
+        base->_mpx
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Avpmmjcpuycbjupdqkxyqbhmddpxcflb (Ljava/io/FilterInputStream;)[B
+      decrypted literals:
+        base->toByteArray(...)
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Czbuzjwfbqdnznzwboqaha (Ljava/io/File;)V
+      literals (1): ['Jxo=']
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Duocbzatzfgomjasxpdynjqcleemuvykqqgqpm (Ljava/io/File; Lfysrzn/com/Ei1v1lrc7; Ljava/lang/String;)V
+      decrypted literals:
+        base->getName(...)
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Dzblbgpgmfdsgrneexit (Ljava/io/File; Ljava/io/File;)Z
+      literals (0): []
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Plnxfmcthmtonaulpktnpilizof (Ljava/io/File; Ljava/lang/String;)V
+      decrypted literals:
+        base->getBytes(...)
+        base->charset
+
+  [HTTP] 1 methods
+    method: Log3; C ()Z
+      decrypted literals:
+        base->gcm.n.noui
+        base->keyguard
+        base->activity
+        base->gcm.n.image
+        base->FirebaseMessaging
+        base->Not downloading image, bad URL: 
+        base->Failed to download image in time, showing notification without it
+        base->Interrupted while downloading image, showing notification without it
+        base->Failed to download image: 
+        base->notification
+
+  [REFLECTION] 30 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; <clinit> ()V
+      decrypted literals:
+        base->android.os.Build$VERSION
+        base->SDK_INT
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Abfgbyshltimylhijahlqcvcnuobmu (Lfysrzn/com/Ei1v1lrc7; Ljava/lang/Object;)Ljava/lang/CharSequence;
+      decrypted literals:
+        base->getApplicationLabel
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Dbtlffbpbggmfwrlastdefhhglvkfshm (Ljava/io/Closeable; Ljava/lang/Throwable;)V
+      decrypted literals:
+        base-><this>
+        base->exception
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Dcruwkoixmnxtrazsjwxohvtiyboehylbzdhzr (Lfysrzn/com/Ei1v1lrc7; Ljava/lang/String;)LJdukavxtffwddfbovmchqvreyuuqhuxzvbg/Igmmzymaazkvykdianvycnkljes;
+      decrypted literals:
+        base->packageName
+        base->null cannot be cast to non-null type kotlin.Any
+        base->android.settings.SETTINGS
+        base->android.intent.action.VIEW
+        base->android.media.action.IMAGE_CAPTURE
+        base->android.net.VpnService
+        base->queryIntentServices
+        base->serviceInfo
+        base->android.content.pm.ApplicationInfo
+        base->FLAG_SYSTEM
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Eglowoeygiiusamtfphehhsqyntjmlgboff (Lfysrzn/com/Ei1v1lrc7; Ljava/lang/Object;)Landroid/graphics/drawable/Drawable;
+      decrypted literals:
+        base->getApplicationIcon
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Lfysrzn/com/Ei1v1lrc7;)Z
+      decrypted literals:
+        base->m6n9k3q8r2t5v1
+        base->p2q6m9k4r7s1u8
+        base->getPackageInfo
+        base->getLaunchIntentForPackage
+
+  [EXEC] 2 methods
+    method: Lcom/android/apksig/ApkSignerHelper; generateKeyStoreWithKeytool (Lcom/android/apksig/ApkSignerHelper$KeyGenParams; Ljava/lang/String;)Ljava/security/KeyStore;
+      decrypted literals:
+        base->CN=
+        base->, OU=
+        base->, O=
+        base->, L=
+        base->, S=
+        base->, C=
+        base->-storetype
+        base->JKS
+        base->keytool
+        base->-genkeypair
+    method: Lfysrzn/com/Ei1v1lrc7; onCreate (Landroid/os/Bundle;)V
+      decrypted literals:
+        base->getWindow(...)
+        base->f2n9m5k7q3p6c4
+        base->j9p4m7k2r6t1g5
+        base->intentPackageLaunched
+        base->intentPackage
+        base->/proc/self/maps
+        base->frida
+        base->gadget
+        base->substrate
+        base->xposed
+
+  [WEBSOCKET] 0 methods
+
+  [BYTE_XOR] 19 methods
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Dodkzdklftszwqtqxwdikwxkgvzuudrqfr ([B)[B
+      decrypted literals:
+        base->551712693drkGqsgO05tb31vbvZGkA0P
+        base->getBytes(...)
+    method: LBpewdfjirjqibwtbcjqdgwqdlzvbvufy/Igmmzymaazkvykdianvycnkljes; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;
+      decrypted literals:
+        base->551712693drkGqsgO05tb31vbvZGkA0P
+        base->getBytes(...)
+    method: LExozolscragydhxidpxomklajxiblntlyhnzm/Gquesyvnltekgxdkymmis; Tnbvjiexzjuayqthripayhscknbauxf (Landroid/content/Context;)Z
+      decrypted literals:
+        base->context
+        base->hL74nO3xS8zT9k
+        base->jM69pQ4yV1aW2
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes; hashCode ()I
+      literals (0): []
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr; hashCode ()I
+      decrypted literals:
+        base->This container does not support retaining Map.Entry objects
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx; hashCode ()I
+      literals (0): []
+
+  [CIPHER_LIKELY] 0 methods
+
+########################################################################
+# toydanfotolar9jpg_10_fixed.apk
+########################################################################
+  4000 non-external methods
+
+  [DEX_LOADER] 0 methods
+
+  [FILE_IO] 38 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Avpmmjcpuycbjupdqkxyqbhmddpxcflb (Ljava/io/FilterInputStream;)[B
+      decrypted literals:
+        base->toByteArray(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Czbuzjwfbqdnznzwboqaha (Ljava/io/File;)V
+      literals (1): ['MyE=']
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Duocbzatzfgomjasxpdynjqcleemuvykqqgqpm (Ljava/io/File; Lujsfgsyu/com/Nrenxflb5odtk; Ljava/lang/String;)V
+      decrypted literals:
+        base->getName(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dzblbgpgmfdsgrneexit (Ljava/io/File; Ljava/io/File;)Z
+      literals (0): []
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Plnxfmcthmtonaulpktnpilizof (Ljava/io/File; Ljava/lang/String;)V
+      decrypted literals:
+        base->getBytes(...)
+        base->charset
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Qfdgpihwcioffpslhrijbtlnbswbvwjfhx (Ljava/io/File; Ljava/io/File; Ljava/util/zip/ZipOutputStream; I)I
+      decrypted literals:
+        base->substring(...)
+        base->replace(...)
+
+  [HTTP] 5 methods
+    method: Li6r; <init> (Lr1w; Lb6s; Ljava/net/Socket; Ljava/net/Socket; Lgfh; Lhvq; Lug2; I)V
+      literals (0): []
+    method: Li6r; c (Lapn; Lb6s; Ljava/io/IOException;)V
+      literals (0): []
+    method: Li6r; cancel ()V
+      literals (0): []
+    method: Li6r; g (Z)Z
+      literals (0): []
+    method: Li6r; i ()V
+      decrypted literals:
+        base->>> CONNECTION 
+        base->closed
+        base->closed
+
+  [REFLECTION] 30 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Abfgbyshltimylhijahlqcvcnuobmu (Lujsfgsyu/com/Nrenxflb5odtk; Ljava/lang/Object;)Ljava/lang/CharSequence;
+      decrypted literals:
+        base->getApplicationLabel
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dbtlffbpbggmfwrlastdefhhglvkfshm (Ljava/io/Closeable; Ljava/lang/Throwable;)V
+      decrypted literals:
+        base-><this>
+        base->exception
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dcruwkoixmnxtrazsjwxohvtiyboehylbzdhzr (Lujsfgsyu/com/Nrenxflb5odtk; Ljava/lang/String;)LEkhovsyarulupbtgjmclox/Igmmzymaazkvykdianvycnkljes;
+      decrypted literals:
+        base->packageName
+        base->null cannot be cast to non-null type kotlin.Any
+        base->android.settings.SETTINGS
+        base->android.intent.action.VIEW
+        base->android.media.action.IMAGE_CAPTURE
+        base->android.net.VpnService
+        base->queryIntentServices
+        base->serviceInfo
+        base->android.content.pm.ApplicationInfo
+        base->FLAG_SYSTEM
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Eglowoeygiiusamtfphehhsqyntjmlgboff (Lujsfgsyu/com/Nrenxflb5odtk; Ljava/lang/Object;)Landroid/graphics/drawable/Drawable;
+      decrypted literals:
+        base->getApplicationIcon
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Lujsfgsyu/com/Nrenxflb5odtk;)Z
+      decrypted literals:
+        base->m6n9k3q8r2t5v1
+        base->p2q6m9k4r7s1u8
+        base->getPackageInfo
+        base->getLaunchIntentForPackage
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Grnjutqtbjdlcmhegeprszhojexek (Landroidx/activity/Aropxvumbrnhdbnkzgxngszsogljvvth;)Z
+      decrypted literals:
+        base->ctx
+        base->getPackageInstaller
+        base->mySessions
+        base->isActive
+
+  [EXEC] 2 methods
+    method: Lcom/android/apksig/ApkSignerHelper; generateKeyStoreWithKeytool (Lcom/android/apksig/ApkSignerHelper$KeyGenParams; Ljava/lang/String;)Ljava/security/KeyStore;
+      decrypted literals:
+        base->CN=
+        base->, OU=
+        base->, O=
+        base->, L=
+        base->, S=
+        base->, C=
+        base->-storetype
+        base->JKS
+        base->keytool
+        base->-genkeypair
+    method: Lujsfgsyu/com/Nrenxflb5odtk; onCreate (Landroid/os/Bundle;)V
+      decrypted literals:
+        base->getWindow(...)
+        base->f2n9m5k7q3p6c4
+        base->j9p4m7k2r6t1g5
+        base->intentPackageLaunched
+        base->intentPackage
+        base->/proc/self/maps
+        base->frida
+        base->gadget
+        base->substrate
+        base->xposed
+
+  [WEBSOCKET] 0 methods
+
+  [BYTE_XOR] 25 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dodkzdklftszwqtqxwdikwxkgvzuudrqfr ([B)[B
+      decrypted literals:
+        base->347692886QFqc74H0w07DWz51sMHjqB4
+        base->getBytes(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;
+      decrypted literals:
+        base->347692886QFqc74H0w07DWz51sMHjqB4
+        base->getBytes(...)
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes; hashCode ()I
+      literals (0): []
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr; hashCode ()I
+      decrypted literals:
+        base->This container does not support retaining Map.Entry objects
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx; hashCode ()I
+      literals (0): []
+    method: LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lujsfgsyu/com/Nrenxflb5odtk; Ljava/lang/String;)V
+      decrypted literals:
+        base->assetName
+        base->347692886QFqc74H0w07DWz51sMHjqB4
+        base->getBytes(...)
+        base->file:///android_asset/
+        base->text/html
+        base->UTF-8
+
+  [CIPHER_LIKELY] 0 methods
+
+########################################################################
+# VID_23856_21052026ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ_fixed.apk
+########################################################################
+  4012 non-external methods
+
+  [DEX_LOADER] 0 methods
+
+  [FILE_IO] 38 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Avpmmjcpuycbjupdqkxyqbhmddpxcflb (Ljava/io/FilterInputStream;)[B
+      decrypted literals:
+        base->toByteArray(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Czbuzjwfbqdnznzwboqaha (Ljava/io/File;)V
+      literals (1): ['MUM=']
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Duocbzatzfgomjasxpdynjqcleemuvykqqgqpm (Ljava/io/File; Lzrtssr/com/Rt28pxjh06wm39; Ljava/lang/String;)V
+      decrypted literals:
+        base->getName(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dzblbgpgmfdsgrneexit (Ljava/io/File; Ljava/io/File;)Z
+      literals (0): []
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Plnxfmcthmtonaulpktnpilizof (Ljava/io/File; Ljava/lang/String;)V
+      decrypted literals:
+        base->getBytes(...)
+        base->charset
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Qfdgpihwcioffpslhrijbtlnbswbvwjfhx (Ljava/io/File; Ljava/io/File; Ljava/util/zip/ZipOutputStream; I)I
+      decrypted literals:
+        base->substring(...)
+        base->replace(...)
+
+  [HTTP] 0 methods
+
+  [REFLECTION] 30 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Abfgbyshltimylhijahlqcvcnuobmu (Lzrtssr/com/Rt28pxjh06wm39; Ljava/lang/Object;)Ljava/lang/CharSequence;
+      decrypted literals:
+        base->getApplicationLabel
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dbtlffbpbggmfwrlastdefhhglvkfshm (Ljava/io/Closeable; Ljava/lang/Throwable;)V
+      decrypted literals:
+        base-><this>
+        base->exception
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dcruwkoixmnxtrazsjwxohvtiyboehylbzdhzr (Lzrtssr/com/Rt28pxjh06wm39; Ljava/lang/String;)LEkhovsyarulupbtgjmclox/Igmmzymaazkvykdianvycnkljes;
+      decrypted literals:
+        base->packageName
+        base->null cannot be cast to non-null type kotlin.Any
+        base->android.settings.SETTINGS
+        base->android.intent.action.VIEW
+        base->android.media.action.IMAGE_CAPTURE
+        base->android.net.VpnService
+        base->queryIntentServices
+        base->serviceInfo
+        base->android.content.pm.ApplicationInfo
+        base->FLAG_SYSTEM
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Eglowoeygiiusamtfphehhsqyntjmlgboff (Lzrtssr/com/Rt28pxjh06wm39; Ljava/lang/Object;)Landroid/graphics/drawable/Drawable;
+      decrypted literals:
+        base->getApplicationIcon
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Lzrtssr/com/Rt28pxjh06wm39;)Z
+      decrypted literals:
+        base->m6n9k3q8r2t5v1
+        base->p2q6m9k4r7s1u8
+        base->getPackageInfo
+        base->getLaunchIntentForPackage
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Grnjutqtbjdlcmhegeprszhojexek (Landroidx/activity/Aropxvumbrnhdbnkzgxngszsogljvvth;)Z
+      decrypted literals:
+        base->ctx
+        base->getPackageInstaller
+        base->mySessions
+        base->isActive
+
+  [EXEC] 2 methods
+    method: Lcom/android/apksig/ApkSignerHelper; generateKeyStoreWithKeytool (Lcom/android/apksig/ApkSignerHelper$KeyGenParams; Ljava/lang/String;)Ljava/security/KeyStore;
+      decrypted literals:
+        base->CN=
+        base->, OU=
+        base->, O=
+        base->, L=
+        base->, S=
+        base->, C=
+        base->-storetype
+        base->JKS
+        base->keytool
+        base->-genkeypair
+    method: Lzrtssr/com/Rt28pxjh06wm39; onCreate (Landroid/os/Bundle;)V
+      decrypted literals:
+        base->getWindow(...)
+        base->f2n9m5k7q3p6c4
+        base->j9p4m7k2r6t1g5
+        base->intentPackageLaunched
+        base->intentPackage
+        base->/proc/self/maps
+        base->frida
+        base->gadget
+        base->substrate
+        base->xposed
+
+  [WEBSOCKET] 0 methods
+
+  [BYTE_XOR] 28 methods
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Dodkzdklftszwqtqxwdikwxkgvzuudrqfr ([B)[B
+      decrypted literals:
+        base->358200732kyGoz80aYtUropyXbvrXv9h
+        base->getBytes(...)
+    method: LAkqqrtawztlximfrgctizmkfnmfykxvk/Gquesyvnltekgxdkymmis; Rcmgkonrkcehzfsxsvxmynywbsgspp (Ljava/lang/String;)Ljava/lang/String;
+      decrypted literals:
+        base->358200732kyGoz80aYtUropyXbvrXv9h
+        base->getBytes(...)
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Igmmzymaazkvykdianvycnkljes; hashCode ()I
+      literals (0): []
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lqmbbgpnlsjsczauionlxsewibwcrbobltfr; hashCode ()I
+      decrypted literals:
+        base->This container does not support retaining Map.Entry objects
+    method: LGsembtpsahrpqujuzwbqriodfjtxnbvhcrxii/Lvykjdzgpnpmedglwtypvjkqvdudx; hashCode ()I
+      literals (0): []
+    method: LIsaxaolzswhvmwzvsvzckqjtamnyepejue/Gquesyvnltekgxdkymmis; Gjiidqnxyecptzulvortrhfdjgjgsxgmxs (Landroid/webkit/WebView; Lzrtssr/com/Rt28pxjh06wm39; Ljava/lang/String;)V
+      decrypted literals:
+        base->assetName
+        base->358200732kyGoz80aYtUropyXbvrXv9h
+        base->getBytes(...)
+        base->file:///android_asset/
+        base->text/html
+        base->UTF-8
+
+  [CIPHER_LIKELY] 0 methods

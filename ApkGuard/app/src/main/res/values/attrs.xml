@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Theme-resolved accent attributes. References from `res/color/kq_primary*.xml`
+      reach into these via `?attr/kqPrimary`. Three theme overlays (Feruz/Za'faron/
+      Anor) bind these to different base colors, so the user's accent pick in
+      Settings re-tints every kq_primary usage app-wide on Activity recreate.
+    -->
+    <attr name="kqPrimary" format="color" />
+    <attr name="kqPrimary2" format="color" />
+    <attr name="kqPrimarySoft" format="color" />
+</resources>

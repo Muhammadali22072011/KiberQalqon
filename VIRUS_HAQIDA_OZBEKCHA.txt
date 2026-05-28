@@ -1,0 +1,53 @@
+═══════════════════════════════════════════════════════════════
+  BU NIMA — ODDIY SO'Z BILAN (har qanday odam uchun)
+═══════════════════════════════════════════════════════════════
+
+Ha, bu haqiqiy virus. U o'zini "To'y taklifnomasi" deb ko'rsatadi,
+lekin aslida telefoningizdan ma'lumot o'g'irlaydi va kontaktlaringizga
+SMS yuboradi.
+
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  U QANDAY ISHLAYDI
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+1. Odam "to'y taklifnomasi" havolasi yoki faylini oladi va
+   ilovani telefonga o'rnatadi.
+
+2. Ilova SMS, kontaktlar, qo'ng'iroqlar uchun ruxsat so'raydi.
+   Agar odam ruxsat bersa — virus to'liq kirish huquqiga ega bo'ladi.
+
+3. Virus internet orqali firibgarning serveriga ulanadi va
+   u yerdan buyruqlar oladi.
+
+4. Shu buyruqlar bo'yicha u:
+   • BARCHA SMSlaringizni o'qiydi (bank kodlari, kartalar balansi,
+     Payme, Humo, Uzcard va hokazo xabarlar) va ularni serverga
+     yuboradi — ya'ni ma'lumotlaringizni firibgarlar ko'radi;
+   • Sizning raqamingizdan o'zi SMS yuborishi mumkin — masalan,
+     barcha kontaktlaringizga havola yoki matn yuboradi;
+   • Telefoningizdan ko'rsatilgan raqamlarga qo'ng'iroq qilishi mumkin;
+   • Siz shubhali harakatlarni sezmasligingiz uchun Telegram va
+     bildirishnomalarni bloklashi mumkin.
+
+5. Bularning hammasi masofadan boshqariladi: serverdagi odam
+   qachon SMS o'g'irlash, qachon xabar tarqatish va qayerga
+   qo'ng'iroq qilishni o'zi belgilaydi.
+
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  NIMA XAVFLI
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+• Bank SMSlaridagi kodlar orqali pul o'g'irlashlari mumkin.
+• Sizning raqamingizdan do'stlar va oilangizga xabar yuborishlari
+  mumkin (ular siz yuborgan deb o'ylaydi).
+• Pulli raqamlarga qo'ng'iroq qilishlari yoki sizning nomingizda
+  odamlarni aldashlari mumkin.
+
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  QISQACHA BIR JUMLA BILAN
+――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+
+Bu to'y taklifnomasi qiyofasidagi virus: o'rnatilgach u SMSlarni
+(bank kodlari ham) o'g'irlaydi, kontaktlaringizga SMS tarqatadi va
+firibgarlar serveridan buyruqlar bajaradi. Uni o'rnatish mumkin emas;
+agar o'rnatgan bo'lsangiz — o'chirib, bank parollari/kodlarini almashtiring.
