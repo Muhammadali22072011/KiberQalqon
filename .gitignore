@@ -20,6 +20,9 @@ release.keystore*
 *.smali
 *.bin
 *.zip
+*.7z
+*.7z.*
+/samples/
 /вирусы/
 /новые вирусы/
 /VIRUS_ANALYSIS/
