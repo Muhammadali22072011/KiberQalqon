@@ -279,12 +279,24 @@ object Statistics {
         val prefs = statsPrefs(context)
         val current = prefs.getInt("total_scanned", 0)
         prefs.edit { putInt("total_scanned", current + 1) }
-        
-        // Также увеличиваем счётчик для текущего дня недели
-        val dayOfWeek = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK) - 1
+
+        // 7 kunlik grafik uchun kun bo'yicha hisoblagich.
+        // WHY rotatsiya: day_0..6 slot'lari har 7 kunda qayta ishlatiladi. Agar shu slot
+        // oxirgi marta BOSHQA kalendar kunida yangilangan bo'lsa (ya'ni o'tgan haftadagi
+        // shu hafta kuni), avval nolga tushiramiz. Aks holda har dushanba day_1 ga cheksiz
+        // yig'ilib borardi va "hafta" grafigi aslida "butun tarix" bo'lib qolardi.
+        val cal = java.util.Calendar.getInstance()
+        val dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK) - 1
+        val epochDay = (cal.timeInMillis +
+            cal.get(java.util.Calendar.ZONE_OFFSET) +
+            cal.get(java.util.Calendar.DST_OFFSET)) / 86_400_000L
         val dayKey = "day_$dayOfWeek"
-        val dayCount = prefs.getInt(dayKey, 0)
-        prefs.edit { putInt(dayKey, dayCount + 1) }
+        val stampKey = "day_${dayOfWeek}_epochday"
+        val dayCount = if (prefs.getLong(stampKey, -1L) == epochDay) prefs.getInt(dayKey, 0) else 0
+        prefs.edit {
+            putInt(dayKey, dayCount + 1)
+            putLong(stampKey, epochDay)
+        }
     }
     
     fun incrementBlocked(context: Context) {
@@ -304,6 +316,7 @@ object Statistics {
         prefs.edit {
             for (day in 0..6) {
                 putInt("day_$day", 0)
+                remove("day_${day}_epochday")
             }
         }
     }
@@ -314,7 +327,10 @@ object Statistics {
             remove("total_scanned")
             remove("total_blocked")
             remove("total_safe")
-            for (day in 0..6) remove("day_$day")
+            for (day in 0..6) {
+                remove("day_$day")
+                remove("day_${day}_epochday")
+            }
         }
     }
 }

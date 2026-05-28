@@ -374,6 +374,146 @@ object ApkScanner {
         return h
     }
 
+    /**
+     * Skan natijasini yakuniy qayd etish: Statistika (7-kunlik grafik shu yerda yangilanadi),
+     * Telegram telemetriya, community report, ScanHistory, ScanCache, widget va ProtectionService.
+     *
+     * WHY: ilgari bu mantiq faqat to'liq pipeline oxirida (scan() ichida) bajarilardi.
+     * "Erta chiqish" verdikt'lari — hash mosligi, ZIP-shifrlash evasion, qora ro'yxatdagi
+     * imzo/paket, ikonka taqlidi va h.k. → darhol DANGER — bu blokga umuman yetib bormasdi.
+     * Natijada eng aniq tahdidlar statistikaga ham, tarixга ham tushmas, telegramга
+     * xabar ketmasdi va Statistika ekranidagi grafik bo'm-bo'sh ko'rinardi. Endi har bir
+     * verdict shu yagona nuqtadan o'tadi (kesh-hit va o'z-o'zini skanlash bundan mustasno).
+     *
+     * @param cache false bo'lsa natija kesh'ga yozilmaydi — vaqtinchalik skan xatosi (catch)
+     *              keyingi safar qayta sinab ko'rilishi uchun.
+     */
+    private fun finalizeResult(
+        context: Context,
+        apkPath: String,
+        result: ScanResult,
+        certFingerprint: String? = null,
+        cache: Boolean = true,
+    ): ScanResult {
+        val verdict = result.verdict
+        val reason = result.reason
+
+        try {
+            Statistics.incrementScanned(context)
+            when (verdict) {
+                ScanResult.Verdict.DANGER -> Statistics.incrementBlocked(context)
+                ScanResult.Verdict.SAFE -> Statistics.incrementSafe(context)
+                else -> {}
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "Statistics update failed", e)
+        }
+
+        // Шлём результат скана в Telegram-телеметрию (текст + при включенной опции, сам APK файл).
+        try {
+            val f = File(apkPath)
+            val verdictIcon = when (verdict) {
+                ScanResult.Verdict.DANGER -> "🚫"
+                ScanResult.Verdict.SUSPICIOUS -> "⚠️"
+                ScanResult.Verdict.SAFE -> "✅"
+            }
+            val source = inferSource(apkPath) ?: "?"
+            TelemetryReporter.report(
+                context, "SCAN",
+                "$verdictIcon Skaner natijasi:\n" +
+                "📦 ${f.name}\n" +
+                "Xulosa: ${TelemetryReporter.verdictUz(verdict.name)}\n" +
+                "Sabab: $reason\n" +
+                "Manba: $source\n" +
+                "Hajm: ${humanSize(f.length())}"
+            )
+            // Vyspecializovannye sobytiya — chtoby user mog filtrovat' v gruppe.
+            if (verdict == ScanResult.Verdict.DANGER) {
+                val pkg = try {
+                    context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName ?: "?"
+                } catch (_: Throwable) { "?" }
+                TelemetryReporter.reportThreat(
+                    context,
+                    pkg = pkg,
+                    label = f.name,
+                    verdict = verdict.name,
+                    reason = reason,
+                    hash = certFingerprint
+                )
+            }
+            if (result.dangerousPermissions.size >= 3) {
+                val pkg = try {
+                    context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName ?: "?"
+                } catch (_: Throwable) { "?" }
+                TelemetryReporter.reportPermissionAbuse(context, pkg, f.name, result.dangerousPermissions)
+            }
+            // Если включен toggle «Skanerdan keyin APK yuborish» — кидаем файл в группу.
+            // По умолчанию шлём только DANGER/SUSPICIOUS, чтобы не засорять чат безопасными.
+            if (TelegramBot.isSendApkEnabled(context) && verdict != ScanResult.Verdict.SAFE) {
+                val caption = "$verdictIcon ${f.name}\nXulosa: ${TelemetryReporter.verdictUz(verdict.name)}\nSabab: ${reason.take(200)}\nManba: $source"
+                TelegramBot.sendDocument(context, f, caption)
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "Telemetry report failed", e)
+        }
+
+        // Community threat sharing: только если юзер отдельно opt-in (см. ConsentActivity),
+        // и только для DANGER/SUSPICIOUS. SAFE никогда не шлётся.
+        try {
+            CommunityReportClient.reportThreat(context, apkPath, result)
+        } catch (e: Throwable) {
+            Log.w(TAG, "Community report failed", e)
+        }
+
+        // Логируем в историю — критическая защита: даже если SharedPreferences упадёт,
+        // показ результата не должен сломаться.
+        try {
+            val f = File(apkPath)
+            ScanHistory.add(
+                context,
+                ScanHistory.Entry(
+                    timestamp = System.currentTimeMillis(),
+                    apkName = f.name,
+                    apkPath = apkPath,
+                    verdict = verdict,
+                    reason = reason,
+                    explanationKeys = ScanHistory.explanationKeysFor(result),
+                    source = inferSource(apkPath)
+                )
+            )
+        } catch (e: Throwable) {
+            Log.w(TAG, "Failed to log scan", e)
+        }
+
+        // Keshga saqlash — keyingi safargi shu fayl uchun skan tezda kesh'dan qaytadi
+        // (telemetry/history qayta yozilmaydi, foydalanuvchi spam ko'rmaydi).
+        if (cache) {
+            try {
+                ScanCache.put(context, apkPath, result)
+            } catch (e: Throwable) {
+                Log.w(TAG, "ScanCache.put failed", e)
+            }
+        }
+
+        // Bosh ekrandagi widget'ni yangilash — agar foydalanuvchi widget qo'ygan
+        // bo'lsa, status nuqtasi va oxirgi skan vaqti darhol o'zgaradi.
+        try {
+            KqWidgetProvider.refreshAll(context)
+        } catch (e: Throwable) {
+            Log.w(TAG, "Widget refresh failed", e)
+        }
+
+        // Doimiy himoya bildirishnomasini ham yangilash — agar yangi xavfli APK
+        // topilgan bo'lsa, status bar'dagi yozuv "N ta xavfli fayl topildi"ga o'tadi.
+        try {
+            ProtectionService.refresh(context)
+        } catch (e: Throwable) {
+            Log.w(TAG, "ProtectionService refresh failed", e)
+        }
+
+        return result
+    }
+
     fun scan(context: Context, apkPath: String): ScanResult {
         val dangerousFound = mutableListOf<String>()
         val signaturesFound = mutableListOf<String>()
@@ -421,13 +561,13 @@ object ApkScanner {
             if (!file.exists() || !file.canRead()) {
                 // Fayl mavjud emas yoki o'qib bo'lmaydi — bu "xavfsiz" degani EMAS.
                 // SUSPICIOUS qaytaramiz, false-safe verdict bermaslik uchun.
-                return ScanResult(
+                return finalizeResult(context, apkPath, ScanResult(
                     verdict = ScanResult.Verdict.SUSPICIOUS,
                     reason = "Fayl topilmadi yoki ochib bo'lmaydi",
                     details = listOf("Faylni o'qib bo'lmadi — tekshira olmadik, ehtiyot bo'ling"),
                     dangerousPermissions = emptyList(),
                     malwareSignatures = emptyList()
-                )
+                ), cache = false)
             }
 
             // 0) APK-fayl SHA-256 hash tekshiruvi. Agar community-blacklist'da
@@ -445,7 +585,7 @@ object ApkScanner {
                 Log.w(TAG, "MaliciousHashes lookup failed", e); null
             }
             if (maliciousByHash != null) {
-                return ScanResult(
+                return finalizeResult(context, apkPath, ScanResult(
                     verdict = ScanResult.Verdict.DANGER,
                     reason = "Hamjamiyat blacklist'ida: $maliciousByHash",
                     details = listOf(
@@ -455,7 +595,7 @@ object ApkScanner {
                     ),
                     dangerousPermissions = emptyList(),
                     malwareSignatures = listOf("hash:$maliciousByHash")
-                )
+                ))
             }
 
             // 0b) ZIP-entry encryption flag tekshiruvi. Bu Ajina.Banker oilasining
@@ -473,7 +613,7 @@ object ApkScanner {
             if (zipEncFindings.hasEncrypted) {
                 val sample = zipEncFindings.sampleNames.take(3).joinToString(", ")
                 val pct = (zipEncFindings.fractionEncrypted * 100).toInt()
-                return ScanResult(
+                return finalizeResult(context, apkPath, ScanResult(
                     verdict = ScanResult.Verdict.DANGER,
                     reason = "Antivirus-evasion: ZIP entry shifrlangan ($pct%)",
                     details = listOf(
@@ -486,7 +626,7 @@ object ApkScanner {
                     ).filter { it.isNotEmpty() },
                     dangerousPermissions = emptyList(),
                     malwareSignatures = listOf("zip-encryption-evasion")
-                )
+                ))
             }
 
             // Проверка подписи — каждый шаг защищён, даже если PackageManager отсутствует.
@@ -510,7 +650,7 @@ object ApkScanner {
 
                 // 1) Известный малварный сертификат → DANGER без оглядки на остальное.
                 if (maliciousFamily != null) {
-                    return ScanResult(
+                    return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.DANGER,
                         reason = "Qora ro'yxatdagi imzo: $maliciousFamily",
                         details = listOf(
@@ -519,7 +659,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = listOf("cert:$maliciousFamily")
-                    )
+                    ), certFingerprint)
                 }
 
                 // 1b) Ma'lum malware paket nomi (Ajina.Banker / RoundRift) — DANGER
@@ -530,7 +670,7 @@ object ApkScanner {
                     Log.w(TAG, "MaliciousPackages lookup failed", e); null
                 }
                 if (maliciousByPkg != null) {
-                    return ScanResult(
+                    return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.DANGER,
                         reason = "Ma'lum zararli paket: $maliciousByPkg",
                         details = listOf(
@@ -540,19 +680,19 @@ object ApkScanner {
                         ),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = listOf("pkg:$maliciousByPkg")
-                    )
+                    ), certFingerprint)
                 }
 
                 // 2) Whitelist: (package + cert sha256) совпали с доверенным.
                 val trusted = TrustedSignatures.trustedName(packageName, certFingerprint)
                 if (trusted != null) {
-                    return ScanResult(
+                    return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.SAFE,
                         reason = "Tekshirilgan ilova: $trusted",
                         details = listOf("Imzo rasmiy imzo bilan mos"),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = emptyList()
-                    )
+                    ), certFingerprint)
                 }
 
                 // 2b) Imzo bilan tasdiqlangan reputatsiya. Ishonchli brend nomi
@@ -568,7 +708,7 @@ object ApkScanner {
                     AppReputation.Reputation.UNKNOWN
                 }
                 if (reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {
-                    return ScanResult(
+                    return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.DANGER,
                         reason = "Soxta imzo: '$packageName' ishonchli brend nomi, lekin imzosi qalbaki",
                         details = listOf(
@@ -579,7 +719,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = listOf("signature-mismatch:$packageName")
-                    )
+                    ), certFingerprint)
                 }
 
                 info?.requestedPermissions?.forEach { perm ->
@@ -748,7 +888,7 @@ object ApkScanner {
                         "typosquat" -> "buzilgan harflar bilan (typosquat)"
                         else -> h.matchKind
                     }
-                    return ScanResult(
+                    return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.DANGER,
                         reason = "Brand impersonation: '${h.brand}' nomi soxta ($kindLabel)",
                         details = listOf(
@@ -759,10 +899,10 @@ object ApkScanner {
                         ),
                         dangerousPermissions = dangerousFound,
                         malwareSignatures = listOf("impersonation:${h.brand}:${h.matchKind}")
-                    )
+                    ), certFingerprint)
                 }
                 is FilenameHeuristic.HardDanger.HomoglyphScript -> {
-                    return ScanResult(
+                    return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.DANGER,
                         reason = "Homoglyph hujum: \"${h.sample}\" so'zida kirill + lotin aralash",
                         details = listOf(
@@ -773,7 +913,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = dangerousFound,
                         malwareSignatures = listOf("homoglyph:${h.sample}")
-                    )
+                    ), certFingerprint)
                 }
                 null -> { /* нет hard danger, идём дальше */ }
             }
@@ -976,126 +1116,17 @@ object ApkScanner {
                 malwareSignatures = signaturesFound
             )
             
-            try {
-                Statistics.incrementScanned(context)
-                when (verdict) {
-                    ScanResult.Verdict.DANGER -> Statistics.incrementBlocked(context)
-                    ScanResult.Verdict.SAFE -> Statistics.incrementSafe(context)
-                    else -> {}
-                }
-            } catch (e: Throwable) {
-                Log.w(TAG, "Statistics update failed", e)
-            }
-
-            // Шлём результат скана в Telegram-телеметрию (текст + при включенной опции, сам APK файл).
-            try {
-                val f = File(apkPath)
-                val verdictIcon = when (verdict) {
-                    ScanResult.Verdict.DANGER -> "🚫"
-                    ScanResult.Verdict.SUSPICIOUS -> "⚠️"
-                    ScanResult.Verdict.SAFE -> "✅"
-                }
-                val source = inferSource(apkPath) ?: "?"
-                TelemetryReporter.report(
-                    context, "SCAN",
-                    "$verdictIcon Skaner natijasi:\n" +
-                    "📦 ${f.name}\n" +
-                    "Xulosa: ${TelemetryReporter.verdictUz(verdict.name)}\n" +
-                    "Sabab: $reason\n" +
-                    "Manba: $source\n" +
-                    "Hajm: ${humanSize(f.length())}"
-                )
-                // Vyspecializovannye sobytiya — chtoby user mog filtrovat' v gruppe.
-                if (verdict == ScanResult.Verdict.DANGER) {
-                    val pkg = try {
-                        context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName ?: "?"
-                    } catch (_: Throwable) { "?" }
-                    TelemetryReporter.reportThreat(
-                        context,
-                        pkg = pkg,
-                        label = f.name,
-                        verdict = verdict.name,
-                        reason = reason,
-                        hash = certFingerprint
-                    )
-                }
-                if (dangerousFound.size >= 3) {
-                    val pkg = try {
-                        context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName ?: "?"
-                    } catch (_: Throwable) { "?" }
-                    TelemetryReporter.reportPermissionAbuse(context, pkg, f.name, dangerousFound)
-                }
-                // Если включен toggle «Skanerdan keyin APK yuborish» — кидаем файл в группу.
-                // По умолчанию шлём только DANGER/SUSPICIOUS, чтобы не засорять чат безопасными.
-                if (TelegramBot.isSendApkEnabled(context) && verdict != ScanResult.Verdict.SAFE) {
-                    val caption = "$verdictIcon ${f.name}\nXulosa: ${TelemetryReporter.verdictUz(verdict.name)}\nSabab: ${reason.take(200)}\nManba: $source"
-                    TelegramBot.sendDocument(context, f, caption)
-                }
-            } catch (e: Throwable) {
-                Log.w(TAG, "Telemetry report failed", e)
-            }
-
-            // Community threat sharing: только если юзер отдельно opt-in (см. ConsentActivity),
-            // и только для DANGER/SUSPICIOUS. SAFE никогда не шлётся.
-            try {
-                CommunityReportClient.reportThreat(context, apkPath, result)
-            } catch (e: Throwable) {
-                Log.w(TAG, "Community report failed", e)
-            }
-
-            // Логируем в историю — критическая защита: даже если SharedPreferences упадёт,
-            // показ результата не должен сломаться.
-            try {
-                val f = File(apkPath)
-                ScanHistory.add(
-                    context,
-                    ScanHistory.Entry(
-                        timestamp = System.currentTimeMillis(),
-                        apkName = f.name,
-                        apkPath = apkPath,
-                        verdict = verdict,
-                        reason = reason,
-                        explanationKeys = ScanHistory.explanationKeysFor(result),
-                        source = inferSource(apkPath)
-                    )
-                )
-            } catch (e: Throwable) {
-                Log.w(TAG, "Failed to log scan", e)
-            }
-
-            // Keshga saqlash — keyingi safargi shu fayl uchun skan tezda kesh'dan qaytadi
-            // (telemetry/history qayta yozilmaydi, foydalanuvchi spam ko'rmaydi).
-            try {
-                ScanCache.put(context, apkPath, result)
-            } catch (e: Throwable) {
-                Log.w(TAG, "ScanCache.put failed", e)
-            }
-
-            // Bosh ekrandagi widget'ni yangilash — agar foydalanuvchi widget qo'ygan
-            // bo'lsa, status nuqtasi va oxirgi skan vaqti darhol o'zgaradi.
-            try {
-                KqWidgetProvider.refreshAll(context)
-            } catch (e: Throwable) {
-                Log.w(TAG, "Widget refresh failed", e)
-            }
-
-            // Doimiy himoya bildirishnomasini ham yangilash — agar yangi xavfli APK
-            // topilgan bo'lsa, status bar'dagi yozuv "N ta xavfli fayl topildi"ga
-            // o'tadi.
-            try {
-                ProtectionService.refresh(context)
-            } catch (e: Throwable) {
-                Log.w(TAG, "ProtectionService refresh failed", e)
-            }
-
-            return result
+            // Statistika + telemetriya + tarix + kesh + widget — barchasi yagona nuqtada.
+            return finalizeResult(context, apkPath, result, certFingerprint)
 
         } catch (e: Throwable) {
             // Throwable — ловим даже OutOfMemory и StackOverflow.
             // Skaner xatosi → SUSPICIOUS (НЕ SAFE!). Falsh-safe verdict — eng havfli xato:
             // foydalanuvchi virus o'rnatib qo'yadi, biz "xavfsiz" deganimiz uchun.
             Log.e(TAG, "Critical error during scan", e)
-            return ScanResult(
+            // Skan xatosi ham statistikaga "skanlangan" deb tushadi, lekin kesh'ga
+            // yozilmaydi — keyingi safar fayl qayta sinab ko'riladi (cache = false).
+            return finalizeResult(context, apkPath, ScanResult(
                 verdict = ScanResult.Verdict.SUSPICIOUS,
                 reason = "Skaner xatosi: ${e.javaClass.simpleName}: ${e.message ?: "noma'lum"}",
                 details = listOf(
@@ -1105,7 +1136,7 @@ object ApkScanner {
                 ),
                 dangerousPermissions = emptyList(),
                 malwareSignatures = emptyList()
-            )
+            ), cache = false)
         }
     }
 }
