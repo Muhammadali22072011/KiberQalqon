@@ -120,7 +120,8 @@ TRUSTED_EXACT = {
     "com.linkedin.android", "com.pinterest", "com.skype.raider", "com.opera.browser",
     "com.opera.mini.native", "org.mozilla.firefox", "com.brave.browser",
     "com.duckduckgo.mobile.android", "com.yandex.browser", "ru.yandex.searchplugin",
-    "com.adobe.reader", "com.dropbox.android", "uz.kapitalbank.android", "uz.click.evo",
+    "com.adobe.reader", "com.dropbox.android", "ru.zdevs.zarchiver",
+    "uz.kapitalbank.android", "uz.click.evo",
     "uz.dida.payme", "uz.uzcard.uzcard", "uz.uzum.bank", "uz.tbcbank.mobile",
     "uz.hamkorbank.mobile", "uz.agrobank.mobile", "uz.ipakyulibank.mobile",
     "uz.infinbank.mobile", "uz.davrbank.mobile", "uz.beeline.odp",
@@ -128,6 +129,20 @@ TRUSTED_EXACT = {
     "uz.dunyo.mobile", "uz.soliq.mygov", "uz.yt.dyhcm", "uz.aab.online",
     "com.oson.app", "com.paynet.android",
 }
+
+
+# SelfGuard — never flag our own antivirus builds (they contain the IoC database).
+OWN_PACKAGES = {"com.kiberqalqon", "com.kiberqalqon.debug", "com.apkguard", "com.apkguard.debug"}
+OWN_FILENAME_PREFIXES = ("kiberqalqon", "apkguard")
+
+
+def is_own_apk(apk_path, package):
+    fn = os.path.basename(apk_path).lower()
+    if (package or "").lower() in OWN_PACKAGES:
+        return True
+    if any(fn.startswith(p) for p in OWN_FILENAME_PREFIXES):
+        return True
+    return False
 
 
 def known_good(pkg):
@@ -929,6 +944,12 @@ def scan(apk_path, sensitivity="medium"):
             res["perms"] = list(apk.get_permissions() or [])
         except Exception:
             pass
+
+    # SelfGuard — our own antivirus build → SAFE, never scan (it carries the IoC DB).
+    if is_own_apk(apk_path, res["package"]):
+        res.update(verdict="SAFE", reason="KiberQalqon ning o'zi (SelfGuard)")
+        res["fired"].append("self-skip")
+        return res
 
     # 1) malicious cert
     fam = MALICIOUS_CERTS.get((res["cert"] or "").lower())

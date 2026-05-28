@@ -817,11 +817,32 @@ object ApkScanner {
             // yig'iladi); faqat yakka kuchli combo mgновen DANGER beradi.
             val strongCombo = comboMatches.any { it.combo.score >= 90 }
 
+            // Soxta "xavfsizlik/tozalash" ilovasi: ko'rinadigan nomi (label) antivirus/
+            // cleaner/booster/shield/guard/VPN deydi, LEKIN mikrofon (RECORD_AUDIO) so'raydi.
+            // Haqiqiy antivirus/tozalagich/booster hech qachon mikrofon so'ramaydi — bu
+            // deyarli har doim josuslik niqobi ("Secure Shield" = com.secureshield.app:
+            // kamera+mikrofon+internet, lekin nomi "himoyachi"). Past FP: reputatsiya
+            // (VERIFIED) o'rnatilgan legit ilovalarni yuqorida himoya qiladi; bu +50 faqat
+            // SUSPICIOUS darajasiga yetadi (o'zi DANGER bermaydi).
+            val fakeSecurityMicAbuse = run {
+                val label = (appLabel ?: "").lowercase()
+                val securityWords = listOf(
+                    "antivirus", "anti-virus", "anti virus", "cleaner", "booster",
+                    "optimizer", "security", "shield", "guard", "protector",
+                    "vpn", "cache clean", "speed boost", "phone clean"
+                )
+                val claimsSecurity = securityWords.any { it in label }
+                val wantsMic = allRequestedPerms.any { it.endsWith("RECORD_AUDIO") }
+                claimsSecurity && wantsMic
+            }
+            val fakeSecurityScore = if (fakeSecurityMicAbuse) 50 else 0
+
             // MUHIM: native topilma endi MUSTAQIL DANGER bermaydi (bu false-positive'ning
             // asosiy sababi edi — har bir native lib'da dlopen/JNI_OnLoad bor). U umumiy
             // score'ga qo'shiladi va boshqa signallar bilan tasdiqlanishi kerak.
             val totalScore = manifestFindings.score + comboScore + dexFindings.score +
-                    dropperFindings.score + filenameFindings.score + nativeFindings.score
+                    dropperFindings.score + filenameFindings.score + nativeFindings.score +
+                    fakeSecurityScore
 
             // Threshold'lar headroom bilan — bir nechta yumshoq signal yig'ilib legit
             // ilovani DANGER qilmasligi uchun medium DANGER 65→85 ko'tarildi.
@@ -877,6 +898,9 @@ object ApkScanner {
             if (dangerousFound.isNotEmpty()) {
                 val perms = dangerousFound.take(5).joinToString(", ") { it.substringAfterLast(".") }
                 details.add("Xavfli ruxsatlar: $perms")
+            }
+            if (fakeSecurityMicAbuse) {
+                details.add("⚠️ \"Xavfsizlik/tozalash\" ilovasi mikrofon (RECORD_AUDIO) so'rayapti — bu odatda josuslik niqobi")
             }
             if (signaturesFound.isNotEmpty()) {
                 val sigs = signaturesFound.take(3).joinToString(", ")

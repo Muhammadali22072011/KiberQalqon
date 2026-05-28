@@ -49,19 +49,44 @@ class PeriodicCheckWorker(
                     
                     try {
                         val result = ApkScanner.scan(applicationContext, apk.path)
-                        
+
                         // Добавляем в список проверенных
                         checkedFiles.add(apk.path)
-                        
-                        // Если опасный - показываем окно
-                        if (result.verdict == ScanResult.Verdict.DANGER) {
-                            Log.d(TAG, "🔴 ОПАСНЫЙ файл: ${apk.name}")
-                            newThreats++
-                            showDangerAlert(apk)
-                        } else if (result.verdict == ScanResult.Verdict.SUSPICIOUS) {
-                            Log.d(TAG, "🟠 ПОДОЗРИТЕЛЬНЫЙ файл: ${apk.name}")
-                        } else {
-                            Log.d(TAG, "🟢 Безопасный файл: ${apk.name}")
+
+                        // "Yangi yuklab olingan" = oxirgi 30 daqiqada o'zgargan fayl.
+                        // Real-time FileObserver Telegram'ning /Android/media/... papkasini
+                        // ko'pincha ushlamaydi → bu worker yagona fallback. Avval u FAQAT
+                        // DANGER uchun oyna ko'rsatardi: foydalanuvchi xavfsiz/shubhali
+                        // APK yuklasa — HECH NIMA chiqmasdi ("oyna chiqmadi"). Endi yangi
+                        // yuklab olingan har qanday APK foydalanuvchiga ko'rsatiladi (tap →
+                        // AutoScanActivity: tekshirish natijasi + o'chirish/o'rnatish).
+                        // Eski (allaqachon turgan) fayllar bezovta qilmaydi — faqat DANGER
+                        // har doim ko'rsatiladi. checked_paths dedup spam'ni oldini oladi.
+                        val recentlyDownloaded =
+                            (System.currentTimeMillis() - apk.file.lastModified()) < 30 * 60 * 1000L
+
+                        when (result.verdict) {
+                            ScanResult.Verdict.DANGER -> {
+                                Log.d(TAG, "🔴 ОПАСНЫЙ файл: ${apk.name}")
+                                newThreats++
+                                showDangerAlert(apk)
+                            }
+                            ScanResult.Verdict.SUSPICIOUS -> {
+                                Log.d(TAG, "🟠 ПОДОЗРИТЕЛЬНЫЙ файл: ${apk.name}")
+                                if (recentlyDownloaded) {
+                                    NotificationHelper.showFoundApkNotification(
+                                        applicationContext, apk.file, result.verdict, result.reason
+                                    )
+                                }
+                            }
+                            ScanResult.Verdict.SAFE -> {
+                                Log.d(TAG, "🟢 Безопасный файл: ${apk.name}")
+                                if (recentlyDownloaded) {
+                                    NotificationHelper.showFoundApkNotification(
+                                        applicationContext, apk.file, result.verdict, result.reason
+                                    )
+                                }
+                            }
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Ошибка проверки: ${apk.name}", e)
