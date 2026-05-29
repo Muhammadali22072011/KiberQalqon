@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.*
 import com.kiberqalqon.databinding.ActivityMainBinding
+import com.kiberqalqon.databinding.ItemNewsBinding
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -26,6 +27,9 @@ class MainActivity : AppCompatActivity() {
     private var hasPermission = false
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var multiPathObserver: MultiPathFileObserver? = null
+    // Har bir lenta yangilanishida o'sadi — kechikkan rasm yuklashlari eski
+    // ko'rinishga tushmasligi uchun callback'da solishtiramiz.
+    private var newsGen = 0
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -122,6 +126,81 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshEmptyState() {
         binding.layoutEmpty.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+    }
+
+    // ─── Yangiliklar / e'lonlar lentasi (cloud'dan) ──────────────────────────
+    // Egasi panelda e'lon yozadi; ilova faqat o'qiydi (x-device-secret). Cloud
+    // sozlanmagan, rozilik yo'q yoki lenta bo'sh bo'lsa — bo'lim yashiriladi.
+    private fun loadNews() {
+        if (!Config.hasUserConsent(this)) {
+            binding.newsSection.visibility = View.GONE
+            return
+        }
+        NewsClient.fetch { result ->
+            if (isFinishing || isDestroyed) return@fetch
+            when (result) {
+                is NewsClient.Result.Success -> renderNews(result.items)
+                else -> {
+                    // NotConfigured / NetworkError — jim yashiramiz (bor lentani buzmaymiz).
+                    if (binding.newsContainer.childCount == 0) {
+                        binding.newsSection.visibility = View.GONE
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderNews(items: List<NewsClient.NewsItem>) {
+        newsGen++
+        val container = binding.newsContainer
+        container.removeAllViews()
+        if (items.isEmpty()) {
+            binding.newsSection.visibility = View.GONE
+            return
+        }
+        val gen = newsGen
+        items.forEachIndexed { idx, item ->
+            val ib = ItemNewsBinding.inflate(layoutInflater, container, false)
+            ib.newsItemTitle.text = item.title
+            ib.newsItemDate.text = shortDate(item.createdAt)
+
+            val accent = when (item.level) {
+                "critical" -> R.color.kq_danger
+                "warning" -> R.color.kq_warn
+                else -> R.color.kq_ink_3
+            }
+            ib.newsAccent.setBackgroundColor(ContextCompat.getColor(this, accent))
+
+            if (item.body.isNotBlank()) {
+                ib.newsItemBody.text = item.body
+                ib.newsItemBody.visibility = View.VISIBLE
+            }
+
+            ib.newsItemDivider.visibility = if (idx == items.lastIndex) View.GONE else View.VISIBLE
+
+            if (item.imageUrl.startsWith("http")) {
+                NewsClient.loadImage(item.imageUrl) { bmp ->
+                    if (bmp != null && gen == newsGen && !isFinishing && !isDestroyed) {
+                        ib.newsItemImage.setImageBitmap(bmp)
+                        ib.newsItemImage.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            container.addView(ib.root)
+        }
+        binding.newsSection.visibility = View.VISIBLE
+    }
+
+    // "2026-05-29T06:00:00Z" → "29.05.2026"; parse qila olmasak — bo'sh.
+    private fun shortDate(iso: String): String {
+        val d = iso.trim()
+        if (d.length < 10) return ""
+        val y = d.substring(0, 4)
+        val m = d.substring(5, 7)
+        val day = d.substring(8, 10)
+        val ok = y.all { it.isDigit() } && m.all { it.isDigit() } && day.all { it.isDigit() }
+        return if (ok) "$day.$m.$y" else ""
     }
     
     private fun setupButtons() {
@@ -348,6 +427,7 @@ class MainActivity : AppCompatActivity() {
         if (hasPermission) {
             binding.switchBackground.isChecked = Config.isBackgroundEnabled(this)
         }
+        loadNews()
     }
     
     override fun onDestroy() {

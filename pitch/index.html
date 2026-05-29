@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>KiberQalqon — Investitsiya taqdimoti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg0:#070d11; --bg1:#0f1820; --navy:#0b1014;
+  --ink:#eff6f7; --ink2:#9fb2bb; --ink3:#6c7e88;
+  --teal:#5bcbd3; --teal2:#2d9cb8; --teal-deep:#1f7b92;
+  --saffron:#e0a040; --gold:#cc9442;
+  --danger:#e25a4a; --danger2:#d74536;
+  --safe:#5bcb8a;
+  --hair:rgba(255,255,255,.10); --hair2:rgba(255,255,255,.18);
+  --panel:rgba(255,255,255,.045); --panel2:rgba(255,255,255,.07);
+  --fd:"Space Grotesk","Inter",system-ui,sans-serif;
+  --fb:"Manrope","Inter",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#04080b;overflow:hidden;font-family:var(--fb);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse at 22% 18%, rgba(45,156,184,.22), transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(224,160,64,.12), transparent 55%),
+    var(--bg0);}
+.stage{position:relative;width:1280px;height:720px;transform-origin:center center;
+  background:linear-gradient(165deg,var(--bg1) 0%, var(--navy) 100%);
+  border-radius:18px;overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05) inset;}
+
+/* 8-point star pattern */
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 8 L48 32 L72 40 L48 48 L40 72 L32 48 L8 40 L32 32 Z' fill='none' stroke='%235bcbd3' stroke-width='1' opacity='.10'/%3E%3Ccircle cx='0' cy='0' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='80' cy='0' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='0' cy='80' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='80' cy='80' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3C/svg%3E");
+  background-size:80px 80px;}
+
+/* slides */
+.slide{position:absolute;inset:0;padding:60px 70px;opacity:0;visibility:hidden;
+  transition:opacity .5s ease;display:flex;flex-direction:column;}
+.slide.active{opacity:1;visibility:visible;}
+.slide.prev{}
+
+/* entrance animation */
+[data-anim]{opacity:0;transform:translateY(20px)}
+.slide.active [data-anim]{animation:rise .62s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+@keyframes rise{to{opacity:1;transform:none}}
+.slide.active [data-anim="fade"]{animation-name:fade}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.slide.active [data-anim="zoom"]{animation-name:zoomin}
+@keyframes zoomin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.slide.active [data-anim="right"]{animation-name:fromright}
+@keyframes fromright{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+
+/* typography */
+.eyebrow{font:600 13px/1 var(--fm);letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:inline-flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--teal);border-radius:2px}
+h1{font:700 76px/1.02 var(--fd);letter-spacing:-.03em}
+h2{font:700 44px/1.08 var(--fd);letter-spacing:-.02em;margin-top:12px}
+.sub{font:400 19px/1.5 var(--fb);color:var(--ink2);margin-top:14px;max-width:760px}
+.mono{font-family:var(--fm)}
+b,strong{color:#fff;font-weight:700}
+.teal{color:var(--teal)} .saf{color:var(--saffron)} .dgr{color:var(--danger)}
+.gl{font:400 14px/1.2 var(--fb);color:var(--ink3);letter-spacing:0}
+
+/* layout helpers */
+.row{display:flex;gap:30px}
+.grow{flex:1;min-width:0}
+.spread{display:flex;justify-content:space-between;align-items:flex-end}
+.center{align-items:center}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:18px;padding:22px 24px;backdrop-filter:blur(4px)}
+.card .ct{font:700 19px/1.2 var(--fd);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.card .cd{font:400 15px/1.5 var(--fb);color:var(--ink2)}
+.ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgba(91,203,211,.14);color:var(--teal);flex:none}
+.ic.d{background:rgba(226,90,74,.16);color:#ff9082}
+.ic.s{background:rgba(224,160,64,.16);color:var(--saffron)}
+
+/* stat tiles */
+.stat{background:var(--panel);border:1px solid var(--hair);border-radius:16px;padding:18px 20px}
+.stat .n{font:700 40px/1 var(--fd);letter-spacing:-.02em}
+.stat .l{font:600 12px/1.3 var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
+
+/* phone */
+.phone{width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 26px 50px rgba(0,0,0,.55))}
+.phone-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.phone-wrap::before{content:"";position:absolute;width:74%;height:60%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(91,203,211,.30),transparent);filter:blur(20px);z-index:0}
+.phone-wrap img{position:relative;z-index:1}
+
+/* pills / chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.pill{font:600 13px/1 var(--fm);letter-spacing:.04em;padding:9px 13px;border-radius:999px;border:1px solid var(--hair2);color:var(--ink2);background:rgba(255,255,255,.03)}
+.pill.t{border-color:rgba(91,203,211,.4);color:var(--teal);background:rgba(91,203,211,.08)}
+.pill.d{border-color:rgba(226,90,74,.4);color:#ff9082;background:rgba(226,90,74,.10)}
+
+/* numbered steps */
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{display:flex;gap:16px;align-items:center;background:var(--panel);border:1px solid var(--hair);border-radius:14px;padding:13px 18px}
+.step .sn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:700 16px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none}
+.step .sx{font:500 16px/1.35 var(--fb)}
+.step.d .sn{background:linear-gradient(140deg,#ff7a68,var(--danger2));color:#fff}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:13px 12px;text-align:center;border-bottom:1px solid var(--hair)}
+th{font:600 12px/1.3 var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+td:first-child,th:first-child{text-align:left;font-family:var(--fd);font-weight:600}
+.yes{color:var(--safe);font-weight:700}.no{color:#5b6b73}
+tr.us{background:linear-gradient(90deg,rgba(91,203,211,.14),rgba(91,203,211,.02));}
+tr.us td{border-bottom-color:rgba(91,203,211,.3)}
+tr.us td:first-child{color:var(--teal)}
+
+/* bars */
+.bar{height:13px;border-radius:7px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar > i{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,var(--teal),var(--teal-deep))}
+.bar.s > i{background:linear-gradient(90deg,var(--saffron),var(--gold))}
+
+/* terminal mini */
+.term{background:#0a141a;border:1px solid rgba(91,203,211,.22);border-radius:14px;padding:16px 18px;font:500 14px/1.7 var(--fm);color:#bfe9ed}
+.term .k{color:var(--saffron)} .term .s{color:#82e0a6} .term .c{color:#6a7a83}
+
+/* timeline */
+.tl{display:flex;gap:0;margin-top:18px}
+.tl .t{flex:1;position:relative;padding:0 14px}
+.tl .t::before{content:"";position:absolute;top:9px;left:0;right:0;height:2px;background:var(--hair2)}
+.tl .t .dot{position:relative;width:18px;height:18px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 5px rgba(91,203,211,.18);margin-bottom:14px}
+.tl .t.fut .dot{background:#3a4c57;box-shadow:0 0 0 5px rgba(255,255,255,.05)}
+.tl .t .q{font:700 16px/1 var(--fd);color:var(--teal)}
+.tl .t.fut .q{color:var(--ink2)}
+.tl .t .d{font:400 14px/1.4 var(--fb);color:var(--ink2);margin-top:8px}
+
+/* scan line accent */
+.scanwrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:18px}
+.scanline{position:absolute;left:0;right:0;height:2px;top:-10%;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+  box-shadow:0 0 24px var(--teal);animation:sweep 6s linear infinite;opacity:.5}
+@keyframes sweep{0%{top:-5%}100%{top:105%}}
+
+/* footer brand */
+.brandline{position:absolute;left:70px;bottom:30px;display:flex;align-items:center;gap:10px;font:600 12px/1 var(--fm);letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+.brandline img{width:22px;height:22px;border-radius:6px}
+
+/* chrome: progress + counter + nav */
+.bar-prog{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--saffron));z-index:50;transition:width .4s ease}
+.counter{position:fixed;right:18px;bottom:14px;z-index:50;font:600 13px/1 var(--fm);color:var(--ink3);letter-spacing:.1em}
+.dots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;gap:7px}
+.dots b{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:.2s}
+.dots b.on{background:var(--teal);width:22px;border-radius:5px}
+.nav{position:fixed;bottom:12px;z-index:50;display:flex;gap:8px;left:18px}
+.nav button{width:34px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:rgba(255,255,255,.05);color:var(--ink2);cursor:pointer;font-size:15px}
+.nav button:hover{color:var(--teal);border-color:var(--teal)}
+.hint{position:fixed;right:18px;top:14px;z-index:50;font:500 12px/1 var(--fm);color:var(--ink3);letter-spacing:.05em}
+
+/* cover specifics */
+.cover{justify-content:center;align-items:flex-start}
+.cover .logo{width:120px;height:120px;border-radius:28px;box-shadow:0 18px 50px rgba(91,203,211,.3);margin-bottom:26px}
+.cover h1{font-size:104px}
+.badgeRow{display:flex;gap:10px;margin-top:30px}
+.badge{font:600 13px/1 var(--fm);letter-spacing:.08em;padding:11px 16px;border-radius:999px;border:1px solid var(--hair2);color:var(--ink2);text-transform:uppercase}
+.badge.t{border-color:rgba(91,203,211,.45);color:var(--teal)}
+
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.fill{flex:1;display:flex;flex-direction:column;justify-content:center}
+.cap{font:600 12px/1.3 var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);text-align:center;margin-top:14px}
+.lead{font:500 17px/1.55 var(--fb);color:var(--ink2)}
+.tick{color:var(--teal);font-weight:700;margin-right:8px}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:14px}
+ul.clean li{font:500 18px/1.45 var(--fb);display:flex;gap:12px;align-items:flex-start}
+ul.clean li .tick{font-size:20px;line-height:1.3}
+</style>
+</head>
+<body>
+<div class="bar-prog" id="prog"></div>
+<div class="hint">← / → · bo'sh joy</div>
+<div class="nav"><button id="bPrev">‹</button><button id="bNext">›</button></div>
+<div class="dots" id="dots"></div>
+<div class="counter" id="counter">01 / 15</div>
+
+<div class="deck">
+<div class="stage" id="stage">
+
+<!-- 1 · COVER -->
+<section class="slide cover">
+  <div class="scanwrap"><div class="scanline"></div></div>
+  <img class="logo" src="assets/logo.png" alt="KiberQalqon" data-anim="zoom" style="--d:.05s"/>
+  <div class="eyebrow" data-anim style="--d:.15s">Investitsiya taqdimoti · 2026</div>
+  <h1 data-anim style="--d:.25s">KiberQalqon</h1>
+  <div class="sub" style="font-size:24px;color:var(--ink)" data-anim style="--d:.35s">O'zbekiston uchun mobil antivirus</div>
+  <div class="sub" data-anim style="--d:.45s">Telegram orqali tarqaladigan bank troyanlaridan <b>real vaqtda</b> himoya qiluvchi, telefonning o'zida ishlaydigan qalqon.</div>
+  <div class="badgeRow" data-anim style="--d:.6s">
+    <span class="badge t">v7.9 · ishlaydigan ilova</span>
+    <span class="badge">Android · Kotlin</span>
+    <span class="badge">Navoiyda yaratilgan</span>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>KiberQalqon · Muhammadali</div>
+</section>
+
+<!-- 2 · MUAMMO -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Muammo</div>
+  <h2 data-anim style="--d:.08s">O'zbekistonliklar pulini bir «rasm» orqali yo'qotmoqda</h2>
+  <div class="row grow center" style="margin-top:26px;gap:40px">
+    <div class="grow">
+      <ul class="clean">
+        <li data-anim style="--d:.16s"><span class="tick">▸</span><div>Firibgarlar <b>"rasm", "video", "to'y taklifnomasi"</b> niqobida <span class="mono dgr">.apk</span> <span class="gl">(dastur o'rnatma fayli)</span> yuboradi.</div></li>
+        <li data-anim style="--d:.26s"><span class="tick">▸</span><div>Tarqalish kanali — <b>Telegram</b> va <b>WhatsApp</b>.</div></li>
+        <li data-anim style="--d:.36s"><span class="tick">▸</span><div>O'rnatilgach <b>Ajina.Banker</b> / <b>RoundRift</b> troyani <b>SMS-OTP</b> kodlarini <span class="gl">(bankdan keladigan bir martalik parol)</span> o'g'irlaydi.</div></li>
+        <li data-anim style="--d:.46s"><span class="tick">▸</span><div>Natija — <b class="dgr">bank hisobidan pul yechib olinadi.</b></div></li>
+      </ul>
+      <div class="chips" style="margin-top:24px">
+        <span class="pill d mono" data-anim style="--d:.54s">RASMLAR (18).apk</span>
+        <span class="pill d mono" data-anim style="--d:.6s">toydanfotolar(9.jpg).apk</span>
+        <span class="pill d mono" data-anim style="--d:.66s">VIDEO.20.01.2026.mp4.apk</span>
+        <span class="pill d mono" data-anim style="--d:.72s">TAKLIFNOMA TOY.apk</span>
+      </div>
+    </div>
+    <div class="kpis" style="width:300px;flex:none;grid-template-columns:1fr">
+      <div class="stat" data-anim="zoom" style="--d:.4s"><div class="n dgr">5</div><div class="l">real namuna tahlil qilindi</div></div>
+      <div class="stat" data-anim="zoom" style="--d:.5s"><div class="n saf">2</div><div class="l">bank troyani oilasi</div></div>
+      <div class="stat" data-anim="zoom" style="--d:.6s"><div class="n teal">2</div><div class="l">C2 boshqaruv serveri</div></div>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Muammo</div>
+</section>
+
+<!-- 3 · HUJUM ZANJIRI -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Hujum qanday ishlaydi</div>
+  <h2 data-anim style="--d:.08s">Bir bosishdan — bo'sh hisobgacha</h2>
+  <div class="row grow" style="margin-top:24px;gap:30px">
+    <div class="grow steps">
+      <div class="step" data-anim style="--d:.16s"><span class="sn">1</span><span class="sx">Telegram'da "rasm/video" niqobidagi fayl keladi</span></div>
+      <div class="step" data-anim style="--d:.24s"><span class="sn">2</span><span class="sx">APK o'rnatiladi — Play Market'dan <b>tashqarida</b> <span class="gl">(«sideload»)</span></span></div>
+      <div class="step" data-anim style="--d:.32s"><span class="sn">3</span><span class="sx"><b>Accessibility</b> <span class="gl">(maxsus imkoniyatlar)</span> + <b>SMS</b> o'qish ruxsati so'raladi</span></div>
+      <div class="step d" data-anim style="--d:.4s"><span class="sn">4</span><span class="sx">Soxta "yangilanish" <b>oynasi</b> ko'rsatiladi <span class="gl">(overlay · 3 tilda)</span></span></div>
+    </div>
+    <div class="grow steps">
+      <div class="step d" data-anim style="--d:.48s"><span class="sn">5</span><span class="sx">Kelgan <b>SMS-OTP</b> kodi <span class="gl">(bir martalik parol)</span> ushlab qolinadi</span></div>
+      <div class="step d" data-anim style="--d:.56s"><span class="sn">6</span><span class="sx">C2 (boshqaruv) serverga uzatiladi — <span class="mono dgr">elrxzx.com</span></span></div>
+      <div class="step d" data-anim style="--d:.64s"><span class="sn">7</span><span class="sx"><b class="dgr">Hisobdan pul yechib olinadi</b></span></div>
+      <div class="card" data-anim="fade" style="--d:.74s;margin-top:6px;border-color:rgba(226,90,74,.3)">
+        <div class="cd">Foydalanuvchi hech narsani sezmaydi — ilova ko'rinmas, overlay esa tizim oynasiga o'xshaydi.</div>
+      </div>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Hujum zanjiri</div>
+</section>
+
+<!-- 4 · NEGA ANTIVIRUSLAR KO'RMAYDI -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Texnik sabab</div>
+  <h2 data-anim style="--d:.08s">Oddiy antiviruslar bu APK'ni <span class="dgr">ocha olmaydi</span></h2>
+  <div class="grid2" style="margin-top:26px">
+    <div class="card" data-anim style="--d:.16s"><div class="ct"><span class="ic d">🔒</span>ZIP-evasion <span class="gl">· arxiv hiylasi</span></div><div class="cd">Har bir fayl <span class="mono">GP-flag=0x01</span> (shifrlangan) deb belgilangan. Antivirus arxivni <b>ocha olmaydi</b>, lekin Android baribir o'rnatadi.</div></div>
+    <div class="card" data-anim style="--d:.26s"><div class="ct"><span class="ic d">🐞</span>Anti-Frida / Magisk / VPN <span class="gl">· tahlildan qochish</span></div><div class="cd">Tahlil muhitini, root'ni <span class="gl">(tizimga to'liq huquq)</span> va VPN'ni aniqlaydi — topilsa, o'zini <b>yashiradi</b> va ishga tushmaydi.</div></div>
+    <div class="card" data-anim style="--d:.36s"><div class="ct"><span class="ic d">🪟</span>3 tilli soxta oyna <span class="gl">· HTML overlay</span></div><div class="cd">O'zbek · Русский · Français soxta oyna. <span class="mono">WebView↔Java</span> <span class="gl">(oyna↔kod)</span> ko'prigi orqali bosish bankerni ishga tushiradi.</div></div>
+    <div class="card" data-anim style="--d:.46s"><div class="ct"><span class="ic d">🚫</span>Play Protect chetlab o'tiladi</div><div class="cd">Fayl do'kondan tashqarida tarqalgani uchun Google Play Protect uni <b>tekshirmaydi</b>.</div></div>
+  </div>
+  <div class="card" data-anim="fade" style="--d:.6s;margin-top:20px;background:rgba(226,90,74,.08);border-color:rgba(226,90,74,.3)">
+    <div class="lead" style="color:var(--ink)">➜ Aynan shu bo'shliqni <b class="teal">KiberQalqon</b> yopadi: u faylni <b>o'rnatishdan oldin</b>, telefonning o'zida ushlaydi.</div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Nega antiviruslar ko'rmaydi</div>
+</section>
+
+<!-- 5 · YECHIM -->
+<section class="slide">
+  <div class="row grow center" style="gap:50px">
+    <div class="fill grow">
+      <div class="eyebrow" data-anim>Yechim</div>
+      <h2 data-anim style="--d:.08s">Telefoningizda yashaydigan qalqon</h2>
+      <ul class="clean" style="margin-top:22px">
+        <li data-anim style="--d:.18s"><span class="tick">✓</span><div><b>Real vaqtda kuzatuv</b> <span class="gl">(FileObserver tizimi)</span> — yangi APK tushishi bilanoq darhol tekshiradi.</div></li>
+        <li data-anim style="--d:.28s"><span class="tick">✓</span><div><b>Hech qachon noto'g'ri "XAVFSIZ" demaydi</b> — shubha bo'lsa = SHUBHALI deb belgilaydi.</div></li>
+        <li data-anim style="--d:.38s"><span class="tick">✓</span><div><b>5 soniyada avtomatik o'chirish</b> — xavfli faylni qo'l tegmasdan yo'q qiladi.</div></li>
+        <li data-anim style="--d:.48s"><span class="tick">✓</span><div><b>To'liq o'zbekcha</b> va <b>internetsiz</b> <span class="gl">(qurilmaning o'zida · on-device)</span> ishlaydi.</div></li>
+      </ul>
+    </div>
+    <div class="phone-wrap" data-anim="right" style="height:560px;flex:none;--d:.3s">
+      <img class="phone" src="assets/screen-dash-dark.png" alt="Asosiy ekran" style="height:540px"/>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Yechim</div>
+</section>
+
+<!-- 6 · MAHSULOT (real screens) -->
+<section class="slide">
+  <div class="spread">
+    <div><div class="eyebrow" data-anim>Mahsulot</div><h2 data-anim style="--d:.08s">Haqiqiy ilova ekranlari</h2></div>
+    <div class="lead" data-anim style="--d:.16s;max-width:360px;text-align:right">Dizayn — Samarqand feruzasi va suzani naqshi asosida. Kunduzgi va tungi (qorong'i) rejim.</div>
+  </div>
+  <div class="row grow center" style="justify-content:center;gap:34px;margin-top:6px">
+    <div style="text-align:center"><div class="phone-wrap" data-anim="zoom" style="height:440px;--d:.2s"><img class="phone" src="assets/screen-dash-dark.png" style="height:440px"/></div><div class="cap">Asosiy · himoya darajasi</div></div>
+    <div style="text-align:center"><div class="phone-wrap" data-anim="zoom" style="height:460px;--d:.34s"><img class="phone" src="assets/screen-alert-result.png" style="height:460px"/></div><div class="cap">Avto-skaner · xavf aniqlandi</div></div>
+    <div style="text-align:center"><div class="phone-wrap" data-anim="zoom" style="height:440px;--d:.48s"><img class="phone" src="assets/screen-result-banker.png" style="height:440px"/></div><div class="cap">Tahlil natijasi · Ajina.Banker</div></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Mahsulot</div>
+</section>
+
+<!-- 7 · ANIQLASH DVIGATELI -->
+<section class="slide">
+  <div class="row grow center" style="gap:46px">
+    <div class="fill grow">
+      <div class="eyebrow" data-anim>Texnologiya</div>
+      <h2 data-anim style="--d:.08s">Haqiqiy teskari muhandislik asosidagi dvigatel <span class="gl">· reverse-engineering</span></h2>
+      <div class="sub" data-anim style="--d:.16s">Har bir detektor — haqiqiy o'zbek troyanlarini teskari muhandislik qilishdan olingan: aniq hash, sertifikat, kalit va C2'lar ilovaga o'rnatilgan.</div>
+      <div class="chips" style="margin-top:22px">
+        <span class="pill t" data-anim style="--d:.26s">Arxiv hiylasi <span class="gl">· ZIP-evasion</span></span>
+        <span class="pill t" data-anim style="--d:.32s">Kod naqshi <span class="gl">· DEX · Ajina imzosi</span></span>
+        <span class="pill t" data-anim style="--d:.38s">Tashuvchi <span class="gl">· dropper · RoundRift</span></span>
+        <span class="pill t" data-anim style="--d:.44s">Boshqaruv serveri <span class="gl">· C2 qora ro'yxati</span></span>
+        <span class="pill t" data-anim style="--d:.5s">Soxta oyna bloker <span class="gl">· fishing / overlay</span></span>
+      </div>
+      <div class="term" data-anim="fade" style="--d:.6s;margin-top:22px">
+        <div><span class="c">/* DEX'dan ajratilgan kalitlar */</span></div>
+        <div><span class="k">ajina.base_key</span> = <span class="s">"JYTAs0m31lxvwkQE42Y10Ktm"</span></div>
+        <div><span class="k">roundrift.key</span> = <span class="s">"sqsmlH2NOLPXeaDIFGnMEOdG…"</span></div>
+        <div><span class="k">algo</span> = <span class="s">"2× XOR + Base64"</span> <span class="c">// 1310 string ochildi</span></div>
+      </div>
+    </div>
+    <div class="phone-wrap" data-anim="right" style="height:560px;flex:none;--d:.3s"><img class="phone" src="assets/screen-alert-scan.png" alt="Avto-skaner" style="height:540px"/></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Aniqlash dvigateli</div>
+</section>
+
+<!-- 7B · QANDAY ANIQLAYDI (dvigatel ichi) -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Qanday aniqlaydi · dvigatel ichi</div>
+  <h2 data-anim style="--d:.08s">Bitta fayl — 9 qatlamli tekshiruv</h2>
+  <div class="sub" data-anim style="--d:.16s">Har bir fayl ketma-ket 9 ta mustaqil tekshiruvdan o'tadi. Bitta qatlam ham xavfni tanisa — fayl darhol bloklanadi.</div>
+
+  <div class="row center" style="gap:16px;margin-top:20px;align-items:stretch">
+
+    <!-- KIRISH -->
+    <div class="card" data-anim style="--d:.22s;text-align:center;display:flex;flex-direction:column;justify-content:center;min-width:172px;flex:none">
+      <div style="font-size:38px;line-height:1">📦</div>
+      <div style="font:700 18px/1.2 var(--fd);margin-top:8px">APK fayl</div>
+      <div class="cd" style="margin-top:6px;font-size:14px">Telegram yoki «sideload» orqali keladi</div>
+    </div>
+
+    <div style="display:flex;align-items:center;font:700 28px/1 var(--fd);color:var(--teal);flex:none;--d:.28s" data-anim="fade">→</div>
+
+    <!-- 9 QATLAM -->
+    <div class="grow" data-anim style="--d:.3s">
+      <div class="eyebrow" style="font-size:11px;margin-bottom:10px;color:var(--ink3)">9 qatlamli tekshiruv</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px">
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">1</span><span style="font:600 14px/1.1 var(--fd)">Barmoq izi</span></div><div class="gl" style="margin-top:5px">hash (SHA-256) qora ro'yxati</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">2</span><span style="font:600 14px/1.1 var(--fd)">Imzo &amp; sertifikat</span></div><div class="gl" style="margin-top:5px">kim yasagan — soxtami</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">3</span><span style="font:600 14px/1.1 var(--fd)">Ruxsatlar</span></div><div class="gl" style="margin-top:5px">SMS + Accessibility birikmasi</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">4</span><span style="font:600 14px/1.1 var(--fd)">Kod naqshi</span></div><div class="gl" style="margin-top:5px">DEX pattern · Ajina imzosi</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">5</span><span style="font:600 14px/1.1 var(--fd)">Arxiv hiylasi</span></div><div class="gl" style="margin-top:5px">ZIP-evasion · shifrlangan</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">6</span><span style="font:600 14px/1.1 var(--fd)">Tashuvchi</span></div><div class="gl" style="margin-top:5px">dropper · RoundRift</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">7</span><span style="font:600 14px/1.1 var(--fd)">Soxta ikona</span></div><div class="gl" style="margin-top:5px">ishonchli ilovaga taqlid</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">8</span><span style="font:600 14px/1.1 var(--fd)">C2 server</span></div><div class="gl" style="margin-top:5px">boshqaruv domeni ro'yxati</div></div>
+        <div style="background:var(--panel);border:1px solid var(--hair);border-radius:11px;padding:9px 11px"><div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:700 12px/1 var(--fd);color:var(--navy);background:linear-gradient(140deg,var(--teal),var(--teal-deep));flex:none">9</span><span style="font:600 14px/1.1 var(--fd)">Native kod</span></div><div class="gl" style="margin-top:5px">.so kutubxona tahlili</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;font:700 28px/1 var(--fd);color:var(--teal);flex:none" data-anim="fade">→</div>
+
+    <!-- HUKM -->
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:9px;min-width:208px;flex:none;--d:.4s" data-anim="right">
+      <div class="eyebrow" style="font-size:11px;margin-bottom:1px;color:var(--ink3)">Hukm</div>
+      <div style="border:1px solid rgba(226,90,74,.4);background:rgba(226,90,74,.10);border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:10px"><span style="font-size:17px">🔴</span><div><b style="color:#ff9082;font:700 16px/1 var(--fd)">XAVFLI</b><div class="gl" style="margin-top:3px">o'rnatmang — bloklanadi</div></div></div>
+      <div style="border:1px solid rgba(224,160,64,.4);background:rgba(224,160,64,.10);border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:10px"><span style="font-size:17px">🟡</span><div><b style="color:var(--saffron);font:700 16px/1 var(--fd)">SHUBHALI</b><div class="gl" style="margin-top:3px">ehtiyot bo'ling — tekshiring</div></div></div>
+      <div style="border:1px solid rgba(91,203,138,.4);background:rgba(91,203,138,.10);border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:10px"><span style="font-size:17px">🟢</span><div><b style="color:var(--safe);font:700 16px/1 var(--fd)">XAVFSIZ</b><div class="gl" style="margin-top:3px">toza — foydalanish mumkin</div></div></div>
+    </div>
+
+  </div>
+
+  <div data-anim="fade" style="--d:.7s;margin-top:18px;background:rgba(91,203,211,.08);border:1px solid rgba(91,203,211,.3);border-radius:13px;padding:13px 18px;font:500 16px/1.4 var(--fb)">
+    <b class="teal">Asosiy qoida:</b> shubha qolsa, dvigatel hech qachon «xavfsiz» demaydi — tekshiruvda xato bo'lsa ham fayl «SHUBHALI» deb belgilanadi <span class="gl">· never-false-safe</span>.
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Qanday aniqlaydi</div>
+</section>
+
+<!-- 8 · BOZOR -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Bozor · nega aynan hozir</div>
+  <h2 data-anim style="--d:.08s">37 mln aholi · portlovchi mobil banking · dominant Telegram</h2>
+  <div class="grid4" style="margin-top:28px">
+    <div class="stat" data-anim="zoom" style="--d:.18s"><div class="n">~37<span style="font-size:20px"> mln</span></div><div class="l">aholi</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.26s"><div class="n teal">~30<span style="font-size:20px"> mln</span></div><div class="l">smartfon foydalanuvchi</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.34s"><div class="n saf">#1</div><div class="l">Telegram — messenjer</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.42s"><div class="n dgr">↑↑</div><div class="l">troyan kampaniyalari o'smoqda</div></div>
+  </div>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card" data-anim style="--d:.5s"><div class="ct teal" style="font-size:15px">TAM <span class="gl">· umumiy bozor</span></div><div class="cd"><b>Markaziy Osiyo</b> — Android foydalanuvchilar uchun mobil xavfsizlik (~80 mln qurilma).</div></div>
+    <div class="card" data-anim style="--d:.58s"><div class="ct teal" style="font-size:15px">SAM <span class="gl">· erishsa bo'ladigan</span></div><div class="cd"><b>O'zbekiston</b> — mobil banking foydalanuvchilari va do'kondan tashqari (sideload) riski yuqori qatlam.</div></div>
+    <div class="card" data-anim style="--d:.66s"><div class="ct teal" style="font-size:15px">SOM <span class="gl">· egallash mumkin (3 yil)</span></div><div class="cd"><b>1–2 mln</b> faol foydalanuvchi + bank/telekom bilan <b>B2B</b> <span class="gl">(biznesga)</span> shartnomalari.</div></div>
+  </div>
+  <div class="cap" style="text-align:left;margin-top:14px;color:var(--ink3)">* Raqamlar — ochiq manbalar asosidagi taxminiy baholar.</div>
+  <div class="brandline"><img src="assets/logo.png"/>Bozor</div>
+</section>
+
+<!-- 9 · RAQOBATCHILAR -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Raqobat</div>
+  <h2 data-anim style="--d:.08s">Global antiviruslar mahalliy tahdidga tayyor emas</h2>
+  <div class="card" data-anim="fade" style="--d:.2s;margin-top:22px;padding:8px 22px">
+    <table>
+      <thead><tr><th>Mahsulot</th><th>O'zbekcha qulaylik</th><th>Arxiv hiylasini ko'rish</th><th>Telegram'da real vaqtda</th><th>Mahalliy tahdid bazasi</th><th>Yengil / bepul</th></tr></thead>
+      <tbody>
+        <tr><td>Kaspersky</td><td class="no">qisman</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Avast / AVG</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td><td class="no">qisman</td></tr>
+        <tr><td>Dr.Web</td><td class="no">qisman</td><td class="no">qisman</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Google Play Protect</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+        <tr class="us"><td>KiberQalqon</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="lead" data-anim style="--d:.5s;margin-top:18px;text-align:center">Biz global o'yinchilar bilan emas — <b class="teal">aniq mahalliy tahdid</b> bo'yicha raqobatlashamiz, va aynan shu yerda yutamiz.</div>
+  <div class="brandline"><img src="assets/logo.png"/>Raqobatchilar</div>
+</section>
+
+<!-- 10 · USTUNLIKLAR -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Ustunliklarimiz</div>
+  <h2 data-anim style="--d:.08s">Nega aynan biz yutamiz</h2>
+  <div class="grid3" style="margin-top:24px">
+    <div class="card" data-anim style="--d:.16s"><div class="ct"><span class="ic">📍</span>O'ta mahalliy <span class="gl">· hyper-lokal</span></div><div class="cd">Faqat O'zbekistonga qaratilgan troyanlar bazasi — global ishlab chiqaruvchilar buni ko'rmaydi.</div></div>
+    <div class="card" data-anim style="--d:.24s"><div class="ct"><span class="ic">🔬</span>Teskari muhandislik asosida <span class="gl">· RE</span></div><div class="cd">Detektorlar real namunalardan olingan — soxta imzolar (signatura) emas.</div></div>
+    <div class="card" data-anim style="--d:.32s"><div class="ct"><span class="ic">🛡️</span>Noto'g'ri «xavfsiz» demaslik <span class="gl">· never-false-safe</span></div><div class="cd">Antivirusda eng yomon xato — noto'g'ri "xavfsiz". Biz buni tamoyil sifatida yo'q qildik.</div></div>
+    <div class="card" data-anim style="--d:.4s"><div class="ct"><span class="ic">🇺🇿</span>O'zbekcha-birinchi</div><div class="cd">Til va qulaylik (UX) mahalliy foydalanuvchi uchun — tushunarli, ishonchli.</div></div>
+    <div class="card" data-anim style="--d:.48s"><div class="ct"><span class="ic">🔐</span>Qurilmada maxfiylik <span class="gl">· on-device</span></div><div class="cd">Tekshiruv telefonda — fayllar bulutga majburan yuborilmaydi.</div></div>
+    <div class="card" data-anim style="--d:.56s"><div class="ct"><span class="ic s">🌐</span>Tarmoq effekti</div><div class="cd">Bulutli tahdid almashinuvi <span class="gl">(cloud threat-sharing)</span>: har bir foydalanuvchi yangi tahdidni butun bazaga ulashadi.</div></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Ustunliklar</div>
+</section>
+
+<!-- 11 · BIZNES-MODEL -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Biznes-model</div>
+  <h2 data-anim style="--d:.08s">Freemium <span class="gl">(bepul + pullik)</span> + B2B / B2G <span class="gl">(biznes / davlat)</span></h2>
+  <div class="grid2" style="margin-top:24px;gap:20px">
+    <div class="card" data-anim style="--d:.16s"><div class="ct"><span class="ic">🆓</span>Bepul</div><div class="cd">Asosiy himoya, real vaqtli skaner, reklama bilan. Ommaviy qamrov va ishonch uchun.</div></div>
+    <div class="card" data-anim style="--d:.24s"><div class="ct"><span class="ic s">⭐</span>Pro <span class="gl">· kengaytirilgan</span> — 30 000 so'm / $2.99</div><div class="cd">Yoki obuna <b>$0.99/oy · $9.99/yil</b>: bulutli skaner, cheksiz tekshiruv, reklamasiz, ustuvor yangilanish.</div></div>
+    <div class="card" data-anim style="--d:.32s"><div class="ct"><span class="ic teal">🏦</span>B2B <span class="gl">· biznesga</span> — banklar & telekom</div><div class="cd">Bank ilovasiga integratsiya / litsenziya — firibgarlikdan yo'qotishni kamaytiradi. Telekom paketiga qo'shish (bundling).</div></div>
+    <div class="card" data-anim style="--d:.4s"><div class="ct"><span class="ic teal">🏛️</span>B2G <span class="gl">· davlatga</span></div><div class="cd">Kiberxavfsizlik idoralari uchun tahdid ma'lumotlari (threat-intel) va ommaviy himoya dasturlari.</div></div>
+  </div>
+  <div class="card" data-anim="fade" style="--d:.5s;margin-top:18px">
+    <div class="cd" style="margin-bottom:10px;color:var(--ink)">Daromad tarkibi (maqsadli, 3-yil)</div>
+    <div class="row center" style="gap:14px"><div style="width:120px;font:600 13px/1 var(--fm);color:var(--ink2)">Pro obuna</div><div class="bar grow"><i style="width:45%"></i></div><div class="mono" style="width:44px">45%</div></div>
+    <div class="row center" style="gap:14px;margin-top:8px"><div style="width:120px;font:600 13px/1 var(--fm);color:var(--ink2)">B2B / B2G</div><div class="bar s grow"><i style="width:40%"></i></div><div class="mono" style="width:44px">40%</div></div>
+    <div class="row center" style="gap:14px;margin-top:8px"><div style="width:120px;font:600 13px/1 var(--fm);color:var(--ink2)">Reklama</div><div class="bar grow"><i style="width:15%;background:linear-gradient(90deg,#9fb2bb,#6c7e88)"></i></div><div class="mono" style="width:44px">15%</div></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Biznes-model</div>
+</section>
+
+<!-- 12 · O'SISH STRATEGIYASI -->
+<section class="slide">
+  <div class="eyebrow" data-anim>O'sish strategiyasi</div>
+  <h2 data-anim style="--d:.08s">Foydalanuvchidan tarmoq effektigacha</h2>
+  <div class="steps" style="margin-top:22px">
+    <div class="step" data-anim style="--d:.16s"><span class="sn">1</span><span class="sx"><b>Google Play</b> chiqishi + <b>ASO</b> <span class="gl">(do'konda topilishni yaxshilash)</span> — o'zbek/rus tilida</span></div>
+    <div class="step" data-anim style="--d:.24s"><span class="sn">2</span><span class="sx">Kontent marketing — <b>Telegram kanal · Instagram · TikTok · YouTube</b> (real virus tahlillari)</span></div>
+    <div class="step" data-anim style="--d:.32s"><span class="sn">3</span><span class="sx"><b>Bank hamkorliklari</b> — firibgarlikni kamaytirish bo'yicha sinovlar (pilot)</span></div>
+    <div class="step" data-anim style="--d:.4s"><span class="sn">4</span><span class="sx"><b>Telekom paketiga qo'shish</b> <span class="gl">· bundling</span> + davlat kiberxavfsizlik dasturlari</span></div>
+  </div>
+  <div class="card" data-anim="fade" style="--d:.52s;margin-top:18px;background:rgba(91,203,211,.07);border-color:rgba(91,203,211,.3)">
+    <div class="ct teal">🌐 Mudofaa tarmog'i (moat)</div>
+    <div class="cd" style="color:var(--ink)">Bulutli server <span class="gl">(cloud backend · Vercel + Supabase)</span> tayyor: har bir foydalanuvchi yangi tahdidni ulashadi → baza kuchayadi → himoya yaxshilanadi → ko'proq foydalanuvchi. <b>Vaqt o'tgani sayin nusxa ko'chirish qiyinlashadi.</b></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>O'sish strategiyasi</div>
+</section>
+
+<!-- 13 · HOLAT & YO'L XARITASI -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Holat</div>
+  <h2 data-anim style="--d:.08s">Mahsulot tayyor — endi miqyoslash</h2>
+  <div class="grid4" style="margin-top:24px">
+    <div class="stat" data-anim="zoom" style="--d:.16s"><div class="n teal">v7.9</div><div class="l">ishlaydigan ilova</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.24s"><div class="n">~78</div><div class="l">Kotlin fayl</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.32s"><div class="n saf">5+</div><div class="l">faol detektor</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.4s"><div class="n teal">✓</div><div class="l">bulutli server (kod tayyor)</div></div>
+  </div>
+  <div class="tl" data-anim="fade" style="--d:.5s">
+    <div class="t"><div class="dot"></div><div class="q">2026 · Q3</div><div class="d">Google Play chiqishi · <b class="teal">Navoiy viloyatida pilot</b> · birinchi 10k foydalanuvchi</div></div>
+    <div class="t fut"><div class="dot"></div><div class="q">2026 · Q4</div><div class="d">Bulutga joylash (cloud) + Pro versiya, obuna</div></div>
+    <div class="t fut"><div class="dot"></div><div class="q">2027 · H1</div><div class="d">Bank sinovlari, B2B (biznesga) shartnomalar</div></div>
+    <div class="t fut"><div class="dot"></div><div class="q">2027 · H2</div><div class="d">Mintaqaviy kengayish, tarmoq effekti</div></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Holat & yo'l xaritasi</div>
+</section>
+
+<!-- 14 · JAMOA & INVESTITSIYA -->
+<section class="slide">
+  <div class="scanwrap"><div class="scanline"></div></div>
+  <div class="eyebrow" data-anim>Investitsiya</div>
+  <h2 data-anim style="--d:.08s">Boshlang'ich bosqich <span class="gl">· seed</span> — birga miqyoslaymiz</h2>
+  <div class="row grow" style="margin-top:24px;gap:30px">
+    <div class="grow">
+      <div class="lead" data-anim style="--d:.16s;color:var(--ink)">So'rov: <b class="teal" style="font-size:22px">$200 000</b> boshlang'ich sarmoya <span style="color:var(--ink3)">(seed · kelishuv bo'yicha)</span></div>
+      <div class="card" data-anim="fade" style="--d:.3s;margin-top:16px">
+        <div class="cd" style="margin-bottom:12px;color:var(--ink)">Mablag'dan foydalanish</div>
+        <div class="row center" style="gap:14px"><div style="width:170px;font:600 13px/1 var(--fm);color:var(--ink2)">Play'da chiqarish + marketing</div><div class="bar grow"><i style="width:35%"></i></div><div class="mono" style="width:44px">35%</div></div>
+        <div class="row center" style="gap:14px;margin-top:9px"><div style="width:170px;font:600 13px/1 var(--fm);color:var(--ink2)">Bulut infratuzilmasi & xavfsizlik</div><div class="bar grow"><i style="width:25%"></i></div><div class="mono" style="width:44px">25%</div></div>
+        <div class="row center" style="gap:14px;margin-top:9px"><div style="width:170px;font:600 13px/1 var(--fm);color:var(--ink2)">Tahdid tahlili jamoasi</div><div class="bar s grow"><i style="width:25%"></i></div><div class="mono" style="width:44px">25%</div></div>
+        <div class="row center" style="gap:14px;margin-top:9px"><div style="width:170px;font:600 13px/1 var(--fm);color:var(--ink2)">Bank pilotlari</div><div class="bar s grow"><i style="width:15%"></i></div><div class="mono" style="width:44px">15%</div></div>
+      </div>
+    </div>
+    <div style="width:330px;flex:none">
+      <div class="card" data-anim="right" style="--d:.4s;text-align:center">
+        <img src="assets/logo.png" style="width:72px;height:72px;border-radius:18px;margin:4px auto 14px"/>
+        <div style="font:700 22px/1.1 var(--fd)">Muhammadali</div>
+        <div class="cd" style="margin-top:4px">Asoschi · Navoiy</div>
+        <div class="cd" style="margin-top:6px">Teskari muhandislik <span class="gl">· reverse-engineering</span> · Android · backend <span class="gl">· server tomoni</span></div>
+      </div>
+      <div class="card" data-anim="right" style="--d:.5s;margin-top:14px;background:rgba(91,203,211,.08);border-color:rgba(91,203,211,.3);text-align:center">
+        <div style="font:700 20px/1.2 var(--fd)" class="teal">Keling, O'zbekistonni himoya qilamiz.</div>
+      </div>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>KiberQalqon · Rahmat!</div>
+</section>
+
+</div><!-- /stage -->
+</div><!-- /deck -->
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const stage=document.getElementById('stage');
+const prog=document.getElementById('prog');
+const counter=document.getElementById('counter');
+const dotsWrap=document.getElementById('dots');
+let i=0;
+slides.forEach((_,n)=>{const b=document.createElement('b');b.onclick=()=>go(n);dotsWrap.appendChild(b);});
+const dots=[...dotsWrap.children];
+const pad=n=>String(n).padStart(2,'0');
+
+function go(n){
+  i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+  prog.style.width=((i+1)/slides.length*100)+'%';
+  counter.textContent=pad(i+1)+' / '+pad(slides.length);
+}
+function next(){go(i+1)} function prev(){go(i-1)}
+
+document.getElementById('bNext').onclick=next;
+document.getElementById('bPrev').onclick=prev;
+addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next();}
+  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev();}
+  else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(slides.length-1)}
+});
+// click zones (left third = prev, rest = next), ignore controls
+stage.addEventListener('click',e=>{
+  if(e.target.closest('a,button')) return;
+  const r=stage.getBoundingClientRect();
+  (e.clientX-r.left < r.width*0.32)?prev():next();
+});
+
+// fit-to-viewport scaling
+function fit(){
+  const m=0.965;
+  const s=Math.min(innerWidth/1280, innerHeight/720)*m;
+  stage.style.transform='scale('+s+')';
+}
+addEventListener('resize',fit); fit();
+var _h=parseInt((location.hash||'').slice(1),10); go(_h>0?_h-1:0);
+addEventListener('hashchange',()=>{var h=parseInt((location.hash||'').slice(1),10);if(h>0)go(h-1);});
+</script>
+</body>
+</html>

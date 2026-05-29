@@ -37,8 +37,13 @@ ko'rsatadigan serverless backend.
 5. `supabase/schema.sql` ni to'liq ko'chir va **Run** (jadvallar + bot view'lari)
 6. **Yana New query** → `supabase/02_geo.sql` ni ko'chir va **Run**
    (geo + risk ustunlari, xarita uchun `v_map_points`, oqim uchun `v_recent_threats`).
-   Ikkala fayl ham idempotent — qayta ishga tushirsa xato bermaydi.
-7. **Settings → API** sahifasidan ikkita kalitni nusxala:
+7. **Yana New query** → `supabase/03_roles.sql` ni ko'chir va **Run**
+   (rollar tizimi: `roles`, `operators`, `role_login_audit` + `v_operators_safe`).
+   Bu bo'lmasa panelda rol/operator boshqaruvi va `/api/role/*` 500 qaytaradi.
+8. **Yana New query** → `supabase/04_news.sql` ni ko'chir va **Run**
+   (`news` jadvali — paneldagi "Yangiliklar" lentasi). Bu bo'lmasa `/api/news` 500 qaytaradi.
+   Barcha fayllar idempotent — qayta ishga tushirsa xato bermaydi.
+9. **Settings → API** sahifasidan ikkita kalitni nusxala:
    - `Project URL` → `SUPABASE_URL`
    - `service_role` (secret!) → `SUPABASE_SERVICE_KEY`
 
@@ -204,6 +209,7 @@ Natija: `{ "ok": true, "stats": { ... } }`.
 | `/api/threats` | GET | Zararli APK oilalari ro'yxati |
 | `/api/scans` | GET | Skan tarixi (`?verdict=danger&limit=50`) |
 | `/api/role/code` | GET | Joriy soatlik kod (rollar tizimi uchun) |
+| `/api/news` | GET / POST | Yangiliklar lentasi (o'qish + e'lon qo'shish/o'chirish/qotirish) |
 
 **Telegram (`x-telegram-bot-api-secret-token`):**
 

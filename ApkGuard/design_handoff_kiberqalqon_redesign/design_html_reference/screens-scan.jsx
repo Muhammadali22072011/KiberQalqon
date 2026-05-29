@@ -4,11 +4,15 @@
    ============================================================ */
 
 const AutoScanAlert = ({ goto, sampleId = "rasmlar18" }) => {
-  const [phase, setPhase] = React.useState("scanning"); // scanning -> result
-  const [progress, setProgress] = React.useState(0);
+  const _qs = new URLSearchParams(typeof location !== "undefined" ? location.search : "");
+  const _forcedPhase = _qs.get("phase");        // "scanning" | "result"
+  const _forcedProg  = _qs.get("prog");          // 0..100, freezes the ring
+  const [phase, setPhase] = React.useState(_forcedPhase || "scanning"); // scanning -> result
+  const [progress, setProgress] = React.useState(_forcedProg != null ? Number(_forcedProg) : 0);
   const sample = APK_SAMPLES.find(a => a.id === sampleId) || APK_SAMPLES[0];
 
   React.useEffect(() => {
+    if (_forcedProg != null || _forcedPhase) return; // frozen for capture
     if (phase !== "scanning") return;
     let i = 0;
     const t = setInterval(() => {

@@ -505,6 +505,9 @@
     <string name="scan_empty_desc">APK fayl topilmadi. Yangilarini avtomatik kuzatamiz.</string>
     <string name="scan_guard_active">Avto-himoya yoniq</string>
 
+    <!-- ═══ Yangiliklar / e'lonlar (bosh ekran lentasi) ═══ -->
+    <string name="news_section_title">Yangiliklar</string>
+
     <!-- ═══ Ruxsat tahlili (ScanResultActivity) ═══ -->
     <string name="perm_status_title">Tahdid darajasi</string>
     <string name="perm_count">%1$d ta ruxsat</string>

@@ -66,9 +66,44 @@
   .pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--hair-2);background:rgba(255,255,255,.03);font-family:var(--mono);font-size:11px;color:var(--ink-2)}
   .live-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 0 rgba(37,224,176,.6);animation:beat 1.8s infinite}
   @keyframes beat{0%{box-shadow:0 0 0 0 rgba(37,224,176,.5)}70%{box-shadow:0 0 0 7px rgba(37,224,176,0)}100%{box-shadow:0 0 0 0 rgba(37,224,176,0)}}
-  .icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--hair-2);background:rgba(255,255,255,.03);
+  .icon-btn{position:relative;width:38px;height:38px;border-radius:11px;border:1px solid var(--hair-2);background:rgba(255,255,255,.03);
     color:var(--ink-2);font-size:17px;cursor:pointer;display:grid;place-items:center;transition:.15s}
   .icon-btn:hover{color:var(--ink);border-color:var(--primary)}
+
+  /* ── news / e'lonlar ── */
+  .badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;
+    background:var(--danger);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;
+    display:grid;place-items:center;box-shadow:0 0 0 2px #070b14}
+  .news-ov{position:fixed;inset:0;z-index:1200;background:rgba(4,7,14,.66);backdrop-filter:blur(6px);
+    display:flex;align-items:flex-start;justify-content:center;padding:64px 18px 24px;overflow:auto}
+  .news-modal{width:100%;max-width:560px;background:linear-gradient(160deg,var(--card),var(--card-2));
+    border:1px solid var(--hair-2);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.6);
+    display:flex;flex-direction:column;max-height:calc(100vh - 88px);overflow:hidden;animation:newsIn .22s cubic-bezier(.2,.8,.2,1)}
+  @keyframes newsIn{from{opacity:0;transform:translateY(-12px) scale(.98)}to{opacity:1;transform:none}}
+  .news-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 18px 14px;border-bottom:1px solid var(--hair)}
+  .news-compose{display:flex;flex-direction:column;gap:8px;padding:14px 18px;border-bottom:1px solid var(--hair);background:rgba(255,255,255,.02)}
+  .news-compose input,.news-compose textarea,.news-compose select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--hair-2);border-radius:10px;padding:9px 11px;color:var(--ink);font:inherit;font-size:13px;resize:vertical}
+  .news-compose input:focus,.news-compose textarea:focus,.news-compose select:focus{outline:none;border-color:var(--primary)}
+  .news-compose-row{display:flex;gap:8px}
+  .news-compose-row select{flex:1}
+  .news-compose-row button{padding:9px 18px;border:none;border-radius:10px;background:var(--primary);color:#04120d;font-weight:700;cursor:pointer;white-space:nowrap}
+  .news-compose-row button:disabled{opacity:.55;cursor:default}
+  .news-scroll{padding:12px 14px 16px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+  .news-card{border:1px solid var(--hair-2);border-left:3px solid var(--ink-3);border-radius:12px;padding:11px 13px;background:rgba(255,255,255,.02);cursor:pointer;transition:.15s}
+  .news-card:hover{background:rgba(255,255,255,.05)}
+  .news-card.lv-warning{border-left-color:var(--warn)}
+  .news-card.lv-critical{border-left-color:var(--danger)}
+  .nc-top{display:flex;align-items:center;gap:8px}
+  .nc-title{font-weight:700;font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .nc-date{font-family:var(--mono);font-size:10px;color:var(--ink-3);white-space:nowrap}
+  .nc-act{background:none;border:none;cursor:pointer;font-size:13px;color:var(--ink-3);padding:2px 4px;line-height:1;border-radius:6px}
+  .nc-act:hover{color:var(--ink)}
+  .nc-act.on{color:var(--primary)}
+  .nc-body{font-size:13px;color:var(--ink-2);line-height:1.55;margin-top:9px;white-space:pre-wrap;display:none}
+  .news-card.open .nc-body{display:block}
+  .nc-img{margin-top:9px;border-radius:10px;max-width:100%;display:none;border:1px solid var(--hair-2)}
+  .news-card.open .nc-img{display:block}
+  .nc-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;flex:none;border:1px solid var(--hair-2)}
 
   /* ── kpi cards ── */
   .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px}
@@ -172,10 +207,51 @@
   .pp-clean{padding:7px 14px 14px;color:var(--primary);font-size:13px;font-weight:600}
   .pp-load{padding:22px 14px;text-align:center;color:var(--ink-3);font-family:var(--mono);font-size:12px}
 
+  /* ── admin: maxfiy kirish (rollar & operatorlar) ── */
+  .adm-wrap{margin-top:16px}
+  .adm-grid{display:grid;grid-template-columns:.9fr 1.1fr 1.35fr;gap:16px}
+  .adm-card{background:linear-gradient(160deg,var(--card),var(--card-2));border:1px solid var(--hair);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+  .adm-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+  .code-box{display:flex;flex-direction:column;align-items:center;gap:7px;padding:8px 0 2px}
+  .code-val{font-family:var(--mono);font-size:34px;font-weight:700;letter-spacing:.2em;color:var(--primary);text-shadow:0 0 22px rgba(37,224,176,.35)}
+  .code-val.dim{color:var(--ink-3);text-shadow:none;letter-spacing:.3em}
+  .code-meta{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .code-bar{width:100%;height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:2px}
+  .code-bar i{display:block;height:100%;background:var(--primary);transition:width 1s linear}
+  .mini-btn{align-self:center;background:rgba(255,255,255,.04);border:1px solid var(--hair-2);color:var(--ink-2);font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:9px;cursor:pointer;transition:.15s}
+  .mini-btn:hover{color:var(--ink);border-color:var(--primary)}
+  .adm-form{display:flex;flex-direction:column;gap:8px}
+  .adm-form input,.adm-form select{background:var(--card-2);border:1px solid var(--hair-2);border-radius:10px;padding:9px 11px;color:var(--ink);font-size:13px;font-family:var(--sans);outline:none;width:100%}
+  .adm-form input:focus,.adm-form select:focus{border-color:var(--primary)}
+  .adm-form button{background:var(--primary);color:#04140f;border:none;border-radius:10px;padding:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--sans)}
+  .adm-form button:disabled{opacity:.6;cursor:default}
+  .pick{display:flex;flex-wrap:wrap;gap:6px}
+  .pick label{font-family:var(--mono);font-size:11px;color:var(--ink-2);border:1px solid var(--hair-2);border-radius:999px;padding:5px 10px;cursor:pointer;user-select:none;transition:.12s}
+  .pick label:has(input:checked){border-color:var(--primary);background:var(--primary-dim);color:var(--primary)}
+  .pick input{display:none}
+  .fld-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+  .adm-list{display:flex;flex-direction:column;max-height:236px;overflow-y:auto}
+  .adm-list::-webkit-scrollbar{width:7px}.adm-list::-webkit-scrollbar-thumb{background:var(--hair-2);border-radius:99px}
+  .role-row{padding:9px 2px;border-top:1px solid var(--hair)}
+  .role-row:first-child{border-top:none}
+  .role-row b{font-size:13px}
+  .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+  .tag{font-family:var(--mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--ink-2);border:1px solid var(--hair)}
+  .tag.perm{color:#9be0c8;border-color:rgba(155,224,200,.2)} .tag.comp{color:#8fc6ff;border-color:rgba(143,198,255,.2)}
+  .op-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--hair)}
+  .op-row:first-child{border-top:none}
+  .op-main{flex:1;min-width:0}
+  .op-login{font-size:13px;font-weight:600}
+  .op-sub{font-family:var(--mono);font-size:10px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .op-toggle{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 9px;border-radius:7px;cursor:pointer;border:1px solid transparent;text-transform:uppercase;letter-spacing:.04em}
+  .op-toggle.on{background:rgba(37,224,176,.16);color:#3ee9bd}
+  .op-toggle.off{background:rgba(255,67,97,.16);color:#ff6679}
+
   @media(max-width:1100px){
     .kpis{grid-template-columns:repeat(2,1fr)}
     .grid{grid-template-columns:1fr}
     .row2{grid-template-columns:1fr}
+    .adm-grid{grid-template-columns:1fr}
     #map,.feed{height:420px}
   }
 </style>
@@ -204,6 +280,7 @@
     <div class="brand"><b>KiberQalqon</b><small>Boshqaruv paneli</small></div>
     <div class="spacer"></div>
     <span class="pill"><span class="live-dot"></span> JONLI &middot; <span id="clock">--:--:--</span></span>
+    <button class="icon-btn" id="btn-news" title="Yangiliklar">&#128240;<span class="badge hidden" id="newsBadge">0</span></button>
     <button class="icon-btn" id="btn-refresh" title="Yangilash">&#8635;</button>
     <button class="icon-btn" id="btn-logout" title="Chiqish">&#9099;</button>
   </div>
@@ -284,11 +361,83 @@
     </div>
   </div>
 
+  <!-- maxfiy kirish: rollar & operatorlar -->
+  <div class="adm-wrap">
+    <div class="adm-grid">
+
+      <div class="adm-card">
+        <div class="p-head"><div class="p-title"><small>Maxfiy kirish &middot; 2-qulf</small><b>Joriy soatlik kod</b></div></div>
+        <div class="adm-body">
+          <div class="code-box">
+            <div class="code-val dim" id="rcCode">&bull;&bull;&bull;&bull;&bull;&bull;</div>
+            <div class="code-meta" id="rcMeta">Yuklanmoqda&hellip;</div>
+            <div class="code-bar"><i id="rcBar" style="width:0%"></i></div>
+          </div>
+          <button class="mini-btn" id="rcCopy" type="button">Nusxa olish</button>
+          <div class="fld-lbl">Kirishga ruxsat bergan odamga shu kodni ayting &mdash; har soatda yangilanadi.</div>
+        </div>
+      </div>
+
+      <div class="adm-card">
+        <div class="p-head"><div class="p-title"><small>Boshqaruv</small><b>Rollar</b></div></div>
+        <div class="adm-body">
+          <form class="adm-form" id="roleForm">
+            <input id="roleName" type="text" placeholder="Rol nomi (masalan: Tergovchi)" autocomplete="off" />
+            <div class="fld-lbl">Huquqlar</div>
+            <div class="pick" id="rolePerms"></div>
+            <div class="fld-lbl">Ko&#39;rsatiladigan bo&#39;limlar</div>
+            <div class="pick" id="roleComps"></div>
+            <button type="submit">Rol qo&#39;shish</button>
+          </form>
+          <div class="adm-list" id="roleList"><div class="empty">Yuklanmoqda&hellip;</div></div>
+        </div>
+      </div>
+
+      <div class="adm-card">
+        <div class="p-head"><div class="p-title"><small>Boshqaruv</small><b>Operatorlar (kirish berilganlar)</b></div></div>
+        <div class="adm-body">
+          <form class="adm-form" id="opForm">
+            <input id="opLogin" type="text" placeholder="Login" autocomplete="off" />
+            <input id="opPass" type="text" placeholder="Parol" autocomplete="off" />
+            <select id="opRole"><option value="">&mdash; rol tanlang &mdash;</option></select>
+            <button type="submit">Operator qo&#39;shish</button>
+          </form>
+          <div class="adm-list" id="opList"><div class="empty">Yuklanmoqda&hellip;</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div class="foot">
     <span>KiberQalqon Cloud &middot; Vercel + Supabase &middot; jonli ma&#39;lumotlar</span>
     <span>&#169; 2026 &middot; Muhammadali</span>
   </div>
 
+</div>
+
+<!-- yangiliklar / e'lonlar -->
+<div class="news-ov hidden" id="newsOv">
+  <div class="news-modal">
+    <div class="news-head">
+      <div class="p-title"><small>E&#39;lonlar &middot; lenta</small><b>Yangiliklar</b></div>
+      <button class="icon-btn" id="newsClose" title="Yopish">&#10005;</button>
+    </div>
+    <form class="news-compose" id="newsForm">
+      <input id="newsTitle" type="text" placeholder="Sarlavha" autocomplete="off" maxlength="160" />
+      <textarea id="newsBody" rows="2" placeholder="Matn (ixtiyoriy)" maxlength="2000"></textarea>
+      <input id="newsImg" type="url" placeholder="Rasm havolasi (ixtiyoriy, https://&hellip;)" autocomplete="off" maxlength="600" />
+      <div class="news-compose-row">
+        <select id="newsLevel">
+          <option value="info">Oddiy</option>
+          <option value="warning">Ogohlantirish</option>
+          <option value="critical">Muhim</option>
+        </select>
+        <button type="submit">E&#39;lon qilish</button>
+      </div>
+    </form>
+    <div class="news-scroll" id="newsList"><div class="empty">Yuklanmoqda&hellip;</div></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -612,16 +761,231 @@ function startClock(){
 
 // ── orkestrovka ──────────────────────────────────────────────
 let timers = [];
-function stopTimers(){ timers.forEach(clearInterval); timers = []; if (clockTimer){ clearInterval(clockTimer); clockTimer = null; } }
-function refreshAll(){ loadStats(); loadMap(); loadThreats(); loadFeed(); }
+function stopTimers(){
+  timers.forEach(clearInterval); timers = [];
+  if (clockTimer){ clearInterval(clockTimer); clockTimer = null; }
+  if (codeTimer){ clearInterval(codeTimer); codeTimer = null; }
+}
+function refreshAll(){ loadStats(); loadMap(); loadThreats(); loadFeed(); loadRoleAdmin(); loadRoleCode(); loadNews(); }
 function boot(){
   stopTimers();
   startClock();
+  fillPick('rolePerms', PERM_OPTS); fillPick('roleComps', COMP_OPTS);
+  startCodeTick();
   refreshAll();
   timers.push(setInterval(loadFeed, 9000));
   timers.push(setInterval(() => { loadStats(); loadMap(); }, 30000));
   timers.push(setInterval(loadThreats, 60000));
+  timers.push(setInterval(loadRoleAdmin, 90000));
+  timers.push(setInterval(loadNews, 120000));
 }
+
+// ── maxfiy kirish: rollar & operatorlar ─────────────────────
+const COMP_OPTS = [["map","Xarita"],["feed","Oqim"],["devices","Qurilmalar"],["threats","Tahdidlar"],["roles","Rollar"]];
+const PERM_OPTS = [["view_all","Hammasi"],["view_map","Xarita"],["delete_threat","O'chirish"],["export","Eksport"],["manage_roles","Rol boshqaruvi"]];
+
+function fillPick(boxId, opts){
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  box.innerHTML = opts.map(([v,l]) => `<label><input type="checkbox" value="${esc(v)}"><span>${esc(l)}</span></label>`).join('');
+}
+function pickValues(boxId){
+  return Array.from(document.querySelectorAll('#'+boxId+' input:checked')).map(i => i.value);
+}
+
+async function apiPost(path, body){
+  const r = await fetch(path, {
+    method:'POST',
+    headers:{ 'content-type':'application/json', 'x-admin-secret': SECRET },
+    body: JSON.stringify(body),
+  });
+  if (r.status === 401){ const e = new Error('auth'); e.auth = true; throw e; }
+  const j = await r.json().catch(() => ({ ok:false, error:'json' }));
+  if (!j || !j.ok) throw new Error((j && j.error) || 'xato');
+  return j;
+}
+function formErr(err, where){
+  if (err && err.auth){ logout('Sessiya tugadi — qaytadan kiring'); return; }
+  toast(err && err.message ? err.message : ('Xatolik: ' + where));
+}
+
+// ── soatlik kod + countdown ──
+let codeTimer = null, codeLeft = 0, codeVal = '';
+function paintCode(){
+  const el = $('#rcCode'), meta = $('#rcMeta'), bar = $('#rcBar');
+  if (!el) return;
+  if (codeVal){ el.textContent = codeVal; el.classList.remove('dim'); }
+  const mm = String(Math.floor(codeLeft/60)).padStart(2,'0'), ss = String(codeLeft%60).padStart(2,'0');
+  meta.textContent = codeLeft > 0 ? `${mm}:${ss} dan keyin yangilanadi` : 'yangilanmoqda…';
+  bar.style.width = Math.max(0, Math.min(100, codeLeft/3600*100)).toFixed(1) + '%';
+}
+async function loadRoleCode(){
+  try{
+    const j = await api('/api/role/code');
+    codeVal = j.code || ''; codeLeft = Number(j.seconds_left) || 0;
+    paintCode();
+  }catch(e){
+    if (e && e.auth) return logout('Sessiya tugadi — qaytadan kiring');
+    const m = $('#rcMeta'); if (m) m.textContent = 'kod sozlanmagan (ROLE_CODE_SECRET)';
+  }
+}
+function startCodeTick(){
+  if (codeTimer) clearInterval(codeTimer);
+  codeTimer = setInterval(() => {
+    if (codeLeft > 0){ codeLeft--; paintCode(); if (codeLeft <= 0) loadRoleCode(); }
+  }, 1000);
+}
+
+// ── rollar + operatorlar ──
+function renderRoles(roles){
+  const list = roles || [];
+  const box = $('#roleList');
+  box.innerHTML = list.length
+    ? list.map(r => {
+        const perms = (r.permissions||[]).map(p => `<span class="tag perm">${esc(p)}</span>`).join('');
+        const comps = (r.components||[]).map(c => `<span class="tag comp">${esc(c)}</span>`).join('');
+        const tags = (perms + comps) || '<span class="tag">—</span>';
+        return `<div class="role-row"><b>${esc(r.name)}</b><div class="tags">${tags}</div></div>`;
+      }).join('')
+    : '<div class="empty">Hali rol yo\'q</div>';
+  const sel = $('#opRole'), cur = sel.value;
+  sel.innerHTML = '<option value="">— rol tanlang —</option>' + list.map(r => `<option value="${esc(r.name)}">${esc(r.name)}</option>`).join('');
+  sel.value = cur;
+}
+function renderOperators(ops){
+  const box = $('#opList'), list = ops || [];
+  if (!list.length){ box.innerHTML = '<div class="empty">Hali operator yo\'q</div>'; return; }
+  box.innerHTML = list.map(o => {
+    const last = o.last_login_at ? ago(Date.now() - new Date(o.last_login_at).getTime()) : 'hali kirmagan';
+    const role = o.role_name || 'rolsiz';
+    const on = o.active !== false;
+    return `<div class="op-row">
+      <div class="op-main"><div class="op-login">${esc(o.login)}</div><div class="op-sub">${esc(role)} · ${esc(last)}</div></div>
+      <span class="op-toggle ${on?'on':'off'}" data-login="${esc(o.login)}" data-on="${on?'1':'0'}">${on?'Faol':'Bloklangan'}</span>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.op-toggle').forEach(t => t.addEventListener('click', async () => {
+    const login = t.dataset.login, next = t.dataset.on !== '1';
+    try{ await apiPost('/api/role/admin', { action:'set_active', login, active: next }); toast(next ? 'Faollashtirildi' : 'Bloklandi'); loadRoleAdmin(); }
+    catch(e){ formErr(e, 'operator holati'); }
+  }));
+}
+async function loadRoleAdmin(){
+  try{
+    const j = await api('/api/role/admin');
+    renderRoles(j.roles); renderOperators(j.operators);
+  }catch(e){
+    if (e && e.auth) return logout('Sessiya tugadi — qaytadan kiring');
+    $('#roleList').innerHTML = '<div class="empty">Yuklanmadi</div>'; $('#opList').innerHTML = '';
+  }
+}
+
+$('#rcCopy').addEventListener('click', () => {
+  if (!codeVal) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(codeVal).then(() => toast('Kod nusxalandi')).catch(() => {});
+});
+$('#roleForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('#roleName').value.trim(); if (!name) return;
+  const btn = e.currentTarget.querySelector('button'); btn.disabled = true;
+  try{
+    await apiPost('/api/role/admin', { action:'create_role', name, permissions: pickValues('rolePerms'), components: pickValues('roleComps') });
+    toast('Rol qo\'shildi'); e.currentTarget.reset(); loadRoleAdmin();
+  }catch(err){ formErr(err, 'rol qo\'shish'); }
+  finally{ btn.disabled = false; }
+});
+$('#opForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const login = $('#opLogin').value.trim(), password = $('#opPass').value, role_name = $('#opRole').value;
+  if (!login || !password){ toast('Login va parol kerak'); return; }
+  const btn = e.currentTarget.querySelector('button'); btn.disabled = true;
+  try{
+    await apiPost('/api/role/admin', { action:'create_operator', login, password, role_name });
+    toast('Operator qo\'shildi'); e.currentTarget.reset(); loadRoleAdmin();
+  }catch(err){ formErr(err, 'operator qo\'shish'); }
+  finally{ btn.disabled = false; }
+});
+
+// ── yangiliklar / e'lonlar ──────────────────────────────────
+const NEWS_SEEN = 'kq_news_seen';
+const NEWS_LEVELS = ['info','warning','critical'];
+let newsCache = [];
+
+async function loadNews(){
+  try{
+    const j = await api('/api/news');
+    newsCache = j.news || [];
+    renderNews(newsCache);
+    updateNewsBadge();
+  }catch(e){
+    if (e && e.auth) return logout('Sessiya tugadi — qaytadan kiring');
+    $('#newsList').innerHTML = '<div class="empty">Yuklanmadi</div>';
+  }
+}
+function updateNewsBadge(){
+  const seen = Number(localStorage.getItem(NEWS_SEEN) || 0);
+  const unread = newsCache.filter(n => (new Date(n.created_at).getTime() || 0) > seen).length;
+  const b = $('#newsBadge');
+  if (unread > 0){ b.textContent = unread > 99 ? '99+' : String(unread); b.classList.remove('hidden'); }
+  else b.classList.add('hidden');
+}
+function renderNews(list){
+  const box = $('#newsList');
+  if (!list.length){ box.innerHTML = '<div class="empty">Hali e\'lon yo\'q</div>'; return; }
+  box.innerHTML = list.map(n => {
+    const d = new Date(n.created_at);
+    const date = isNaN(d.getTime()) ? '' : uzDate(d);
+    const lvl = NEWS_LEVELS.includes(n.level) ? n.level : 'info';
+    const body = n.body ? `<div class="nc-body">${esc(n.body)}</div>` : '';
+    const img = (n.image_url && /^https?:\/\//i.test(n.image_url)) ? esc(n.image_url) : '';
+    const thumb = img ? `<img class="nc-thumb" src="${img}" alt="" loading="lazy" />` : '';
+    const full = img ? `<img class="nc-img" src="${img}" alt="" loading="lazy" />` : '';
+    return `<div class="news-card lv-${lvl}">
+      <div class="nc-top">
+        ${thumb}<span class="nc-title">${esc(n.title)}</span>
+        <span class="nc-date">${esc(date)}</span>
+        <button class="nc-act nc-pin${n.pinned?' on':''}" title="Qotirish" data-id="${esc(n.id)}" data-pin="${n.pinned?'1':'0'}">&#9733;</button>
+        <button class="nc-act nc-del" title="O'chirish" data-id="${esc(n.id)}">&#10005;</button>
+      </div>${body}${full}
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.news-card').forEach(c => c.addEventListener('click', () => c.classList.toggle('open')));
+  box.querySelectorAll('.nc-pin').forEach(btn => btn.addEventListener('click', async ev => {
+    ev.stopPropagation();
+    try{ await apiPost('/api/news', { action:'toggle_pin', id: btn.dataset.id, pinned: btn.dataset.pin !== '1' }); loadNews(); }
+    catch(e){ formErr(e, 'qotirish'); }
+  }));
+  box.querySelectorAll('.nc-del').forEach(btn => btn.addEventListener('click', async ev => {
+    ev.stopPropagation();
+    try{ await apiPost('/api/news', { action:'delete', id: btn.dataset.id }); toast('O\'chirildi'); loadNews(); }
+    catch(e){ formErr(e, 'o\'chirish'); }
+  }));
+}
+function openNews(){
+  $('#newsOv').classList.remove('hidden');
+  localStorage.setItem(NEWS_SEEN, String(Date.now()));
+  $('#newsBadge').classList.add('hidden');
+}
+function closeNews(){ $('#newsOv').classList.add('hidden'); }
+
+$('#btn-news').addEventListener('click', openNews);
+$('#newsClose').addEventListener('click', closeNews);
+$('#newsOv').addEventListener('click', e => { if (e.target === $('#newsOv')) closeNews(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#newsOv').classList.contains('hidden')) closeNews(); });
+$('#newsForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const title = $('#newsTitle').value.trim(); if (!title){ toast('Sarlavha kerak'); return; }
+  const body = $('#newsBody').value, level = $('#newsLevel').value;
+  const image_url = $('#newsImg').value.trim();
+  const btn = e.currentTarget.querySelector('button[type=submit]'); btn.disabled = true;
+  try{
+    await apiPost('/api/news', { action:'create', title, body, level, image_url });
+    toast('E\'lon qilindi'); e.currentTarget.reset();
+    localStorage.setItem(NEWS_SEEN, String(Date.now()));
+    loadNews();
+  }catch(err){ formErr(err, 'e\'lon qilish'); }
+  finally{ btn.disabled = false; }
+});
 
 // ── init: kalit bo'lsa avtomatik kirish ──────────────────────
 (async function init(){

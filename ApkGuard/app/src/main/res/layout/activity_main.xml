@@ -578,6 +578,65 @@
                             android:textSize="13sp" />
                     </LinearLayout>
 
+                    <!-- ─── Yangiliklar (e'lonlar) — cloud'dan; bo'sh/sozlanmagan bo'lsa yashirin ─── -->
+                    <LinearLayout
+                        android:id="@+id/newsSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/kq_section_dot" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:letterSpacing="0.12"
+                                android:text="@string/news_section_title"
+                                android:textAllCaps="true"
+                                android:textColor="@color/kq_primary"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:background="@color/kq_hairline" />
+                        </LinearLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:cardBackgroundColor="@color/kq_bg_elev"
+                            app:cardCornerRadius="22dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/kq_hairline"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:id="@+id/newsContainer"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:paddingVertical="4dp" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
                     <!-- ─── Section header: tvCount ko'rsatadi "Topilgan APK: N" / "Tekshirilmoqda..." ─── -->
                     <LinearLayout
                         android:layout_width="match_parent"

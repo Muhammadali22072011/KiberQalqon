@@ -60,11 +60,27 @@ function Phone({ children, dark, hideStatus, hideNav }) {
   );
 }
 
+/* ── Capture params (for headless screenshot pipeline) ───── */
+const KQ_QS = new URLSearchParams(typeof location !== "undefined" ? location.search : "");
+const KQ_INIT_SCREEN = KQ_QS.get("screen");
+const KQ_INIT_SAMPLE = KQ_QS.get("sample");
+if (KQ_QS.get("theme"))  KQ_DEFAULTS.theme  = KQ_QS.get("theme");
+if (KQ_QS.get("accent")) KQ_DEFAULTS.accent = KQ_QS.get("accent");
+if (typeof document !== "undefined") {
+  document.documentElement.dataset.theme  = KQ_DEFAULTS.theme;
+  document.documentElement.dataset.accent = KQ_DEFAULTS.accent;
+  if (KQ_QS.get("bare")) {
+    const _st = document.createElement("style");
+    _st.textContent = "html,body{background:transparent !important}#root{background:transparent !important}";
+    document.head.appendChild(_st);
+  }
+}
+
 /* ── App router ──────────────────────────────────────────── */
 function App() {
   const [tweaks, setTweak] = useTweaks(KQ_DEFAULTS);
-  const [screen, setScreen] = React.useState("splash"); // splash → onboarding → dash → ...
-  const [param, setParam]   = React.useState(null);
+  const [screen, setScreen] = React.useState(KQ_INIT_SCREEN || "splash"); // splash → onboarding → dash → ...
+  const [param, setParam]   = React.useState(KQ_INIT_SAMPLE || null);
 
   // sync theme + accent
   React.useEffect(() => {
