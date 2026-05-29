@@ -124,7 +124,9 @@ object NotificationHelper {
         )
     }
 
+    @Suppress("NAME_SHADOWING")
     fun showScanNotification(context: Context, apkFile: File) {
+        val context = LocaleHelper.apply(context)
         createChannels(context)
 
         val intent = Intent(context, AutoScanActivity::class.java).apply {
@@ -160,12 +162,14 @@ object NotificationHelper {
      * Уведомление после установки опасного APK. Тапание открывает системный диалог
      * удаления — юзер одним кликом сносит вирус.
      */
+    @Suppress("NAME_SHADOWING")
     fun showInstalledDangerNotification(
         context: Context,
         pkg: String,
         appLabel: String,
         result: ScanResult
     ) {
+        val context = LocaleHelper.apply(context)
         createChannels(context)
         val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
             data = android.net.Uri.parse("package:$pkg")
@@ -202,12 +206,14 @@ object NotificationHelper {
      * stack'da to'planib qolib, foydalanuvchi orqaga qaytsa boshqasi chiqib turardi
      * va dasturdan chiqib bo'lmasdi. Bu funksiya — o'rnini bosadi.
      */
+    @Suppress("NAME_SHADOWING")
     fun showFoundApkNotification(
         context: Context,
         apkFile: File,
         verdict: ScanResult.Verdict,
         reason: String
     ) {
+        val context = LocaleHelper.apply(context)
         createChannels(context)
         val intent = Intent(context, AutoScanActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -245,7 +251,9 @@ object NotificationHelper {
      * o'ldirgan bo'lsa, qaytib kelganida bu eslatma ko'rsatiladi. Tap → SettingsActivity
      * (yoki to'g'ridan-to'g'ri OEM autostart ekrani) ochiladi.
      */
+    @Suppress("NAME_SHADOWING")
     fun showKillDetectedNotification(context: Context, gapHours: Long) {
+        val context = LocaleHelper.apply(context)
         createChannels(context)
         val oem = OemAutostartGuide.detect()
         // Tap → SplashActivity orqali autostart guide qayta ochiladi
@@ -282,7 +290,9 @@ object NotificationHelper {
      * Birinchi ochilishda chiqadigan xush kelibsiz xabari — "Himoyangiz yoqildi"
      * deb foydalanuvchiga vizual tasdiqlash. Bir martagina, doimiy emas (auto-cancel).
      */
+    @Suppress("NAME_SHADOWING")
     fun showWelcomeNotification(context: Context) {
+        val context = LocaleHelper.apply(context)
         createChannels(context)
         val openIntent = Intent(context, SplashActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -305,12 +315,14 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(7001, builder.build())
     }
 
+    @Suppress("NAME_SHADOWING")
     fun showInstalledSuspiciousNotification(
         context: Context,
         pkg: String,
         appLabel: String,
         result: ScanResult
     ) {
+        val context = LocaleHelper.apply(context)
         createChannels(context)
         val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
             data = android.net.Uri.parse("package:$pkg")

@@ -83,6 +83,9 @@ quyidagilarni qo'sh (`.env.example` dagi *barcha* qiymatlar):
 | `DEVICE_SHARED_SECRET` | random 32 hex — **APK'ga ham shu qiymat kerak** (6-qadam) |
 | `ADMIN_SECRET` | random 32 hex — **faqat panel uchun, APK'ga QO'YILMAYDI** |
 | `ADMIN_CHAT_IDS` | guruh chat_id (manfiy son) |
+| `ADMIN_TOTP_SECRET` | (ixtiyoriy) panel 2FA — autentifikator base32 sekret. Bo'sh = faqat parol |
+| `SESSION_SECRET` | (ixtiyoriy) panel sessiya tokenini imzolash; bo'sh = ADMIN_SECRET |
+| `ROLE_CODE_SECRET` | rollar tizimi — soatlik umumiy kod shu sekretdan hisoblanadi |
 
 Endi deploy:
 
@@ -106,12 +109,30 @@ Natija: `✅ Webhook o'rnatildi`. Guruhga `/help` yoz — bot javob beradi.
 ### 5) Panelni ochish (markaziy monitoring)
 
 1. Brauzerda deploy URL'ini och: `https://kiberqalqon-cloud.vercel.app/`
-2. Kirish oynasi `ADMIN_SECRET` so'raydi — Vercel'ga qo'ygan qiymatni kirit.
-   (Kalit faqat brauzerning `sessionStorage`'ida saqlanadi, serverga har
-   so'rovda `x-admin-secret` sarlavhasida boradi.)
+2. Kirish: `ADMIN_SECRET` (parol) + (agar 2FA yoqilgan bo'lsa) autentifikator
+   ilovasidagi 6 xonali kod. Server tekshiradi va **qisqa muddatli sessiya tokeni**
+   beradi — master kalit brauzerda SAQLANMAYDI (faqat ~8 soatlik token).
 3. Ko'rasan: O'zbekiston xaritasi (har nuqta = bitta telefon, rang yashil→qizil
    risk bo'yicha — nuqtaga bossang qurilma kartochkasi ochiladi), KPI kartalar,
    jonli tahdid oqimi, top zararli oilalar, hududlar jadvali.
+
+**Panelni 2FA bilan himoyalash (qiyin kirish — tavsiya etiladi):**
+
+1. base32 sekret yarat (yoki istalgan TOTP generatordan ol):
+   ```powershell
+   node -e "const c=require('crypto');const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';let b=c.randomBytes(20),s='',v=0,n=0;for(const x of b){v=(v<<8)|x;n+=8;while(n>=5){n-=5;s+=A[(v>>>n)&31]}}console.log(s)"
+   ```
+2. Shu sekretni Google Authenticator / Authy'ga **"qo'lda kalit kiritish"** orqali qo'sh
+   (hisob nomi: KiberQalqon, kalit: yuqoridagi satr).
+3. Shu sekretni Vercel env'ga `ADMIN_TOTP_SECRET` deb qo'sh va qayta deploy qil.
+4. Endi panelga kirishda parol + ilovadagi 6 xonali kod kerak bo'ladi.
+
+> `ADMIN_TOTP_SECRET` bo'sh bo'lsa 2FA o'chiq (faqat parol) — o'zingni qulflab
+> qo'ymaslik uchun. Sekretni qo'shganingdan keyingina 2FA majburiy bo'ladi.
+
+Sahifa himoyasi (avtomatik, `vercel.json`): `X-Frame-Options: DENY` (clickjacking
+yo'q), `Content-Security-Policy`, `Strict-Transport-Security` (HSTS), `nosniff`,
+`Referrer-Policy: no-referrer` — barcha javoblarga qo'shiladi.
 
 > Hozircha qurilmalar yo'q bo'lsa xarita bo'sh — bu normal. 6-qadamdan keyin
 > ilova ma'lumot yubora boshlaydi va nuqtalar paydo bo'ladi.
@@ -163,8 +184,15 @@ Natija: `{ "ok": true, "stats": { ... } }`.
 |----------|--------|--------|
 | `/api/scan/upload` | POST | Skan natijasini yuboradi (har skan, SAFE ham) |
 | `/api/device/register` | POST | Qurilmani ro'yxatdan o'tkazadi (xaritada nuqta) |
+| `/api/role/login` | POST | Maxfiy kirish: `{code, login, password}` → rol (huquqlar) |
 
-**O'qish (Panel/admin, `x-admin-secret`):**
+**Kirish (panel sessiyasi — sarlavhasiz, qiymatlar body'da):**
+
+| Endpoint | Method | Vazifa |
+|----------|--------|--------|
+| `/api/admin/login` | POST | `{secret, otp}` → qisqa muddatli sessiya tokeni (2FA) |
+
+**O'qish (Panel/admin, `x-admin-secret` yoki sessiya tokeni):**
 
 | Endpoint | Method | Vazifa |
 |----------|--------|--------|
@@ -175,6 +203,7 @@ Natija: `{ "ok": true, "stats": { ... } }`.
 | `/api/device/:id` | GET | Bitta qurilma + oxirgi 20 skani (uuid bo'yicha) |
 | `/api/threats` | GET | Zararli APK oilalari ro'yxati |
 | `/api/scans` | GET | Skan tarixi (`?verdict=danger&limit=50`) |
+| `/api/role/code` | GET | Joriy soatlik kod (rollar tizimi uchun) |
 
 **Telegram (`x-telegram-bot-api-secret-token`):**
 

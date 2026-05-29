@@ -23,8 +23,12 @@ create index if not exists idx_devices_risk on devices(risk_score desc);
 -- ============================================================================
 -- 2) v_devices_with_counts — geo + risk maydonlarini qo'shamiz
 -- (Panel qurilmalar ro'yxatini shu ko'rinishdan oladi.)
+-- DIQQAT: yangi ustunlar OLDINGI ustunlar ORASIGA qo'shilgani uchun
+-- "create or replace view" xato beradi (faqat oxiriga qo'shishga ruxsat).
+-- Shuning uchun avval drop qilamiz — bu view'ga boshqa hech narsa bog'lanmagan.
 -- ============================================================================
-create or replace view v_devices_with_counts as
+drop view if exists v_devices_with_counts;
+create view v_devices_with_counts as
 select
   d.id, d.name, d.android_ver, d.app_ver, d.created_at, d.last_seen,
   d.country, d.city, d.lat, d.lng, d.risk_score, d.last_verdict, d.last_scan_at,
@@ -44,7 +48,8 @@ left join (
 -- 3) v_map_points — xarita uchun yengil ko'rinish (faqat koordinatasi borlar)
 -- Panel /api/geo shu yerdan o'qiydi: minimal maydonlar, tez yuklanadi.
 -- ============================================================================
-create or replace view v_map_points as
+drop view if exists v_map_points;
+create view v_map_points as
 select
   d.id,
   d.name,

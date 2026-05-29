@@ -11,11 +11,21 @@ export function checkDeviceSecret(req: VercelRequest): boolean {
 // Panel (o'qish/admin) endpointlari uchun — bu sirni APK ichiga QO'YMAYMIZ.
 // Shu sabab qurilma siri (x-device-secret) bilan butun flotni dump qilib
 // bo'lmaydi: panel alohida ADMIN_SECRET talab qiladi.
+//
+// x-admin-secret sarlavhasi IKKI xil qiymatni qabul qiladi:
+//   1) xom ADMIN_SECRET — skriptlar/curl uchun (ping.mjs), eski usul.
+//   2) qisqa muddatli sessiya tokeni — panel /api/admin/login'dan oladi (2FA'dan
+//      keyin). Shunda master kalit brauzerda saqlanmaydi.
+// Ikkalasi ham shu bitta funksiyada tekshiriladi → boshqa endpointlar o'zgarmaydi.
 export function checkAdminSecret(req: VercelRequest): boolean {
-  const expected = process.env.ADMIN_SECRET;
-  if (!expected) return false;
   const got = req.headers['x-admin-secret'];
-  return typeof got === 'string' && timingSafeEqual(got, expected);
+  if (typeof got !== 'string' || got.length === 0) return false;
+
+  const expected = process.env.ADMIN_SECRET;
+  if (expected && timingSafeEqual(got, expected)) return true;
+
+  // Aks holda — sessiya tokeni bo'lishi mumkin (panel kiritadi).
+  return verifySession(got);
 }
 
 export function checkTelegramSecret(req: VercelRequest): boolean {

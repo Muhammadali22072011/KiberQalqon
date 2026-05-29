@@ -189,9 +189,10 @@
     <b class="gate-title">KiberQalqon</b>
     <span class="gate-sub">Boshqaruv paneli &middot; kirish</span>
     <input id="gate-input" type="password" placeholder="Admin kalit (ADMIN_SECRET)" autocomplete="off" />
+    <input id="gate-otp" type="text" inputmode="numeric" maxlength="6" placeholder="2FA kod (agar yoqilgan bo&#39;lsa)" autocomplete="one-time-code" />
     <button id="gate-btn" type="submit">Kirish</button>
     <span class="gate-err" id="gate-err"></span>
-    <span class="gate-hint">Bu kalit faqat panel uchun &mdash; ilova ichiga qo&#39;yilmagan.</span>
+    <span class="gate-hint">Bu kalit faqat panel uchun &mdash; ilova ichiga qo&#39;yilmagan. 2FA yoqilgan bo&#39;lsa, autentifikator ilovasidagi 6 xonali kodni kiriting.</span>
   </form>
 </div>
 
@@ -359,22 +360,34 @@ function logout(msg){
   sessionStorage.removeItem(KEY); SECRET = '';
   stopTimers();
   $('#gate-input').value = '';
+  const otp = $('#gate-otp'); if (otp) otp.value = '';
   showGate(msg || '');
 }
 
 $('#gate-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const v = $('#gate-input').value.trim();
-  if (!v) return;
-  SECRET = v;
+  const secret = $('#gate-input').value.trim();
+  const otp = $('#gate-otp').value.trim();
+  if (!secret) return;
   const btn = $('#gate-btn'); btn.disabled = true; btn.textContent = 'Tekshirilmoqda…';
+  $('#gate-err').textContent = '';
   try{
-    await api('/api/stats');                 // kalitni tekshiramiz
-    sessionStorage.setItem(KEY, v);
+    // Master kalit + 2FA serverda tekshiriladi → qisqa muddatli sessiya tokeni.
+    // Brauzerda ADMIN_SECRET emas, faqat shu token saqlanadi.
+    const r = await fetch('/api/admin/login', {
+      method:'POST',
+      headers:{ 'content-type':'application/json' },
+      body: JSON.stringify({ secret, otp }),
+    });
+    const j = await r.json().catch(() => ({ ok:false }));
+    if (!r.ok || !j.ok) throw new Error((j && j.error) || 'Kalit yoki kod noto‘g‘ri');
+    SECRET = j.token;
+    sessionStorage.setItem(KEY, j.token);
+    $('#gate-input').value = ''; $('#gate-otp').value = '';
     enterApp();
   }catch(err){
     SECRET = '';
-    $('#gate-err').textContent = 'Kalit noto‘g‘ri';
+    $('#gate-err').textContent = (err && err.message) || 'Kalit noto‘g‘ri';
   }finally{
     btn.disabled = false; btn.textContent = 'Kirish';
   }
