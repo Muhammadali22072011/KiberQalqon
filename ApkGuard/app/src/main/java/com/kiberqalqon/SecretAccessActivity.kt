@@ -1,8 +1,12 @@
 package com.kiberqalqon
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
@@ -29,11 +33,16 @@ import com.google.android.material.button.MaterialButton
  */
 class SecretAccessActivity : AppCompatActivity() {
 
-    private enum class Stage { CODE, CREDS, LOADING, RESULT_OK, RESULT_OFF }
+    private enum class Stage { CODE, CREDS, LOADING, RESULT_OK, RESULT_OFF, OWNER_SECRET, OWNER_CODE }
 
     private lateinit var content: LinearLayout
     private var enteredCode: String = ""
     private var enteredLogin: String = ""
+
+    // Owner mode (kodni ko'rsatish) — joriy kod va u yangilanguncha qolgan soniya.
+    private val ui = Handler(Looper.getMainLooper())
+    private var ownerTicker: Runnable? = null
+    private var ownerSecondsLeft = 0
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -66,6 +75,8 @@ class SecretAccessActivity : AppCompatActivity() {
     // ---- Bosqichlarni chizish ---------------------------------------------
 
     private fun render(stage: Stage) {
+        // Owner-kod taymeri faqat OWNER_CODE bosqichida ishlaydi.
+        if (stage != Stage.OWNER_CODE) stopOwnerTicker()
         content.removeAllViews()
         content.addView(header())
 
@@ -75,6 +86,8 @@ class SecretAccessActivity : AppCompatActivity() {
             Stage.LOADING -> renderLoading()
             Stage.RESULT_OK -> renderResultOk()
             Stage.RESULT_OFF -> renderServerOff()
+            Stage.OWNER_SECRET -> renderOwnerSecret()
+            Stage.OWNER_CODE -> renderOwnerCode()
         }
     }
 
@@ -186,6 +199,12 @@ class SecretAccessActivity : AppCompatActivity() {
         letterSpacing = 0.18f
         isAllCaps = true
         setPadding(0, 0, 0, dp(16))
+        // Egasi uchun yashirin kirish: sarlavhani uzoq bossa — kodni ko'rsatish rejimi.
+        // Operator buni bilmaydi; bilsa ham admin sirisiz kodni ololmaydi.
+        setOnLongClickListener {
+            render(if (SecretAccess.hasOwnerSecret(this@SecretAccessActivity)) Stage.OWNER_CODE else Stage.OWNER_SECRET)
+            true
+        }
     }
 
     private fun label(t: String): TextView = TextView(this).apply {

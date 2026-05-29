@@ -43,6 +43,20 @@ object VersionCompat {
     }
 
     /**
+     * True если есть ПОЛНЫЙ файловый доступ, нужный сканеру: рекурсивный обход
+     * папок (Download/Telegram/…), чтение .apk и удаление.
+     *
+     * На Android 11+ это ТОЛЬКО MANAGE_EXTERNAL_STORAGE — READ_MEDIA_* и
+     * READ_EXTERNAL_STORAGE не дают listFiles() по чужим папкам и не открывают
+     * .apk (это не картинка/видео/аудио). Совпадает с гейтом в SplashActivity,
+     * поэтому экран сканера и сплэш видят разрешение одинаково.
+     */
+    fun hasFileScanAccess(ctx: Context): Boolean = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> hasManageStorage()
+        else -> hasPerm(ctx, Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
+
+    /**
      * True если можем удалять чужие APK напрямую без диалогов.
      * - Android 7-9: WRITE_EXTERNAL_STORAGE (всегда true по умолчанию для targetSdk<29)
      * - Android 10: WRITE_EXTERNAL_STORAGE + requestLegacyExternalStorage (true благодаря манифесту)

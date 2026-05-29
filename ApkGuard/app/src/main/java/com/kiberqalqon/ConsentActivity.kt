@@ -152,12 +152,24 @@ Ilovadan foydalanish uchun siz kamida 13 yoshda bo'lishingiz kerak. Agar 13-18 y
 - KiberQalqon xavfli deb topgan APK'larni avtomatik o'chirib yoki karantinga qo'yishi mumkin (sozlamalardan boshqaring).
 - Dasturchi noto'g'ri natija sababli yo'qotgan ma'lumot yoki zarar uchun javobgar emas.
 
-4. RUXSATLAR
-KiberQalqon quyidagi tizim ruxsatlarini so'raydi:
-- Barcha fayllarga kirish (MANAGE_EXTERNAL_STORAGE) — APK'larni topish uchun
-- Boshqa ilovalar ustida ko'rsatish — ogohlantirish chiqarish uchun
-- Bildirishnomalar — xavfli APK aniqlanganda xabar berish uchun
-- Internet — yangi virus signaturalarini yangilash uchun (kelajakda)
+4. RUXSATLAR (nima uchun so'raladi)
+KiberQalqon faqat o'z vazifasi uchun zarur tizim ruxsatlarini so'raydi. Hech bir ruxsat reklama yoki kuzatuv uchun ishlatilmaydi.
+
+Fayllarni tekshirish:
+- Barcha fayllarga kirish (MANAGE_EXTERNAL_STORAGE) — qurilmadagi APK fayllarni topish va xavflilarini o'chirish uchun
+- Rasm, video, audio fayllar (READ_MEDIA_IMAGES/VIDEO/AUDIO) — Android 13+ da "rasm" yoki "video" niqobidagi APK'larni tekshirish uchun
+- Xotiradan o'qish/yozish (READ/WRITE_EXTERNAL_STORAGE) — eski Android (12 va undan past) versiyalarda xuddi shu maqsadda
+
+Himoya va ogohlantirish:
+- Bildirishnomalar (POST_NOTIFICATIONS) — xavfli APK aniqlanganda darhol xabar berish uchun
+- Boshqa oynalar ustida ko'rsatish va to'liq ekran ogohlantirish (SYSTEM_ALERT_WINDOW, USE_FULL_SCREEN_INTENT) — xavf topilganda ekranni bloklab ogohlantirish chiqarish uchun
+- Doimiy himoya xizmati (FOREGROUND_SERVICE, Android 14+ uchun "specialUse" turi) — fonda real vaqtli himoyani saqlash uchun
+- Qayta yuklashdan keyin ishga tushish (RECEIVE_BOOT_COMPLETED) — telefon o'chib-yongach himoyani avtomatik tiklash uchun
+- Batareya optimizatsiyasidan ozod qilish (REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) — Xiaomi, Samsung kabi qurilmalarda davriy skan to'xtab qolmasligi uchun
+
+O'rnatish va internet:
+- Ilova o'rnatish (REQUEST_INSTALL_PACKAGES) — tekshiruvdan o'tgan APK'ni xavfsiz o'rnatishga uzatish uchun
+- Internet (INTERNET, ACCESS_NETWORK_STATE) — faqat IXTIYORIY Telegram telemetriya yoki jamoatchilik xavf bazasi yoqilgan bo'lsa ishlatiladi; aks holda ilova internetga chiqmaydi
 
 5. TAQIQLAR
 Quyidagilarni qilmang:
