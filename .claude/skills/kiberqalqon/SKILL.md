@@ -4,7 +4,7 @@ description: >-
   Complete project knowledge for KiberQalqon (formerly ApkGuard) — Muhammadali's
   personal Android APK antivirus written in Kotlin (package com.kiberqalqon) — together
   with the bundled Android-malware forensics case study, all living in
-  C:\Users\Muhammadali\Desktop\APK Virus Analysis. ALWAYS use this skill when the user
+  C:\Users\User\OneDrive\Desktop\KiberQalqon. ALWAYS use this skill when the user
   mentions KiberQalqon, ApkGuard, the APK antivirus / scanner / "skaner", any analyzer
   (ApkScanner, DexPatternAnalyzer, DropperDetector, IconImpersonationDetector,
   ZipEncryptionDetector, PermissionCombos, ManifestAnalyzer, NativeLibAnalyzer,
@@ -23,11 +23,14 @@ metadata:
 # KiberQalqon — Project Knowledge
 
 Personal Android security project by **Muhammadali**. One workspace
-(`C:\Users\Muhammadali\Desktop\APK Virus Analysis`) holds two tightly-linked halves:
+(`C:\Users\User\OneDrive\Desktop\KiberQalqon`) holds two tightly-linked halves:
 
-1. **KiberQalqon antivirus** — a Kotlin Android app (`com.kiberqalqon`, ~78 `.kt` files,
-   versionName 7.8) that finds, judges, quarantines and deletes malicious APKs. Its
-   "backend" is a Telegram bot used as a private remote command panel + telemetry sink.
+1. **KiberQalqon antivirus** — a Kotlin Android app (`com.kiberqalqon`, ~89 `.kt` files,
+   versionName 7.9) that finds, judges, quarantines and deletes malicious APKs. It now has
+   **two backends**: a personal Telegram bot (remote command panel + per-event telemetry) and
+   a **live Vercel+Supabase cloud** (central monitoring map + admin panel). The phone reports
+   anonymous, opt-in structured telemetry to the cloud (`CloudTelemetry.kt`) on top of the
+   Telegram path.
 2. **A malware forensics case study** — the user reverse-engineered real Uzbek banking
    trojans / droppers (disguised as photos/videos, spread over Telegram). That RE work is
    the **empirical basis** for every detector in the antivirus. The detectors hard-code the
@@ -41,12 +44,12 @@ to catch.** When touching a detector, the matching threat is documented in the c
 ## Repository map (top level)
 
 ```
-APK Virus Analysis/
+KiberQalqon/                   # workspace root (was "APK Virus Analysis")
 ├── ApkGuard/                  # the antivirus app (folder still named ApkGuard; package = com.kiberqalqon)
-│   ├── app/src/main/java/com/kiberqalqon/   # all ~78 Kotlin files
+│   ├── app/src/main/java/com/kiberqalqon/   # all ~89 Kotlin files
 │   ├── app/src/test/java/com/kiberqalqon/   # JUnit4 unit tests (pure functions only)
 │   ├── app/build.gradle.kts                 # build config, signing, BuildConfig fields
-│   ├── cloud/                 # Gen-3 backend: Vercel + Supabase + Telegram webhook (TypeScript)
+│   ├── cloud/                 # LIVE cloud backend: Vite+React SPA + Vercel functions + Supabase + Telegram webhook (TS)
 │   ├── server/                # Gen-1 backend: local Flask upload sink (legacy)
 │   ├── test_server/           # serves test APKs to an emulator for QA
 │   ├── gradlew / gradlew.bat  # build from HERE
@@ -77,15 +80,16 @@ XOR+Base64 key scheme, the ZIP general-purpose-bit evasion, the verdict threshol
 ## Build & run
 
 ```powershell
-cd "C:\Users\Muhammadali\Desktop\APK Virus Analysis\ApkGuard"
+cd "C:\Users\User\OneDrive\Desktop\KiberQalqon\ApkGuard"
 .\gradlew.bat assembleDebug
 # output: app\build\outputs\apk\debug\kiberqalqon-<epoch-millis>-debug.apk
 ```
 
 Gotchas that bite every time:
-- **Folder is `ApkGuard/`, package is `com.kiberqalqon`.** A rename to a `KiberQalqon/`
-  folder is pending; some docs (README, HOW_TO_BUILD.md) already say `KiberQalqon/` — that
-  path may not exist yet. Build from `ApkGuard/`.
+- **Workspace root is `KiberQalqon/`, but the app module folder is still `ApkGuard/`** (package
+  `com.kiberqalqon`). The old workspace path `C:\Users\Muhammadali\Desktop\APK Virus Analysis`
+  is stale — some in-repo docs (cloud README, HOW_TO_BUILD.md) still reference it. Build from
+  `ApkGuard/`.
 - **APK filename carries `System.currentTimeMillis()`** on purpose: Windows Defender locks a
   freshly-built APK for ~15–30 min, so each build gets a unique name instead of overwriting.
 - **Debug installs side-by-side** with release (`applicationIdSuffix=.debug`, `-DEBUG` suffix).
@@ -100,16 +104,18 @@ Gotchas that bite every time:
 
 ## Backend at a glance
 
-Three generations exist in the repo; know which is live:
-- **LIVE today:** the **in-app Telegram command panel** — the phone itself long-polls
-  `getUpdates` (`TelegramBot.kt` + `TelegramCommandPoller.kt` + `CommandRouter.kt`) and sends
+Two backends are LIVE today; two older generations are dormant:
+- **LIVE — Telegram command panel:** the phone itself long-polls `getUpdates`
+  (`TelegramBot.kt` + `TelegramCommandPoller.kt` + `CommandRouter.kt`) and sends per-event
   telemetry to the user's *personal* bot. The phone *is* the bot server.
-- **Gen-1 Flask** (`server/app.py`) — local LAN upload sink, dormant by default (empty
-  `DEFAULT_SERVER_URL`). **Gen-2 python bot** (`telegram_bot/bot.py`) — standalone
-  sample-intake/crowd bot, not part of the app runtime.
-- **Gen-3 cloud** (`cloud/`, Vercel+Supabase+webhook) — the *intended* replacement, **code
-  complete but NOT deployed and NOT yet wired into Android.** The missing piece is the
-  Android client that POSTs to `/api/scan/upload`. Details in `references/backends.md`.
+- **LIVE — Gen-3 cloud** (`cloud/`, deployed at **`https://kiberqalqon-cloud.vercel.app`**):
+  Vite+React SPA dashboard + Vercel serverless functions + Supabase + Telegram webhook. **Now
+  wired into Android** — `CloudTelemetry.kt` POSTs structured JSON to `/api/device/register`
+  and `/api/scan/upload` (header `x-device-secret`), so the panel's monitoring map and stats
+  fill with real device data. The old "not deployed / Android client missing" note is obsolete.
+- **Dormant — Gen-1 Flask** (`server/app.py`): local LAN upload sink, off by default (empty
+  `DEFAULT_SERVER_URL`). **Gen-2 python bot** (`telegram_bot/bot.py`): standalone sample-intake
+  bot, not part of the app runtime. Details + the cloud access model in `references/backends.md`.
 
 ---
 
@@ -128,6 +134,11 @@ These are load-bearing project rules (several come from the user's standing pref
   dev/community token comes from a gitignored `local.properties` via `BuildConfig`. There are
   **two distinct bots**: personal (full admin panel + telemetry) and dev-community (opt-in,
   hash + file only). `chat_id` is whitelisted; shared telemetry is opt-in only.
+- **Cloud panel access model is owner + one admin — no roles.** The panel has exactly two kinds
+  of user: the **owner** (master key + optional 2FA, full rights) and a **single restricted admin**
+  (login+password, view+export+post-news only). A roles/hierarchy system was tried and
+  deliberately removed — **do not reintroduce roles, `rolecode`, or per-permission tiers.** Details
+  in `references/backends.md` §3.
 - **Just fix, don't ask.** When the user reports bugs, fix them all in one pass — don't
   enumerate them and ask which to fix first.
 

@@ -1,10 +1,12 @@
 # KiberQalqon Android App — Architecture Reference
 
-Package `com.kiberqalqon` · versionName 7.8 / versionCode 78 · Kotlin · ~78 `.kt` files.
+Package `com.kiberqalqon` · versionName 7.9 / versionCode 79 · Kotlin · ~89 `.kt` files.
 A personal APK antivirus specialized against Central-Asian banking trojans
 (Ajina.Banker, RoundRift, Uzbek droppers). Source root:
-`ApkGuard/app/src/main/java/com/kiberqalqon/`. The Telegram bot is the remote
-command/telemetry backend. All user-facing strings are Uzbek; comments mix RU/UZ.
+`ApkGuard/app/src/main/java/com/kiberqalqon/`. Two backends: the personal Telegram bot
+(remote command panel + telemetry) and a **live Vercel+Supabase cloud** the app now reports
+to (`CloudTelemetry.kt` → `/api/scan/upload` + `/api/device/register`; see `backends.md`). All
+user-facing strings are Uzbek; comments mix RU/UZ.
 
 > file:line citations are point-in-time — verify before relying on exact numbers.
 
@@ -27,8 +29,8 @@ command/telemetry backend. All user-facing strings are Uzbek; comments mix RU/UZ
 **`App.kt`** (`onCreate`) orchestrates startup; every step is wrapped in try/catch so one
 failure never kills the app:
 1. `CrashHandler.install()` — first line; routes later uncaught exceptions to a file + Telegram.
-2. `Config.ensureFirstRunDefaults()` — bakes all protection toggles ON on first launch; welcome notification.
-3. `TelemetryReporter.report(APP_START)`.
+2. `Config.ensureFirstRunDefaults()` — bakes all protection toggles ON on first launch; welcome notification. Then `ThreatDb.init()` loads the large external blacklist (`assets/malicious_hashes.txt` + `malicious_certs.txt`) into memory (non-fatal on failure — lookups just return null).
+3. `TelemetryReporter.report(APP_START)` + `CloudTelemetry.registerDevice()` (registers the phone with the cloud; no-op if `BuildConfig.CLOUD_BASE_URL` is empty).
 4. "Service killed" detector — compares `last_start` in `kiberqalqon_lifecycle`; gap ≥6h on an OEM-restricted device → kill notification; ≥12h → `SERVICE_KILLED` telemetry.
 5. `SecurityGuard.runAllChecks()` — **release only**; kills the process (`Process.killProcess` + `exitProcess(10)`) if tamper/root/Frida/emulator is detected, before protection classes are observable.
 6. `ThemeHelper.applyTheme()` + `LocaleHelper.apply()`.
@@ -37,15 +39,32 @@ failure never kills the app:
 9. Schedules `GuardWorker` (15-min periodic, `KEEP`, work name `kiberqalqon_scan`), starts `TelegramCommandPoller` if listen opted-in, schedules Heartbeat / DailyReport / InstalledAppsRescan / AccessibilityWatcher.
 10. Dynamically registers 3 receivers (manifest broadcasts don't fire on API 26+): `PackageInstallReceiver` (PACKAGE_ADDED/REPLACED/REMOVED), `SystemStateReceiver` (SIM/airplane), `ScreenUnlockReceiver` (USER_PRESENT/SCREEN_ON).
 
-**`SplashActivity`** (launcher, exported) — logo animation → permission gauntlet
-(`checkPermissions()`): storage → overlay → OEM overlay → battery optimization →
-notifications → OEM autostart guide. Long-press the version text opens `DiagnosticsActivity`
-(hidden backdoor). Routing (`goToMainActivity()`): no consent→`ConsentActivity`; first
-run→`OnboardingActivity`; no initial scan→`InitialScanActivity`; else→`DashboardNewActivity`.
+**`LanguageSelectActivity`** (the **launcher**, exported) — shown only on the very first launch:
+pick UZ/RU → save → `SplashActivity`. Once a language is chosen it forwards to Splash
+immediately without showing UI. (Splash is no longer the launcher.)
+
+**`SplashActivity`** (exported) — logo animation → permission gauntlet (`checkPermissions()`):
+storage → overlay → OEM overlay → battery optimization → notifications → OEM autostart guide.
+Long-press the version text opens `DiagnosticsActivity` (hidden backdoor). Routing
+(`goToMainActivity()`): no consent→`ConsentActivity`; no initial scan→`InitialScanActivity`;
+protection not acked (`!Config.isProtectionAcked`) **or** a critical permission is missing
+(`!ProtectionStatusActivity.allCriticalPermissionsGranted`)→`ProtectionStatusActivity`;
+else→`DashboardNewActivity`. (`OnboardingActivity` still exists as a file but is no longer in
+this routing chain.)
+
+**`ProtectionStatusActivity`** — the permission/setup gate that sits on the entry path. Shows
+every required permission/setting on one screen (✓ on / ✗ off / ⚠ manual) with an "Enable"
+button per row that opens the matching system screen; a "Continue" button stays disabled until
+all mandatory permissions are granted (sets `protection_acked_v1`). Also requests location once
+(for the cloud map). Hardened: any `onCreate` error routes straight to the Dashboard so the gate
+can never lock the user out.
 
 **`MainActivity`** — the "Skaner" tab; lists found APKs (`ApkAdapter`), tap-to-scan with 5s
-timeout, hosts `MultiPathFileObserver`, schedules `PeriodicCheckWorker` (separate 15-min work
-`periodic_apk_check`).
+timeout, schedules `PeriodicCheckWorker` (separate 15-min work `periodic_apk_check`). Also hosts
+the **news ticker**: `NewsClient.fetch()` pulls announcements from the cloud and
+`NewsTickerAdapter` renders them as a horizontal strip; tapping one opens a detail dialog (image
+via `NewsClient.loadImage`). (Real-time file watching moved out of here into `ProtectionService`
+— see §3.)
 
 **`DashboardNewActivity`** — main home post-onboarding; speedometer protection level, recent
 threat rows (`ScanHistory`), full installed-apps list with verdict dots + install-source
@@ -64,6 +83,9 @@ findings so a single analyzer crash can't abort the scan.
 - File unreadable → **SUSPICIOUS** (never false-SAFE).
 - **`MaliciousHashes`** — SHA-256 of APK bytes vs blacklist (6 hardcoded families:
   Ajina.Banker ×3, RoundRift, Uzbek-dropper.vudgi / .taklifnoma) → instant DANGER.
+- **`ThreatDb`** — a much larger external blacklist (file-hash + cert-hash) loaded at startup
+  from `assets/` text files. Complements the hand-curated `MaliciousHashes`/`MaliciousCerts`
+  (those are checked first / are higher-confidence); a `ThreatDb` hit is also instant DANGER.
 - **`ZipEncryptionDetector`** — raw byte scan of ZIP **local-file-headers AND central-directory
   headers** for GP-flag bit-0 (encryption). Android installs these but Java `ZipFile` can't
   read them → all other analyzers get neutered. Classic Ajina.Banker / TAKLIFNOMA evasion.
@@ -112,16 +134,33 @@ count threshold {4, 3, 2}. **Hard DANGER overrides score:** icon match, hidden A
 encrypted payload + extra signal, device-admin + comboScore ≥30, any obfuscated signature,
 suspicious native lib, comboScore ≥90, **≥2 evasion techniques** (anti-Frida/Magisk/debug/VPN).
 1 evasion technique → SUSPICIOUS. Random package name + 2 perms → DANGER. Critical scan error
-→ **SUSPICIOUS** (never SAFE). On result: updates Statistics, ScanHistory, ScanCache, widget,
-ProtectionService; fires telemetry + community report.
+→ **SUSPICIOUS** (never SAFE).
+
+**`AppReputation` (false-positive guard, applied at the verdict stage):** legit apps (Chrome,
+Gmail, Telegram, Kapitalbank…) have native libs + 3+ dangerous perms and were tripping the
+heuristics. `AppReputation.evaluate(pkg, certFingerprint)` returns `VERIFIED` /
+`SIGNATURE_MISMATCH` / `UNKNOWN`. A **VERIFIED** vendor (known package prefix + matching cert)
+**suppresses only the *soft* score signals** → SAFE; it is *not* a package-name whitelist —
+hard signals (blacklisted hash/cert/package, hidden APK/DEX dropper, icon impersonation,
+ZIP-encryption, brand impersonation) are checked **before** reputation and still force DANGER.
+A **SIGNATURE_MISMATCH** (known package name signed with the *wrong* cert = impersonation) is
+itself a danger signal.
+
+On result: updates Statistics, ScanHistory, ScanCache, widget, ProtectionService; fires Telegram
+telemetry + community report; and **`CloudTelemetry.uploadScan()` POSTs the verdict to the cloud
+for *every* scan (including SAFE)** — no-op if the cloud isn't configured.
 
 ---
 
 ## 3. Background protection
 
 - **`GuardWorker`** — 15-min periodic (+ one-shot on screen-unlock & Telegram "scan now").
-  Scans up to 10 found APKs. DANGER + auto-delete → `Quarantine` (works screen-locked); else
-  `AutoScanActivity` popup or notification fallback.
+  Scans up to 10 found APKs. DANGER + auto-delete → `Quarantine` (works screen-locked). The
+  post-quarantine alert is **keyguard-aware** (`pm.isInteractive && !km.isKeyguardLocked`):
+  screen on + unlocked → launch the `AutoScanActivity` window directly; locked → a
+  **full-screen-intent notification** so the "virus removed" alert still surfaces over the lock
+  screen (fixes MIUI/keyguard swallowing the activity launch). `NotificationHelper` provides the
+  lock-screen alert.
 - **`PeriodicCheckWorker`** — separate 15-min worker from `MainActivity` (`periodic_apk_check`);
   `FullPhoneScan` recursive, tracks `checked_paths` to scan only new files.
 - **`HeartbeatWorker`** — every 6h (15-min initial delay). Battery/storage/uptime; diff-state
@@ -133,7 +172,11 @@ ProtectionService; fires telemetry + community report.
 - **`AccessibilityWatcher`** — every 4h; reads `Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES`,
   alerts on a new non-system service (banking-trojan vector). Whitelists Google/Samsung a11y.
 - **`ProtectionService`** — foreground service (type `specialUse` on API 34+), `START_STICKY`,
-  IMPORTANCE_LOW ongoing notification "KIBER QALQON faol"; status reflects worst 24h verdict.
+  IMPORTANCE_LOW ongoing notification "🛡️ KIBER QALQON faol"; status reflects worst 24h verdict.
+  **Now the real-time watcher:** it owns `MultiPathFileObserver` in a service-lifetime coroutine
+  scope plus a fast-scan poll loop (started once). This moved here **from `MainActivity`** —
+  previously, closing the app stopped file watching and a Telegram-delivered APK was only caught
+  by the next 15-min `GuardWorker`; now the foreground service keeps watching 24/7.
 - **`PackageInstallReceiver`** — scans newly installed/replaced packages; DANGER → popup +
   uninstall notification; warns if KiberQalqon itself is removed.
 - **`BootReceiver`** — manifest-registered (priority 999); on BOOT_COMPLETED reschedules all
@@ -142,7 +185,8 @@ ProtectionService; fires telemetry + community report.
   & airplane-mode telemetry (anti-theft).
 - **File observers:** `ImprovedApkFileObserver` (active — debounce 700 ms + waitUntilStable),
   `MultiPathFileObserver` (manages observers across Downloads/Telegram/WhatsApp/Bluetooth +
-  Android/media paths, dedups by canonical path), `ApkFileObserver` (legacy/unused).
+  Android/media paths, dedups by canonical path — **now hosted by `ProtectionService`**, not
+  MainActivity), `ApkFileObserver` (legacy/unused).
 - **`ScanTileService`** — Quick-Settings tile → MainActivity. **`KqWidgetProvider`** — home
   widget (refreshed via `refreshAll()` after scans), colored status dot + last-scan time.
 - **`PhishingNotificationService`** — NotificationListener that hides phishing notifications.
@@ -179,8 +223,15 @@ ProtectionService; fires telemetry + community report.
   **`NetworkInfo.kt`** — local/external IP + connection type for the panel (personal bot only;
   "like TeamViewer for your own phone").
 
+- **`ReportProblemActivity.kt`** — "Muammoni yuborish": user sends a bug/problem straight to the
+  dev's Telegram via `CommunityReportClient.reportUserError`. Because it's an explicit user
+  action, it bypasses the community-share opt-in gate (only requires `DEV_TG_*` to be configured).
+  Reached from Settings → Help center.
+
 Two distinct bots: **personal** (TelemetryReporter + full admin panel) vs **dev community**
-(CommunityReportClient, hash + file only). Tokens are never hardcoded in the shipped APK.
+(CommunityReportClient, hash + file only). Tokens are never hardcoded in the shipped APK. A
+**third** reporting target is the cloud — `CloudTelemetry.kt` (every scan + device register; see
+§2 and `backends.md`); `DeviceLocation.kt` supplies optional GPS for the cloud's threat map.
 
 ---
 
@@ -192,9 +243,16 @@ Two distinct bots: **personal** (TelemetryReporter + full admin panel) vs **dev 
   `/data/adb` + boot props like `ro.boot.flash.locked`), debugger, Frida (ports 27042–27050,
   `/proc/self/maps` markers, thread names gum-js/frida/pool-frida, `/proc/self/net/tcp`),
   Xposed (classpath + installed apps), emulator (Build fingerprint/model/product + QEMU files).
-- **`SelfGuard.kt`** — prevents self-deletion: checks package (`com.kiberqalqon[.debug]`),
-  `/data/app/` path, sourceDir match, cached signature match, filename fallback. Used in
-  scan / findApk / FileDeleter / Quarantine.
+- **`SelfGuard.kt`** — prevents self-deletion / self-scan: checks package
+  (`com.kiberqalqon[.debug]`, plus legacy `com.apkguard*`), install-path, sourceDir match, cached
+  signature match, filename fallback. Used in scan / findApk / FileDeleter / Quarantine.
+  **Critical false-SAFE bug fix:** the install-path check used to match a bare `/$pkg/`
+  substring — but `ShareReceiverActivity` copies every incoming APK into the app's own cache
+  (`…/Android/data/com.kiberqalqon.debug/cache/…`), whose path contains `/com.kiberqalqon.debug/`,
+  so **every shared virus was treated as "our own APK" and returned SAFE** (ZipEncryption/Dropper
+  never ran). The path check now requires `/data/app/` *and* the package (the real installed
+  location, which the app can never write to); the package/sourceDir/signature checks still catch
+  our own APK if it lives elsewhere.
 - **`Quarantine.kt`** — moves an APK to `filesDir/quarantine/<token>.quar` (+ `.json` meta),
   7-day TTL, restore/purge. `.quar` can't be installed; the dir is MODE_PRIVATE.
   Reports `QUARANTINE_RESTORE` to Telegram on user restore.
@@ -212,7 +270,9 @@ Keys include: `background_on`(def true), `upload_on`, `phishing_on`, `lang`(uz),
 `auto_delete_mode`(delete), `sensitivity_level`(medium), `sound_enabled`, `vibration_enabled`,
 `auto_update_enabled`, `first_run`, `initial_scan_done`, `dark_theme`(system),
 `accent_variant`(pomegranate), `user_consent_v1` (int vs `CURRENT_CONSENT_VERSION=3`),
-`community_share_v1`, `defaults_baked_v1`.
+`community_share_v1`, `defaults_baked_v1`, `protection_acked_v1` (set once the user clears the
+`ProtectionStatusActivity` permission gate). `CloudTelemetry` keeps its own `device_token` +
+`last_register_ts`/`last_register_ver` for register dedup.
 
 Other prefs files: `kiberqalqon_stats` (total_scanned / **total_blocked** / total_safe +
 day_0..6 — `total_blocked` is the **canonical** key), `kiberqalqon_history` (ScanHistory JSON,
@@ -225,31 +285,40 @@ day_0..6 — `total_blocked` is the **canonical** key), `kiberqalqon_history` (S
 
 ## 7. UI surface
 
-Activities: **SplashActivity** (launcher + permissions), **ConsentActivity** (mandatory
-ToS+Privacy, 3 checkboxes incl. mandatory community-share; full legal text in-source for
-resilience), **OnboardingActivity** (3 ViewPager2 slides), **InitialScanActivity** (one-time
-full scan with RadarScanView + per-threat delete rows + bulk delete + VoiceVerdict),
-**DashboardNewActivity** (home), **MainActivity** (scanner tab), **AutoScanActivity**
-(full-screen overlay popup, `showWhenLocked`, dedup window, auto-delete 2.5s countdown,
-exported=false), **ScanResultActivity** (verdict banner, evasion/IOC rows, delete),
-**ScanHistoryActivity** (7-day chart, family bars, sample rows, C2 rows), **SettingsActivity**
-(reactive toggles, theme/accent/lang, consent section, revoke), **DiagnosticsActivity**
-(code-built; copy/share diagnostics, test-virus button), **TelemetrySettingsActivity**
-(code-built), **ShareReceiverActivity** (exported translucent; copies a shared APK to cacheDir
-→ AutoScanActivity).
+Activities: **LanguageSelectActivity** (launcher; first-run UZ/RU picker → Splash),
+**SplashActivity** (permission gauntlet + routing), **ConsentActivity** (mandatory ToS+Privacy,
+3 checkboxes incl. mandatory community-share; full legal text in-source for resilience),
+**OnboardingActivity** (3 ViewPager2 slides; no longer in launch routing), **InitialScanActivity**
+(one-time full scan with RadarScanView + per-threat delete rows + bulk delete + VoiceVerdict),
+**ProtectionStatusActivity** (entry permission/setup gate — see §1), **DashboardNewActivity**
+(home), **MainActivity** (scanner tab + news ticker), **AutoScanActivity** (full-screen overlay
+popup, `showWhenLocked`, dedup window, auto-delete 2.5s countdown, exported=false),
+**ScanResultActivity** (verdict banner, evasion/IOC rows, delete; uses `PermissionCatalog` to
+render dangerous-permission rows in human language), **ScanHistoryActivity** (7-day chart, family
+bars, sample rows, C2 rows), **SettingsActivity** (reactive toggles, theme/accent/lang, consent
+section, revoke, Help center), **AdminPanelActivity** (opens the **cloud web panel inside the app
+via WebView** — same panel as on PC; owner logs in with the master key, the single admin with
+login+password; secrets are typed in, never baked into the APK; `FLAG_SECURE` blocks
+screenshots), **ReportProblemActivity** (send a problem to the dev's Telegram),
+**DiagnosticsActivity** (code-built; copy/share diagnostics, test-virus button),
+**TelemetrySettingsActivity** (code-built), **ShareReceiverActivity** (exported translucent;
+copies a shared APK to cacheDir → AutoScanActivity).
 
 Custom views: **`RadarScanView`** (sweeping radar + threat/safe pings), **`SpeedometerView`**
 (270° protection gauge), **`StatsGraphView`** (7-day bar chart — legacy, likely unused by new
-screens). **`KqBottomNav`** — shared bottom nav (Home/Scan/Stats/Settings).
+screens). **`KqBottomNav`** — shared bottom nav (Home/Scan/Stats/Settings). Adapters:
+`ApkAdapter` (found-APK list), **`NewsTickerAdapter`** (horizontal announcement ticker on the
+scanner tab).
 
 ---
 
 ## 8. Full file inventory
 
-**Entry/lifecycle:** `App.kt`, `SplashActivity.kt`, `MainActivity.kt`,
-`DashboardNewActivity.kt`, `CrashHandler.kt`.
+**Entry/lifecycle:** `App.kt`, `LanguageSelectActivity.kt`, `SplashActivity.kt`,
+`ProtectionStatusActivity.kt`, `MainActivity.kt`, `DashboardNewActivity.kt`, `CrashHandler.kt`.
 **Scanner core:** `ApkScanner.kt`, `ScanCache.kt`, `ScanHistory.kt`, `CertUtil.kt`,
-`ApkItem.kt`, `FullPhoneScan.kt`.
+`ApkItem.kt`, `FullPhoneScan.kt`, `ThreatDb.kt` (external blacklist), `AppReputation.kt`
+(false-positive guard).
 **Analyzers:** `MaliciousHashes.kt`, `MaliciousCerts.kt`, `MaliciousPackages.kt`,
 `TrustedSignatures.kt`, `ObfuscatedSignatures.kt`, `ManifestAnalyzer.kt`,
 `PermissionCombos.kt`, `DexPatternAnalyzer.kt`, `DropperDetector.kt`,
@@ -264,20 +333,27 @@ screens). **`KqBottomNav`** — shared bottom nav (Home/Scan/Stats/Settings).
 **Telegram:** `TelegramBot.kt`, `CommandRouter.kt`, `TelegramCommandPoller.kt`,
 `TelemetryReporter.kt`, `ThreatActions.kt`, `CommunityReportClient.kt`,
 `TelemetrySettingsActivity.kt`, `NetworkInfo.kt`.
-**Self-defense/quarantine:** `SecurityGuard.kt`, `SelfGuard.kt`, `Quarantine.kt`, `FileDeleter.kt`.
+**Cloud / news:** `CloudTelemetry.kt` (scan upload + device register), `DeviceLocation.kt`
+(GPS for the map), `NewsClient.kt` (read announcements feed), `NewsTickerAdapter.kt`,
+`AdminPanelActivity.kt` (in-app WebView panel).
+**Self-defense/quarantine:** `SecurityGuard.kt`, `SelfGuard.kt`, `Shield.kt` (runtime
+string-deobfuscation), `Quarantine.kt`, `FileDeleter.kt`.
 **Config:** `Config.kt` (incl. `Statistics`).
 **UI activities:** `OnboardingActivity.kt`, `ConsentActivity.kt`, `InitialScanActivity.kt`,
 `ScanResultActivity.kt`, `ScanHistoryActivity.kt`, `SettingsActivity.kt`,
-`DiagnosticsActivity.kt`, `AutoScanActivity.kt`, `ShareReceiverActivity.kt`.
+`DiagnosticsActivity.kt`, `AutoScanActivity.kt`, `ShareReceiverActivity.kt`,
+`ReportProblemActivity.kt`.
 **Views/UI helpers:** `RadarScanView.kt`, `SpeedometerView.kt`, `StatsGraphView.kt`,
-`KqBottomNav.kt`, `ApkAdapter.kt`, `AnimationHelper.kt`.
+`KqBottomNav.kt`, `ApkAdapter.kt`, `AnimationHelper.kt`, `PermissionCatalog.kt`
+(permission→label+severity for ScanResult display).
 **Util:** `ThemeHelper.kt`, `LocaleHelper.kt`, `VersionCompat.kt`, `NotificationHelper.kt`
 (4 channels for sound/vibrate combos), `VoiceVerdict.kt` (TTS uz/ru), `OemAutostartGuide.kt`
 (Xiaomi/Huawei/etc. autostart+overlay intents), `ServerUpload.kt` (HTTPS-only APK upload to
 the optional self-hosted server), `TestVirusGenerator.kt` (6 synthetic non-malicious test APKs).
 **Tests (`src/test/`):** `ApkScannerTest.kt` (matchesSignature word-boundary, inferSource),
-`FileDeleterTest.kt` (sandboxOwner), `MaliciousCertsTest.kt`. Plain JUnit4, no Robolectric —
-only pure functions are tested.
+`FileDeleterTest.kt` (sandboxOwner), `MaliciousCertsTest.kt`, `AppReputationTest.kt`,
+`ObfuscatedSignaturesTest.kt`, `ShieldTest.kt` (byte-exact deobfuscation vs the Python encoder).
+Plain JUnit4, no Robolectric — only pure functions are tested.
 
 ---
 
@@ -291,7 +367,9 @@ only pure functions are tested.
   keyAlias=kiberqalqon/keyPassword); v2+v3+v4. Applied only if the keystore exists (else
   unsigned, doesn't fail).
 - **BuildConfig fields:** `DEFAULT_SERVER_URL` (empty), `DEV_TG_BOT_TOKEN` / `DEV_TG_CHAT_ID`
-  (from gitignored `local.properties`; empty → community sharing is a no-op).
+  (community sharing — empty → no-op), and **`CLOUD_BASE_URL` / `CLOUD_DEVICE_SECRET`** (cloud
+  telemetry — empty → `CloudTelemetry` no-ops). All come from gitignored `local.properties`, so
+  forks/CI build with the cloud + community features silently disabled.
 - **release:** R8 minify + shrinkResources, not debuggable. **debug:** `applicationIdSuffix=.debug`,
   `versionNameSuffix=-DEBUG`, no minify.
 - Deps: AndroidX (core/appcompat/material/constraintlayout/cardview/recyclerview/
@@ -315,9 +393,19 @@ only pure functions are tested.
 - **OEM aggression** is heavily mitigated: foreground service + battery-optimization prompts +
   OEM autostart/overlay deep-links + screen-unlock one-shot scans + kill detection (Xiaomi/
   Huawei kill WorkManager).
-- `ServerUpload` / `DEFAULT_SERVER_URL` is a vestigial self-hosted path; the live backend is
-  Telegram. The `cloud/` effort (Vercel+Supabase+webhook) is the intended replacement but is
-  outside the app module and not yet wired in — see `backends.md`.
+- `ServerUpload` / `DEFAULT_SERVER_URL` is a vestigial self-hosted path. The live backends are
+  Telegram **and the cloud** (Vercel+Supabase): `CloudTelemetry.kt` is now wired (every scan +
+  device register, optional GPS), and `AdminPanelActivity` embeds the cloud panel. All cloud
+  config comes from `BuildConfig` (`CLOUD_BASE_URL`/`CLOUD_DEVICE_SECRET`) — empty → no-op. See
+  `backends.md`.
+- **Don't "fix" a heuristic false-positive by adding a package to a whitelist** — that's what
+  `AppReputation` does *correctly* (VERIFIED suppresses only soft signals; hard signals still
+  fire). A bare package-name allowlist would be a backdoor (a repacked app under a trusted
+  package name would pass). Keep hard-signal checks ahead of reputation.
+- **`Shield`** hides IOCs (hashes/packages/certs) and anti-tamper markers from `strings`; the
+  encoded blobs are generated by `scripts/shield_encode.py` and must stay **byte-exact** with the
+  Kotlin decoder (`ShieldTest` enforces this). If you change a guarded constant, re-run the
+  encoder — don't hand-edit the hex.
 
 **Known issues worth fixing if you're in the area (not urgent):**
 - There are two parallel 15-min scan systems (`GuardWorker` `kiberqalqon_scan` from `App` +
