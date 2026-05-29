@@ -17,3 +17,16 @@ sdk.dir=C\:\\Android-SDK
 # @BotFather → /revoke orqali yangilang.
 dev.tg.bot.token=
 dev.tg.chat.id=
+
+# === KiberQalqon Cloud (markaziy monitoring paneli) ===
+# Vercel'ga deploy qilingan loyihaning manzili + qurilma yozish kaliti.
+# Foydalanuvchi community sharing (3-galochka) ni yoqsagina ma'lumot yuboriladi.
+# Bo'sh qoldirsangiz — xarita/panelga hech narsa bormaydi (funksiya o'chiq).
+#
+# cloud.base.url      — Vercel deploy URL'i, masalan: https://kiberqalqon.vercel.app
+#                       (oxiriga / qo'ymang)
+# cloud.device.secret — Vercel ENV'dagi DEVICE_SHARED_SECRET bilan BIR XIL bo'lsin.
+#                       DIQQAT: ADMIN_SECRET EMAS! Admin kaliti hech qachon APK'ga
+#                       kompilatsiya qilinmaydi — u faqat panelni ochish uchun.
+cloud.base.url=
+cloud.device.secret=

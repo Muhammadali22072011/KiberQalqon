@@ -1,10 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { checkDeviceSecret } from '../lib/auth.js';
+import { checkAdminSecret } from '../lib/auth.js';
 
+// O'qish endpointi — barcha qurilmalarning skan tarixini ko'rsatadi, shuning uchun
+// ADMIN_SECRET talab qiladi (DEVICE_SHARED_SECRET har bir APK ichida — u bilan
+// boshqalarning ma'lumotini ko'rib bo'lmasligi kerak). Panel/admin uchun.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
-  if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+  if (!checkAdminSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
   const limit = clamp(Number(req.query.limit ?? 50), 1, 200);
   const verdict = String(req.query.verdict ?? '');

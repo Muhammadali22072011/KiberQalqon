@@ -134,6 +134,17 @@
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon" />
 
+        <!-- Maxfiy kirish (rollar tizimi). Sozlamalardagi 4 tugma kombinatsiyasi
+             orqali ochiladi. exported=false — tashqi intent bilan ochib bo'lmaydi;
+             excludeFromRecents — so'nggi ilovalar ro'yxatida ko'rinmaydi. -->
+        <activity
+            android:name=".SecretAccessActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
         <activity
             android:name=".ReportProblemActivity"
             android:exported="false"

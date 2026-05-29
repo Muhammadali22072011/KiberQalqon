@@ -62,9 +62,21 @@ class ScanResultActivity : AppCompatActivity() {
         bindActions(res)
         loadPermissions(res)
 
-        // Natija ochilishida verdict ikonkasi yengil "pop" (overshoot) bilan paydo bo'ladi —
-        // ekran o'tishi (tema) ustiga qo'shimcha jonli mikro-animatsiya.
+        revealVerdict(res.verdict)
+    }
+
+    /**
+     * Verdict ochilish mikro-animatsiyasi ("Yorug' minimal"): ikonka yengil "pop"
+     * (overshoot) bilan paydo bo'ladi; XAVF bo'lsa qo'shimcha ogohlantiruvchi tebranish.
+     */
+    private fun revealVerdict(verdict: ScanResult.Verdict) {
         AnimationHelper.bounce(binding.imgVerdictIcon, duration = 600)
+        if (verdict == ScanResult.Verdict.DANGER) {
+            binding.imgVerdictIcon.postDelayed(
+                { AnimationHelper.shake(binding.imgVerdictIcon) },
+                620
+            )
+        }
     }
 
     override fun onDestroy() {
@@ -256,7 +268,7 @@ class ScanResultActivity : AppCompatActivity() {
         }
         binding.tvPermNone.visibility = View.GONE
         val inflater = layoutInflater
-        for (row in rows) {
+        for ((index, row) in rows.withIndex()) {
             val view = inflater.inflate(R.layout.inc_kq_perm_row, container, false)
             view.findViewById<TextView>(R.id.tvPermLabel).text = row.label
             view.findViewById<TextView>(R.id.tvPermRaw).text = PermissionCatalog.shortName(row.raw)
@@ -274,6 +286,8 @@ class ScanResultActivity : AppCompatActivity() {
                 sev.text = getString(R.string.perm_sev_warning)
             }
             container.addView(view)
+            // Xavfli ruxsatlar ketma-ket, yengil suriladi (stagger reveal).
+            AnimationHelper.fadeIn(view, duration = 320, delay = index * 60L)
         }
     }
 

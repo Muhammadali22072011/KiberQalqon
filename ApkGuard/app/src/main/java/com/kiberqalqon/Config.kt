@@ -215,18 +215,18 @@ object Config {
         prefs(context).edit { putBoolean("community_thanks_shown", true) }
     }
     
-    // Тёмная тема
+    // Tema rejimi. Default = "light" (Yorug' minimal dizayn — oqish-krem fon).
     fun getDarkThemeMode(context: Context): String =
-        prefs(context).getString(KEY_DARK_THEME, "system") ?: "system"
+        prefs(context).getString(KEY_DARK_THEME, "light") ?: "light"
 
     fun setDarkThemeMode(context: Context, mode: String) {
         prefs(context).edit { putString(KEY_DARK_THEME, mode) }
     }
 
     // Asosiy rang (Settings §3.7 — Feruz / Za'faron / Anor).
-    // Default = pomegranate (Anor) per Le Muhammadali's preference, 2026-05-22.
+    // Default = turkuaz (Feruz) — "Yorug' minimal" dizayn akssenti.
     fun getAccent(context: Context): String =
-        prefs(context).getString(KEY_ACCENT, "pomegranate") ?: "pomegranate"
+        prefs(context).getString(KEY_ACCENT, "feruz") ?: "feruz"
 
     fun setAccent(context: Context, variant: String) {
         prefs(context).edit { putString(KEY_ACCENT, variant) }

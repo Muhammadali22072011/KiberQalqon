@@ -495,8 +495,10 @@ class MainActivity : AppCompatActivity() {
                 
                 withContext(Dispatchers.Main) {
                     adapter.updateList(list)
+                    // Ro'yxat kelganda satrlar ketma-ket (stagger) suriladi.
+                    if (list.isNotEmpty()) binding.recycler.scheduleLayoutAnimation()
                     binding.tvCount.text = getString(R.string.apk_count, list.size)
-                    
+
                     if (list.isEmpty()) {
                         Toast.makeText(
                             this@MainActivity,

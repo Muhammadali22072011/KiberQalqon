@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Yengil "scan-ring" — hero meter ortida yumshoq pulsatsiya qiluvchi halqa.
+  Rang ?attr/kqPrimary orqali olinadi, shuning uchun Anor/Feruz/Zafaron akssentiga
+  avtomatik moslashadi. DashboardNewActivity imgScanGlow'ga o'rnatadi va glowPulse qiladi.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <stroke
+        android:width="2dp"
+        android:color="?attr/kqPrimary" />
+    <solid android:color="@android:color/transparent" />
+</shape>

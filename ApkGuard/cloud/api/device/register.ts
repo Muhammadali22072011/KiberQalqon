@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { checkDeviceSecret } from '../../lib/auth.js';
+import { readGeo, jitterGeo } from '../../lib/geo.js';
 
 type Body = {
   device_token: string;
@@ -18,18 +19,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ ok: false, error: 'bad token' });
   }
 
+  const row: Record<string, unknown> = {
+    device_token: b.device_token,
+    name: b.name ?? null,
+    android_ver: b.android_ver ?? null,
+    app_ver: b.app_ver ?? null,
+    last_seen: new Date().toISOString(),
+  };
+
+  // Geo — Vercel IP sarlavhalaridan (mavjud bo'lsa). Null bo'lsa eski
+  // qiymatni ustiga yozmaymiz (lokal dev'da sarlavhalar bo'lmaydi).
+  const geo = jitterGeo(readGeo(req), b.device_token);
+  if (geo.country != null) row.country = geo.country;
+  if (geo.city != null) row.city = geo.city;
+  if (geo.lat != null) row.lat = geo.lat;
+  if (geo.lng != null) row.lng = geo.lng;
+
   const { data, error } = await db()
     .from('devices')
-    .upsert(
-      {
-        device_token: b.device_token,
-        name: b.name ?? null,
-        android_ver: b.android_ver ?? null,
-        app_ver: b.app_ver ?? null,
-        last_seen: new Date().toISOString(),
-      },
-      { onConflict: 'device_token' }
-    )
+    .upsert(row, { onConflict: 'device_token' })
     .select('id')
     .single();
 

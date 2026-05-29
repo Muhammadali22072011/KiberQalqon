@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, adminChatIds } from '../../lib/telegram.js';
 import { checkDeviceSecret } from '../../lib/auth.js';
+import { readGeo, jitterGeo } from '../../lib/geo.js';
 import { formatThreatAlert } from '../../lib/format.js';
 
 type Body = {
@@ -30,13 +31,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const sb = db();
 
-  // 1) Device topish yoki yaratish
+  // 1) Device topish yoki yaratish — geo + eng oxirgi risk/verdict bilan yangilash.
+  // Panelda nuqta rangi shu risk_score bo'yicha (yashil→qizil) chiziladi.
+  const now = new Date().toISOString();
+  const devRow: Record<string, unknown> = {
+    device_token: b.device_token,
+    last_seen: now,
+    last_scan_at: now,
+    risk_score: b.risk_score ?? 0,
+    last_verdict: b.verdict,
+  };
+  const geo = jitterGeo(readGeo(req), b.device_token);
+  if (geo.country != null) devRow.country = geo.country;
+  if (geo.city != null) devRow.city = geo.city;
+  if (geo.lat != null) devRow.lat = geo.lat;
+  if (geo.lng != null) devRow.lng = geo.lng;
+
   const { data: dev, error: devErr } = await sb
     .from('devices')
-    .upsert(
-      { device_token: b.device_token, last_seen: new Date().toISOString() },
-      { onConflict: 'device_token' }
-    )
+    .upsert(devRow, { onConflict: 'device_token' })
     .select('id, name')
     .single();
   if (devErr || !dev) {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RecyclerView uchun ketma-ket (stagger) kirish: har bir satr 12% kechikish bilan. -->
+<layoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
+    android:animation="@anim/kq_row_enter"
+    android:animationOrder="normal"
+    android:delay="12%" />

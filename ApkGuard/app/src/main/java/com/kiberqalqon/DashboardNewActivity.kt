@@ -28,6 +28,10 @@ class DashboardNewActivity : AppCompatActivity() {
         AnimationHelper.fadeIn(binding.root, duration = 400)
         AnimationHelper.glowPulse(binding.imgLiveDot, duration = 1200)
 
+        // Hero meter ortida yumshoq, tinch pulsatsiya qiluvchi "scan-ring" (akssent rangida).
+        binding.imgScanGlow.setImageResource(R.drawable.kq_scan_ring)
+        AnimationHelper.glowPulse(binding.imgScanGlow, duration = 2200)
+
         binding.dashboardContent.post {
             AnimationHelper.cascadeChildren(binding.dashboardContent, delayBetween = 70)
         }
@@ -410,10 +414,11 @@ class DashboardNewActivity : AppCompatActivity() {
     }
 
     private fun updateUI(stats: Statistics) {
-        binding.tvTotalScanned.text = stats.totalScanned.toString()
-        binding.tvTotalBlocked.text = stats.totalBlocked.toString()
+        // "Yorug' minimal": raqamlar jonli sanaladi (count-up), darhol o'rnatilmaydi.
+        AnimationHelper.countUp(binding.tvTotalScanned, stats.totalScanned, startDelay = 120)
+        AnimationHelper.countUp(binding.tvTotalBlocked, stats.totalBlocked, startDelay = 220)
         // Repurposed: was "safe count" — design §3.3 shows "Karantin" here, treat as quarantined files
-        binding.tvTotalSafe.text = stats.totalSafe.toString()
+        AnimationHelper.countUp(binding.tvTotalSafe, stats.totalSafe, startDelay = 320)
 
         val protectionLevel = calculateProtectionLevel(stats)
         binding.speedometer.setProtectionLevel(protectionLevel, animate = true)

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
+import android.widget.TextView
 
 object AnimationHelper {
     
@@ -234,6 +235,33 @@ object AnimationHelper {
             .setStartDelay(delay)
             .setInterpolator(DecelerateInterpolator())
             .start()
+    }
+
+    /**
+     * Count-up — raqamni 0 dan (yoki joriy qiymatdan) yakuniy songacha animatsiya bilan
+     * sanaydi. "Yorug' minimal" dizayn: dashboard statistikasi jonli ko'rinadi.
+     * Bir xil qiymat qayta o'rnatilsa animatsiya o'tkazib yuboriladi (titrashning oldini olish).
+     */
+    fun countUp(
+        view: TextView,
+        to: Int,
+        from: Int = 0,
+        duration: Long = 900,
+        startDelay: Long = 0,
+    ) {
+        val current = view.text?.toString()?.toIntOrNull()
+        if (current == to) {
+            view.text = to.toString()
+            return
+        }
+        val start = current ?: from
+        ValueAnimator.ofInt(start, to).apply {
+            this.duration = duration
+            this.startDelay = startDelay
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { view.text = (it.animatedValue as Int).toString() }
+            start()
+        }
     }
 
     /**

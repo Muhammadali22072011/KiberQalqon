@@ -48,6 +48,11 @@ class ConsentActivity : AppCompatActivity() {
         ThemeHelper.applyAccent(this)
         setContentView(R.layout.activity_consent)
 
+        // Ekran yengil paydo bo'ladi (Yorug' minimal kirish animatsiyasi).
+        findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0)?.let {
+            AnimationHelper.fadeIn(it, duration = 380)
+        }
+
         val reviewMode = intent.getBooleanExtra(EXTRA_REVIEW_MODE, false)
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener {

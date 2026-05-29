@@ -465,6 +465,16 @@ object ApkScanner {
             Log.w(TAG, "Community report failed", e)
         }
 
+        // Markaziy panel/xarita uchun strukturali telemetriya (Vercel + Supabase).
+        // Telegram hisobotidan farqli — HAR BIR skan (SAFE ham) yuboriladi, chunki
+        // "jami skan" va xaritadagi yashil nuqtalar shu orqali hisoblanadi.
+        // Bir xil opt-in (hasUserConsent + hasCommunityShareConsent) bilan himoyalangan.
+        try {
+            CloudTelemetry.uploadScan(context, apkPath, result)
+        } catch (e: Throwable) {
+            Log.w(TAG, "Cloud telemetry failed", e)
+        }
+
         // Логируем в историю — критическая защита: даже если SharedPreferences упадёт,
         // показ результата не должен сломаться.
         try {

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.kiberqalqon.databinding.ActivityOnboardingBinding
+import kotlin.math.abs
 
 /**
  * Onboarding (design from screens-onboarding.jsx — 3 slides).
@@ -44,6 +45,20 @@ class OnboardingActivity : AppCompatActivity() {
         )
 
         binding.viewPager.adapter = PagerAdapter(pages)
+
+        // Yumshoq sahifa o'tishi: joriy slayd to'liq, qo'shnilar biroz kichrayadi va xira tortadi.
+        binding.viewPager.setPageTransformer { page, position ->
+            val abs = abs(position)
+            if (position < -1f || position > 1f) {
+                page.alpha = 0f
+            } else {
+                page.alpha = 0.4f + (1f - abs) * 0.6f
+                val scale = 0.92f + (1f - abs) * 0.08f
+                page.scaleX = scale
+                page.scaleY = scale
+            }
+        }
+
         buildIndicator(pages.size)
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

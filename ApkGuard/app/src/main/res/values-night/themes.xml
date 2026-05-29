@@ -24,8 +24,8 @@
              the default (no merge), so without these any screen that doesn't apply an
              accent overlay (e.g. LanguageSelectActivity) crashes inflating @color/kq_primary
              in dark mode. Dark accent values come from values-night/colors.xml. -->
-        <item name="kqPrimary">@color/kq_anor</item>
-        <item name="kqPrimary2">@color/kq_anor_2</item>
-        <item name="kqPrimarySoft">@color/kq_anor_soft</item>
+        <item name="kqPrimary">@color/kq_feruz</item>
+        <item name="kqPrimary2">@color/kq_feruz_2</item>
+        <item name="kqPrimarySoft">@color/kq_feruz_soft</item>
     </style>
 </resources>

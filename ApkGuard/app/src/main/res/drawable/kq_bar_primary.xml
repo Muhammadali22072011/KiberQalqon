@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Vertical bar in the 7-day chart (no-threat day). Top-rounded primary gradient. -->
+<!-- Vertical bar in the 7-day chart (no-threat day). Top-rounded turquoise gradient.
+     Literal kq_feruz/_2, not @color/kq_primary*: a ?attr/-backed ColorStateList
+     renders magenta inside <gradient>. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
         android:angle="270"
-        android:startColor="@color/kq_primary"
-        android:endColor="@color/kq_primary_2"
+        android:startColor="@color/kq_feruz"
+        android:endColor="@color/kq_feruz_2"
         android:type="linear" />
     <corners
         android:topLeftRadius="6dp"

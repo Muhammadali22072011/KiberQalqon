@@ -698,6 +698,7 @@
                                 android:layout_height="wrap_content"
                                 android:background="@color/kq_bg_elev"
                                 android:clipToPadding="false"
+                                android:layoutAnimation="@anim/kq_layout_stagger"
                                 android:nestedScrollingEnabled="false"
                                 android:overScrollMode="never"
                                 android:paddingVertical="4dp" />

@@ -9,33 +9,34 @@
       Default = Anor (matches the design screenshots Le Muhammadali shipped on
       2026-05-22). ThemeHelper reads the stored pref and picks Anor/Feruz/Zafaron.
     -->
-    <style name="Theme.KiberQalqon" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/background_dark</item>
-        <item name="colorAccent">@color/primary_glow</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
-        <item name="colorControlActivated">@color/primary_glow</item>
-        <item name="colorControlHighlight">@color/chip_background</item>
+    <style name="Theme.KiberQalqon" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/kq_feruz</item>
+        <item name="colorPrimaryDark">@color/kq_feruz_2</item>
+        <item name="colorAccent">@color/kq_feruz</item>
+        <item name="colorControlNormal">@color/kq_ink_3</item>
+        <item name="colorControlActivated">@color/kq_feruz</item>
+        <item name="colorControlHighlight">@color/kq_feruz_soft</item>
 
-        <item name="android:statusBarColor">@color/background_dark</item>
-        <item name="android:navigationBarColor">@color/background_dark</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:colorBackground">@color/background</item>
+        <!-- Yorug' minimal: oqish-krem fon, quyuq-ko'k matn, yorug' status/nav panel. -->
+        <item name="android:statusBarColor">@color/kq_bg</item>
+        <item name="android:navigationBarColor">@color/kq_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">@color/kq_bg</item>
+        <item name="android:colorBackground">@color/kq_bg</item>
 
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="android:textColorPrimary">@color/kq_ink</item>
+        <item name="android:textColorSecondary">@color/kq_ink_2</item>
+        <item name="android:textColorHint">@color/kq_ink_3</item>
 
         <!-- Butun ilova bo'ylab yengil, animatsiyali ekran o'tishlari (bitta joydan
              barcha Activity'larga qo'llanadi; Anor/Feruz/Zafaron ham meros oladi). -->
         <item name="android:windowAnimationStyle">@style/KqWindowAnimations</item>
 
-        <!-- Default accent = Anor. .Feruz / .Zafaron child themes override these. -->
-        <item name="kqPrimary">@color/kq_anor</item>
-        <item name="kqPrimary2">@color/kq_anor_2</item>
-        <item name="kqPrimarySoft">@color/kq_anor_soft</item>
+        <!-- Default accent = Feruz (turkuaz). .Anor / .Zafaron child themes override these. -->
+        <item name="kqPrimary">@color/kq_feruz</item>
+        <item name="kqPrimary2">@color/kq_feruz_2</item>
+        <item name="kqPrimarySoft">@color/kq_feruz_soft</item>
     </style>
 
     <!-- Ekrandan ekranga o'tish animatsiyalari. Oldinga: yangi ekran o'ngdan yengil

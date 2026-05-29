@@ -1,17 +1,32 @@
-# KiberQalqon Cloud — Vercel + Supabase + Telegram
+# KiberQalqon Cloud — Vercel + Supabase + Telegram + Panel
 
-Android ilovasi skan natijalarini yuboradigan, Supabase bazasida saqlaydigan
-va Telegram orqali xabar beradigan serverless backend.
+Android ilovasi skan natijalarini yuboradigan, Supabase bazasida saqlaydigan,
+Telegram orqali xabar beradigan va **markaziy web-panelda** (xarita + statistika)
+ko'rsatadigan serverless backend.
 
 ```
-📱 Android  →  ☁️ Vercel API  →  🗄️ Supabase
-                     ↓
-                💬 Telegram group
+📱 Android  ─(x-device-secret)─►  ☁️ Vercel API  ─►  🗄️ Supabase
+                                       │  ▲
+                                       │  └──(x-admin-secret)── 🖥️ Panel (xarita + KPI + oqim)
+                                       ▼
+                                  💬 Telegram guruh (xavfli APK alert)
 ```
+
+**Ikki xil kalit (eng muhim tushuncha):**
+
+| Kalit | Sarlavha | Kim ishlatadi | APK ichida? |
+|-------|----------|---------------|-------------|
+| `DEVICE_SHARED_SECRET` | `x-device-secret` | Android ilova — **yozish** (`/api/scan/upload`, `/api/device/register`) | ✅ ha (kompilatsiya qilinadi) |
+| `ADMIN_SECRET` | `x-admin-secret` | Faqat **panel/admin** — **o'qish** (`/api/stats`, `/api/geo`, `/api/feed`, …) | ❌ **YO'Q, hech qachon** |
+
+> Sabab: APK leak bo'lsa ham, undagi `DEVICE_SHARED_SECRET` bilan faqat *yangi*
+> ma'lumot yuborib bo'ladi — **boshqalarning** ma'lumotini ko'rib bo'lmaydi.
+> Barcha o'qish endpointlari `ADMIN_SECRET` talab qiladi, u esa hech qaerda
+> tarqatilmaydi.
 
 ---
 
-## Sozlash — 4 qadam
+## Sozlash — 6 qadam
 
 ### 1) Supabase loyihasi (5 daqiqa)
 
@@ -19,8 +34,11 @@ va Telegram orqali xabar beradigan serverless backend.
 2. Region: `Frankfurt (eu-central-1)` (Toshkentga eng yaqini)
 3. Database password — saqlab qo'y
 4. Proyekt ochilganda → **SQL Editor → New query**
-5. `supabase/schema.sql` faylini to'liq ko'chir va **Run**
-6. **Settings → API** sahifasidan ikkita kalitni nusxala:
+5. `supabase/schema.sql` ni to'liq ko'chir va **Run** (jadvallar + bot view'lari)
+6. **Yana New query** → `supabase/02_geo.sql` ni ko'chir va **Run**
+   (geo + risk ustunlari, xarita uchun `v_map_points`, oqim uchun `v_recent_threats`).
+   Ikkala fayl ham idempotent — qayta ishga tushirsa xato bermaydi.
+7. **Settings → API** sahifasidan ikkita kalitni nusxala:
    - `Project URL` → `SUPABASE_URL`
    - `service_role` (secret!) → `SUPABASE_SERVICE_KEY`
 
@@ -31,7 +49,18 @@ va Telegram orqali xabar beradigan serverless backend.
 3. BotFather token beradi → `TELEGRAM_BOT_TOKEN`
 4. Yangi *guruh* yarat, botni admin qil
 5. Guruhga [@userinfobot](https://t.me/userinfobot) qo'sh, u **chat_id** ni ko'rsatadi (manfiy son: `-1001234567890`) → `ADMIN_CHAT_IDS`
-6. `TELEGRAM_WEBHOOK_SECRET` va `DEVICE_SHARED_SECRET` uchun random 32-belgi yarat (Linux/Mac: `openssl rand -hex 32`, Windows PS: `[guid]::NewGuid().ToString('N')+[guid]::NewGuid().ToString('N')`)
+
+**Random kalitlar** (`TELEGRAM_WEBHOOK_SECRET`, `DEVICE_SHARED_SECRET`,
+`ADMIN_SECRET`) — har biri uchun **alohida** 32+ belgi yarat:
+
+```powershell
+# Windows PowerShell — uch marta ishga tushir, har birини alohida ENV uchun:
+[guid]::NewGuid().ToString('N') + [guid]::NewGuid().ToString('N')
+```
+```bash
+# Linux/Mac:
+openssl rand -hex 32
+```
 
 ### 3) Vercel deploy (3 daqiqa)
 
@@ -43,15 +72,16 @@ npx vercel link        # yangi loyiha yaratasan
 ```
 
 Keyin **Vercel Dashboard → Project → Settings → Environment Variables** ga
-`.env.example` dagi *barcha* qiymatlarni qo'sh:
+quyidagilarni qo'sh (`.env.example` dagi *barcha* qiymatlar):
 
 | Variable | Qayerdan |
 |----------|----------|
 | `SUPABASE_URL` | Supabase Settings → API |
-| `SUPABASE_SERVICE_KEY` | Supabase Settings → API (service_role) |
+| `SUPABASE_SERVICE_KEY` | Supabase Settings → API (`service_role`) |
 | `TELEGRAM_BOT_TOKEN` | @BotFather |
 | `TELEGRAM_WEBHOOK_SECRET` | random 32 hex |
-| `DEVICE_SHARED_SECRET` | random 32 hex |
+| `DEVICE_SHARED_SECRET` | random 32 hex — **APK'ga ham shu qiymat kerak** (6-qadam) |
+| `ADMIN_SECRET` | random 32 hex — **faqat panel uchun, APK'ga QO'YILMAYDI** |
 | `ADMIN_CHAT_IDS` | guruh chat_id (manfiy son) |
 
 Endi deploy:
@@ -60,7 +90,7 @@ Endi deploy:
 npx vercel --prod
 ```
 
-Bu sengа URL beradi, masalan `https://kiberqalqon-cloud.vercel.app`.
+Bu senga URL beradi, masalan `https://kiberqalqon-cloud.vercel.app`.
 
 ### 4) Telegram webhookni ulash (1 daqiqa)
 
@@ -71,9 +101,45 @@ $env:VERCEL_URL="https://kiberqalqon-cloud.vercel.app"
 node scripts/set-webhook.mjs
 ```
 
-Natija: `✅ Webhook o'rnatildi`.
+Natija: `✅ Webhook o'rnatildi`. Guruhga `/help` yoz — bot javob beradi.
 
-Endi guruhga `/help` yoz — bot javob beradi. Tayyor.
+### 5) Panelni ochish (markaziy monitoring)
+
+1. Brauzerda deploy URL'ini och: `https://kiberqalqon-cloud.vercel.app/`
+2. Kirish oynasi `ADMIN_SECRET` so'raydi — Vercel'ga qo'ygan qiymatni kirit.
+   (Kalit faqat brauzerning `sessionStorage`'ida saqlanadi, serverga har
+   so'rovda `x-admin-secret` sarlavhasida boradi.)
+3. Ko'rasan: O'zbekiston xaritasi (har nuqta = bitta telefon, rang yashil→qizil
+   risk bo'yicha — nuqtaga bossang qurilma kartochkasi ochiladi), KPI kartalar,
+   jonli tahdid oqimi, top zararli oilalar, hududlar jadvali.
+
+> Hozircha qurilmalar yo'q bo'lsa xarita bo'sh — bu normal. 6-qadamdan keyin
+> ilova ma'lumot yubora boshlaydi va nuqtalar paydo bo'ladi.
+
+### 6) Android ilovani cloudga ulash
+
+`ApkGuard/local.properties` (gitignore'da) ga qo'sh — namuna
+`local.properties.example` da:
+
+```properties
+cloud.base.url=https://kiberqalqon-cloud.vercel.app
+cloud.device.secret=<Vercel'dagi DEVICE_SHARED_SECRET bilan BIR XIL>
+```
+
+> `cloud.base.url` — oxiriga `/` qo'yma, faqat `https://` (HTTP rad etiladi).
+> `cloud.device.secret` — bu **DEVICE_SHARED_SECRET**, ADMIN emas!
+
+Keyin APK'ni qayta qur:
+
+```powershell
+cd "C:\Users\Muhammadali\Desktop\APK Virus Analysis\ApkGuard"
+.\gradlew.bat assembleDebug
+```
+
+**Foydalanuvchi tomonda:** ma'lumot yuborilishi uchun ConsentActivity'da
+**3-galochka ("Jamoatchilik xavfsizligi")** yoqilgan bo'lishi shart (opt-in).
+Galochka yoqilmasa yoki `cloud.*` bo'sh bo'lsa — ilova hech narsa yubormaydi
+(maxfiylik: shaxsiy build/forklar uchun butunlay no-op).
 
 ---
 
@@ -81,7 +147,7 @@ Endi guruhga `/help` yoz — bot javob beradi. Tayyor.
 
 ```powershell
 $env:VERCEL_URL="https://kiberqalqon-cloud.vercel.app"
-$env:DEVICE_SHARED_SECRET="..."
+$env:ADMIN_SECRET="..."
 node scripts/ping.mjs
 ```
 
@@ -91,12 +157,30 @@ Natija: `{ "ok": true, "stats": { ... } }`.
 
 ## API
 
-| Endpoint | Method | Auth header | Vazifa |
-|----------|--------|-------------|--------|
-| `/api/scan/upload` | POST | `x-device-secret` | Android skan natijasini yuboradi |
-| `/api/device/register` | POST | `x-device-secret` | Qurilmani ro'yxatdan o'tkazish |
-| `/api/stats` | GET | `x-device-secret` | Bugungi statistika |
-| `/api/telegram/webhook` | POST | `x-telegram-bot-api-secret-token` | Telegramdan keladi |
+**Yozish (Android, `x-device-secret`):**
+
+| Endpoint | Method | Vazifa |
+|----------|--------|--------|
+| `/api/scan/upload` | POST | Skan natijasini yuboradi (har skan, SAFE ham) |
+| `/api/device/register` | POST | Qurilmani ro'yxatdan o'tkazadi (xaritada nuqta) |
+
+**O'qish (Panel/admin, `x-admin-secret`):**
+
+| Endpoint | Method | Vazifa |
+|----------|--------|--------|
+| `/api/stats` | GET | Umumiy + bugungi statistika |
+| `/api/geo` | GET | Xarita nuqtalari (`v_map_points`) |
+| `/api/feed` | GET | Jonli tahdid oqimi (oxirgi xavfli/shubhali) |
+| `/api/devices` | GET | Qurilmalar ro'yxati (geo + risk bilan) |
+| `/api/device/:id` | GET | Bitta qurilma + oxirgi 20 skani (uuid bo'yicha) |
+| `/api/threats` | GET | Zararli APK oilalari ro'yxati |
+| `/api/scans` | GET | Skan tarixi (`?verdict=danger&limit=50`) |
+
+**Telegram (`x-telegram-bot-api-secret-token`):**
+
+| Endpoint | Method | Vazifa |
+|----------|--------|--------|
+| `/api/telegram/webhook` | POST | Telegramdan keladi (bot buyruqlari) |
 
 ### Misol — Android'dan scan yuborish
 
@@ -106,12 +190,13 @@ Content-Type: application/json
 x-device-secret: <DEVICE_SHARED_SECRET>
 
 {
-  "device_token": "abc123...",
+  "device_token": "abc123...(>=16 belgi)",
   "apk_hash": "a3f5b9c2...64 hex chars",
   "package_name": "com.example.malware",
   "app_label": "Free VPN",
   "apk_size": 5242880,
   "verdict": "danger",
+  "risk_score": 86,
   "reasons": ["READ_SMS", "BIND_ACCESSIBILITY_SERVICE"],
   "perms": ["android.permission.READ_SMS"]
 }
@@ -132,6 +217,18 @@ x-device-secret: <DEVICE_SHARED_SECRET>
 
 ---
 
+## Maxfiylik (nima yuboriladi, nima YO'Q)
+
+**Yuboriladi:** anonim `device_token` (tasodifiy UUID), qurilma modeli,
+Android/ilova versiyasi, skan natijasi (apk_hash, paket nomi, yorliq, verdict,
+risk ball, sabablar, xavfli ruxsatlar). Geo — server tomonda Vercel IP
+sarlavhalaridan **shahar darajasida** (taxminiy), GPS emas.
+
+**Hech qachon yuborilmaydi:** APK faylning o'zi, IMEI/seriya/MAC/IP/GPS,
+foydalanuvchi ismi/telefoni, boshqa o'rnatilgan ilovalar ro'yxati.
+
+---
+
 ## Local development
 
 ```powershell
@@ -140,7 +237,8 @@ cp .env.example .env.local   # va ichini to'ldir
 npx vercel dev
 ```
 
-`http://localhost:3000` da ishlaydi.
+`http://localhost:3000` da ishlaydi. (Lokalda Vercel IP sarlavhalari bo'lmaydi —
+geo `null` qoladi, bu normal; deploy'da real ishlaydi.)
 
 ---
 
@@ -148,15 +246,8 @@ npx vercel dev
 
 | Servis | Limit |
 |--------|-------|
-| Vercel Hobby | 100 GB-hours/oy, 10s function timeout |
+| Vercel Hobby | 100 GB-hours/oy, 30s function timeout |
 | Supabase Free | 500 MB DB, 2 GB bandwidth, 50k MAU |
 | Telegram Bot | cheksiz (rate limit: 30 msg/sec) |
 
 Bitta telefon kuniga ~50 skan yuborsa, 10 yilgacha free tier yetadi.
-
----
-
-## Keyingi qadam — Android tarafi
-
-`ApkGuard/app/` ichida `ApkScanner.kt` skan tugagandan keyin natijani
-`/api/scan/upload` ga POST qilishi kerak. Bu hali yozilmagan — alohida task.

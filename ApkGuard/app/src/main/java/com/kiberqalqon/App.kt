@@ -145,6 +145,14 @@ class App : android.app.Application() {
             } catch (e: Exception) {
                 Log.e("KiberQalqon", "Error starting Telegram poller", e)
             }
+            // Markaziy panel xaritasida qurilma nuqtasi skansiz ham ko'rinishi uchun
+            // ro'yxatdan o'tkazamiz. Ichida opt-in + 12 soatlik throttle tekshiriladi —
+            // sozlanmagan/rozilik berilmagan bo'lsa shartsiz no-op.
+            try {
+                CloudTelemetry.registerDevice(this@App)
+            } catch (e: Exception) {
+                Log.e("KiberQalqon", "Cloud register failed", e)
+            }
         }
 
         // Слушаем установку/обновление/удаление пакетов. Зарегистрирован динамически,

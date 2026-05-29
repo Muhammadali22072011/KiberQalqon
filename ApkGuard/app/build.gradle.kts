@@ -37,6 +37,13 @@ val localProperties = Properties().apply {
 val devTgBotToken: String = localProperties.getProperty("dev.tg.bot.token", "").trim()
 val devTgChatId: String = localProperties.getProperty("dev.tg.chat.id", "").trim()
 
+// KiberQalqon Cloud (Vercel + Supabase) — markaziy monitoring paneli uchun.
+// Bo'sh qoldirsangiz cloud telemetriya umuman ishlamaydi (forklar uchun no-op).
+// cloud.device.secret = Vercel'dagi DEVICE_SHARED_SECRET (yozish endpointlari uchun).
+// DIQQAT: bu ADMIN_SECRET EMAS — admin kaliti hech qachon APK ichiga qo'yilmaydi.
+val cloudBaseUrl: String = localProperties.getProperty("cloud.base.url", "").trim()
+val cloudDeviceSecret: String = localProperties.getProperty("cloud.device.secret", "").trim()
+
 android {
     namespace = "com.kiberqalqon"
     compileSdk = 34
@@ -55,6 +62,11 @@ android {
         // Empty values disable the feature entirely.
         buildConfigField("String", "DEV_TG_BOT_TOKEN", "\"$devTgBotToken\"")
         buildConfigField("String", "DEV_TG_CHAT_ID", "\"$devTgChatId\"")
+
+        // KiberQalqon Cloud — markaziy panel/xarita uchun telemetriya endpointi.
+        // Bo'sh bo'lsa — funksiya o'chiq (CloudTelemetry hech narsa yubormaydi).
+        buildConfigField("String", "CLOUD_BASE_URL", "\"$cloudBaseUrl\"")
+        buildConfigField("String", "CLOUD_DEVICE_SECRET", "\"$cloudDeviceSecret\"")
 
         // НЕ оставляем ARM64-only — иначе на armeabi-v7a/x86 APK не поставится.
         ndk {
