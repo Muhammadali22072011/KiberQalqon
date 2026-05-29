@@ -3,10 +3,10 @@ package com.kiberqalqon
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: ApkAdapter
     private var hasPermission = false
+    // Ruxsat berilgach skan/kuzatuvchini bir martagina ishga tushiramiz —
+    // har onResume'da (masalan, sozlamalardan qaytganda) takror skan bo'lmasligi uchun.
+    private var scanStarted = false
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var multiPathObserver: MultiPathFileObserver? = null
     // Har bir lenta yangilanishida o'sadi — kechikkan rasm yuklashlari eski
@@ -45,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
             setupAdapter()
             setupButtons()
-            checkPermission()
+            refreshPermissionState()
 
             // Единая нижняя нав — активна вкладка Skaner.
             KqBottomNav.attach(this, KqBottomNav.Tab.SCAN)
@@ -424,8 +427,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Foydalanuvchi tashqi "Barcha fayllarga ruxsat" ekranidan qaytgan bo'lishi
+        // mumkin — holatni qayta tekshiramiz va ruxsat ENDIGINA berilgan bo'lsa
+        // skanni ishga tushiramiz (scanStarted bilan har resume'da takrorlanmaydi).
+        refreshPermissionState()
         if (hasPermission) {
             binding.switchBackground.isChecked = Config.isBackgroundEnabled(this)
+            if (!scanStarted) {
+                scanStarted = true
+                startScanningAfterGrant()
+            }
+        } else {
+            scanStarted = false
         }
         loadNews()
     }
@@ -459,53 +472,73 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkPermission() {
-        val permission = if (Build.VERSION.SDK_INT >= 33) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-        hasPermission = ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
-        
+    /**
+     * Faqat HOLATNI yangilaydi (skan ishga tushirmaydi): skanerga kerakli to'liq
+     * fayl kirishimiz bormi. Android 11+ da bu — "Barcha fayllarga ruxsat"
+     * (MANAGE_EXTERNAL_STORAGE). Ilgari bu yerda READ_MEDIA_IMAGES tekshirilardi —
+     * lekin u faqat RASMLARGA kirish beradi, APK fayllarga emas; natijada Splash'da
+     * "Barcha fayllarga ruxsat" berilgan bo'lsa ham Skaner varag'i "ruxsat yo'q"
+     * kartasini ko'rsatib, hech narsa topa olmasdi. Endi Splash bilan bir xil,
+     * yagona VersionCompat tekshiruvidan foydalanamiz.
+     */
+    private fun refreshPermissionState() {
+        hasPermission = VersionCompat.hasFileScanAccess(this)
         binding.cardPermission.visibility = if (hasPermission) View.GONE else View.VISIBLE
         binding.contentMain.visibility = if (hasPermission) View.VISIBLE else View.GONE
-        
         if (hasPermission) {
-            // Показываем пустой список
             binding.tvCount.text = getString(R.string.apk_count, 0)
-            
-            // Если фоновая защита включена - сразу ищем APK
-            if (Config.isBackgroundEnabled(this)) {
-                scope.launch {
-                    delay(500)
-                    startAutoProtection()
-                }
-            } else {
-                // Запускаем только FileObserver
-                scope.launch {
-                    delay(500)
-                    startFileObserver()
-                }
+        }
+    }
+
+    /** Ruxsat berilgach bir marta: fon himoyasi yoqilgan bo'lsa skan, aks holda kuzatuvchi. */
+    private fun startScanningAfterGrant() {
+        if (Config.isBackgroundEnabled(this)) {
+            scope.launch {
+                delay(500)
+                startAutoProtection()
+            }
+        } else {
+            scope.launch {
+                delay(500)
+                startFileObserver()
             }
         }
     }
 
     private fun requestStoragePermission() {
-        // Android 13+ uchun POST_NOTIFICATIONS runtime'da so'ralishi shart, aks holda
-        // popup chiqmaganida bildirishnoma ham chiqmaydi — foydalanuvchi virus borligini bilmaydi.
-        val perms = mutableListOf<String>()
-        if (Build.VERSION.SDK_INT >= 33) {
-            perms += Manifest.permission.READ_MEDIA_IMAGES
-            perms += Manifest.permission.READ_MEDIA_VIDEO
-            perms += Manifest.permission.READ_MEDIA_AUDIO
-            perms += Manifest.permission.POST_NOTIFICATIONS
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            perms += Manifest.permission.READ_EXTERNAL_STORAGE
-            perms += Manifest.permission.WRITE_EXTERNAL_STORAGE
-        } else {
-            perms += Manifest.permission.READ_EXTERNAL_STORAGE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+: APK fayllarni topish/o'qish/o'chirish uchun YAGONA yo'l —
+            // "Barcha fayllarga ruxsat" tizim ekrani. READ_MEDIA_* (rasm/video/audio)
+            // APK fayllarga kirish bermaydi.
+            openAllFilesAccessSettings()
+            return
         }
-        ActivityCompat.requestPermissions(this, perms.toTypedArray(), 100)
+        // Android 10 va pastda — oddiy runtime ruxsat (legacy external storage).
+        val perms = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        ActivityCompat.requestPermissions(this, perms, 100)
+    }
+
+    /** Android 11+ "Barcha fayllarga ruxsat" ekranini ochadi (qaytganda onResume qayta tekshiradi). */
+    private fun openAllFilesAccessSettings() {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+            } catch (e2: Exception) {
+                android.util.Log.e("MainActivity", "all-files settings intent failed", e2)
+                Toast.makeText(this, getString(R.string.toast_permission_required), Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -515,33 +548,11 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
-            // POST_NOTIFICATIONS ixtiyoriy — agar foydalanuvchi rad etsa ham storage ruxsati borligi yetadi.
-            // Faqat asosiy storage ruxsatlar grant bo'lganini tekshiramiz.
-            val storageGranted = permissions.indices.all { i ->
-                val perm = permissions[i]
-                if (perm == Manifest.permission.POST_NOTIFICATIONS) true
-                else grantResults[i] == PackageManager.PERMISSION_GRANTED
-            }
-            if (storageGranted) {
-                hasPermission = true
-                binding.cardPermission.visibility = View.GONE
-                binding.contentMain.visibility = View.VISIBLE
-                
-                // Показываем пустой список
-                binding.tvCount.text = getString(R.string.apk_count, 0)
-                
-                // Если фоновая защита включена - сразу ищем APK
-                if (Config.isBackgroundEnabled(this)) {
-                    scope.launch {
-                        delay(500)
-                        startAutoProtection()
-                    }
-                } else {
-                    // Запускаем только FileObserver
-                    scope.launch {
-                        delay(500)
-                        startFileObserver()
-                    }
+            refreshPermissionState()
+            if (hasPermission) {
+                if (!scanStarted) {
+                    scanStarted = true
+                    startScanningAfterGrant()
                 }
             } else {
                 Toast.makeText(this, getString(R.string.toast_permission_required), Toast.LENGTH_SHORT).show()

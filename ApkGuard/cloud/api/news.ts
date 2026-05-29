@@ -70,6 +70,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true });
     }
 
+    // Rasmni serverda Supabase Storage'ga yuklab, ochiq https havola qaytaramiz.
+    // Brauzer SERVICE_KEY ko'rmaydi — yuklash shu yerda (serverda) bo'ladi. Qaytgan
+    // https havola create action'dagi /^https?:\/\// filtridan o'tadi.
+    if (action === 'upload_image') {
+      const dataUrl = String(b.data ?? '');
+      const m = /^data:(image\/(?:png|jpe?g|gif|webp));base64,([a-z0-9+/=\s]+)$/i.exec(dataUrl);
+      if (!m) return res.status(400).json({ ok: false, error: "rasm formati noto'g'ri (png/jpg/gif/webp)" });
+      const contentType = m[1].toLowerCase();
+      const buf = Buffer.from(m[2].replace(/\s/g, ''), 'base64');
+      if (buf.length === 0) return res.status(400).json({ ok: false, error: "bo'sh rasm" });
+      if (buf.length > 3_500_000) return res.status(400).json({ ok: false, error: 'rasm 3MB dan katta' });
+      const ext = contentType.replace('image/', '').replace('jpeg', 'jpg');
+      const name = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
+      // Bucket bo'lmasa — yaratamiz (idempotent; mavjud bo'lsa xatoni yutamiz).
+      await sb.storage.createBucket('news', { public: true }).catch(() => undefined);
+      const up = await sb.storage.from('news').upload(name, buf, { contentType, upsert: false });
+      if (up.error) return res.status(500).json({ ok: false, error: up.error.message });
+      const { data: pub } = sb.storage.from('news').getPublicUrl(name);
+      return res.status(200).json({ ok: true, url: pub.publicUrl });
+    }
+
     return res.status(400).json({ ok: false, error: "noma'lum action" });
   }
 

@@ -886,22 +886,24 @@ $('#rcCopy').addEventListener('click', () => {
 });
 $('#roleForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const form = e.currentTarget;
   const name = $('#roleName').value.trim(); if (!name) return;
-  const btn = e.currentTarget.querySelector('button'); btn.disabled = true;
+  const btn = form.querySelector('button'); btn.disabled = true;
   try{
     await apiPost('/api/role/admin', { action:'create_role', name, permissions: pickValues('rolePerms'), components: pickValues('roleComps') });
-    toast('Rol qo\'shildi'); e.currentTarget.reset(); loadRoleAdmin();
+    toast('Rol qo\'shildi'); form.reset(); loadRoleAdmin();
   }catch(err){ formErr(err, 'rol qo\'shish'); }
   finally{ btn.disabled = false; }
 });
 $('#opForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const form = e.currentTarget;
   const login = $('#opLogin').value.trim(), password = $('#opPass').value, role_name = $('#opRole').value;
   if (!login || !password){ toast('Login va parol kerak'); return; }
-  const btn = e.currentTarget.querySelector('button'); btn.disabled = true;
+  const btn = form.querySelector('button'); btn.disabled = true;
   try{
     await apiPost('/api/role/admin', { action:'create_operator', login, password, role_name });
-    toast('Operator qo\'shildi'); e.currentTarget.reset(); loadRoleAdmin();
+    toast('Operator qo\'shildi'); form.reset(); loadRoleAdmin();
   }catch(err){ formErr(err, 'operator qo\'shish'); }
   finally{ btn.disabled = false; }
 });
@@ -974,13 +976,14 @@ $('#newsOv').addEventListener('click', e => { if (e.target === $('#newsOv')) clo
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#newsOv').classList.contains('hidden')) closeNews(); });
 $('#newsForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const form = e.currentTarget;
   const title = $('#newsTitle').value.trim(); if (!title){ toast('Sarlavha kerak'); return; }
   const body = $('#newsBody').value, level = $('#newsLevel').value;
   const image_url = $('#newsImg').value.trim();
-  const btn = e.currentTarget.querySelector('button[type=submit]'); btn.disabled = true;
+  const btn = form.querySelector('button[type=submit]'); btn.disabled = true;
   try{
     await apiPost('/api/news', { action:'create', title, body, level, image_url });
-    toast('E\'lon qilindi'); e.currentTarget.reset();
+    toast('E\'lon qilindi'); form.reset();
     localStorage.setItem(NEWS_SEEN, String(Date.now()));
     loadNews();
   }catch(err){ formErr(err, 'e\'lon qilish'); }

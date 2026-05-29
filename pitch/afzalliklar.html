@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>KiberQalqon — Asosiy afzalliklar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#10242c; --ink2:#47626c; --ink3:#8499a1;
+  --teal:#1f7b92; --teal-d:#14606e; --teal-soft:#eaf5f6;
+  --saffron:#b9772a;
+  --line:#dbe7ea; --card:#ffffff; --navy:#0b1014;
+  --fd:"Space Grotesk","Inter",system-ui,sans-serif;
+  --fb:"Manrope","Inter",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#ffffff}
+@page{size:A4 portrait;margin:0}
+.page{
+  position:relative;width:210mm;height:297mm;overflow:hidden;
+  padding:15mm 14mm 13mm;
+  font-family:var(--fb);color:var(--ink);background:#ffffff;
+  -webkit-font-smoothing:antialiased;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+/* subtle brand texture top-right */
+.page::before{content:"";position:absolute;top:-60px;right:-60px;width:260px;height:260px;
+  border-radius:50%;background:radial-gradient(closest-side,rgba(31,123,146,.10),transparent);pointer-events:none}
+
+/* header */
+.head{display:flex;align-items:center;gap:16px;padding-bottom:14px;border-bottom:2px solid var(--teal)}
+.head .logo{width:58px;height:58px;border-radius:14px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(145deg,#0f1820,#0b1014);box-shadow:0 6px 18px rgba(11,16,20,.25)}
+.head .logo img{width:42px;height:42px;border-radius:9px}
+.head .wm{font:700 30px/1 var(--fd);letter-spacing:-.02em;color:var(--ink)}
+.head .wm small{display:block;font:500 13.5px/1.3 var(--fb);color:var(--ink2);margin-top:6px;letter-spacing:0}
+.head .tag{margin-left:auto;text-align:right}
+.head .tag .eyebrow{font:700 13px/1 var(--fm);letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}
+.head .tag .n{font:600 14px/1.3 var(--fb);color:var(--ink2);margin-top:7px}
+
+.intro{font:500 15px/1.5 var(--fb);color:var(--ink2);margin:13px 0 12px}
+.intro b{color:var(--ink);font-weight:700}
+
+/* list */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:flex-start;gap:14px;background:var(--card);
+  border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:11px;padding:10px 16px}
+.item .num{font:700 21px/1.35 var(--fd);color:var(--teal);min-width:30px;letter-spacing:-.02em}
+.item .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:19px;
+  background:var(--teal-soft);flex:none;margin-top:1px}
+.item .tx{min-width:0;padding-top:1px}
+.item .ti{font:700 17px/1.25 var(--fd);color:var(--ink)}
+.item .de{font:400 13px/1.4 var(--fb);color:var(--ink2);margin-top:3px}
+.item b{color:var(--teal-d);font-weight:700}
+
+/* footer */
+.foot{position:absolute;left:14mm;right:14mm;bottom:10mm;display:flex;align-items:center;
+  justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;
+  font:600 11px/1 var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.foot .l{color:var(--teal)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="head">
+    <div class="logo"><img src="assets/logo.png" alt="KiberQalqon"/></div>
+    <div class="wm">KiberQalqon<small>O'zbekiston uchun mobil antivirus</small></div>
+    <div class="tag">
+      <div class="eyebrow">Asosiy afzalliklar</div>
+      <div class="n">Nega aynan biz</div>
+    </div>
+  </div>
+
+  <div class="intro">KiberQalqon — telefoningizni <b>Telegram orqali tarqaladigan firibgar dasturlardan</b> himoya qiladi. Asosiy afzalliklari:</div>
+
+  <div class="list">
+    <div class="item">
+      <span class="num">01</span><span class="ic">⚡</span>
+      <div class="tx"><div class="ti">Zararli faylni o'zi topib o'chiradi</div>
+      <div class="de">Xavfli <b>.apk</b> faylni avtomatik aniqlaydi va <b>bir necha soniyada</b> o'chiradi — siz hech nima qilmaysiz.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">02</span><span class="ic">⏱️</span>
+      <div class="tx"><div class="ti">Real vaqtda himoya</div>
+      <div class="de">Yangi fayl tushishi bilan <b>darhol</b>, kutmasdan tekshiradi.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">03</span><span class="ic">🔍</span>
+      <div class="tx"><div class="ti">Kuchli aniqlash dvigateli</div>
+      <div class="de">Har bir faylni <b>9 xil usulda</b> tekshiradi — chuqur yashiringan virusni ham topadi.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">04</span><span class="ic">🛡️</span>
+      <div class="tx"><div class="ti">O'zini himoya qiladi</div>
+      <div class="de">Virus dasturni <b>o'chira olmaydi</b> yoki to'xtata olmaydi.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">05</span><span class="ic">📡</span>
+      <div class="tx"><div class="ti">Internetsiz ham ishlaydi</div>
+      <div class="de">Tekshiruv <b>telefonning o'zida</b> bajariladi — internet shart emas.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">06</span><span class="ic">🔕</span>
+      <div class="tx"><div class="ti">Fonda jim ishlaydi</div>
+      <div class="de">Orqa fonda ishlaydi: telefonni <b>sekinlashtirmaydi</b> va xalaqit bermaydi.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">07</span><span class="ic">👍</span>
+      <div class="tx"><div class="ti">Oddiy va qulay</div>
+      <div class="de">O'rnatasiz — tamom. <b>Murakkab sozlash yo'q</b>, hamma uchun tushunarli.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">08</span><span class="ic">🆓</span>
+      <div class="tx"><div class="ti">Bepul va yengil</div>
+      <div class="de">Asosiy himoya <b>bepul</b>; joy va batareyani kam ishlatadi.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">09</span><span class="ic">🇺🇿</span>
+      <div class="tx"><div class="ti">To'liq o'zbekcha</div>
+      <div class="de">Hamma yozuv o'zbek tilida — <b>tushunarli va ishonchli</b>.</div></div>
+    </div>
+    <div class="item">
+      <span class="num">10</span><span class="ic">📍</span>
+      <div class="tx"><div class="ti">O'zbekiston uchun maxsus</div>
+      <div class="de">Aynan bizda tarqaladigan <b>mahalliy firibgar dasturlarga</b> qarshi tayyorlangan.</div></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="l">🛡 KiberQalqon · Navoiyda yaratilgan</span>
+    <span>Tez · Oddiy · Ishonchli · 2026</span>
+  </div>
+
+</div>
+</body>
+</html>

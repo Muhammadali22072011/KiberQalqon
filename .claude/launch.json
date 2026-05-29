@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "kqproto",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8753",
+        "--directory",
+        "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\design_handoff_kiberqalqon_redesign\\design_html_reference"
+      ],
+      "port": 8753
+    },
+    {
+      "name": "kqpitch",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8754",
+        "--directory",
+        "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\pitch"
+      ],
+      "port": 8754
+    },
+    {
+      "name": "kqpanel",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8755",
+        "--directory",
+        "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\cloud\\public"
+      ],
+      "port": 8755
+    }
+  ]
+}

@@ -40,7 +40,7 @@ object SecurityGuard {
      * для sideload/прямой установки APK, подписанного этим release.keystore.
      */
     private const val EXPECTED_RELEASE_SIGNATURE_SHA256 =
-        "34C1D12C1F9549B02F6DBAB6E6BEAFAF83F7C67A9724CA151B3710365C81D2BD"
+        "1CB3F378189D6EF38985B3AE234D859E750029AB353246FA496349A8FF14D983"
 
     /**
      * Разрешённые источники установки. Если APK поставили не из этих источников

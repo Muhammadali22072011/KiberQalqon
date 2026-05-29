@@ -81,6 +81,9 @@ object SecretAccess {
     private const val KEY_PERMS = "role_perms"
     private const val KEY_COMPONENTS = "role_components"
     private const val KEY_GRANTED_AT = "granted_at"
+    // Egasining admin siri — faqat EGASINING qurilmasida (kodni ko'rsatish uchun).
+    // APK ichida emas: egasi qo'lda kiritadi. Boshqa qurilmaga tarqalmaydi.
+    private const val KEY_OWNER_SECRET = "owner_admin_secret"
 
     private fun prefs(ctx: Context): SharedPreferences =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -100,6 +103,26 @@ object SecretAccess {
     fun hasSession(ctx: Context): Boolean = roleName(ctx) != null
 
     fun clearSession(ctx: Context) {
-        prefs(ctx).edit().clear().apply()
+        // Faqat sessiya tozalanadi — egasining admin siri (kodni ko'rsatish uchun) saqlanadi.
+        prefs(ctx).edit()
+            .remove(KEY_ROLE)
+            .remove(KEY_PERMS)
+            .remove(KEY_COMPONENTS)
+            .remove(KEY_GRANTED_AT)
+            .apply()
+    }
+
+    // ---- Egasining admin siri (kodni ko'rsatish — owner mode) -------------
+    fun saveOwnerSecret(ctx: Context, secret: String) {
+        prefs(ctx).edit().putString(KEY_OWNER_SECRET, secret.trim()).apply()
+    }
+
+    fun ownerSecret(ctx: Context): String? =
+        prefs(ctx).getString(KEY_OWNER_SECRET, null)?.takeIf { it.isNotBlank() }
+
+    fun hasOwnerSecret(ctx: Context): Boolean = ownerSecret(ctx) != null
+
+    fun clearOwnerSecret(ctx: Context) {
+        prefs(ctx).edit().remove(KEY_OWNER_SECRET).apply()
     }
 }
