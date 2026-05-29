@@ -75,10 +75,10 @@ where d.lat is not null and d.lng is not null;
 
 -- ============================================================================
 -- 4) v_recent_threats — jonli oqim uchun city + risk_score qo'shamiz.
--- DIQQAT: create or replace view faqat OXIRIGA ustun qo'shishga ruxsat beradi —
--- shu sabab mavjud ustunlar tartibi saqlanib, city/risk_score oxiriga qo'shildi.
+-- Bu yerda ham drop+create — qayta ishga tushirishda ustun tartibi muammosi bo'lmasin.
 -- ============================================================================
-create or replace view v_recent_threats as
+drop view if exists v_recent_threats;
+create view v_recent_threats as
 select s.scanned_at, d.name as device_name, s.app_label, s.package_name,
        s.apk_hash, s.verdict, s.reasons,
        d.city, s.risk_score
