@@ -56,6 +56,12 @@ object CloudTelemetry {
     private const val KEY_DEVICE_TOKEN = "device_token"
     private const val KEY_LAST_REGISTER_TS = "last_register_ts"
     private const val KEY_LAST_REGISTER_VER = "last_register_ver"
+    // Oxirgi muvaffaqiyatli register'da yuborilgan nuqta ("lat,lng") — qurilma ko'chsa
+    // 12 soatlik throttle oynasida ham qayta yuboramiz, shunda xaritadagi nuqta telefon
+    // bilan birga yuradi (egasi shuni xohladi). Fon kuzatuvi YO'Q — faqat ilova ochilganda.
+    private const val KEY_LAST_GEO = "last_register_geo"
+    // "Sezilarli ko'chish" chegarasi (metr) — GPS shovqini yolg'on trigger bermasligi uchun.
+    private const val GEO_MOVE_THRESHOLD_M = 500.0
     // Bulutga allaqachon yuklangan APK namuna hash'lari — qayta yuklamaslik uchun.
     private const val KEY_UPLOADED_SAMPLES = "uploaded_samples"
     // Storage'ga yuklanadigan eng katta APK (ConsentActivity 4(a) va'dasi bilan bir xil).
@@ -102,24 +108,44 @@ object CloudTelemetry {
         val lastTs = sp.getLong(KEY_LAST_REGISTER_TS, 0L)
         val lastVer = sp.getInt(KEY_LAST_REGISTER_VER, -1)
         val verChanged = lastVer != BuildConfig.VERSION_CODE
-        if (!verChanged && now - lastTs in 0 until REGISTER_INTERVAL_MS) return
+        val withinWindow = !verChanged && now - lastTs in 0 until REGISTER_INTERVAL_MS
 
         val token = deviceToken(ctx)
-        val body = JSONObject().apply {
-            put("device_token", token)
-            put("name", "${Build.MANUFACTURER} ${Build.MODEL}")
-            put("android_ver", "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
-            put("app_ver", "${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})")
-        }
         scope.launch {
-            // putGeo aktiv GPS fix uchun bloklashi mumkin — IO oqimida (App.onCreate'da emas).
-            putGeo(ctx, body)
+            // Joylashuvni qaytaib yuborish strategiyasi (fon kuzatuvi YO'Q — faqat ilova ochilganda):
+            //   • 12 soatlik throttle oynasida — aktiv GPS YOQMAYMIZ (batareya). Faqat OS
+            //     keshidagi nuqta bilan ko'chishni tekshiramiz; qurilma >500 m ko'chmagan
+            //     bo'lsa hech narsa yubormaymiz. Ko'chgan bo'lsa — xaritadagi nuqta telefon
+            //     bilan birga yursin deb qayta yuboramiz.
+            //   • Oyna o'tgan / versiya o'zgargan bo'lsa — to'liq fix (kerak bo'lsa bir
+            //     martalik aktiv GPS) bilan odatdagi 12 soatlik "tirikman" signali.
+            val fix: DeviceLocation.Fix? = if (withinWindow) {
+                val cached = DeviceLocation.lastKnown(ctx)
+                if (!movedSignificantly(sp, cached)) return@launch
+                cached
+            } else {
+                DeviceLocation.currentFix(ctx)
+            }
+
+            val body = JSONObject().apply {
+                put("device_token", token)
+                put("name", "${Build.MANUFACTURER} ${Build.MODEL}")
+                put("android_ver", "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
+                put("app_ver", "${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})")
+            }
+            if (fix != null) {
+                body.put("lat", fix.lat)
+                body.put("lng", fix.lng)
+                fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
+            }
+
             val ok = postJson("$base/api/device/register", secret, body)
             if (ok) {
-                sp.edit()
+                val ed = sp.edit()
                     .putLong(KEY_LAST_REGISTER_TS, now)
                     .putInt(KEY_LAST_REGISTER_VER, BuildConfig.VERSION_CODE)
-                    .apply()
+                if (fix != null) ed.putString(KEY_LAST_GEO, "${fix.lat},${fix.lng}")
+                ed.apply()
             }
         }
     }
@@ -211,6 +237,33 @@ object CloudTelemetry {
         body.put("lat", fix.lat)
         body.put("lng", fix.lng)
         fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
+    }
+
+    /**
+     * Qurilma oxirgi yuborilgan nuqtadan sezilarli (>500 m) uzoqlashganmi? Throttle
+     * oynasida ham qayta register qilish kerakligini shu hal qiladi (nuqta telefon
+     * bilan birga yursin). fix == null bo'lsa solishtirib bo'lmaydi → false (yubormaymiz).
+     * Avval geo yuborilmagan bo'lsa → true (birinchi marta yuboramiz).
+     */
+    private fun movedSignificantly(sp: SharedPreferences, fix: DeviceLocation.Fix?): Boolean {
+        if (fix == null) return false
+        val last = sp.getString(KEY_LAST_GEO, null) ?: return true
+        val i = last.indexOf(',')
+        if (i <= 0) return true
+        val lat = last.substring(0, i).toDoubleOrNull() ?: return true
+        val lng = last.substring(i + 1).toDoubleOrNull() ?: return true
+        return distanceMeters(lat, lng, fix.lat, fix.lng) > GEO_MOVE_THRESHOLD_M
+    }
+
+    /** Ikki koordinata orasidagi masofa (metr) — haversine; ko'chishni tekshirishga yetarli. */
+    private fun distanceMeters(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+        val r = 6_371_000.0
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLng = Math.toRadians(lng2 - lng1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2)
+        return 2 * r * Math.asin(Math.min(1.0, Math.sqrt(a)))
     }
 
     private fun prefs(ctx: Context): SharedPreferences =

@@ -263,6 +263,27 @@ export function resolveGeo(req: VercelRequest, body: unknown, seed: string): Geo
   return jitterGeo(ip, seed);
 }
 
+// IP geo qurilmaning mavjud (ehtimol GPS) joylashuvini ALMASHTIRMASLIGI uchun.
+//   • Qurilma GPS yuborgan bo'lsa — authoritative: har doim yoziladi (xaritadagi
+//     nuqta telefon bilan birga harakatlanadi — egasi shuni xohladi).
+//   • GPS yo'q, lekin qurilmada joylashuv allaqachon bor — TEGMAYMIZ. Aks holda
+//     joylashuvsiz ping (IP fallback) to'g'ri qo'yilgan nuqtani noto'g'ri operator
+//     shahriga (deyarli har doim Toshkent/eng yaqin shlyuz) "sakratardi" — aynan shu
+//     "qurilma boshqa shaharda ko'rinib qoldi" xatosi shundan kelib chiqardi.
+//   • GPS ham, eski joylashuv ham yo'q (birinchi sezish) — IP geo + jitter (eski yo'l).
+// existing — devices jadvalidagi joriy {lat,lng} (yo'q bo'lsa null/undefined).
+export function resolveGeoNoDowngrade(
+  req: VercelRequest,
+  body: unknown,
+  seed: string,
+  existing: { lat: number | null; lng: number | null } | null | undefined,
+): Geo {
+  if (readDeviceGeo(body)) return resolveGeo(req, body, seed); // GPS — authoritative
+  const hasLoc = existing != null && existing.lat != null && existing.lng != null;
+  if (hasLoc) return { country: null, city: null, lat: null, lng: null }; // eski joylashuv saqlanadi
+  return resolveGeo(req, body, seed); // birinchi sezish — IP darajasidagi taxmin
+}
+
 function toNum(v: unknown): number | null {
   if (typeof v === 'number') return Number.isFinite(v) ? v : null;
   if (typeof v === 'string' && v.trim() !== '') {

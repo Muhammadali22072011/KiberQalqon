@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, adminChatIds } from '../../lib/telegram.js';
 import { checkDeviceSecret } from '../../lib/auth.js';
-import { resolveGeo, clientIp } from '../../lib/geo.js';
+import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
 import { formatThreatAlert } from '../../lib/format.js';
 
 type Body = {
@@ -44,8 +44,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     risk_score: b.risk_score ?? 0,
     last_verdict: b.verdict,
   };
-  // Qurilma GPS yuborgan bo'lsa — aniq nuqta (jittersiz); aks holda IP geo + jitter.
-  const geo = resolveGeo(req, b, b.device_token);
+  // GPS authoritative (har doim yoziladi → nuqta telefon bilan birga yuradi); GPS yo'q
+  // bo'lsa IP taxmini qurilmada joylashuv allaqachon bor bo'lsa YOZILMAYDI (to'g'ri
+  // nuqtani noto'g'ri operator shahriga sakratmaymiz). Shuning uchun GPS yo'qdagina
+  // mavjud joylashuvni o'qiymiz.
+  let existingGeo: { lat: number | null; lng: number | null } | null = null;
+  if (!readDeviceGeo(b)) {
+    const { data: cur } = await sb
+      .from('devices')
+      .select('lat, lng')
+      .eq('device_token', b.device_token)
+      .maybeSingle();
+    existingGeo = cur ?? null;
+  }
+  const geo = resolveGeoNoDowngrade(req, b, b.device_token, existingGeo);
   if (geo.country != null) devRow.country = geo.country;
   if (geo.city != null) devRow.city = geo.city;
   if (geo.lat != null) devRow.lat = geo.lat;

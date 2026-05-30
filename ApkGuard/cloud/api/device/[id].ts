@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { checkAdminSecret, checkDeviceSecret } from '../../lib/auth.js';
-import { resolveGeo, clientIp } from '../../lib/geo.js';
+import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
 
 // Ikkita yo'l bitta dinamik route'da (Hobby 12-funksiya limiti uchun):
 //   /api/device/register → handleRegister (x-device-secret, POST) — qurilma o'zini yozadi
@@ -63,6 +63,8 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ ok: false, error: 'bad token' });
   }
 
+  const sb = db();
+
   const row: Record<string, unknown> = {
     device_token: b.device_token,
     name: b.name ?? null,
@@ -71,9 +73,20 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     last_seen: new Date().toISOString(),
   };
 
-  // Geo — qurilma GPS yuborgan bo'lsa aniq nuqta (jittersiz); aks holda IP geo + jitter.
-  // Null bo'lsa eski qiymatni ustiga yozmaymiz (lokal dev'da sarlavhalar bo'lmaydi).
-  const geo = resolveGeo(req, b, b.device_token);
+  // Geo — GPS authoritative (har doim yoziladi); GPS yo'q bo'lsa IP taxmini qurilmada
+  // joylashuv allaqachon bor bo'lsa YOZILMAYDI (to'g'ri nuqtani IP shahriga sakratmaymiz).
+  // Shuning uchun GPS yo'q bo'lsagina mavjud joylashuvni o'qiymiz. Null qiymatlarni
+  // ustiga yozmaymiz (lokal dev'da IP sarlavhalari bo'lmaydi).
+  let existingGeo: { lat: number | null; lng: number | null } | null = null;
+  if (!readDeviceGeo(b)) {
+    const { data: cur } = await sb
+      .from('devices')
+      .select('lat, lng')
+      .eq('device_token', b.device_token)
+      .maybeSingle();
+    existingGeo = cur ?? null;
+  }
+  const geo = resolveGeoNoDowngrade(req, b, b.device_token, existingGeo);
   if (geo.country != null) row.country = geo.country;
   if (geo.city != null) row.city = geo.city;
   if (geo.lat != null) row.lat = geo.lat;
@@ -83,7 +96,7 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
   const ip = clientIp(req);
   if (ip) row.ip = ip;
 
-  const { data, error } = await db()
+  const { data, error } = await sb
     .from('devices')
     .upsert(row, { onConflict: 'device_token' })
     .select('id')
