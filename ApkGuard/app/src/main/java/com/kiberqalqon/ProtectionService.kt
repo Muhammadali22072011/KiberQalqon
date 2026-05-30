@@ -119,36 +119,111 @@ class ProtectionService : Service() {
      * Telegram yangi APK'ni o'z papkasiga (/Android/media/org.telegram.messenger/...)
      * saqlaganda, ko'p qurilmalarda FileObserver inotify event bermaydi. Shuning uchun
      * har 15 soniyada MediaStore + papka ro'yxati orqali yangi APK qidiramiz (bu ishonchli).
-     * Yangi fayl topilsa — kanonik GuardWorker'ni ishga tushiramiz: u skanlaydi va
-     * DANGER bo'lsa avtomatik karantinga oladi (ekran qulflangan bo'lsa ham) yoki popup.
+     * Yangi fayl topilsa — DARHOL AutoScanActivity oynasini ochamiz (jonli "tekshirilmoqda"
+     * animatsiyasi → verdikt), xuddi FileObserver yo'li kabi. Ekran qulflangan / overlay
+     * ruxsati yo'q bo'lsa — GuardWorker'ga o'tamiz (u skanlaydi, DANGER'ni karantinga oladi
+     * va full-screen notification ko'rsatadi).
      *
-     * MUHIM: Telegram papkasini ko'rish uchun "Barcha fayllarga ruxsat"
+     * MUHIM #1: Telegram papkasini ko'rish uchun "Barcha fayllarga ruxsat"
      * (MANAGE_EXTERNAL_STORAGE) berilgan bo'lishi SHART — aks holda Android boshqa
      * ilovaning papkasini o'qishga ruxsat bermaydi va hech narsa topilmaydi.
+     *
+     * MUHIM #2 (tuzatilgan xato): yangi faylni mtime "watermark" bilan emas, KO'RILGAN
+     * yo'llar to'plami bilan aniqlaymiz. Telegram/WhatsApp/Bluetooth yuklamalari faylning
+     * mtime'sini jo'natuvchining (eski) timestamp'iga qo'yadi — shuning uchun
+     * "mtime > watermark" tekshiruvi yangi kelgan APK'ni butunlay o'tkazib yuborardi.
      */
     private fun startFastScanLoop() {
         if (fastLoopStarted) return
         fastLoopStarted = true
         serviceScope.launch {
-            // Service ishga tushgan vaqt — faqat shundan keyin paydo bo'lgan (yangi
-            // yuklab olingan) APK'larni ushlaymiz; eski fayllarni qayta-qayta emas.
-            var lastSeenMax = System.currentTimeMillis()
+            // Ko'rilgan APK yo'llari. Birinchi pollda mavjud fayllar bilan to'ldiriladi —
+            // eski fayllar uchun oyna chiqarmaymiz; faqat SHUNDAN keyin paydo bo'lganlar uchun.
+            // Yangilik aniqlash mantig'i NewApkDetector'da (sof funksiya, unit-test bilan qoplangan).
+            val seenPaths = HashSet<String>(256)
+            var seeded = false
             while (isActive) {
                 delay(POLL_INTERVAL_MS)
                 try {
                     if (!Config.isBackgroundEnabled(applicationContext)) continue
-                    val list = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = 4000)
-                    val hasNew = list.any { it.file.exists() && it.file.lastModified() > lastSeenMax }
-                    if (hasNew) {
-                        lastSeenMax = list.maxOf { it.file.lastModified() }
-                        android.util.Log.d(TAG, "Fast loop: new APK detected → enqueue GuardWorker")
-                        WorkManager.getInstance(applicationContext)
-                            .enqueue(OneTimeWorkRequestBuilder<GuardWorker>().build())
+                    val list = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = FAST_SCAN_BUDGET_MS)
+                        .filter { it.file.exists() }
+                    val stamps = list.map {
+                        NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified())
+                    }
+
+                    if (!seeded) {
+                        NewApkDetector.seed(stamps, seenPaths)
+                        seeded = true
+                        continue
+                    }
+
+                    val newPaths = NewApkDetector.pickNew(stamps, seenPaths, System.currentTimeMillis())
+                    if (newPaths.isNotEmpty()) {
+                        val newSet = newPaths.toHashSet()
+                        val newItems = list.filter { it.file.absolutePath in newSet }
+                        android.util.Log.d(TAG, "Fast loop: ${newItems.size} new APK(s) detected")
+                        presentNewApks(newItems)
                     }
                 } catch (t: Throwable) {
                     android.util.Log.w(TAG, "fast scan loop iteration failed", t)
                 }
             }
+        }
+    }
+
+    /**
+     * Yangi aniqlangan APK(lar)ni foydalanuvchiga KO'RSATISH.
+     *
+     * Ekran ochiq + qulfsiz + overlay ruxsati bor → eng yangi yangi faylni darhol
+     * AutoScanActivity oynasida ochamiz (jonli skan → verdikt, BARCHA verdiktlar uchun,
+     * SAFE ham — foydalanuvchi "tekshirildi" ni ko'radi). Bu — FileObserver yo'li bilan
+     * bir xil xulq, dedup AutoScanActivity ichida (10s) hal qilinadi.
+     *
+     * Aks holda (ekran qulflangan / overlay yo'q / launch muvaffaqiyatsiz) → GuardWorker:
+     * u skanlaydi, DANGER'ni karantinga oladi va full-screen-intent notification
+     * ko'rsatadi (u ham aynan shu oynani ochadi).
+     */
+    private fun presentNewApks(newOnes: List<ApkItem>) {
+        val ctx = applicationContext
+        val newest = newOnes.maxByOrNull { it.file.lastModified() } ?: return
+
+        if (isScreenInteractiveAndUnlocked(ctx) &&
+            ImprovedApkFileObserver.canLaunchActivityFromBackground(ctx)) {
+            try {
+                val intent = Intent(ctx, AutoScanActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    putExtra("apk_path", newest.file.absolutePath)
+                    putExtra("apk_name", newest.name)
+                }
+                ctx.startActivity(intent)
+                return
+            } catch (t: Throwable) {
+                android.util.Log.w(TAG, "direct AutoScan launch failed, falling back to GuardWorker", t)
+            }
+        }
+
+        try {
+            WorkManager.getInstance(ctx).enqueue(OneTimeWorkRequestBuilder<GuardWorker>().build())
+        } catch (t: Throwable) {
+            android.util.Log.w(TAG, "GuardWorker enqueue failed", t)
+        }
+    }
+
+    /**
+     * Ekran ayni paytda ochiq (interactive) VA qulfdan chiqarilganmi? Faqat shu holatda
+     * fon'dan startActivity() real ko'rinadi; aks holda (qulflangan/o'chiq) MIUI uni jim
+     * bloklaydi va notification ishlatish kerak.
+     */
+    private fun isScreenInteractiveAndUnlocked(ctx: Context): Boolean {
+        return try {
+            val pm = ctx.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            val km = ctx.getSystemService(Context.KEYGUARD_SERVICE) as android.app.KeyguardManager
+            pm.isInteractive && !km.isKeyguardLocked
+        } catch (_: Throwable) {
+            false
         }
     }
 
@@ -158,8 +233,17 @@ class ProtectionService : Service() {
         private const val CHANNEL_NAME = "Himoya holati"
         const val NOTIFICATION_ID = 1010
 
-        /** Tezkor avtomatik skan oralig'i — yangi yuklab olingan APK ~15s ichida ushlanadi. */
-        private const val POLL_INTERVAL_MS = 15_000L
+        /** Tezkor avtomatik skan oralig'i — yangi yuklab olingan APK ~1s ichida ushlanadi. */
+        private const val POLL_INTERVAL_MS = 1_000L
+
+        /**
+         * Bitta poll iteratsiyasi uchun vaqt byudjeti. 1s oraliqda ishlagani uchun u
+         * oraliqdan kichik bo'lishi SHART — aks holda skanlar bir-birining ustiga chiqib,
+         * real oraliq cho'ziladi va batareyani behuda yeydi. MediaStore so'rovi odatda
+         * shundan ancha tez tugaydi; rekursiv fallback har iteratsiyada qisman yuradi,
+         * lekin 1s'da takror ishlagani uchun baribir hammasini qamrab oladi.
+         */
+        private const val FAST_SCAN_BUDGET_MS = 800L
 
         /** Service'ni ishga tushiradi. Idempotent — qayta chaqirish bezarar. */
         fun start(context: Context) {

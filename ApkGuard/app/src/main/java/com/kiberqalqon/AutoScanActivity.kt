@@ -156,8 +156,13 @@ class AutoScanActivity : AppCompatActivity() {
     }
 
     companion object {
-        /** Сколько секунд считаем повторный запуск с тем же путём дубликатом. */
-        private const val DEDUP_WINDOW_MS = 10_000L
+        /**
+         * Сколько секунд считаем повторный запуск с тем же путём дубликатом.
+         * Должно быть БОЛЬШЕ интервала fast-scan poll (ProtectionService = 15s):
+         * inotify-FileObserver ловит файл за ~1s, а poll-loop — на следующем тике (≤15s),
+         * и без широкого окна один и тот же SAFE-файл показался бы дважды.
+         */
+        private const val DEDUP_WINDOW_MS = 20_000L
 
         @Volatile private var lastLaunchedPath: String? = null
         @Volatile private var lastLaunchedAt: Long = 0L
