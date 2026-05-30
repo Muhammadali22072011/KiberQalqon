@@ -54,8 +54,8 @@ android {
         applicationId = "com.kiberqalqon"
         minSdk = 24
         targetSdk = 34
-        versionCode = 79
-        versionName = "7.9"
+        versionCode = 80
+        versionName = "8.0"
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"\"")
 
         // OPT-IN community threat sharing endpoint (dev's Telegram).
