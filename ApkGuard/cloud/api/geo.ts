@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { checkAdminSecret } from '../lib/auth.js';
+import { canRead } from '../lib/auth.js';
 
 // Xarita nuqtalari — har bir qurilma bitta nuqta.
-// Faqat ADMIN_SECRET bilan (panel). Qurilma siri bilan bu yerga kirilmaydi.
+// Egasi yoki cheklangan admin ko'radi. Qurilma siri bilan kirilmaydi.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
-  if (!checkAdminSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+  if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
   const { data, error } = await db()
     .from('v_map_points')

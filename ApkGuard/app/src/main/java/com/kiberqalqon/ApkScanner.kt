@@ -1,3 +1,11 @@
+/*
+ *  #### #  # #### #  #    #  # #### #  #     ← MIDDLE (yadro / engine)
+ *  #    #  # #    # #     #  # #  # #  #
+ *  ###  #  # #    ##      #### #  # #  #
+ *  #    #  # #    # #       #  #  # #  #
+ *  #    #### #### #  #      #  #### ####
+ *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ */
 package com.kiberqalqon
 
 import android.content.Context

@@ -10,6 +10,15 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * Doimiy himoya foreground service'i.
@@ -33,10 +42,25 @@ import androidx.core.app.NotificationCompat
  */
 class ProtectionService : Service() {
 
+    // Service umri davomida yashaydigan scope — real-time FileObserver shu yerda turadi.
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // Real-time kuzatuvchi: Downloads/Telegram/WhatsApp papkalariga yangi APK tushishi
+    // bilan darhol AutoScanActivity ochadi. ILGARI faqat MainActivity'da yashar edi —
+    // ilova yopilsa kuzatuv to'xtardi va Telegram'dan kelgan virus REAL VAQTDA
+    // ushlanmasdi (faqat 15 daqiqalik GuardWorker keyinroq topardi). Endi doimiy
+    // foreground service'da yashaydi — telefon 24/7 himoyalangan.
+    private var fileObserver: MultiPathFileObserver? = null
+
+    // Tezkor poll loop bir martagina ishga tushadi (onStartCommand bir necha bor chaqirilsa ham).
+    @Volatile private var fastLoopStarted = false
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         ensureChannel(this)
+        startFileWatcher()
+        startFastScanLoop()
         val notification = buildNotification(this)
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -63,7 +87,69 @@ class ProtectionService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        try { fileObserver?.stopWatching() } catch (t: Throwable) {
+            android.util.Log.w(TAG, "stopWatching failed", t)
+        }
+        fileObserver = null
+        try { serviceScope.cancel() } catch (_: Throwable) {}
         // Service o'lgan bo'lsa, OS qayta tiklaydi (START_STICKY tufayli).
+    }
+
+    /**
+     * Real-time FileObserver'ni ishga tushiradi. onStartCommand bir necha bor
+     * chaqirilishi mumkin (START_STICKY restart, qayta start) — shuning uchun
+     * fileObserver != null bo'lsa takror ishga tushirmaymiz (aks holda bitta APK
+     * bir nechta observer'ga tushib, ikki marta xabar qiladi).
+     */
+    private fun startFileWatcher() {
+        if (fileObserver != null) return
+        try {
+            fileObserver = MultiPathFileObserver(applicationContext, serviceScope).also {
+                it.startWatching()
+            }
+            android.util.Log.d(TAG, "Real-time file watcher started (service-owned, 24/7)")
+        } catch (t: Throwable) {
+            android.util.Log.e(TAG, "startFileWatcher failed", t)
+        }
+    }
+
+    /**
+     * Tezkor avtomatik skan loop'i — FileObserver'ga BOG'LIQ EMAS.
+     *
+     * Telegram yangi APK'ni o'z papkasiga (/Android/media/org.telegram.messenger/...)
+     * saqlaganda, ko'p qurilmalarda FileObserver inotify event bermaydi. Shuning uchun
+     * har 15 soniyada MediaStore + papka ro'yxati orqali yangi APK qidiramiz (bu ishonchli).
+     * Yangi fayl topilsa — kanonik GuardWorker'ni ishga tushiramiz: u skanlaydi va
+     * DANGER bo'lsa avtomatik karantinga oladi (ekran qulflangan bo'lsa ham) yoki popup.
+     *
+     * MUHIM: Telegram papkasini ko'rish uchun "Barcha fayllarga ruxsat"
+     * (MANAGE_EXTERNAL_STORAGE) berilgan bo'lishi SHART — aks holda Android boshqa
+     * ilovaning papkasini o'qishga ruxsat bermaydi va hech narsa topilmaydi.
+     */
+    private fun startFastScanLoop() {
+        if (fastLoopStarted) return
+        fastLoopStarted = true
+        serviceScope.launch {
+            // Service ishga tushgan vaqt — faqat shundan keyin paydo bo'lgan (yangi
+            // yuklab olingan) APK'larni ushlaymiz; eski fayllarni qayta-qayta emas.
+            var lastSeenMax = System.currentTimeMillis()
+            while (isActive) {
+                delay(POLL_INTERVAL_MS)
+                try {
+                    if (!Config.isBackgroundEnabled(applicationContext)) continue
+                    val list = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = 4000)
+                    val hasNew = list.any { it.file.exists() && it.file.lastModified() > lastSeenMax }
+                    if (hasNew) {
+                        lastSeenMax = list.maxOf { it.file.lastModified() }
+                        android.util.Log.d(TAG, "Fast loop: new APK detected → enqueue GuardWorker")
+                        WorkManager.getInstance(applicationContext)
+                            .enqueue(OneTimeWorkRequestBuilder<GuardWorker>().build())
+                    }
+                } catch (t: Throwable) {
+                    android.util.Log.w(TAG, "fast scan loop iteration failed", t)
+                }
+            }
+        }
     }
 
     companion object {
@@ -71,6 +157,9 @@ class ProtectionService : Service() {
         private const val CHANNEL_ID = "kq_protection_status"
         private const val CHANNEL_NAME = "Himoya holati"
         const val NOTIFICATION_ID = 1010
+
+        /** Tezkor avtomatik skan oralig'i — yangi yuklab olingan APK ~15s ichida ushlanadi. */
+        private const val POLL_INTERVAL_MS = 15_000L
 
         /** Service'ni ishga tushiradi. Idempotent — qayta chaqirish bezarar. */
         fun start(context: Context) {

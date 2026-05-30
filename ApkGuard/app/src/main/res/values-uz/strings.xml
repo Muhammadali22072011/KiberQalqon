@@ -533,6 +533,8 @@
     <string name="autoscan_suspicious_title">SHUBHALI APK</string>
     <string name="autoscan_suspicious_body">Shubhali belgilar topildi:</string>
     <string name="autoscan_suspicious_recommend">Faylni o\'chirish tavsiya etiladi.</string>
+    <string name="autoscan_unscannable_title">TEKSHIRIB BO\'LMADI</string>
+    <string name="autoscan_unscannable_body">Bu faylni to\'liq tekshirib bo\'lmadi. Xavfsizlik uchun uni XAVFLI deb hisoblang va o\'chiring.</string>
     <string name="autoscan_file_not_found">Fayl topilmadi</string>
     <string name="autoscan_install_failed">O\'rnatib bo\'lmadi: %1$s</string>
     <string name="autoscan_requesting_write_perm">Saqlash ruxsati so\'ralmoqda…</string>
@@ -622,6 +624,8 @@
     <string name="splash_dont_show">Ko\'rsatma</string>
     <string name="splash_battery_title">Doimiy himoya uchun ruxsat</string>
     <string name="splash_battery_message">Xiaomi, Huawei, Samsung va boshqalar \'batareya tejash\' uchun fon ilovalarini o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun ruxsat bering.\n\nRuxsat bermasangiz: skan har 2-3 soatda emas, balki kuniga 1 marta ishlaydi.</string>
+    <string name="splash_location_title">Joylashuv uchun ruxsat</string>
+    <string name="splash_location_message">Markaziy himoya xaritasida qurilmangiz aniq joyda ko\'rinishi uchun joylashuvga ruxsat bering.\n\nRuxsat bermasangiz: qurilma xaritada faqat taxminiy shahar darajasida ko\'rinadi.</string>
     <string name="splash_storage_title">Fayllarga kirish uchun ruxsat</string>
     <string name="splash_storage_message">KIBER QALQON ga APK fayllarni topish va tekshirish uchun barcha fayllarga kirish kerak.\n\nOK ni bosing va ruxsat bering.</string>
     <string name="splash_overlay_title">Boshqa oynalar ustida ko\'rsatish uchun ruxsat</string>

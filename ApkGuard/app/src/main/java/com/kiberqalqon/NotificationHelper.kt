@@ -159,6 +159,59 @@ object NotificationHelper {
     }
 
     /**
+     * Fon'da DANGER fayl avtomatik karantinga olingach ko'rsatiladi.
+     *
+     * MUHIM: ilgari GuardWorker faylni jim karantinga olardi va foydalanuvchiga
+     * HECH NARSA ko'rsatmasdi (faqat Telegram telemetriya). Natijada foydalanuvchi
+     * "ilova hech narsa qilmadi" deb o'ylardi. Endi — full-screen-intent bilan
+     * lock ekran ustida ham ko'rinadigan, tovushli bildirishnoma: "Virus o'chirildi".
+     *
+     * Bu Activity EMAS — shuning uchun MIUI keyguard bloklamaydi (POST_NOTIFICATION
+     * ruxsati yetarli). Tap → Dashboard (karantin tarixini ko'rish mumkin).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showQuarantinedNotification(
+        context: Context,
+        fileName: String,
+        reason: String,
+        originalPath: String? = null
+    ) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        // Tap / full-screen-intent → "Virus topildi va o'chirildi" OYNA (ilgari Splash ochilardi).
+        // already_handled: AutoScanActivity qayta skanlamaydi (fayl karantinda), natijani darhol ko'rsatadi.
+        val openIntent = Intent(context, AutoScanActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("apk_name", fileName)
+            if (!originalPath.isNullOrBlank()) putExtra("apk_path", originalPath)
+            putExtra("already_handled", true)
+            putExtra("verdict", "DANGER")
+            putExtra("reason", reason)
+        }
+        val pi = PendingIntent.getActivity(
+            context, 7100, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle("🛡️ Virus o'chirildi")
+            .setContentText("$fileName — avtomatik karantinga olindi")
+            .setStyle(NotificationCompat.BigTextStyle().bigText(
+                "$fileName fayli xavfli deb topildi va avtomatik o'chirildi (karantin).\n\n" +
+                    "Sabab: ${reason.take(200)}\n\n" +
+                    "Agar bu xato bo'lsa, 7 kun ichida tiklash mumkin."
+            ))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+            // Lock ekran ustida ko'rinishi uchun (Android 12 — full-screen intent auto-grant).
+            .setFullScreenIntent(pi, true)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(7100, builder.build())
+    }
+
+    /**
      * Уведомление после установки опасного APK. Тапание открывает системный диалог
      * удаления — юзер одним кликом сносит вирус.
      */
@@ -192,6 +245,9 @@ object NotificationHelper {
             // Full-screen intent: lock screen ustida ko'rinadi, telefon ochilsa
             // tizim avtomatik ravishda uninstall dialogini ochadi.
             .setFullScreenIntent(pi, true)
+            // Ko'rinadigan "O'chirish" tugmasi — foydalanuvchi butun bildirishnomani emas,
+            // to'g'ridan-to'g'ri tugmani bosib uninstall dialogini ochadi.
+            .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), pi)
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(pkg.hashCode() and 0x7FFFFFFF, builder.build())
     }
@@ -339,6 +395,7 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .setContentIntent(pi)
+            .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), pi)
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(pkg.hashCode() and 0x7FFFFFFF, builder.build())
     }

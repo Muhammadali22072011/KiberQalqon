@@ -73,22 +73,3 @@ export const riskColor = (s: number): string => {
   const v = Math.max(0, Math.min(100, s || 0));
   return `hsl(${(150 * (1 - v / 100)).toFixed(0)},82%,55%)`;
 };
-
-// Inson huquqlari / komponentlarning o'zbekcha nomlari.
-export const PERM_UZ: Record<string, string> = {
-  view_all: 'Hammasini ko‘rish',
-  view_map: 'Xaritani ko‘rish',
-  view_feed: 'Oqimni ko‘rish',
-  view_devices: 'Qurilmalarni ko‘rish',
-  view_threats: 'Tahdidlarni ko‘rish',
-  delete_threat: 'Tahdidni o‘chirish',
-  export: 'Eksport qilish',
-  manage_roles: 'Rollarni boshqarish',
-  manage_news: 'E‘lonlarni boshqarish',
-};
-export const COMP_UZ: Record<string, string> = {
-  map: 'Xarita', feed: 'Oqim', devices: 'Qurilmalar',
-  threats: 'Tahdidlar', roles: 'Rollar', news: 'E‘lonlar', overview: 'Bosh sahifa',
-};
-export const permUz = (p: string): string => PERM_UZ[p] || p;
-export const compUz = (c: string): string => COMP_UZ[c] || c;

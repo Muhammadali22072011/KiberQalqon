@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { checkAdminSecret, checkDeviceSecret } from '../../lib/auth.js';
-import { readGeo, jitterGeo } from '../../lib/geo.js';
+import { resolveGeo, clientIp } from '../../lib/geo.js';
 
 // Ikkita yo'l bitta dinamik route'da (Hobby 12-funksiya limiti uchun):
 //   /api/device/register → handleRegister (x-device-secret, POST) — qurilma o'zini yozadi
@@ -49,6 +49,9 @@ type RegisterBody = {
   name?: string;
   android_ver?: string;
   app_ver?: string;
+  lat?: number | string;
+  lng?: number | string;
+  loc_accuracy_m?: number | string;
 };
 
 async function handleRegister(req: VercelRequest, res: VercelResponse) {
@@ -68,13 +71,17 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     last_seen: new Date().toISOString(),
   };
 
-  // Geo — Vercel IP sarlavhalaridan (mavjud bo'lsa). Null bo'lsa eski
-  // qiymatni ustiga yozmaymiz (lokal dev'da sarlavhalar bo'lmaydi).
-  const geo = jitterGeo(readGeo(req), b.device_token);
+  // Geo — qurilma GPS yuborgan bo'lsa aniq nuqta (jittersiz); aks holda IP geo + jitter.
+  // Null bo'lsa eski qiymatni ustiga yozmaymiz (lokal dev'da sarlavhalar bo'lmaydi).
+  const geo = resolveGeo(req, b, b.device_token);
   if (geo.country != null) row.country = geo.country;
   if (geo.city != null) row.city = geo.city;
   if (geo.lat != null) row.lat = geo.lat;
   if (geo.lng != null) row.lng = geo.lng;
+
+  // IP — egasi paneli uchun (null bo'lsa eski qiymatni o'chirmaymiz).
+  const ip = clientIp(req);
+  if (ip) row.ip = ip;
 
   const { data, error } = await db()
     .from('devices')

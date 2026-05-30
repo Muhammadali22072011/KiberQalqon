@@ -6,13 +6,12 @@ const SECURITY = [
   { icon: '🔑', title: 'Master kalit', text: 'ADMIN_SECRET hech qachon APK ichida emas — faqat panel kirishida ishlatiladi va brauzerda saqlanmaydi.' },
   { icon: '⏱', title: 'Qisqa sessiya', text: 'Kirgach faqat qisqa muddatli token beriladi; u sessiya tugashi bilan o‘chadi.' },
   { icon: '📱', title: 'Qurilma siri', text: 'APK ichidagi DEVICE_SHARED_SECRET faqat o‘z maʼlumotini yuborish uchun — boshqalarnikini ko‘ra olmaydi.' },
-  { icon: '🧾', title: 'Audit jurnali', text: 'Maxfiy kirishga har bir urinish (kim, qachon, muvaffaqiyatlimi) yozib boriladi.' },
   { icon: '🛰', title: 'Server kalitlari', text: 'Supabase va Telegram kalitlari faqat serverda (Vercel env) — brauzerga umuman chiqmaydi.' },
   { icon: '🔒', title: 'Qat‘iy CSP', text: 'Sahifa qat‘iy Content-Security-Policy bilan himoyalangan — begona skript yuklanmaydi.' },
 ];
 
 export default function Profile() {
-  const { logout } = useAuth();
+  const { isOwner, name, logout } = useAuth();
   const nav = useNavigate();
   const doLogout = () => { logout(); nav('/'); };
 
@@ -24,24 +23,45 @@ export default function Profile() {
       </div>
 
       <div className="grid map-grid">
-        <Panel>
-          <PanelHead sub="Hisob" title="Egasi (Super-admin)" />
-          <div className="body-pad">
-            <div className="pp-rows" style={{ borderTop: 'none' }}>
-              <div><span>Rol</span><b>Egasi · to‘liq huquq</b></div>
-              <div><span>Sessiya</span><b style={{ color: 'var(--primary)' }}>Faol</b></div>
-              <div><span>Kirish usuli</span><b>Master kalit (+2FA)</b></div>
-              <div><span>Til</span><b>O‘zbekcha</b></div>
+        {isOwner ? (
+          <Panel>
+            <PanelHead sub="Hisob" title="Egasi (Super-admin)" />
+            <div className="body-pad">
+              <div className="pp-rows" style={{ borderTop: 'none' }}>
+                <div><span>Rol</span><b>Egasi · to‘liq huquq</b></div>
+                <div><span>Sessiya</span><b style={{ color: 'var(--primary)' }}>Faol</b></div>
+                <div><span>Kirish usuli</span><b>Master kalit (+2FA)</b></div>
+                <div><span>Til</span><b>O‘zbekcha</b></div>
+              </div>
+              <div className="note ok" style={{ marginTop: 14 }}>
+                <span className="ni">✓</span>
+                <span>Siz to‘liq huquqli egasiz: e‘lonlar, qurilmalar va tahdidlarning barchasini boshqarasiz.</span>
+              </div>
+              <button className="btn danger block" style={{ marginTop: 14 }} onClick={doLogout}>
+                ⎋ Tizimdan chiqish
+              </button>
             </div>
-            <div className="note ok" style={{ marginTop: 14 }}>
-              <span className="ni">✓</span>
-              <span>Siz to‘liq huquqli egasiz: rollar, e‘lonlar, qurilmalar va tahdidlarning barchasini boshqarasiz.</span>
+          </Panel>
+        ) : (
+          <Panel>
+            <PanelHead sub="Hisob" title="Admin" />
+            <div className="body-pad">
+              <div className="pp-rows" style={{ borderTop: 'none' }}>
+                <div><span>Hisob</span><b>{name || 'Admin'}</b></div>
+                <div><span>Sessiya</span><b style={{ color: 'var(--primary)' }}>Faol</b></div>
+                <div><span>Kirish usuli</span><b>Login + parol</b></div>
+                <div><span>Til</span><b>O‘zbekcha</b></div>
+              </div>
+              <div className="note" style={{ marginTop: 14 }}>
+                <span className="ni">ℹ️</span>
+                <span>Siz hamma ma‘lumotni ko‘rasiz, eksport qilasiz va e‘lon joylaysiz. Ma‘lumotni o‘zgartirish/o‘chirish faqat egada.</span>
+              </div>
+              <button className="btn danger block" style={{ marginTop: 14 }} onClick={doLogout}>
+                ⎋ Tizimdan chiqish
+              </button>
             </div>
-            <button className="btn danger block" style={{ marginTop: 14 }} onClick={doLogout}>
-              ⎋ Tizimdan chiqish
-            </button>
-          </div>
-        </Panel>
+          </Panel>
+        )}
 
         <Panel>
           <PanelHead sub="Himoya" title="Xavfsizlik holati" />

@@ -28,6 +28,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Geo-monitoring: qurilma o'z aniq joylashuvini markaziy xaritaga yuboradi.
+         FAQAT "Jamoatchilik xavfsizligi" opt-in yoqilgan bo'lsa so'raladi va yuboriladi
+         (CloudTelemetry darvozasi). Rad etilsa — server IP'dan shahar darajasida taxminlaydi.
+         Fon (background) joylashuv SO'RALMAYDI: koordinata faqat ilova ishlatilayotganda
+         (skan / ishga tushish) o'qiladi. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Android 14+ (API 34): antivirus ilovasi uchun "specialUse" foreground type
          talab qilinadi. ProtectionService doimiy himoya bildirishnomasi uchun. -->
@@ -134,21 +142,25 @@
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon" />
 
-        <!-- Maxfiy kirish (rollar tizimi). Sozlamalardagi 4 tugma kombinatsiyasi
-             orqali ochiladi. exported=false — tashqi intent bilan ochib bo'lmaydi;
-             excludeFromRecents — so'nggi ilovalar ro'yxatida ko'rinmaydi. -->
-        <activity
-            android:name=".SecretAccessActivity"
-            android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
-            android:screenOrientation="portrait"
-            android:excludeFromRecents="true"
-            android:taskAffinity="" />
-
         <activity
             android:name=".ReportProblemActivity"
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- Boshqaruv paneli (admin) — veb-panelni ilova ichida WebView orqali ochadi.
+             exported=false: tashqi intent bilan ochib bo'lmaydi. -->
+        <activity
+            android:name=".AdminPanelActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+
+        <!-- Himoya holati — kirishda barcha ruxsat/sozlamalarni ko'rsatadi. -->
+        <activity
+            android:name=".ProtectionStatusActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
 
         <!-- Окно предупреждения - поверх всех окон.
              exported=false: запускается только нашим WorkManager/FileObserver, никаких внешних intent.

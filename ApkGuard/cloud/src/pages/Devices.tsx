@@ -3,6 +3,7 @@ import { usePoll } from '../hooks/usePoll';
 import { apiGet, type DeviceRow, type ScanRow } from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner, VerdictBadge } from '../components/ui';
 import { agoSafe, catUz, riskColor, uzDateSafe } from '../lib/format';
+import { nearestCity } from '../lib/uzRegions';
 
 function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const [dev, setDev] = useState<DeviceRow | null>(null);
@@ -33,7 +34,8 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
         ) : (
           <>
             <div className="pp-rows" style={{ borderTop: 'none' }}>
-              <div><span>Joylashuv</span><b>{(dev.city || '—') + ', ' + (dev.country || 'UZ')}</b></div>
+              <div><span>Joylashuv</span><b>{((nearestCity(dev.lat, dev.lng) || dev.city) || '—') + ', ' + (dev.country || 'UZ')}</b></div>
+              <div><span>IP manzil</span><b className="mono">{dev.ip || '—'}</b></div>
               <div><span>Android</span><b>{dev.android_ver || '—'}</b></div>
               <div><span>Ilova versiyasi</span><b>{dev.app_ver || '—'}</b></div>
               <div><span>Xavf bali</span><b style={{ color: riskColor(dev.risk_score || 0) }}>{Math.round(dev.risk_score || 0)}</b></div>
@@ -102,7 +104,7 @@ export default function Devices() {
                     return (
                       <tr key={d.id} className="click" onClick={() => setSel(d.id)}>
                         <td><b>{d.name || 'Qurilma'}</b></td>
-                        <td style={{ color: 'var(--ink-2)' }}>{d.city || '—'}</td>
+                        <td style={{ color: 'var(--ink-2)' }}>{nearestCity(d.lat, d.lng) || d.city || '—'}</td>
                         <td className="num">{d.scan_count || 0}</td>
                         <td className={'num' + ((d.danger_count || 0) > 0 ? ' dgr' : '')}>{d.danger_count || 0}</td>
                         <td>

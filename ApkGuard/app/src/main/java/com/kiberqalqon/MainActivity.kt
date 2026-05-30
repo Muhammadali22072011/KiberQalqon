@@ -1,3 +1,11 @@
+/*
+ *  #### #  # #### #  #    #  # #### #  #     ← END (asosiy ekran / UI)
+ *  #    #  # #    # #     #  # #  # #  #
+ *  ###  #  # #    ##      #### #  # #  #
+ *  #    #  # #    # #       #  #  # #  #
+ *  #    #### #### #  #      #  #### ####
+ *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ */
 package com.kiberqalqon
 
 import android.Manifest
@@ -6,16 +14,20 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
 import com.kiberqalqon.databinding.ActivityMainBinding
-import com.kiberqalqon.databinding.ItemNewsBinding
+import com.kiberqalqon.databinding.DialogNewsBinding
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -30,9 +42,16 @@ class MainActivity : AppCompatActivity() {
     private var scanStarted = false
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var multiPathObserver: MultiPathFileObserver? = null
-    // Har bir lenta yangilanishida o'sadi — kechikkan rasm yuklashlari eski
-    // ko'rinishga tushmasligi uchun callback'da solishtiramiz.
-    private var newsGen = 0
+
+    // Beruvchi lenta (news ticker) holati.
+    private var tickerAdapter: NewsTickerAdapter? = null
+    private var lastNewsSig: String? = null
+    private val tickerHandler = Handler(Looper.getMainLooper())
+    private var tickerRunnable: Runnable? = null
+    private var tickerPaused = false
+    private var tickerAccum = 0f
+    // Kadrlararo siljish (~0.7dp/16ms ≈ 44dp/s) — sokin, o'qish mumkin bo'lgan tezlik.
+    private val tickerStepPx by lazy { (resources.displayMetrics.density * 0.7f).coerceAtLeast(1f) }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -145,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 is NewsClient.Result.Success -> renderNews(result.items)
                 else -> {
                     // NotConfigured / NetworkError — jim yashiramiz (bor lentani buzmaymiz).
-                    if (binding.newsContainer.childCount == 0) {
+                    if (tickerAdapter == null) {
                         binding.newsSection.visibility = View.GONE
                     }
                 }
@@ -154,45 +173,119 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderNews(items: List<NewsClient.NewsItem>) {
-        newsGen++
-        val container = binding.newsContainer
-        container.removeAllViews()
         if (items.isEmpty()) {
             binding.newsSection.visibility = View.GONE
+            stopTicker()
+            tickerAdapter = null
+            lastNewsSig = null
+            binding.newsTicker.adapter = null
             return
         }
-        val gen = newsGen
-        items.forEachIndexed { idx, item ->
-            val ib = ItemNewsBinding.inflate(layoutInflater, container, false)
-            ib.newsItemTitle.text = item.title
-            ib.newsItemDate.text = shortDate(item.createdAt)
 
-            val accent = when (item.level) {
-                "critical" -> R.color.kq_danger
-                "warning" -> R.color.kq_warn
-                else -> R.color.kq_ink_3
-            }
-            ib.newsAccent.setBackgroundColor(ContextCompat.getColor(this, accent))
+        val rv = binding.newsTicker
+        if (rv.layoutManager == null) {
+            rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            rv.setHasFixedSize(true)
+            attachTickerTouchPause(rv)
+        }
 
-            if (item.body.isNotBlank()) {
-                ib.newsItemBody.text = item.body
-                ib.newsItemBody.visibility = View.VISIBLE
-            }
+        // Bir xil e'lonlar bo'lsa — adapterni qayta qurmaymiz (rasm keshi saqlanadi,
+        // har onResume'da qayta yuklab miltillamaydi). Faqat lentani qayta yoqamiz.
+        val sig = items.joinToString("|") { it.id + "" + it.imageUrl + "" + it.title }
+        if (sig == lastNewsSig && tickerAdapter != null) {
+            binding.newsSection.visibility = View.VISIBLE
+            startTicker(rv)
+            return
+        }
+        lastNewsSig = sig
 
-            ib.newsItemDivider.visibility = if (idx == items.lastIndex) View.GONE else View.VISIBLE
+        val ad = NewsTickerAdapter(items) { openNewsDialog(it) }
+        tickerAdapter = ad
+        rv.adapter = ad
+        // Cheksiz ro'yxat o'rtasidan boshlaymiz — foydalanuvchi ikki tomonga ham sura oladi.
+        rv.scrollToPosition(items.size * 1000)
+        binding.newsSection.visibility = View.VISIBLE
+        startTicker(rv)
+    }
 
-            if (item.imageUrl.startsWith("http")) {
-                NewsClient.loadImage(item.imageUrl) { bmp ->
-                    if (bmp != null && gen == newsGen && !isFinishing && !isDestroyed) {
-                        ib.newsItemImage.setImageBitmap(bmp)
-                        ib.newsItemImage.visibility = View.VISIBLE
+    // Lentani uzluksiz suradi (har ~16ms da bir oz). Bir nechta e'lon bo'lsagina harakatlanadi.
+    private fun startTicker(rv: RecyclerView) {
+        stopTicker()
+        tickerPaused = false
+        val r = object : Runnable {
+            override fun run() {
+                if (isFinishing || isDestroyed) return
+                if (!tickerPaused && (tickerAdapter?.realCount ?: 0) > 1) {
+                    tickerAccum += tickerStepPx
+                    val dx = tickerAccum.toInt()
+                    if (dx > 0) {
+                        rv.scrollBy(dx, 0)
+                        tickerAccum -= dx
                     }
                 }
+                tickerHandler.postDelayed(this, 16)
             }
-
-            container.addView(ib.root)
         }
-        binding.newsSection.visibility = View.VISIBLE
+        tickerRunnable = r
+        tickerHandler.postDelayed(r, 16)
+    }
+
+    private fun stopTicker() {
+        tickerRunnable?.let { tickerHandler.removeCallbacks(it) }
+        tickerRunnable = null
+    }
+
+    // Foydalanuvchi lentaga tegsa — to'xtaymiz; qo'yib yuborgach biroz kutib davom etamiz.
+    // false qaytaramiz → kartochka bosilishi (klik) baribir ishlaydi.
+    private fun attachTickerTouchPause(rv: RecyclerView) {
+        rv.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when (e.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> tickerPaused = true
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                        tickerHandler.postDelayed({ tickerPaused = false }, 1800)
+                }
+                return false
+            }
+        })
+    }
+
+    // Kartochka bosilganda to'liq e'lonni dialogda ochamiz (rasm + matn).
+    private fun openNewsDialog(item: NewsClient.NewsItem) {
+        val db = DialogNewsBinding.inflate(layoutInflater)
+        db.newsDlgTitle.text = item.title
+        db.newsDlgDate.text = shortDate(item.createdAt)
+        if (item.body.isNotBlank()) {
+            db.newsDlgBody.text = item.body
+        } else {
+            db.newsDlgBody.visibility = View.GONE
+        }
+
+        val (lvlText, lvlColor) = when (item.level) {
+            "critical" -> "Muhim" to R.color.kq_danger
+            "warning" -> "Ogohlantirish" to R.color.kq_warn
+            else -> "E'lon" to R.color.kq_primary
+        }
+        db.newsDlgLevel.text = lvlText
+        db.newsDlgLevel.setTextColor(ContextCompat.getColor(this, lvlColor))
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(db.root)
+            .create()
+        dialog.window?.setBackgroundDrawable(
+            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+        )
+        db.newsDlgClose.setOnClickListener { dialog.dismiss() }
+
+        if (item.imageUrl.startsWith("http")) {
+            NewsClient.loadImage(item.imageUrl) { bmp ->
+                if (bmp != null && !isFinishing && !isDestroyed) {
+                    db.newsDlgImage.setImageBitmap(bmp)
+                    db.newsDlgImage.visibility = View.VISIBLE
+                }
+            }
+        }
+        dialog.show()
     }
 
     // "2026-05-29T06:00:00Z" → "29.05.2026"; parse qila olmasak — bo'sh.
@@ -442,14 +535,31 @@ class MainActivity : AppCompatActivity() {
         }
         loadNews()
     }
-    
+
+    override fun onPause() {
+        super.onPause()
+        // Ekran ko'rinmasa — lentani to'xtatamiz (Handler callback'lari osilib qolmasin).
+        stopTicker()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         scope.cancel()
         stopFileObserver()
+        stopTicker()
     }
     
     private fun startFileObserver() {
+        // Fon himoyasi yoqilgan bo'lsa (default), real-time kuzatuvchini
+        // ProtectionService 24/7 yuritadi — bu yerda takror ishga tushirmaymiz,
+        // aks holda bitta yangi APK ikki observer'ga tushib, ikki marta
+        // download_detected telemetriya/bildirishnoma yuborardi. MainActivity faqat
+        // fon himoyasi O'CHIRILGAN holatda (service yo'q) ekran ochiqligida kuzatadi.
+        if (Config.isBackgroundEnabled(this)) {
+            multiPathObserver = null
+            android.util.Log.d("MainActivity", "Skip MainActivity observer — ProtectionService owns it 24/7")
+            return
+        }
         try {
             // Используем MultiPathFileObserver для мониторинга всех папок!
             multiPathObserver = MultiPathFileObserver(applicationContext, scope)

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { checkAdminSecret, checkDeviceSecret } from '../lib/auth.js';
+import { canManageNews, canRead, checkDeviceSecret } from '../lib/auth.js';
 
 // Yangiliklar / e'lonlar — panel bosh sahifasidagi lenta + APK bosh ekrani.
 //   GET  → o'qish: panel (x-admin-secret) YOKI qurilma (x-device-secret).
@@ -16,8 +16,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const sb = db();
 
   if (req.method === 'GET') {
-    // O'qish: panel (admin) yoki qurilma (APK) — ikkalasi ham ko'ra oladi.
-    if (!checkAdminSecret(req) && !checkDeviceSecret(req)) {
+    // O'qish: kirgan panel foydalanuvchisi (egasi yoki admin) YOKI qurilma (APK,
+    // x-device-secret). E'lonlar hamma uchun — APK bosh ekranda lentani ko'rsatadi.
+    if (!canRead(req) && !checkDeviceSecret(req)) {
       return res.status(401).json({ ok: false, error: 'auth' });
     }
     const { data, error } = await sb
@@ -31,8 +32,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'POST') {
-    // Yozish faqat admin panelida — qurilma siri e'lon qo'sha olmaydi.
-    if (!checkAdminSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+    // Yozish: egasi YOKI cheklangan admin (admin uchun yagona "yozish" huquqi — e'lonlar).
+    // Qurilma siri e'lon qo'sha olmaydi.
+    if (!canManageNews(req)) return res.status(401).json({ ok: false, error: 'auth' });
     const b = (req.body ?? {}) as Record<string, unknown>;
     const action = String(b.action ?? '');
 

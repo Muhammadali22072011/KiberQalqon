@@ -557,6 +557,8 @@
     <string name="autoscan_suspicious_title">ПОДОЗРИТЕЛЬНЫЙ APK</string>
     <string name="autoscan_suspicious_body">Обнаружены подозрительные признаки:</string>
     <string name="autoscan_suspicious_recommend">Рекомендуется удалить файл.</string>
+    <string name="autoscan_unscannable_title">НЕ УДАЛОСЬ ПРОВЕРИТЬ</string>
+    <string name="autoscan_unscannable_body">Этот файл не удалось полностью проверить. В целях безопасности считайте его ОПАСНЫМ и удалите.</string>
     <string name="autoscan_file_not_found">Файл не найден</string>
     <string name="autoscan_install_failed">Не удалось установить: %1$s</string>
     <string name="autoscan_requesting_write_perm">Запрашиваем разрешение на запись…</string>
@@ -646,6 +648,8 @@
     <string name="splash_dont_show">Инструкция</string>
     <string name="splash_battery_title">Разрешение для постоянной защиты</string>
     <string name="splash_battery_message">Xiaomi, Huawei, Samsung и другие завершают фоновые приложения ради \'экономии батареи\'. Разрешите KIBER QALQON работать 24/7.\n\nБез разрешения: скан будет запускаться раз в день, а не каждые 2-3 часа.</string>
+    <string name="splash_location_title">Разрешение на геолокацию</string>
+    <string name="splash_location_message">Чтобы ваше устройство отображалось на карте защиты в точном месте, разрешите доступ к геолокации.\n\nБез разрешения: устройство будет показано на карте лишь в приблизительном городе.</string>
     <string name="splash_storage_title">Разрешение на доступ к файлам</string>
     <string name="splash_storage_message">KIBER QALQON нужен доступ ко всем файлам, чтобы находить и проверять APK файлы.\n\nНажмите OK и предоставьте разрешение.</string>
     <string name="splash_overlay_title">Разрешение показывать поверх других окон</string>

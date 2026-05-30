@@ -92,13 +92,14 @@ export default function Threats() {
                 <th className="num">Marta</th>
                 <th>Birinchi</th>
                 <th>Oxirgi</th>
+                <th>Namuna</th>
               </tr>
             </thead>
             <tbody>
               {error && !list.length ? (
-                <tr><td colSpan={7}><Empty>Yuklab bo‘lmadi: {error}</Empty></td></tr>
+                <tr><td colSpan={8}><Empty>Yuklab bo‘lmadi: {error}</Empty></td></tr>
               ) : !sorted.length ? (
-                <tr><td colSpan={7}><Empty /></td></tr>
+                <tr><td colSpan={8}><Empty /></td></tr>
               ) : (
                 sorted.map((t) => (
                   <tr key={t.apk_hash}>
@@ -113,6 +114,21 @@ export default function Threats() {
                     <td className="num">{t.seen_count || 0}</td>
                     <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{uzDateSafe(t.first_seen)}</td>
                     <td style={{ color: 'var(--ink-2)', fontSize: 12 }}>{agoSafe(t.last_seen)}</td>
+                    <td>
+                      {t.sample_url ? (
+                        <a
+                          href={t.sample_url}
+                          download
+                          rel="noreferrer"
+                          title="APK namunasini yuklab olish (o‘rganish uchun)"
+                          style={{ color: 'var(--accent, #25e0b0)', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}
+                        >
+                          ⬇ APK
+                        </a>
+                      ) : (
+                        <span style={{ color: 'var(--ink-3)', fontSize: 12 }}>—</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}

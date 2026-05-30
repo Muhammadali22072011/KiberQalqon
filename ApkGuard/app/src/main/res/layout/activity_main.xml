@@ -618,23 +618,16 @@
                                 android:background="@color/kq_hairline" />
                         </LinearLayout>
 
-                        <com.google.android.material.card.MaterialCardView
+                        <!-- Beruvchi lenta: e'lonlar gorizontal va uzluksiz suriladi.
+                             Kartochka bosilsa — to'liq e'lon dialogda ochiladi. -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/newsTicker"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            app:cardBackgroundColor="@color/kq_bg_elev"
-                            app:cardCornerRadius="22dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="@color/kq_hairline"
-                            app:strokeWidth="1dp">
-
-                            <LinearLayout
-                                android:id="@+id/newsContainer"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingVertical="4dp" />
-                        </com.google.android.material.card.MaterialCardView>
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never" />
                     </LinearLayout>
 
                     <!-- ─── Section header: tvCount ko'rsatadi "Topilgan APK: N" / "Tekshirilmoqda..." ─── -->

@@ -140,7 +140,7 @@ object NewsClient {
         return Result.Success(out)
     }
 
-    // ---- Konfiguratsiya (RoleAccessClient bilan bir xil BuildConfig) ------
+    // ---- Konfiguratsiya (CloudTelemetry bilan bir xil BuildConfig) ------
 
     private fun baseUrl(): String? {
         val u = BuildConfig.CLOUD_BASE_URL.trim().trimEnd('/')

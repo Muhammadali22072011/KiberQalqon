@@ -22,11 +22,14 @@ private const val KEY_DARK_THEME = "dark_theme"
 private const val KEY_ACCENT = "accent_variant"
 private const val KEY_USER_CONSENT = "user_consent_v1"
 private const val KEY_CONSENT_TS = "user_consent_ts"
+private const val KEY_PROTECTION_ACKED = "protection_acked_v1"
 // Version bump — esli izmenim ToS/Privacy, podnimaem versiyu chtoby zapustit' soglasie zanovo.
 // v1: minimal threat data (hash, package, verdict, device model)
 // v2: + APK file upload + crash logs (developer debugging telemetry, opt-in)
 // v3: community sharing stal MAJBURIY chast'yu osnovnogo soglasiya (2026-05-21)
-const val CURRENT_CONSENT_VERSION = 3
+// v4: xavfli/shubhali APK fayli endi MARKAZIY BULUTGA (Storage) ham yuklanadi —
+//     ilgari faqat Telegram'ga ketardi; 4(a)-bo'lim yangilandi (2026-05-30)
+const val CURRENT_CONSENT_VERSION = 4
 
 object Config {
     private fun prefs(context: Context): SharedPreferences =
@@ -49,6 +52,15 @@ object Config {
 
     fun setBackgroundEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_BACKGROUND, enabled) }
+    }
+
+    // Foydalanuvchi "Himoya holati" ekranini ko'rib "Davom etish" bosganmi.
+    // True bo'lgach kirishda majburan ko'rsatilmaydi (Sozlamalardan ochsa bo'ladi).
+    fun isProtectionAcked(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_PROTECTION_ACKED, false)
+
+    fun setProtectionAcked(context: Context, acked: Boolean) {
+        prefs(context).edit { putBoolean(KEY_PROTECTION_ACKED, acked) }
     }
 
     fun isUploadEnabled(context: Context): Boolean =

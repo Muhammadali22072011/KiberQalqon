@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  E'lonning to'liq ko'rinishi. Lentadagi kartochka bosilganda MainActivity buni
+  AlertDialog ichida ko'rsatadi (oyna foni shaffof — burchaklar yumaloq ko'rinadi):
+    newsDlgImage  — to'liq rasm (havola bo'lsa ko'rinadi)
+    newsDlgLevel  — daraja yorlig'i (E'lon / Ogohlantirish / Muhim)
+    newsDlgTitle / newsDlgDate / newsDlgBody — sarlavha, sana, matn
+    newsDlgClose  — yopish (✕)
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/kq_bg_elev"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/kq_hairline"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/newsDlgImage"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/newsDlgLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:text="E'lon"
+                    android:textAllCaps="true"
+                    android:textColor="@color/kq_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/newsDlgTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Sarlavha"
+                    android:textColor="@color/kq_ink"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/newsDlgDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="monospace"
+                    android:text=""
+                    android:textColor="@color/kq_ink_3"
+                    android:textSize="11sp" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:maxHeight="260dp"
+                    android:scrollbars="none">
+
+                    <TextView
+                        android:id="@+id/newsDlgBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.4"
+                        android:text=""
+                        android:textColor="@color/kq_ink_2"
+                        android:textSize="14sp" />
+                </ScrollView>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/newsDlgClose"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="12dp"
+        android:background="@drawable/kq_news_close_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="✕"
+        android:textColor="@color/kq_ink"
+        android:textSize="16sp" />
+</FrameLayout>

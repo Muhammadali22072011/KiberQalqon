@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { usePoll } from '../hooks/usePoll';
 import { apiGet, type FeedItem, type Stats, type ThreatFamily } from '../lib/api';
 import { Empty, Kpi, LivePill, Panel, PanelHead, Spinner, VerdictBadge } from '../components/ui';
+import NewsCarousel from '../components/NewsCarousel';
 import { agoSafe, catUz, SEV_COLOR, VERDICT_DOT } from '../lib/format';
 
 export default function Overview() {
@@ -38,7 +39,9 @@ export default function Overview() {
         </div>
       )}
 
-      <div className="grid cols-2">
+      <NewsCarousel />
+
+      <div className="grid cols-2 gap-top">
         <Panel>
           <PanelHead sub="Real vaqt" title="So‘nggi tahdidlar" right={<LivePill />} />
           <div className="feed-scroll">
@@ -108,10 +111,10 @@ export default function Overview() {
           <h3>Qurilmalar</h3>
           <p>Himoyalangan qurilmalar ro‘yxati, xavf darajasi va skan tarixi.</p>
         </Link>
-        <Link to="/app/roles" className="lfeat" style={{ cursor: 'pointer' }}>
-          <div className="lf-ico">🔐</div>
-          <h3>Rollar</h3>
-          <p>Operatorlarga huquq bering, soatlik maxfiy kodni boshqaring.</p>
+        <Link to="/app/news" className="lfeat" style={{ cursor: 'pointer' }}>
+          <div className="lf-ico">📰</div>
+          <h3>E‘lonlar</h3>
+          <p>Rahbariyat e‘lonlari va yangiliklar lentasi.</p>
         </Link>
       </div>
     </>

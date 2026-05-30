@@ -76,6 +76,17 @@ class GuardWorker(
                         when (q) {
                             is Quarantine.Result.Ok -> {
                                 Log.w(TAG, "Auto-quarantined: ${item.name} — ${result.reason}")
+                                // MUHIM: foydalanuvchiga TELEFONDA ko'rsatamiz. Ekran ochiq bo'lsa —
+                                // popup OYNA ("Virus topildi va o'chirildi"), aks holda full-screen
+                                // notification (u ham shu oynani ochadi). Ilgari faqat notification
+                                // edi — foydalanuvchi "oyna chiqmadi" deb shikoyat qilgan.
+                                try {
+                                    showThreatHandledAlert(
+                                        item.name, result.reason, item.file.absolutePath
+                                    )
+                                } catch (e: Throwable) {
+                                    Log.w(TAG, "threat-handled alert failed", e)
+                                }
                                 // "Bloklandi" skan paytida sanalgan (ApkScanner, DANGER) — bu yerda qayta emas.
                                 try {
                                     TelemetryReporter.report(
@@ -132,15 +143,27 @@ class GuardWorker(
     }
     
     /**
-     * Popup ochish. Android 10+ da fon'dan startActivity() jim ishlamaydi —
-     * shuning uchun avval canDrawOverlays() tekshirib, ruxsat yo'q bo'lsa
-     * full-screen-intent notification chiqaramiz (lock-screen ustida ko'rinadi,
-     * telefon ochilsa Activity avtomatik faollashadi).
+     * Tahdid haqida ogohlantirish.
+     *
+     * MUHIM TARIXIY XATO (Xiaomi/MIUI'da topildi, ADB bilan tasdiqlandi):
+     * ilgari bu funksiya `canDrawOverlays()` true bo'lsa darhol startActivity()
+     * chaqirardi va notification'ni FAQAT startActivity() exception bersa ko'rsatardi.
+     * Lekin MIUI ekran QULFLANGAN bo'lsa Activity'ni JIM bloklaydi
+     * (`MIUILOG- Permission Denied Activity KeyguardLocked`) — exception BERMAYDI.
+     * Natijada: popup ham chiqmaydi, fallback notification ham chiqmaydi →
+     * foydalanuvchi HECH NARSA ko'rmaydi. Aynan foydalanuvchi shikoyat qilgan holat.
+     *
+     * Yangi mantiq:
+     *  • Ekran ochiq VA qulfsiz → to'g'ridan-to'g'ri popup (eng tezkor, eng aniq).
+     *  • Ekran qulflangan/o'chiq → full-screen-intent notification (MIUI lock ekran
+     *    ustida ham ruxsat beradi, tovush+tebranish bilan; telefon ochilsa Activity
+     *    avtomatik ochiladi). Bu — MIUI'da yagona ishonchli kanal.
      */
     private fun showAutoScanPopup(apkPath: String, apkName: String) {
         val ctx = applicationContext
         val file = java.io.File(apkPath)
-        if (ImprovedApkFileObserver.canLaunchActivityFromBackground(ctx)) {
+        val screenUsable = isScreenInteractiveAndUnlocked(ctx)
+        if (screenUsable && ImprovedApkFileObserver.canLaunchActivityFromBackground(ctx)) {
             try {
                 val intent = Intent(ctx, AutoScanActivity::class.java).apply {
                     putExtra("apk_path", apkPath)
@@ -155,10 +178,68 @@ class GuardWorker(
                 Log.w(TAG, "startActivity failed, fallback to notification", e)
             }
         }
+        // Qulflangan/o'chiq ekran (yoki startActivity muvaffaqiyatsiz) → notification.
         try {
             NotificationHelper.showScanNotification(ctx, file)
         } catch (e: Throwable) {
             Log.e(TAG, "Notification fallback failed", e)
+        }
+    }
+
+    /**
+     * Fon'da DANGER fayl avtomatik karantinga olingach foydalanuvchiga KO'RSATISH.
+     *
+     * Foydalanuvchi shikoyati: "fayl fonida o'chiriladi-yu, lekin OYNA chiqmaydi".
+     * Ilgari bu yerda faqat notification (showQuarantinedNotification) bor edi,
+     * popup OYNA umuman ochilmasdi. Endi:
+     *   • Ekran ochiq + qulfsiz → to'g'ridan-to'g'ri AutoScanActivity OYNA
+     *     ("Virus topildi va o'chirildi"; already_handled — qayta skanlamaydi).
+     *   • Ekran qulflangan/o'chiq → full-screen-intent notification; u ham AYNAN shu
+     *     oynani ochadi (telefon yoqilganda), Splash emas.
+     */
+    private fun showThreatHandledAlert(apkName: String, reason: String, originalPath: String) {
+        val ctx = applicationContext
+        if (isScreenInteractiveAndUnlocked(ctx) &&
+            ImprovedApkFileObserver.canLaunchActivityFromBackground(ctx)) {
+            try {
+                val intent = Intent(ctx, AutoScanActivity::class.java).apply {
+                    // fayl o'chgan, lekin yo'l matni manbani aniqlashga (Telegram/WhatsApp) kerak.
+                    putExtra("apk_path", originalPath)
+                    putExtra("apk_name", apkName)
+                    putExtra("already_handled", true)
+                    putExtra("verdict", "DANGER")
+                    putExtra("reason", reason)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
+                ctx.startActivity(intent)
+                return
+            } catch (e: Exception) {
+                Log.w(TAG, "handled popup startActivity failed, fallback to notification", e)
+            }
+        }
+        // Qulflangan/o'chiq ekran (yoki startActivity muvaffaqiyatsiz) → full-screen-intent
+        // notification (u ham shu "Virus o'chirildi" oynasini ochadi).
+        try {
+            NotificationHelper.showQuarantinedNotification(ctx, apkName, reason, originalPath)
+        } catch (e: Throwable) {
+            Log.w(TAG, "quarantine notification failed", e)
+        }
+    }
+
+    /**
+     * Ekran ayni paytda ochiq (interactive) VA qulfdan chiqarilganmi?
+     * Faqat shu holatda fon'dan startActivity() real ko'rinadi. Aks holda
+     * (qulflangan/o'chiq) MIUI uni jim bloklaydi — notification ishlatamiz.
+     */
+    private fun isScreenInteractiveAndUnlocked(ctx: Context): Boolean {
+        return try {
+            val pm = ctx.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            val km = ctx.getSystemService(Context.KEYGUARD_SERVICE) as android.app.KeyguardManager
+            pm.isInteractive && !km.isKeyguardLocked
+        } catch (_: Throwable) {
+            false
         }
     }
 }

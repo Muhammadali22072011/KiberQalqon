@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
@@ -25,7 +26,8 @@ import java.util.concurrent.TimeUnit
  * Bu CommunityReportClient (Telegram) dan ALOHIDA modul. Farqi:
  *   - CommunityReportClient: faqat DANGER/SUSPICIOUS ni dev Telegram'iga MATN qilib yuboradi.
  *   - CloudTelemetry: Vercel + Supabase backendiga STRUKTURALI JSON yuboradi, shunda panel:
- *       • xaritada qurilma nuqtasini ko'rsatadi (IP'dan shahar darajasidagi geo, GPS EMAS),
+ *       • xaritada qurilma nuqtasini ko'rsatadi (joylashuv ruxsati bo'lsa — aniq GPS;
+ *         bo'lmasa — server IP'dan shahar darajasida taxminlaydi),
  *       • "jami skan" / "topilgan virus" statistikasini chizadi (shuning uchun SAFE ham yuboriladi),
  *       • jonli tahdid oqimini to'ldiradi.
  *
@@ -36,11 +38,16 @@ import java.util.concurrent.TimeUnit
  *
  * Maxfiylik (aniq, yashirin maydonsiz):
  *   - device_token — TASODIFIY anonim ID (UUID), qurilmada saqlanadi.
- *     IMEI / seriya / MAC / telefon raqami / IP / GPS — HECH QACHON yuborilmaydi.
- *   - Geo — server tomonda Vercel IP sarlavhalaridan (shahar darajasi). Qurilma koordinata yubormaydi.
+ *     IMEI / seriya / MAC / telefon raqami — HECH QACHON yuborilmaydi.
+ *   - Geo — joylashuv ruxsati berilgan bo'lsa, qurilma o'z aniq koordinatasini (lat/lng)
+ *     yuboradi. Ruxsat bo'lmasa koordinata yuborilmaydi va server faqat IP'dan shahar
+ *     darajasida taxminlaydi. Fon joylashuvi so'ralmaydi (faqat oxirgi ma'lum nuqta).
  *   - Yuboriladi: qurilma modeli, Android versiyasi, ilova versiyasi va skan natijasi
  *     (apk_hash, paket nomi, yorliq, verdict, risk ball, sabablar, xavfli ruxsatlar).
- *   - APK faylning O'ZI yuborilmaydi. Boshqa ilovalar ro'yxati yuborilmaydi.
+ *   - APK faylning O'ZI — FAQAT xavfli/shubhali natijada — markaziy bulut Storage'iga
+ *     yuklanadi (50 MB gacha), yangi viruslarni o'rganish va himoya signaturalari
+ *     yaratish uchun. XAVFSIZ APK fayllari HECH QACHON yuklanmaydi. Boshqa ilovalar
+ *     ro'yxati yuborilmaydi. (Privacy Policy 4(a)-bo'lim.)
  */
 object CloudTelemetry {
 
@@ -49,6 +56,10 @@ object CloudTelemetry {
     private const val KEY_DEVICE_TOKEN = "device_token"
     private const val KEY_LAST_REGISTER_TS = "last_register_ts"
     private const val KEY_LAST_REGISTER_VER = "last_register_ver"
+    // Bulutga allaqachon yuklangan APK namuna hash'lari — qayta yuklamaslik uchun.
+    private const val KEY_UPLOADED_SAMPLES = "uploaded_samples"
+    // Storage'ga yuklanadigan eng katta APK (ConsentActivity 4(a) va'dasi bilan bir xil).
+    private const val MAX_SAMPLE_BYTES = 50L * 1024 * 1024
 
     // Register'ni har app start'da emas, 12 soatda bir marta (yoki ilova versiyasi
     // o'zgarsa) yuboramiz — 15 daqiqalik WorkManager wakeup'larida spam bo'lmasin.
@@ -62,7 +73,17 @@ object CloudTelemetry {
             .readTimeout(20, TimeUnit.SECONDS)
             .build()
     }
+    // APK namunasi 50 MB gacha bo'lishi mumkin — sekin mobil tarmoqda yozish uchun
+    // uzunroq write timeout (kichik JSON client'i bilan bir xil emas).
+    private val uploadClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
     private val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
+    private val APK_MEDIA = "application/vnd.android.package-archive".toMediaTypeOrNull()
 
     // ---- Public API -------------------------------------------------------
 
@@ -91,6 +112,8 @@ object CloudTelemetry {
             put("app_ver", "${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})")
         }
         scope.launch {
+            // putGeo aktiv GPS fix uchun bloklashi mumkin — IO oqimida (App.onCreate'da emas).
+            putGeo(ctx, body)
             val ok = postJson("$base/api/device/register", secret, body)
             if (ok) {
                 sp.edit()
@@ -139,7 +162,16 @@ object CloudTelemetry {
                     put("reasons", reasons)
                     put("perms", perms)
                 }
-                postJson("$base/api/scan/upload", secret, body)
+                putGeo(ctx, body)
+                val resp = postJsonForResult("$base/api/scan/upload", secret, body)
+                // Server xavfli/shubhali natija uchun imzolangan yuklash URL'i qaytarsa —
+                // APK namunasini to'g'ridan-to'g'ri Storage'ga yuklaymiz (o'rganish uchun).
+                // Xavfsiz APK'lar uchun server URL bermaydi → bu yer ham hech narsa qilmaydi.
+                if (resp != null &&
+                    (result.verdict == ScanResult.Verdict.DANGER ||
+                        result.verdict == ScanResult.Verdict.SUSPICIOUS)) {
+                    maybeUploadSample(ctx, resp, hash, file)
+                }
             } catch (e: Throwable) {
                 Log.w(TAG, "uploadScan failed", e)
             }
@@ -167,6 +199,19 @@ object CloudTelemetry {
     }
 
     // ---- Helpers ----------------------------------------------------------
+
+    /**
+     * Joylashuv ruxsati berilgan bo'lsa, qurilmaning aniq koordinatasini bodyga qo'shadi.
+     * currentFix() kesh bo'sh bo'lsa providerdan bir martalik aktiv fix so'raydi (bloklaydi),
+     * shuning uchun FAQAT IO oqimidan chaqiriladi. Ruxsat yo'q / joylashuv o'chiq bo'lsa —
+     * hech narsa qo'shilmaydi (server IP'dan shahar darajasida taxminlaydi).
+     */
+    private fun putGeo(ctx: Context, body: JSONObject) {
+        val fix = DeviceLocation.currentFix(ctx) ?: return
+        body.put("lat", fix.lat)
+        body.put("lng", fix.lng)
+        fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
+    }
 
     private fun prefs(ctx: Context): SharedPreferences =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -224,6 +269,79 @@ object CloudTelemetry {
             }
         } catch (e: Throwable) {
             Log.w(TAG, "postJson failed: $url", e)
+            false
+        }
+    }
+
+    /**
+     * postJson kabi, lekin javob MATNINI qaytaradi (muvaffaqiyatli bo'lsa) — chunki
+     * /api/scan/upload xavfli natija uchun "sample_upload" URL'ini qaytarishi mumkin.
+     * Xato/muvaffaqiyatsiz bo'lsa null.
+     */
+    private fun postJsonForResult(url: String, secret: String, body: JSONObject): String? {
+        return try {
+            val req = Request.Builder()
+                .url(url)
+                .header("x-device-secret", secret)
+                .post(body.toString().toRequestBody(JSON))
+                .build()
+            client.newCall(req).execute().use { resp ->
+                val text = resp.body?.string()
+                if (!resp.isSuccessful) {
+                    Log.w(TAG, "POST $url -> ${resp.code}: ${text?.take(180)}")
+                    null
+                } else text
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "postJsonForResult failed: $url", e)
+            null
+        }
+    }
+
+    /**
+     * Server "sample_upload" URL'i bergan bo'lsa, APK faylni o'sha imzolangan
+     * Storage URL'iga PUT qiladi. Faqat xavfli/shubhali natijada chaqiriladi.
+     * Shartlar: fayl o'qiladigan, 1..50MB, va shu qurilmadan bu hash hali yuborilmagan.
+     */
+    private fun maybeUploadSample(ctx: Context, responseBody: String, hash: String, file: File) {
+        try {
+            val url = JSONObject(responseBody)
+                .optJSONObject("sample_upload")
+                ?.optString("url")
+                ?.takeIf { it.isNotBlank() } ?: return
+
+            if (!file.exists() || !file.canRead()) return
+            if (file.length() !in 1..MAX_SAMPLE_BYTES) return
+
+            val sp = prefs(ctx)
+            val done = sp.getStringSet(KEY_UPLOADED_SAMPLES, emptySet()) ?: emptySet()
+            if (hash in done) return  // shu qurilmadan allaqachon yuborilgan
+
+            if (putFile(url, file)) {
+                // Yangi to'plam (qaytarilgan set'ni o'zgartirmaymiz — Android talabi).
+                sp.edit().putStringSet(KEY_UPLOADED_SAMPLES, done + hash).apply()
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "maybeUploadSample failed", e)
+        }
+    }
+
+    /** APK faylni imzolangan Storage URL'iga yuklaydi (PUT). true — muvaffaqiyatli. */
+    private fun putFile(signedUrl: String, file: File): Boolean {
+        return try {
+            val req = Request.Builder()
+                .url(signedUrl)
+                .header("x-upsert", "true")  // bir xil hash qayta kelsa — qayta yoziladi
+                .put(file.asRequestBody(APK_MEDIA))
+                .build()
+            uploadClient.newCall(req).execute().use { resp ->
+                if (!resp.isSuccessful) {
+                    Log.w(TAG, "sample PUT -> ${resp.code}: ${resp.body?.string()?.take(180)}")
+                }
+                resp.isSuccessful
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "putFile failed", e)
             false
         }
     }

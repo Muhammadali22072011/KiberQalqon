@@ -122,7 +122,7 @@ button{font-family:inherit}
 .kpi .k-delta{font-family:var(--mono);font-size:11px;margin-top:6px;color:var(--ink-2)}
 
 /* ── map ── */
-.map-box{height:560px;width:100%}
+.map-box{height:560px;width:100%;position:relative}
 .map-box.tall{height:calc(100vh - 230px);min-height:520px}
 .leaflet-container{background:#060a12;font-family:var(--sans)}
 .leaflet-control-attribution{background:rgba(7,11,20,.7)!important;color:var(--ink-3)!important}
@@ -132,6 +132,45 @@ button{font-family:inherit}
 .dev-hi{filter:drop-shadow(0 0 6px rgba(255,80,70,.85))}
 .legend{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--ink-2);font-family:var(--mono)}
 .grad-bar{display:inline-block;width:120px;height:8px;border-radius:99px;background:linear-gradient(90deg,#25e0b0,#9be03a,#ffb020,#ff6a3d,#ff3b5c)}
+
+/* ── to'liq ekran jonli monitoring ── */
+.panel.map-fs{position:fixed;inset:0;z-index:1200;margin:0;border:none;border-radius:0;display:flex;flex-direction:column}
+.panel.map-fs .map-box{flex:1;height:auto!important;min-height:0}
+.fs-feed{position:absolute;top:14px;right:14px;bottom:14px;width:340px;max-width:42vw;z-index:1000;display:flex;flex-direction:column;background:rgba(8,12,20,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--hair-2);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.5);overflow:hidden}
+.fs-feed-top{padding:13px 14px;border-bottom:1px solid var(--hair)}
+.fs-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fs-stats span{display:flex;flex-direction:column;gap:3px}
+.fs-stats small{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.fs-stats b{font-family:var(--mono);font-size:21px;font-weight:700;line-height:1}
+.fs-feed-h{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.fs-feed-h b{font-size:13px}
+.fs-clock{font-family:var(--mono);font-size:12px;color:var(--primary)}
+.fs-feed-list{flex:1;overflow-y:auto;padding:6px 8px}
+@media(max-width:720px){.fs-feed{left:14px;width:auto;max-width:none;bottom:auto;max-height:46%}}
+
+/* ── geo yon panel: viloyat / shahar kesimi ── */
+.geo-side{display:flex;flex-direction:column;max-height:calc(100vh - 230px);min-height:520px}
+.geo-filters{display:flex;flex-direction:column;gap:11px;padding:14px 16px;border-bottom:1px solid var(--hair)}
+.geo-filters label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.geo-filters select{font-size:13px}
+.geo-sum{display:flex;gap:16px;padding:13px 16px;border-bottom:1px solid var(--hair)}
+.geo-sum span{display:flex;flex-direction:column;gap:3px}
+.geo-sum small{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.geo-sum b{font-family:var(--mono);font-size:17px;font-weight:700;letter-spacing:-.01em}
+.geo-bd{flex:1;overflow:auto;padding:8px 10px 12px}
+.geo-row{display:grid;grid-template-columns:1fr 78px auto;align-items:center;gap:10px;width:100%;text-align:left;
+  background:none;border:1px solid transparent;border-radius:11px;padding:9px 11px;cursor:pointer;color:var(--ink);transition:.13s}
+.geo-row:hover{background:rgba(255,255,255,.04);border-color:var(--hair)}
+.geo-row.active{background:var(--primary-dim);border-color:rgba(37,224,176,.3)}
+.geo-name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.geo-track{height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.geo-track i{display:block;height:100%;border-radius:99px;transition:width .3s}
+.geo-cnt{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right;white-space:nowrap}
+.geo-cnt em{font-style:normal;font-weight:500;font-size:11px;color:#ff6679;margin-left:6px}
+.geo-back{display:inline-flex;align-items:center;gap:6px;margin:2px 4px 8px;padding:6px 11px;border-radius:999px;
+  background:rgba(255,255,255,.03);border:1px solid var(--hair-2);color:var(--ink-2);font-size:12px;cursor:pointer;font-family:var(--mono);transition:.13s}
+.geo-back:hover{color:var(--ink);border-color:var(--primary)}
+.geo-empty{padding:26px 14px;text-align:center;color:var(--ink-3);font-size:12px;font-family:var(--mono)}
 
 /* leaflet popup (qurilma) */
 .leaflet-popup-content-wrapper{background:var(--elev);color:var(--ink);border:1px solid var(--hair-2);border-radius:14px;box-shadow:var(--shadow);padding:0}
@@ -211,6 +250,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 .btn.ghost{background:rgba(255,255,255,.04);color:var(--ink-2);border:1px solid var(--hair-2)}
 .btn.ghost:hover{color:var(--ink);border-color:var(--primary)}
 .btn.block{width:100%}
+.btn.sm{padding:6px 12px;font-size:12px;border-radius:9px}
 .btn.danger{background:rgba(255,67,97,.16);color:#ff6679}
 .row-inline{display:flex;gap:8px;align-items:center}
 
@@ -265,6 +305,74 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 .up-prev{width:64px;height:64px;border-radius:11px;object-fit:cover;border:1px solid var(--hair-2)}
 .up-btn{display:inline-flex;align-items:center;gap:8px;border:1px dashed var(--hair-2);border-radius:11px;padding:11px 14px;color:var(--ink-2);cursor:pointer;font-size:13px;transition:.15s}
 .up-btn:hover{border-color:var(--primary);color:var(--ink)}
+
+/* daraja chipi (carousel + modal) */
+.lvl-chip{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--hair-2);
+  background:rgba(74,168,255,.16);color:#9fd0ff}
+.lvl-chip.lv-warning{background:rgba(255,176,32,.18);color:#ffc24d;border-color:rgba(255,176,32,.3)}
+.lvl-chip.lv-critical{background:rgba(255,67,97,.18);color:#ff7a8c;border-color:rgba(255,67,97,.32)}
+
+/* ── news carousel (bosh sahifa lentasi) ── */
+.carousel{position:relative;padding:14px 18px 16px}
+.car-stage{position:relative;height:340px;border-radius:14px;overflow:hidden;border:1px solid var(--hair-2);background:var(--card-2)}
+.car-slide{position:absolute;inset:0;border:none;padding:0;margin:0;cursor:pointer;background:none;
+  color:var(--ink);text-align:left;opacity:0;pointer-events:none;transition:opacity .6s ease;display:block}
+.car-slide.on{opacity:1;pointer-events:auto;z-index:1}
+.car-img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
+.car-slide.on .car-img{animation:kenburns 7s ease-out forwards}
+@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+.car-img.ph{display:grid;place-items:center;font-size:64px;
+  background:radial-gradient(140% 120% at 30% 0%,rgba(37,224,176,.16),transparent 60%),linear-gradient(160deg,var(--card),var(--card-2))}
+.car-img.ph span{filter:grayscale(.2);opacity:.7}
+.car-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,8,15,.05) 0%,rgba(5,8,15,.15) 42%,rgba(5,8,15,.86) 100%)}
+.car-info{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:7px;
+  padding:18px 20px 20px}
+.car-title{font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1.18;
+  text-shadow:0 2px 14px rgba(0,0,0,.6);max-width:80%}
+.car-snip{font-size:13px;color:var(--ink-2);line-height:1.5;max-width:70%;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.car-date{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:1px}
+.car-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:40px;height:40px;border-radius:50%;
+  display:grid;place-items:center;border:1px solid var(--hair-2);background:rgba(7,11,20,.6);backdrop-filter:blur(6px);
+  color:var(--ink);font-size:24px;line-height:1;cursor:pointer;transition:.15s;padding-bottom:3px}
+.car-nav:hover{border-color:var(--primary);color:var(--primary);background:rgba(7,11,20,.82)}
+.car-nav.prev{left:12px}
+.car-nav.next{right:12px}
+.car-dots{display:flex;justify-content:center;gap:7px;margin-top:13px}
+.car-dot{width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;padding:0;
+  background:var(--hair-2);transition:.2s}
+.car-dot:hover{background:var(--ink-3)}
+.car-dot.on{width:22px;background:var(--primary);box-shadow:0 0 10px rgba(37,224,176,.5)}
+
+/* ── news lightbox (to‘liq e‘lon) ── */
+.news-modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;
+  background:rgba(3,6,12,.74);backdrop-filter:blur(8px);animation:nm-in .2s ease}
+@keyframes nm-in{from{opacity:0}to{opacity:1}}
+.nm-card{position:relative;width:min(720px,94vw);max-height:90vh;overflow-y:auto;border-radius:20px;
+  background:linear-gradient(160deg,var(--card),var(--card-2));border:1px solid var(--hair-2);
+  box-shadow:var(--shadow);animation:nm-pop .25s cubic-bezier(.22,1,.36,1)}
+@keyframes nm-pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.nm-img{width:100%;max-height:420px;object-fit:cover;display:block}
+.nm-img.ph{height:240px;display:grid;place-items:center;font-size:72px;
+  background:radial-gradient(140% 120% at 30% 0%,rgba(37,224,176,.16),transparent 60%),linear-gradient(160deg,var(--card),var(--card-2))}
+.nm-img.ph span{opacity:.7}
+.nm-body{display:flex;flex-direction:column;gap:9px;padding:20px 24px 26px}
+.nm-title{font-size:23px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.nm-date{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.nm-text{font-size:15px;color:var(--ink-2);line-height:1.65;white-space:pre-wrap;margin-top:4px}
+.nm-close{position:absolute;top:12px;right:12px;z-index:4;width:36px;height:36px;border-radius:50%;
+  display:grid;place-items:center;border:1px solid var(--hair-2);background:rgba(7,11,20,.7);
+  color:var(--ink);font-size:15px;cursor:pointer;transition:.15s}
+.nm-close:hover{border-color:var(--danger);color:#ff7a8c;background:rgba(7,11,20,.9)}
+.nm-nav{position:fixed;top:50%;transform:translateY(-50%);z-index:4;width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;border:1px solid var(--hair-2);background:rgba(7,11,20,.7);backdrop-filter:blur(6px);
+  color:var(--ink);font-size:26px;line-height:1;cursor:pointer;transition:.15s;padding-bottom:3px}
+.nm-nav:hover{border-color:var(--primary);color:var(--primary)}
+.nm-nav.prev{left:max(16px,calc(50vw - 420px))}
+.nm-nav.next{right:max(16px,calc(50vw - 420px))}
+.nm-count{position:absolute;bottom:14px;right:18px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
 
 /* ── toast ── */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--elev);
@@ -321,6 +429,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 .gate-hint{color:var(--ink-3);font-size:11px;line-height:1.5}
 .gate-back{margin-top:4px;color:var(--ink-3);font-size:12px;cursor:pointer;background:none;border:none}
 .gate-back:hover{color:var(--ink-2)}
+.gate-tabs{display:flex;gap:6px;padding:4px;background:rgba(255,255,255,.03);border:1px solid var(--hair);border-radius:12px}
+.gate-tab{flex:1;padding:9px 8px;border:none;background:none;color:var(--ink-3);font-size:13px;font-weight:600;
+  border-radius:9px;cursor:pointer;transition:background .15s,color .15s}
+.gate-tab:hover{color:var(--ink-2)}
+.gate-tab.active{background:var(--primary);color:#06231a}
 
 /* ============================================================================
    RESPONSIVE
@@ -328,6 +441,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 @media(max-width:1100px){
   .kpis{grid-template-columns:repeat(2,1fr)}
   .map-grid{grid-template-columns:1fr}
+  .geo-side{max-height:none;min-height:0}
   .cols-2,.cols-3{grid-template-columns:1fr}
   .lfeatures,.lstats{grid-template-columns:1fr 1fr}
   .map-box.tall{height:480px}
@@ -338,9 +452,18 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
   .shell.nav-open .sidebar{transform:none}
   .burger{display:grid;place-items:center}
   .content{padding:18px 16px 40px}
+  .car-stage{height:260px}
+  .car-title{font-size:18px;max-width:100%}
+  .car-snip{max-width:100%}
+  .nm-nav.prev{left:10px}
+  .nm-nav.next{right:10px}
 }
 @media(max-width:560px){
   .kpis{grid-template-columns:1fr 1fr}
   .lfeatures,.lstats{grid-template-columns:1fr}
   .topbar .pill{display:none}
+  .car-stage{height:210px}
+  .car-info{padding:14px 15px 15px}
+  .car-title{font-size:16px}
+  .car-nav{width:34px;height:34px;font-size:20px}
 }

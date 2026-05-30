@@ -39,6 +39,13 @@ class AutoScanActivity : AppCompatActivity() {
     private var apkPath: String? = null
     private var apkName: String? = null
 
+    /**
+     * Agar bu APK allaqachon o'rnatilgan ilova bo'lsa — uning paket nomi.
+     * PackageInstallReceiver o'rnatilgan tahdidni shu extra bilan uzatadi. Bo'sh bo'lsa —
+     * bu oddiy yuklab olingan APK fayl (o'chirish = faylni o'chirish).
+     */
+    private var installedPkg: String? = null
+
     // Один общий Handler с очисткой в onDestroy — иначе postDelayed-колбэки выстреливают
     // после finish() и крашат app на binding.* (Activity destroyed but view accessed).
     private val handler = Handler(Looper.getMainLooper())
@@ -136,9 +143,16 @@ class AutoScanActivity : AppCompatActivity() {
 
         apkPath = incomingPath
         apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
+        installedPkg = intent.getStringExtra("installed_pkg")?.takeIf { it.isNotBlank() }
 
         setupUI()
-        startScanning()
+        // "already_handled" — fayl fonida (GuardWorker) allaqachon karantinga olingan/o'chirilgan.
+        // Qayta skanlamaymiz (fayl yo'q): to'g'ridan-to'g'ri "virus topildi va o'chirildi" oynasi.
+        if (intent.getBooleanExtra("already_handled", false)) {
+            presentHandledResult()
+        } else {
+            startScanning()
+        }
     }
 
     companion object {
@@ -252,12 +266,18 @@ class AutoScanActivity : AppCompatActivity() {
                     safeShow { showDangerousResult(result) }
                 }
                 ScanResult.Verdict.SUSPICIOUS -> safeShow { showSuspiciousResult(result) }
-                else -> safeShow { showSafeResult() }
+                ScanResult.Verdict.SAFE -> safeShow { showSafeResult() }
+                // result == null — skan ISTISNO bilan tugadi (fayl o'qilmadi / parse xatosi).
+                // ANTIVIRUS ASOSIY QOIDASI: o'qib bo'lmagan fayl HECH QACHON "xavfsiz" emas.
+                // Avval `else -> showSafeResult()` edi — bu soxta-XAVFSIZ buggi: skan crash
+                // bo'lsa virus "✓ Fayl xavfsiz" deb ko'rsatilardi (Tekshirildi: 0). Endi → shubhali.
+                null -> safeShow { showUnscannableResult() }
             }
             // Ovoz bilan verdict — yangi APK aniqlanganda foydalanuvchi telefonga
             // qaramasa ham eshitadi. Sozlamada o'chirilgan bo'lsa, VoiceVerdict sukut saqlaydi.
             try {
-                val v = result?.verdict ?: ScanResult.Verdict.SAFE
+                // null (skan xatosi) → SUSPICIOUS ovozi beriladi, HECH QACHON SAFE emas.
+                val v = result?.verdict ?: ScanResult.Verdict.SUSPICIOUS
                 VoiceVerdict.init(this)
                 VoiceVerdict.speak(this, v)
             } catch (_: Throwable) {}
@@ -389,6 +409,8 @@ class AutoScanActivity : AppCompatActivity() {
         }
 
         binding.btnDelete.visibility = View.VISIBLE
+        // O'rnatilgan ilova bo'lsa — tugma "Ilovani o'chirish" (uninstall), fayl emas.
+        if (installedPkg != null) binding.btnDelete.text = getString(R.string.uninstall_app)
         binding.tvDeleteHint.visibility = View.VISIBLE
         // Превращаем "подсказку" в кликабельный share — юзер одним тапом
         // отправляет друзьям предупреждение "этот APK — вирус, не ставьте".
@@ -448,11 +470,108 @@ class AutoScanActivity : AppCompatActivity() {
         }
 
         binding.btnDelete.visibility = View.VISIBLE
+        if (installedPkg != null) binding.btnDelete.text = getString(R.string.uninstall_app)
         binding.tvDeleteHint.visibility = View.VISIBLE
         binding.tvDeleteHint.text = getString(R.string.share_result)
         binding.tvDeleteHint.setOnClickListener { shareScanResult(ScanResult.Verdict.SUSPICIOUS) }
 
         sendNotification("🟠 Shubhali fayl", "$apkName faylida shubhali belgilar bor", false)
+    }
+
+    /**
+     * Skan ISTISNO bilan tugadi (ApkScanner.scan() throw qildi yoki natija null).
+     * ANTIVIRUS ASOSIY QOIDASI: o'qib bo'lmagan / xato bilan tugagan fayl HECH QACHON
+     * "xavfsiz" deb ko'rsatilmaydi — har doim shubhali deb hisoblanadi va o'chirish
+     * tavsiya etiladi. Avval bunday holatda showSafeResult() chaqirilardi (soxta-XAVFSIZ).
+     */
+    private fun showUnscannableResult() {
+        binding.resultBadge.setBackgroundResource(R.drawable.kq_warn_badge)
+        binding.resultShield.setImageResource(R.drawable.ic_warning_alert)
+        binding.dangerDetails.visibility = View.GONE
+        binding.tvAutoDelete.visibility = View.GONE
+
+        binding.tvResultTitle.text = getString(R.string.autoscan_unscannable_title)
+        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
+
+        val context = sourceHint()
+        binding.tvResultMessage.text = buildString {
+            append(getString(R.string.autoscan_unscannable_body))
+            if (context != null) {
+                append("\n\n")
+                append(context)
+            }
+        }
+
+        val installedPkg = installedPackageForApk(apkPath)
+        binding.btnDelete.visibility = View.VISIBLE
+        binding.btnDelete.isEnabled = true
+        binding.btnDelete.text =
+            if (installedPkg != null) getString(R.string.uninstall_app)
+            else getString(R.string.delete_apk)
+        binding.btnDelete.setOnClickListener { deleteApk() }
+        binding.tvDeleteHint.visibility = View.VISIBLE
+        binding.tvDeleteHint.text = getString(R.string.share_result)
+        binding.tvDeleteHint.setOnClickListener { shareScanResult(ScanResult.Verdict.SUSPICIOUS) }
+
+        sendNotification(
+            "🟠 Faylni tekshirib bo'lmadi",
+            "$apkName ni to'liq tekshirib bo'lmadi — ehtiyot bo'ling, o'chirish tavsiya etiladi",
+            true
+        )
+    }
+
+    /**
+     * Fon'da (GuardWorker) DANGER fayl ALLAQACHON karantinga olingan holat.
+     *
+     * Foydalanuvchi shikoyati: "fayl fonida o'chiriladi-yu, lekin OYNA chiqmaydi".
+     * Ilgari delete rejimida faqat notification ko'rsatilardi. Endi shu OYNA chiqadi:
+     * fayl yo'q — qayta skanlamaymiz, o'chirish tugmasi ham kerak emas, faqat xabar + "Tushunarli".
+     */
+    private fun presentHandledResult() {
+        try { binding.layoutScanning.visibility = View.GONE } catch (_: Throwable) {}
+        try { binding.layoutResult.visibility = View.VISIBLE } catch (_: Throwable) {}
+        try { binding.root.setBackgroundResource(R.drawable.kq_autoscan_danger_bg) } catch (_: Throwable) {}
+        try { AnimationHelper.bounce(binding.cardResult, duration = 600) } catch (_: Throwable) {}
+
+        binding.resultBadge.setBackgroundResource(R.drawable.kq_danger_badge)
+        binding.resultShield.setImageResource(R.drawable.ic_alert_triangle)
+        binding.dangerDetails.visibility = View.GONE
+        binding.tvAutoDelete.visibility = View.GONE
+
+        binding.tvResultTitle.text = "🛡️ Virus topildi va o'chirildi"
+        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
+
+        val reason = intent.getStringExtra("reason")?.takeIf { it.isNotBlank() }
+        val ctxHint = sourceHint()
+        binding.tvResultMessage.text = buildString {
+            append("$apkName fayli xavfli deb topildi va avtomatik o'chirildi (karantin).")
+            if (reason != null) {
+                append("\n\nSabab: ${reason.take(300)}")
+            }
+            append("\n\nAgar bu xato bo'lsa, 7 kun ichida tiklash mumkin.")
+            if (ctxHint != null) {
+                append("\n\n")
+                append(ctxHint)
+            }
+        }
+
+        // O'chirish tugmasi KERAK EMAS — fayl allaqachon yo'q. "Tushunarli" → oynani yopish.
+        binding.btnDelete.visibility = View.VISIBLE
+        binding.btnDelete.isEnabled = true
+        binding.btnDelete.text = getString(R.string.btn_ok)
+        binding.btnDelete.setOnClickListener { finish() }
+
+        // Do'stlarni ogohlantirish (ulashish).
+        binding.tvDeleteHint.visibility = View.VISIBLE
+        binding.tvDeleteHint.text = getString(R.string.share_result)
+        binding.tvDeleteHint.setOnClickListener { shareScanResult(ScanResult.Verdict.DANGER) }
+
+        try { AnimationHelper.shake(binding.cardResult, duration = 500) } catch (_: Throwable) {}
+        try {
+            VoiceVerdict.init(this)
+            VoiceVerdict.speak(this, ScanResult.Verdict.DANGER)
+        } catch (_: Throwable) {}
+        resultShown = true
     }
 
     private fun showSafeResult() {
@@ -555,7 +674,37 @@ class AutoScanActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * O'rnatilgan ilovani o'chirish — tizimning standart uninstall oynasini ochadi.
+     * (ACTION_DELETE + package: URI). Foydalanuvchi bitta "OK" bilan virusni o'chiradi.
+     */
+    private fun uninstallInstalledApp(pkg: String) {
+        try {
+            val intent = android.content.Intent(
+                android.content.Intent.ACTION_DELETE,
+                Uri.parse("package:$pkg")
+            ).apply { flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK }
+            startActivity(intent)
+            reportDelete("O'rnatilgan ilova — uninstall oynasi ochildi", apkPath, extra = pkg)
+            // O'z oynamizni yopamiz — endi ekranda tizim uninstall dialogi turadi.
+            handler.postDelayed({ if (!isFinishing) finish() }, 300)
+        } catch (e: Throwable) {
+            android.util.Log.e("AutoScanActivity", "uninstallInstalledApp failed", e)
+            binding.tvResultMessage.text = e.message ?: ""
+            binding.btnDelete.isEnabled = true
+        }
+    }
+
     private fun deleteApk() {
+        // O'rnatilgan ilovani faylsifat o'chirib BO'LMAYDI: uning base.apk yo'li /data/app/...
+        // da, egasi — tizim. file.delete() har doim false qaytaradi. Shuning uchun bu yerda
+        // tizimning uninstall oynasini ochamiz (foydalanuvchi bir tasdiq bilan o'chiradi).
+        val pkg = installedPkg
+        if (pkg != null) {
+            uninstallInstalledApp(pkg)
+            return
+        }
+
         val path = apkPath
         if (path.isNullOrBlank()) {
             binding.tvResultMessage.text = getString(R.string.autoscan_no_path)

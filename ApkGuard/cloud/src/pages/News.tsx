@@ -20,6 +20,7 @@ const fileToDataUrl = (f: File) =>
   });
 
 export default function News() {
+  const canManage = true; // egasi va admin — ikkalasi ham e'lon joylaydi/o'chiradi
   const { data, loading, reload } = usePoll(() => apiGet<{ news: NewsItem[] }>('/api/news'), 20000);
   const { show } = useToast();
   const news = data?.news || [];
@@ -91,10 +92,15 @@ export default function News() {
     <>
       <div className="page-intro">
         <h1>Yangiliklar va e‘lonlar</h1>
-        <p>Bu yerga joylangan e‘lonlar darhol foydalanuvchilarning KiberQalqon ilovasi bosh ekranida ko‘rinadi.</p>
+        <p>
+          {canManage
+            ? 'Bu yerga joylangan e‘lonlar darhol foydalanuvchilarning KiberQalqon ilovasi bosh ekranida ko‘rinadi.'
+            : 'Rahbariyat e‘lonlari. Bu yerda faqat o‘qiy olasiz — e‘lon joylash huquqi egada.'}
+        </p>
       </div>
 
-      <div className="grid map-grid">
+      <div className={canManage ? 'grid map-grid' : 'grid'}>
+        {canManage && (
         <Panel>
           <PanelHead sub="Yangi e‘lon" title="E‘lon yozish" />
           <form className="body-pad" onSubmit={create}>
@@ -142,6 +148,7 @@ export default function News() {
             </button>
           </form>
         </Panel>
+        )}
 
         <Panel>
           <PanelHead sub="Lenta" title={`${news.length} ta e‘lon`} />
@@ -158,8 +165,10 @@ export default function News() {
                       {n.image_url && <img className="nc-thumb" src={n.image_url} alt="" />}
                       <div className="nc-title">{n.title}</div>
                       <span className="nc-date">{uzDateSafe(n.created_at)}</span>
-                      <button className={'nc-act' + (n.pinned ? ' on' : '')} title="Qadab qo‘yish" onClick={() => togglePin(n)}>📌</button>
-                      <button className="nc-act" title="O‘chirish" onClick={() => del(n)}>🗑</button>
+                      {canManage && (<>
+                        <button className={'nc-act' + (n.pinned ? ' on' : '')} title="Qadab qo‘yish" onClick={() => togglePin(n)}>📌</button>
+                        <button className="nc-act" title="O‘chirish" onClick={() => del(n)}>🗑</button>
+                      </>)}
                     </div>
                     {n.body && <div className="nc-body">{n.body}</div>}
                     {n.image_url && <img className="nc-img" src={n.image_url} alt="" />}

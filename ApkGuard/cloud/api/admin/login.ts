@@ -1,16 +1,21 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { timingSafeEqual } from 'crypto';
 import { verifyTotp } from '../../lib/totp.js';
-import { issueSession } from '../../lib/session.js';
+import { issueSession, issueAdminSession } from '../../lib/session.js';
 
-// Panelga "qiyin" kirish: ADMIN_SECRET (parol) + TOTP 6 xonali kod (autentifikator
-// ilovasidan). Muvaffaqiyatli bo'lsa qisqa muddatli sessiya tokeni qaytadi — keyingi
-// so'rovlar shu token bilan ketadi, master kalit brauzerda saqlanmaydi.
+// Veb-panelga kirish — IKKI xil odam uchun:
+//   • EGASI (dasturchi) — ADMIN_SECRET (master kalit) + ixtiyoriy TOTP. TO'LIQ huquq.
+//   • ADMIN (bitta hisob) — login + parol (env: ADMIN_LOGIN / ADMIN_PASSWORD).
+//     Cheklangan: faqat KO'RISH, EKSPORT va E'LON joylash. O'zgartira/o'chira olmaydi.
 //
-// 2FA faqat ADMIN_TOTP_SECRET env o'rnatilganda majburiy bo'ladi (aks holda
-// faqat parol — egasini lockout qilmaslik uchun, 2FA'ni keyin yoqadi).
+// So'rov tanasi qaysi maydonlarni bersa — o'sha oqim:
+//   { login, password }  → admin
+//   { secret, otp }      → egasi
+// Muvaffaqiyatda qisqa muddatli HMAC token qaytadi (master kalit/parol brauzerda saqlanmaydi).
+//
+// 2FA faqat ADMIN_TOTP_SECRET env o'rnatilganda majburiy (egasini lockout qilmaslik uchun).
 
-type Body = { secret?: string; otp?: string };
+type Body = { secret?: string; otp?: string; login?: string; password?: string };
 
 function safeEq(a: string, b: string): boolean {
   const ba = Buffer.from(a);
@@ -21,10 +26,17 @@ function safeEq(a: string, b: string): boolean {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
 
+  const b = (req.body ?? {}) as Body;
+
+  // Admin (login+parol) kirishi — login yoki parol berilgan bo'lsa shu oqim.
+  if ((b.login ?? '') !== '' || (b.password ?? '') !== '') {
+    return loginAdmin(res, b);
+  }
+
+  // Egasi (owner) kirishi — master sir (+2FA).
   const expected = process.env.ADMIN_SECRET;
   if (!expected) return res.status(500).json({ ok: false, error: 'ADMIN_SECRET sozlanmagan' });
 
-  const b = (req.body ?? {}) as Body;
   const secret = b.secret ?? '';
   const otp = b.otp ?? '';
 
@@ -43,5 +55,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { token, exp } = issueSession();
-  return res.status(200).json({ ok: true, token, exp, twofa: Boolean(totpSecret) });
+  return res.status(200).json({ ok: true, token, exp, level: 'owner', twofa: Boolean(totpSecret) });
+}
+
+// --- Bitta cheklangan ADMIN (login + parol) ----------------------------------
+// Hisob env'da: ADMIN_LOGIN va ADMIN_PASSWORD. Rol/baza yo'q — bitta hisob.
+function loginAdmin(res: VercelResponse, b: Body) {
+  const login = (b.login ?? '').trim();
+  const password = b.password ?? '';
+  const FAIL = { ok: false as const, error: "Login yoki parol noto'g'ri" };
+  if (!login || !password) {
+    return res.status(400).json({ ok: false, error: 'Login va parol kerak' });
+  }
+
+  const expLogin = process.env.ADMIN_LOGIN;
+  const expPassword = process.env.ADMIN_PASSWORD;
+  if (!expLogin || !expPassword) {
+    return res.status(500).json({ ok: false, error: 'ADMIN_LOGIN/ADMIN_PASSWORD sozlanmagan' });
+  }
+
+  // Ikkala maydon ham doimiy-vaqtli solishtiriladi (enumeration'ga qarshi bir xil xato).
+  const okLogin = safeEq(login, expLogin);
+  const okPassword = safeEq(password, expPassword);
+  if (!okLogin || !okPassword) {
+    return res.status(401).json(FAIL);
+  }
+
+  const { token, exp } = issueAdminSession(login);
+  return res.status(200).json({ ok: true, token, exp, level: 'admin', name: login });
 }

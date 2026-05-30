@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, adminChatIds } from '../../lib/telegram.js';
 import { checkDeviceSecret } from '../../lib/auth.js';
-import { readGeo, jitterGeo } from '../../lib/geo.js';
+import { resolveGeo, clientIp } from '../../lib/geo.js';
 import { formatThreatAlert } from '../../lib/format.js';
 
 type Body = {
@@ -15,6 +15,9 @@ type Body = {
   risk_score?: number;
   reasons?: string[];
   perms?: string[];
+  lat?: number | string;
+  lng?: number | string;
+  loc_accuracy_m?: number | string;
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -41,11 +44,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     risk_score: b.risk_score ?? 0,
     last_verdict: b.verdict,
   };
-  const geo = jitterGeo(readGeo(req), b.device_token);
+  // Qurilma GPS yuborgan bo'lsa — aniq nuqta (jittersiz); aks holda IP geo + jitter.
+  const geo = resolveGeo(req, b, b.device_token);
   if (geo.country != null) devRow.country = geo.country;
   if (geo.city != null) devRow.city = geo.city;
   if (geo.lat != null) devRow.lat = geo.lat;
   if (geo.lng != null) devRow.lng = geo.lng;
+
+  // IP — egasi paneli uchun (null bo'lsa eski qiymatni o'chirmaymiz).
+  const ip = clientIp(req);
+  if (ip) devRow.ip = ip;
 
   const { data: dev, error: devErr } = await sb
     .from('devices')
@@ -76,6 +84,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ ok: false, error: 'scan insert', detail: scanErr.message });
   }
 
+  // Xavfli/shubhali bo'lsa — qurilma APK namunasini Storage'ga yuklashi uchun
+  // imzolangan (signed) URL beramiz. Qurilma faylni TO'G'RIDAN-TO'G'RI Storage'ga
+  // yuklaydi (Vercel ~4.5MB body chegarasini chetlab o'tadi, 50MB gacha APK uchun).
+  // Yo'l = "<hash>.apk" → bir xil fayl bir marta saqlanadi (dedup); upsert bilan
+  // qayta yozilaveradi (xavfsiz, bayt-baytma bir xil). Xavfsiz APK'lar yuborilmaydi.
+  let sampleUpload: { url: string } | null = null;
+
   // 3) Agar xavfli — threats jadvalini upsert qilamiz va Telegramga yuboramiz
   if (b.verdict === 'danger' || b.verdict === 'suspicious') {
     const severity = b.verdict === 'danger' ? 'high' : 'medium';
@@ -92,6 +107,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // davom etadi — bu eng muhim narsa).
     if (rpcRes.error) {
       console.error(`[upload] upsert_threat RPC failed: ${rpcRes.error.message}`);
+    }
+
+    // APK namunasi uchun imzolangan yuklash URL'i. Bucket bo'lmasa / xato bo'lsa —
+    // log qoldiramiz, lekin upload'ni yiqitmaymiz (telemetriya muhimroq).
+    try {
+      const { data: signed, error: upErr } = await sb.storage
+        .from('malware-samples')
+        .createSignedUploadUrl(`${b.apk_hash.toLowerCase()}.apk`, { upsert: true });
+      if (upErr) {
+        console.error(`[upload] createSignedUploadUrl failed: ${upErr.message}`);
+      } else if (signed?.signedUrl) {
+        sampleUpload = { url: signed.signedUrl };
+      }
+    } catch (e) {
+      console.error(`[upload] sample url exception: ${(e as Error).message}`);
     }
 
     const alertText = formatThreatAlert({
@@ -118,7 +148,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
   }
 
-  return res.status(200).json({ ok: true, scan_id: scan?.id });
+  return res.status(200).json({ ok: true, scan_id: scan?.id, sample_upload: sampleUpload });
 }
 
 function classify(reasons: string[]): string {

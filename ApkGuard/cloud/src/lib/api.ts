@@ -1,22 +1,56 @@
-// API mijozi. Brauzerda ADMIN_SECRET emas, faqat qisqa muddatli sessiya tokeni
-// (x-admin-secret) saqlanadi. 401 bo'lsa — token tozalanadi va onUnauth chaqiriladi.
+// API mijozi. Brauzerda master kalit/parol hech qachon saqlanmaydi — faqat qisqa
+// muddatli sessiya tokeni. Ikki xil foydalanuvchi bor:
+//   • egasi (owner) → master kalit (+2FA) bilan kiradi. To'liq huquq.
+//   • admin         → login+parol bilan kiradi. Faqat ko'rish + eksport + e'lon.
+// Ikkalasining ham tokeni x-admin-secret sarlavhasida ketadi; server qaysi biri
+// ekanini token ichidan biladi. 401 bo'lsa — sessiya tozalanadi va onUnauth chaqiriladi.
 
-const KEY = 'kq_admin_secret';
+const KEY = 'kq_session';
+
+export type Kind = 'owner' | 'admin';
+export interface Session {
+  token: string;
+  kind: Kind;
+  name?: string;
+  exp?: number; // unix soniya
+}
+
+function readStored(): Session | null {
+  try {
+    const raw = sessionStorage.getItem(KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as Session;
+    return s && typeof s.token === 'string' && s.token ? s : null;
+  } catch {
+    return null;
+  }
+}
+
+let session: Session | null = readStored();
 
 let onUnauth: (() => void) | null = null;
 export function setUnauthHandler(fn: (() => void) | null) { onUnauth = fn; }
 
-export const getToken = (): string => sessionStorage.getItem(KEY) || '';
-export const setToken = (t: string): void => sessionStorage.setItem(KEY, t);
-export const clearToken = (): void => sessionStorage.removeItem(KEY);
+export const getSession = (): Session | null => session;
+export function setSession(s: Session): void {
+  session = s;
+  sessionStorage.setItem(KEY, JSON.stringify(s));
+}
+export function clearSession(): void {
+  session = null;
+  sessionStorage.removeItem(KEY);
+}
+export const hasToken = (): boolean => Boolean(session?.token);
 
 export interface ApiError extends Error { auth?: boolean; }
 
 async function request<T = any>(path: string, init?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
     ...(init?.headers as Record<string, string> | undefined),
-    'x-admin-secret': getToken(),
   };
+  if (session?.token) {
+    headers['x-admin-secret'] = session.token;
+  }
   let r: Response;
   try {
     r = await fetch(path, { ...init, headers });
@@ -24,7 +58,7 @@ async function request<T = any>(path: string, init?: RequestInit): Promise<T> {
     throw new Error('tarmoq');
   }
   if (r.status === 401) {
-    clearToken();
+    clearSession();
     onUnauth?.();
     const e = new Error('auth') as ApiError;
     e.auth = true;
@@ -43,6 +77,7 @@ export const apiPost = <T = any>(path: string, body: unknown) =>
     body: JSON.stringify(body),
   });
 
+// Egasi (owner) kirishi: master kalit + (yoqilgan bo'lsa) 2FA. To'liq huquq.
 export interface LoginResult { ok: boolean; token: string; exp?: number; twofa?: boolean; }
 export async function login(secret: string, otp: string): Promise<LoginResult> {
   const r = await fetch('/api/admin/login', {
@@ -55,13 +90,28 @@ export async function login(secret: string, otp: string): Promise<LoginResult> {
   return j as LoginResult;
 }
 
+// Admin kirishi: login + parol. Cheklangan — faqat ko'rish + eksport + e'lon.
+export interface AdminLoginResult {
+  ok: boolean; token: string; exp?: number; level: 'admin'; name?: string;
+}
+export async function adminLogin(login: string, password: string): Promise<AdminLoginResult> {
+  const r = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ login, password }),
+  });
+  const j = await r.json().catch(() => ({ ok: false }));
+  if (!r.ok || !j.ok || !j.token) throw new Error((j && j.error) || 'Login yoki parol noto‘g‘ri');
+  return j as AdminLoginResult;
+}
+
 // ── Javob turlari (Supabase view'lariga mos) ────────────────────────────────
 export interface Stats {
   total_scans?: number; danger_count?: number; suspicious_count?: number;
   safe_count?: number; active_devices?: number;
 }
 export interface MapPoint {
-  id: string; name?: string | null; city?: string | null; country?: string | null;
+  id: string; name?: string | null; city?: string | null; country?: string | null; ip?: string | null;
   lat: number | null; lng: number | null; risk_score?: number; last_verdict?: string | null;
   last_seen?: string | null; last_scan_at?: string | null; scan_count?: number; danger_count?: number;
 }
@@ -74,24 +124,17 @@ export interface ThreatFamily {
   apk_hash: string; package_name?: string | null; app_label?: string | null;
   category?: string | null; severity?: string | null; seen_count?: number;
   first_seen?: string; last_seen?: string;
+  sample_url?: string | null; // APK namunasini yuklab olish uchun imzolangan URL (bor bo'lsa)
 }
 export interface DeviceRow {
   id: string; name?: string | null; android_ver?: string | null; app_ver?: string | null;
-  created_at?: string; last_seen?: string; country?: string | null; city?: string | null;
+  created_at?: string; last_seen?: string; country?: string | null; city?: string | null; ip?: string | null;
   lat?: number | null; lng?: number | null; risk_score?: number; last_verdict?: string | null;
   last_scan_at?: string | null; scan_count?: number; danger_count?: number;
 }
 export interface ScanRow {
   id: number; apk_hash?: string; package_name?: string | null; app_label?: string | null;
   verdict: string; risk_score?: number; reasons?: unknown; scanned_at?: string;
-}
-export interface Role {
-  id?: string; name: string; permissions?: string[]; components?: string[]; created_at?: string;
-}
-export interface Operator {
-  id?: string; login: string; active?: boolean; created_at?: string;
-  last_login_at?: string | null; role_name?: string | null;
-  permissions?: string[]; components?: string[];
 }
 export interface NewsItem {
   id: string; title: string; body?: string | null; level?: string;

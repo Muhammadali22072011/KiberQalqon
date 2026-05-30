@@ -26,6 +26,17 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
     private val PERMISSION_REQUEST_CODE = 100
     private val OVERLAY_PERMISSION_REQUEST_CODE = 101
+
+    // Joylashuvni shu sessiyada so'radikmi (loop bo'lmasligi uchun). PERSIST QILMAYMIZ:
+    // ruxsat berilmaган bo'lsa, keyingi ishga tushishda QAYTA so'raymiz — aks holda bir
+    // marta o'tkazib yuborilsa xaritada qurilma umuman ko'rinmay qoladi.
+    private var locationAskedThisSession = false
+
+    // Batareya optimizatsiyasi dialogini shu sessiyada so'radikmi. Rad etilsa (yoki tizim
+    // ekranidan ozod qilmasdan qaytsa) QAYTA ko'rsatmaymiz — aks holda checkPermissions
+    // har safar shu bosqichga qaytib, dialog cheksiz takrorlanardi va foydalanuvchi
+    // keyingi bosqichlarga (joylashuv / bildirishnoma / Dashboard) umuman o'ta olmasdi.
+    private var batteryAskedThisSession = false
     
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -135,7 +146,8 @@ class SplashActivity : AppCompatActivity() {
             !hasStoragePermission() -> requestStoragePermission()
             !hasOverlayPermission() -> requestOverlayPermission()
             shouldPromptOemOverlay() -> maybePromptOemOverlay()
-            !hasBatteryOptimizationIgnored() -> requestBatteryOptimization()
+            shouldRequestBattery() -> requestBatteryOptimization()
+            shouldRequestLocation() -> requestLocationPermission()
             !hasNotificationPermission() -> requestNotificationPermission()
             shouldShowOemGuide() -> showOemAutostartGuide()
             else -> goToMainActivity()
@@ -195,6 +207,15 @@ class SplashActivity : AppCompatActivity() {
         return pm?.isIgnoringBatteryOptimizations(packageName) ?: true
     }
 
+    /**
+     * Batareya optimizatsiyasidan ozod qilishni so'raymizmi. Bir marta so'ralgach
+     * (rad etilsa ham) shu sessiyada QAYTA so'ramaymiz — aks holda checkPermissions
+     * shu bosqichga qaytib, dialog cheksiz takrorlanardi. Keyingi ishga tushirishda
+     * (hali ozod qilinmagan bo'lsa) yana bir marta so'raladi.
+     */
+    private fun shouldRequestBattery(): Boolean =
+        !hasBatteryOptimizationIgnored() && !batteryAskedThisSession
+
     private fun hasNotificationPermission(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return ContextCompat.checkSelfPermission(
@@ -203,7 +224,43 @@ class SplashActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Joylashuv ruxsatini FAQAT "Jamoatchilik xavfsizligi" opt-in yoqilgan bo'lsa so'raymiz
+     * (CloudTelemetry shu bilan darvozalangan — opt-in bermagan foydalanuvchini bezovta qilmaymiz).
+     * Bir marta so'ralgach (rad etilsa ham) qayta so'ramaymiz — checkPermissions sikliga tushmasin.
+     */
+    private fun shouldRequestLocation(): Boolean {
+        if (!Config.hasCommunityShareConsent(this)) return false
+        if (DeviceLocation.hasPermission(this)) return false
+        // Sessiya ichida bir marta — lekin har yangi ishga tushishda qayta so'raladi
+        // (ruxsat hali berilmagan bo'lsa), shunda foydalanuvchi qo'lda Sozlamalarga kirmaydi.
+        return !locationAskedThisSession
+    }
+
+    private fun requestLocationPermission() {
+        // Faqat shu sessiya uchun belgilaymiz (loop bo'lmasin) — keyingi runda qayta so'raladi.
+        locationAskedThisSession = true
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.splash_location_title))
+            .setMessage(getString(R.string.splash_location_message))
+            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ),
+                    104
+                )
+            }
+            .setNegativeButton(getString(R.string.btn_skip)) { _, _ -> checkPermissions() }
+            .setCancelable(false)
+            .show()
+    }
+
     private fun requestBatteryOptimization() {
+        // Shu sessiyada so'radik — rad etilsa ham qayta ko'rsatmaymiz (loop bo'lmasin).
+        batteryAskedThisSession = true
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             checkPermissions()
             return
@@ -403,6 +460,10 @@ class SplashActivity : AppCompatActivity() {
                     .setCancelable(false)
                     .show()
             }
+        } else if (requestCode == 104) {
+            // Joylashuv — berilsa GPS yuboriladi, rad etilsa server IP'dan taxminlaydi.
+            // Ikki holda ham oqimni davom ettiramiz (keyingi bosqich — bildirishnoma).
+            checkPermissions()
         } else if (requestCode == 103) {
             // POST_NOTIFICATIONS — rad etilsa ham davom etamiz, faqat bildirishnoma ishlamaydi.
             // Foydalanuvchi keyinroq Settings'dan o'zi yoqishi mumkin.
@@ -465,6 +526,14 @@ class SplashActivity : AppCompatActivity() {
             !Config.hasUserConsent(this) -> ConsentActivity::class.java
             Config.isFirstRun(this) -> OnboardingActivity::class.java
             !Config.isInitialScanDone(this) -> InitialScanActivity::class.java
+            // Himoya holati ekrani — barcha ruxsat/sozlama yoqilganini bir joyda ko'rsatadi.
+            // Bir marta "Davom etish" bosilgach qayta majburlanmaydi (Config.isProtectionAcked).
+            !Config.isProtectionAcked(this) -> ProtectionStatusActivity::class.java
+            // MAJBURIY ruxsatlardan birortasi keyinchalik o'chirilgan bo'lsa — Dashboard'ga
+            // o'tkazmaymiz, qaytadan "Himoya holati" shlagbaumiga yo'naltiramiz. Ruxsatsiz
+            // ilova ishlamaydi (fon kuzatuvi / o'chirish / ogohlantirish oynasi ishlamaydi).
+            !ProtectionStatusActivity.allCriticalPermissionsGranted(this) ->
+                ProtectionStatusActivity::class.java
             else -> DashboardNewActivity::class.java
         }
         startActivity(Intent(this, target))

@@ -1,0 +1,88 @@
+import type * as XLSXNS from 'xlsx';
+import {
+  apiGet, type Stats, type DeviceRow, type ThreatFamily, type FeedItem, type MapPoint,
+} from './api';
+import { nearestCity } from './uzRegions';
+
+// Panel ma'lumotlarini bitta Excel (.xlsx) faylga eksport qiladi — har bo'lim alohida
+// varaq (list). Faqat o'qish endpointlaridan oladi (egasi ham, admin ham eksport qila oladi).
+// Brauzer faylni yuklab oladi. SheetJS faqat YOZISH uchun ishlatiladi (o'z ma'lumotimiz).
+// xlsx dinamik import qilinadi — faqat eksport bosilganda yuklanadi (asosiy bandl yengil qoladi).
+
+function sheet(XLSX: typeof XLSXNS, rows: Record<string, unknown>[]): XLSXNS.WorkSheet {
+  return XLSX.utils.json_to_sheet(rows.length ? rows : [{ '—': "ma'lumot yo'q" }]);
+}
+
+export async function exportAllToExcel(): Promise<void> {
+  const XLSX = await import('xlsx');
+  const [statsR, devicesR, threatsR, feedR, geoR] = await Promise.all([
+    apiGet<{ stats: Stats }>('/api/stats').catch(() => ({ stats: {} as Stats })),
+    apiGet<{ devices: DeviceRow[] }>('/api/devices').catch(() => ({ devices: [] as DeviceRow[] })),
+    apiGet<{ threats: ThreatFamily[] }>('/api/threats').catch(() => ({ threats: [] as ThreatFamily[] })),
+    apiGet<{ feed: FeedItem[] }>('/api/feed').catch(() => ({ feed: [] as FeedItem[] })),
+    apiGet<{ points: MapPoint[] }>('/api/geo').catch(() => ({ points: [] as MapPoint[] })),
+  ]);
+
+  const s = statsR.stats || {};
+  const statsRows = [
+    { "Ko'rsatkich": 'Bugungi skanlar', Qiymat: s.total_scans ?? 0 },
+    { "Ko'rsatkich": 'Xavfli', Qiymat: s.danger_count ?? 0 },
+    { "Ko'rsatkich": 'Shubhali', Qiymat: s.suspicious_count ?? 0 },
+    { "Ko'rsatkich": 'Xavfsiz', Qiymat: s.safe_count ?? 0 },
+    { "Ko'rsatkich": 'Faol qurilmalar', Qiymat: s.active_devices ?? 0 },
+  ];
+
+  const deviceRows = (devicesR.devices || []).map((d) => ({
+    Nomi: d.name ?? '',
+    Shahar: nearestCity(d.lat, d.lng) ?? d.city ?? '',
+    Mamlakat: d.country ?? '',
+    Android: d.android_ver ?? '',
+    Ilova: d.app_ver ?? '',
+    'Xavf bali': d.risk_score ?? 0,
+    Skanlar: d.scan_count ?? 0,
+    Xavflilar: d.danger_count ?? 0,
+    "Oxirgi ko'rinish": d.last_seen ?? '',
+  }));
+
+  const threatRows = (threatsR.threats || []).map((t) => ({
+    Ilova: t.app_label ?? t.package_name ?? '',
+    Paket: t.package_name ?? '',
+    Toifa: t.category ?? '',
+    Darajasi: t.severity ?? '',
+    "Ko'rilgan": t.seen_count ?? 0,
+    Birinchi: t.first_seen ?? '',
+    Oxirgi: t.last_seen ?? '',
+    Hash: t.apk_hash ?? '',
+  }));
+
+  const feedRows = (feedR.feed || []).map((f) => ({
+    Vaqt: f.scanned_at ?? '',
+    Ilova: f.app_label ?? f.package_name ?? '',
+    Qurilma: f.device_name ?? '',
+    Shahar: f.city ?? '',
+    Xulosa: f.verdict ?? '',
+    'Xavf bali': f.risk_score ?? '',
+  }));
+
+  const geoRows = (geoR.points || []).map((p) => ({
+    Qurilma: p.name ?? '',
+    Shahar: nearestCity(p.lat, p.lng) ?? p.city ?? '',
+    Mamlakat: p.country ?? '',
+    Lat: p.lat ?? '',
+    Lng: p.lng ?? '',
+    'Xavf bali': p.risk_score ?? 0,
+    "So'nggi xulosa": p.last_verdict ?? '',
+  }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, statsRows), 'Umumiy');
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, deviceRows), 'Qurilmalar');
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, threatRows), 'Tahdidlar');
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, feedRows), 'Oqim');
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, geoRows), 'Xarita');
+
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, '0');
+  const name = `kiberqalqon-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.xlsx`;
+  XLSX.writeFile(wb, name);
+}

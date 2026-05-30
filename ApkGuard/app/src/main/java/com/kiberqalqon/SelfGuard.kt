@@ -54,10 +54,26 @@ object SelfGuard {
             val fileName = File(apkPath).name.lowercase()
 
             // 1) Системные пути установленного приложения.
-            //    Android хранит APK как /data/app/<package>-<hash>/base.apk
+            //    Android хранит APK как /data/app/<package>-<hash>/base.apk, а на
+            //    Android 10+ — /data/app/~~rand~~/<package>-<hash>/base.apk.
+            //
+            //    MUHIM (kritik bug-fix): avval bu yerda `path.contains("/$pkg/")`
+            //    ham bor edi. Bu HALOKATLI false-positive berardi: ShareReceiver
+            //    har bir kelgan APK'ni o'z cache'iga ko'chiradi
+            //    (/data/data/com.kiberqalqon.debug/cache/shared/... yoki
+            //     /sdcard/Android/data/com.kiberqalqon.debug/cache/...). Bu yo'lda
+            //    ham "/com.kiberqalqon.debug/" bor → HAR QANDAY skanlangan virus
+            //    "o'zimiznikidir" deb SAFE qaytarilardi (ZipEncryption/Dropper
+            //    tekshiruvlari umuman ishga tushmasdan). Endi faqat HAQIQIY
+            //    o'rnatilgan joy — /data/app/ ostidagi APK — "o'ziniki" deb
+            //    hisoblanadi. App hech qachon /data/app/ ga yozolmaydi, shuning
+            //    uchun u yerda paket nomimiz bilan turgan APK kafolatli bizniki.
+            //    O'zimizning APK boshqa joyda bo'lsa ham (2) paket va (4) imzo
+            //    tekshiruvlari baribir tutadi.
             for (pkg in OWN_PACKAGES) {
-                if (path.contains("/data/app/$pkg") || path.contains("/$pkg/")) {
-                    Log.d(TAG, "Self APK detected by path: $apkPath")
+                if (path.contains("/data/app/") &&
+                    (path.contains("/$pkg-") || path.contains("/$pkg/"))) {
+                    Log.d(TAG, "Self APK detected by install path: $apkPath")
                     return true
                 }
             }

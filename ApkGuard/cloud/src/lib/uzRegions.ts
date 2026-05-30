@@ -1,91 +1,106 @@
-import type { VercelRequest } from '@vercel/node';
+// O'zbekiston hududlari (12 viloyat + Toshkent shahri + Qoraqalpog'iston).
+// IP-geolokatsiya faqat shahar darajasida taxminiy bo'lgani uchun, qurilmani
+// viloyatga ikki bosqichda biriktiramiz:
+//   1) shahar nomi bo'yicha (CITY_REGION jadvali — eng ishonchli signal,
+//      Toshkent shahrini viloyatdan ajratadi);
+//   2) nomi topilmasa — lat/lng bo'yicha eng yaqin viloyat markaziga.
+// Hammasi mijoz tomonida: bazada alohida region ustuni yo'q, mavjud
+// country/city/lat/lng dan kelib chiqiladi (02_geo.sql).
 
-// Geo manbai ikki xil: (1) qurilma o'z aniq GPS koordinatasini (lat/lng) bodyda
-// yuboradi — joylashuv ruxsati bo'lsa (jitter QILINMAYDI); (2) aks holda Vercel IP
-// sarlavhalari (shahar darajasi, taxminiy). resolveGeo() shu ikkisini birlashtiradi.
-// Lokal dev'da IP sarlavhalari bo'sh bo'ladi.
-//   x-vercel-ip-country    "UZ"
-//   x-vercel-ip-city       "Tashkent"  (URL-encoded bo'lishi mumkin)
-//   x-vercel-ip-latitude   "41.3111"
-//   x-vercel-ip-longitude  "69.2797"
+export interface UzRegion { key: string; name: string; lat: number; lng: number; }
 
-export type Geo = {
-  country: string | null;
-  city: string | null;
-  lat: number | null;
-  lng: number | null;
-};
+export const UZ_REGIONS: UzRegion[] = [
+  { key: 'toshkent_sh',     name: 'Toshkent shahri',   lat: 41.31, lng: 69.28 },
+  { key: 'toshkent_v',      name: 'Toshkent viloyati', lat: 41.00, lng: 69.60 },
+  { key: 'andijon',         name: 'Andijon',           lat: 40.78, lng: 72.34 },
+  { key: 'fargona',         name: 'Farg‘ona',          lat: 40.39, lng: 71.79 },
+  { key: 'namangan',        name: 'Namangan',          lat: 41.00, lng: 71.67 },
+  { key: 'sirdaryo',        name: 'Sirdaryo',          lat: 40.49, lng: 68.79 },
+  { key: 'jizzax',          name: 'Jizzax',            lat: 40.12, lng: 67.84 },
+  { key: 'samarqand',       name: 'Samarqand',         lat: 39.65, lng: 66.96 },
+  { key: 'qashqadaryo',     name: 'Qashqadaryo',       lat: 38.86, lng: 65.79 },
+  { key: 'surxondaryo',     name: 'Surxondaryo',       lat: 37.50, lng: 67.27 },
+  { key: 'navoiy',          name: 'Navoiy',            lat: 40.10, lng: 65.38 },
+  { key: 'buxoro',          name: 'Buxoro',            lat: 39.77, lng: 64.43 },
+  { key: 'xorazm',          name: 'Xorazm',            lat: 41.55, lng: 60.63 },
+  { key: 'qoraqalpogiston', name: 'Qoraqalpog‘iston',  lat: 42.47, lng: 59.60 },
+];
 
-export function readGeo(req: VercelRequest): Geo {
-  const h = req.headers;
-  const cityRaw = str(h['x-vercel-ip-city']);
-  let city: string | null = cityRaw;
-  if (cityRaw) {
-    try { city = decodeURIComponent(cityRaw); } catch { city = cityRaw; }
+export const REGION_NAME: Record<string, string> =
+  Object.fromEntries(UZ_REGIONS.map((r) => [r.key, r.name]));
+
+// Shahar nomini taqqoslash uchun normallashtirish: kichik harf, apostrof/diakritikani
+// olib tashlash, ma'muriy qo'shimchalarni ("region", "tumani", "city"…) kesish.
+function norm(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/['’ʻ`‘ʼ]/g, '')
+    .replace(/[\s\-]+/g, ' ')
+    .replace(/\b(region|viloyati|viloyat|shahri|shahar|tumani|tuman|district|city|town|oblast|provinsiyasi|province)\b/g, '')
+    .trim();
+}
+
+// Shahar/tuman nomi → viloyat. Kalitlar norm() bilan kiritiladi (lotin, kichik harf).
+const CITY_REGION: Record<string, string> = {};
+function add(region: string, ...cities: string[]): void {
+  for (const c of cities) CITY_REGION[norm(c)] = region;
+}
+
+add('toshkent_sh', 'tashkent', 'toshkent');
+add('toshkent_v', 'chirchiq', 'chirchik', 'angren', 'olmaliq', 'almalyk', 'bekobod', 'bekabad',
+  'yangiyol', 'yangiyul', 'ohangaron', 'akhangaran', 'parkent', 'gazalkent', 'nurafshon',
+  'keles', 'chinoz', 'chinaz', 'piskent', 'buka', 'boka', 'yangiobod', 'gulbahor', 'iskandar');
+add('andijon', 'andijan', 'andijon', 'asaka', 'shahrixon', 'shahrikhan', 'xonobod', 'khanabad',
+  'marhamat', 'qorgontepa', 'paxtaobod', 'xojaobod');
+add('fargona', 'fergana', 'fargona', 'margilon', 'margilan', 'kokand', 'qoqon', 'quva', 'kuva',
+  'rishton', 'rishtan', 'beshariq', 'quvasoy', 'yaypan');
+add('namangan', 'namangan', 'chust', 'kosonsoy', 'pop', 'uchqorgon', 'uchkurgan', 'chortoq',
+  'toraqorgon', 'haqqulobod');
+add('sirdaryo', 'gulistan', 'guliston', 'yangiyer', 'shirin', 'sirdaryo', 'syrdarya', 'boyovut',
+  'bayaut', 'sardoba', 'baxt');
+add('jizzax', 'jizzakh', 'jizzax', 'gallaorol', 'gallaaral', 'zomin', 'dustlik', 'paxtakor',
+  'pakhtakor', 'marjonbuloq');
+add('samarqand', 'samarkand', 'samarqand', 'urgut', 'kattakurgan', 'kattaqorgon', 'jomboy',
+  'bulungur', 'ishtixon', 'oqtosh', 'payariq');
+add('qashqadaryo', 'karshi', 'qarshi', 'shahrisabz', 'kitob', 'kitab', 'guzor', 'koson', 'kasbi',
+  'muborak', 'yakkabog', 'chiroqchi', 'dehqonobod');
+add('surxondaryo', 'termez', 'termiz', 'denov', 'denau', 'sherobod', 'sherabad', 'boysun',
+  'shorchi', 'jarqorgon', 'qumqorgon', 'sariosiyo');
+add('navoiy', 'navoi', 'navoiy', 'zarafshan', 'uchquduq', 'uchkuduk', 'karmana', 'kermine',
+  'gazgan', 'nurota', 'konimex', 'qiziltepa', 'gazghan');
+add('buxoro', 'bukhara', 'buxoro', 'kogon', 'kagan', 'gijduvon', 'gijduvan', 'vobkent', 'gazli',
+  'olot', 'romitan', 'shofirkon', 'qorakol');
+add('xorazm', 'urgench', 'urganch', 'xiva', 'khiva', 'pitnak', 'xazorasp', 'hazorasp', 'shovot',
+  'gurlan', 'qoshkopir', 'bogot', 'yangiariq');
+add('qoraqalpogiston', 'nukus', 'nokis', 'xojayli', 'khojeyli', 'beruniy', 'chimboy', 'chimbay',
+  'takhiatash', 'taxiatosh', 'qongirot', 'kungrad', 'mangit', 'turtkul', 'tortkol', 'qanlikol');
+
+const sq = (a: number): number => a * a;
+
+// Qurilmani viloyatga biriktirish. Avval shahar nomi, keyin eng yaqin markaz.
+export function regionOf(lat?: number | null, lng?: number | null, city?: string | null): string | null {
+  if (city && city.trim()) {
+    const hit = CITY_REGION[norm(city)];
+    if (hit) return hit;
   }
-  return {
-    country: str(h['x-vercel-ip-country']),
-    city,
-    lat: num(h['x-vercel-ip-latitude']),
-    lng: num(h['x-vercel-ip-longitude']),
-  };
-}
-
-// Qurilmaning real IP-manzili (Vercel proxy orqali). x-forwarded-for birinchi hop
-// mijozning IP'si bo'ladi; bo'lmasa x-real-ip. Lokal dev'da null. Egasi paneliga
-// ko'rsatish uchun saqlanadi (maxfiylik siyosatida oshkor qilingan).
-export function clientIp(req: VercelRequest): string | null {
-  const xff = req.headers['x-forwarded-for'];
-  const raw = Array.isArray(xff) ? xff[0] : xff;
-  if (typeof raw === 'string' && raw.trim()) {
-    const first = raw.split(',')[0].trim();
-    if (first) return first;
-  }
-  const real = req.headers['x-real-ip'];
-  const r = Array.isArray(real) ? real[0] : real;
-  if (typeof r === 'string' && r.trim()) return r.trim();
-  return null;
-}
-
-// Bir shahardagi bir nechta qurilma bitta pikselга to'planib qolmasligi uchun
-// device_token'dan deterministik kichik siljish beramiz (~0..3 km radius).
-// Deterministik bo'lgani uchun nuqta har skanda sakramaydi — joyida turadi.
-export function jitterGeo(geo: Geo, seed: string): Geo {
-  if (geo.lat == null || geo.lng == null) return geo;
-  const hsh = hash(seed);
-  const a = (hsh % 100000) / 100000;             // 0..1
-  const b = ((hsh >>> 7) % 100000) / 100000;     // 0..1
-  const r = 0.028 * Math.sqrt(a);                // ~3 km gacha radius
-  const theta = 2 * Math.PI * b;
-  // lng siljishini kenglikка qarab kichraytiramiz (xarita proporsiyasi uchun)
-  const latRad = (geo.lat * Math.PI) / 180;
-  const cosLat = Math.max(0.2, Math.cos(latRad));
-  return {
-    ...geo,
-    lat: round6(geo.lat + r * Math.cos(theta)),
-    lng: round6(geo.lng + (r * Math.sin(theta)) / cosLat),
-  };
-}
-
-// Qurilma yuborgan aniq koordinatani o'qiydi va tekshiradi (chegara + 0,0 rad etish).
-// Body — JSON (lat/lng son yoki son-satr bo'lishi mumkin). Yaroqsiz bo'lsa null.
-export function readDeviceGeo(body: unknown): { lat: number; lng: number } | null {
-  if (!body || typeof body !== 'object') return null;
-  const b = body as Record<string, unknown>;
-  const lat = toNum(b.lat);
-  const lng = toNum(b.lng);
   if (lat == null || lng == null) return null;
-  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
-  if (lat === 0 && lng === 0) return null; // "Null orol" — odatda haqiqiy emas
-  return { lat: round6(lat), lng: round6(lng) };
+  const cosLat = Math.cos((lat * Math.PI) / 180) || 1;
+  let best: string | null = null;
+  let bestD = Infinity;
+  for (const r of UZ_REGIONS) {
+    const d = sq(lat - r.lat) + sq((lng - r.lng) * cosLat);
+    if (d < bestD) { bestD = d; best = r.key; }
+  }
+  return best;
 }
 
-// O'zbekiston shahar/tuman markazlari (141 ta; GeoNames cities5000 asosida, Uzbek-lotin
-// nomlari tozalangan) — qurilma aniq GPS yuborganda joylashuv nomini KOORDINATADAN
-// aniqlaymiz. IP shahar nomi ko'pincha mobil operator shlyuziga (deyarli har doim
-// Toshkent) bog'lanadi; shuning uchun GPS bo'lsa IP nomiga ishonmaymiz. Eng yaqin
-// shahar nomi qaytadi; panel src/lib/uzRegions.ts uni koordinata bo'yicha to'g'ri
-// viloyatga bog'laydi (nomdan topa olmasa eng yaqin viloyat markaziga tushadi).
+// ── Shahar/tuman darajasi (GPS bo'lsa nomni KOORDINATADAN aniqlaymiz) ───────────
+// IP shahar nomi ishonchsiz: mobil operator shlyuzi deyarli har doim "Tashkent"ga
+// ishora qiladi. Qurilma lat/lng yuborsa, eng yaqin haqiqiy shahar/tuman nomini
+// koordinatadan olamiz (bu nom keyin regionOf orqali to'g'ri viloyatga tushadi).
+// Ro'yxat cloud/lib/geo.ts dagi UZ_CITIES bilan bir xil — server (lib/) va SPA (src/)
+// modul ulasha olmaydi (build chegarasi), shuning uchun nusxa. 141 ta nuqta (GeoNames).
 const UZ_CITIES: { name: string; lat: number; lng: number }[] = [
   { name: 'Amir Timur', lat: 41.0194, lng: 68.9408 },
   { name: 'Andijon', lat: 40.7834, lng: 72.3507 },
@@ -231,68 +246,14 @@ const UZ_CITIES: { name: string; lat: number; lng: number }[] = [
 ];
 
 // Koordinataga eng yaqin shahar/tuman nomi (lng masshtabi kenglikka moslangan).
-function nearestCity(lat: number, lng: number): string | null {
+export function nearestCity(lat?: number | null, lng?: number | null): string | null {
+  if (lat == null || lng == null) return null;
   const cosLat = Math.cos((lat * Math.PI) / 180) || 1;
   let best: string | null = null;
   let bestD = Infinity;
   for (const c of UZ_CITIES) {
-    const dLat = lat - c.lat;
-    const dLng = (lng - c.lng) * cosLat;
-    const d = dLat * dLat + dLng * dLng;
+    const d = sq(lat - c.lat) + sq((lng - c.lng) * cosLat);
     if (d < bestD) { bestD = d; best = c.name; }
   }
   return best;
-}
-
-// Geo manbasini hal qiladi:
-//   • qurilma GPS bersa — aniq nuqta (jittersiz); joylashuv nomi GPS'dan aniqlangan
-//     eng yaqin shahar/tuman (IP shahar nomi noto'g'ri — mobil IP odatda Toshkentga
-//     ishora qiladi); davlat esa IP'dan.
-//   • aks holda — IP geo + deterministik jitter (eski xatti-harakat).
-export function resolveGeo(req: VercelRequest, body: unknown, seed: string): Geo {
-  const ip = readGeo(req);
-  const dev = readDeviceGeo(body);
-  if (dev) {
-    return {
-      country: ip.country,
-      city: nearestCity(dev.lat, dev.lng) ?? ip.city,
-      lat: dev.lat,
-      lng: dev.lng,
-    };
-  }
-  return jitterGeo(ip, seed);
-}
-
-function toNum(v: unknown): number | null {
-  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
-  if (typeof v === 'string' && v.trim() !== '') {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
-  return null;
-}
-
-function str(v: string | string[] | undefined): string | null {
-  if (Array.isArray(v)) v = v[0];
-  if (typeof v !== 'string') return null;
-  const t = v.trim();
-  return t.length ? t : null;
-}
-
-function num(v: string | string[] | undefined): number | null {
-  const s = str(v);
-  if (s == null) return null;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
-
-function round6(n: number): number {
-  return Math.round(n * 1e6) / 1e6;
-}
-
-// djb2 — kichik, deterministik string hash → musbat int
-function hash(s: string): number {
-  let h = 5381;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
-  return h >>> 0;
 }

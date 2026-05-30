@@ -1,5 +1,6 @@
 package com.kiberqalqon
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.material.card.MaterialCardView
 
 /**
@@ -28,6 +30,7 @@ class ConsentActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_REVIEW_MODE = "review_mode"
+        private const val REQ_LOCATION = 104
 
         /** Open in review mode (from Settings) — no checkboxes, no exit-on-decline. */
         fun openForReview(ctx: Context) {
@@ -105,8 +108,45 @@ class ConsentActivity : AppCompatActivity() {
     private fun onAccept(communityConsent: Boolean) {
         Config.setUserConsent(this, true)
         Config.setCommunityShareConsent(this, communityConsent)
-        // Post-consent route: Onboarding (first run) → InitialScanActivity
-        // (если ещё не было первичного скана) → DashboardNewActivity.
+        // Geo xaritasi jamoatchilik roziligi bilan darvozalangan. Rozilik berilgani uchun
+        // joylashuv ruxsatini AYNAN SHU YERDA so'raymiz — shunda qurilma xaritada to'g'ri
+        // nuqtada chiqadi va foydalanuvchi keyin Sozlamalarga qo'lda kirmaydi.
+        // Natija qanday bo'lishidan qat'i nazar keyingi ekranga o'tamiz.
+        if (communityConsent && !DeviceLocation.hasPermission(this)) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                REQ_LOCATION
+            )
+        } else {
+            proceedAfterConsent()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // Joylashuv berilsa GPS yuboriladi; rad etilsa server IP'dan taxminlaydi —
+        // ikki holda ham flow to'xtamaydi.
+        if (requestCode == REQ_LOCATION) proceedAfterConsent()
+    }
+
+    // Post-consent route: Onboarding (first run) → InitialScanActivity
+    // (если ещё не было первичного скана) → DashboardNewActivity.
+    private fun proceedAfterConsent() {
+        // Rozilik + joylashuv ruxsati AYNAN HOZIR hal bo'ldi — qurilmani DARHOL
+        // ro'yxatdan o'tkazamiz, shunda u xaritada birinchi ishga tushirishdayoq
+        // ko'rinadi (App.onCreate'dagi register ilk startda rozilikgача chaqirilgani
+        // uchun o'tkazib yuborilgan edi). registerDevice tarmoq ishini IO oqimida
+        // bajaradi va 12 soatlik throttle bilan takror yubormaydi.
+        CloudTelemetry.registerDevice(this)
+
         val target = when {
             Config.isFirstRun(this) -> OnboardingActivity::class.java
             !Config.isInitialScanDone(this) -> InitialScanActivity::class.java
@@ -195,7 +235,7 @@ Bu siyosat KiberQalqon'ning ma'lumot bilan ishlashini to'liq tushuntiradi. HECH 
 ═══════════════════════════════
 1. ASOSIY PRINSIP
 ═══════════════════════════════
-Standart konfiguratsiyada KiberQalqon ma'lumotlarni HECH QAYERGA YUBORMAYDI. Barcha skan natijalari faqat sizning qurilmangizda saqlanadi.
+Skan natijalari va sozlamalar faqat sizning qurilmangizda saqlanadi. Ma'lumot qurilmadan tashqariga FAQAT quyida (3 va 4-bo'limlar) ochiq tushuntirilgan funksiyalar orqali chiqadi. Bulardan "Jamoatchilik xavfsizligi" (4-bo'lim) ilovadan foydalanish uchun MAJBURIY; shaxsiy Telegram telemetriya (3-bo'lim) esa IXTIYORIY.
 
 ═══════════════════════════════
 2. QURILMADA SAQLANADIGAN MA'LUMOTLAR
@@ -246,27 +286,35 @@ SHU SABABLI ushbu funksiya KiberQalqon'ning ASOSIY ROZILIK QISMI hisoblanadi —
 
 NIMALAR KiberQalqon jamoasiga yuboriladi:
 
-(a) Har bir xavfli/shubhali APK aniqlanganda:
-   • APK SHA-256 hashi (24 bayt fingerprint)
-   • Paket nomi (masalan "com.example.malware")
-   • Skan verdicti va aniqlangan xavf signaturasi (sabab)
-   • Qurilma ishlab chiqaruvchisi va modeli (masalan "Samsung SM-A536E")
-   • Android versiyasi (masalan "14")
+KiberQalqon ikki kanaldan foydalanadi: (1) markaziy BULUT monitoringi — himoya statistikasi va xaritasi uchun, (2) xavfli namunalar uchun Telegram hisoboti. Quyida har biri aniq ko'rsatilgan.
+
+(a) BULUT monitoringiga — HAR BIR skanda (xavfsiz natijalar HAM, "jami skan" statistikasi va xaritadagi yashil nuqtalar uchun):
+   • Anonim qurilma identifikatori — tasodifiy UUID. Bu IMEI, seriya raqami yoki telefon raqami EMAS.
+   • Qurilma modeli (masalan "Samsung SM-A536E"), Android versiyasi va ilova versiyasi
+   • Skan meta-ma'lumoti: APK SHA-256 hashi, paket nomi, verdict (xavfsiz/shubhali/xavfli), risk ball, sabablar va xavfli ruxsatlar
+   • QURILMA JOYLASHUVI (GPS koordinatasi) — FAQAT siz joylashuv ruxsatini bergan bo'lsangiz. Bu markaziy himoya xaritasida qurilmangiz va tahdidlar qayerda ekanini ko'rsatish uchun. DOIMIY KUZATUV YO'Q: koordinata faqat ilova ishlayotganda (skan yoki ro'yxatdan o'tish paytida) o'qiladi, fonda emas, va ~0.1 metrgacha yumaloqlanadi. Ruxsat bermasangiz — koordinata umuman yuborilmaydi.
+   • Bulut serveri, har qanday internet so'rovida bo'lgani kabi, qurilmangizning IP-manzilini ko'radi va undan (GPS bo'lmasa) faqat shahar darajasida taxminiy joyni aniqlaydi.
+   • XAVFLI yoki SHUBHALI deb topilgan APK FAYLNING O'ZI (50 MB gacha) — markaziy bulut serveriga (xavfsiz HTTPS) yuklanadi: uni chuqur o'rganib yangi virus signaturalari yaratish uchun. XAVFSIZ APK fayllari HECH QACHON yuklanmaydi — ulardan faqat meta-ma'lumot (yuqoridagi) statistika uchun ketadi, faylning o'zi emas.
+
+(b) Telegram hisobotiga — FAQAT xavfli yoki shubhali APK aniqlanganda:
+   • APK SHA-256 hashi, paket nomi, verdict va aniqlangan xavf signaturasi (sabab)
+   • Qurilma modeli va Android versiyasi
    • APK FAYLNING O'ZI (50 MB gacha) — yangi virus signaturalarini ishlab chiqish uchun
 
-(b) Ilova xato (crash) yuz berganda — dasturchiga xatoni tuzatishi uchun:
+(c) Ilova xato (crash) yuz berganda — dasturchiga xatoni tuzatishi uchun:
    • Stacktrace (kod xatosi joyi va sababi)
    • Qurilma modeli va Android versiyasi
    • KiberQalqon versiyasi va vaqt
 
-YOQILGAN bo'lsa HAM, YUBORILMAYDI:
-• Xavfsiz APK fayllar (faqat xavfli/shubhalilar yuboriladi)
-• Boshqa skanlar (faqat aniq xavf hodisalari)
-• Sizning ismingiz, telefon raqamingiz, IMEI, seriya raqami
-• Joylashuv (GPS), IP-manzil, MAC-address
+YOQILGAN bo'lsa HAM, HECH QACHON YUBORILMAYDI:
+• Xavfsiz APK FAYLLARINING o'zi (faqat meta-ma'lumoti statistika uchun ketadi — faylning o'zi emas)
+• Sizning ismingiz, telefon raqamingiz, IMEI, seriya raqami, MAC-address
 • Qurilmadagi boshqa ilovalar ro'yxati
 • Shaxsiy fayllar (rasm, video, hujjat), kontaktlar, SMS, chat
 • Internet brauzer tarixi, parollar, token'lar
+
+NIMA UCHUN JOYLASHUV SO'RALADI:
+Markaziy himoya xaritasi qaysi hududlarda qanday tahdidlar tarqalayotganini ko'rsatadi — bu yangi hujum to'lqinlarini erta aniqlash va foydalanuvchilarni ogohlantirishga yordam beradi. Joylashuvsiz ham ilova to'liq ishlaydi; u holda qurilmangiz xaritada faqat IP bo'yicha taxminiy shaharga joylashtiriladi.
 
 NIMA UCHUN APK FAYL YUBORILADI:
 Faqat hash bilan biz "bu fayl xavfli" deyishimiz mumkin, lekin uning ICHKI tuzilishini ko'rib yangi virus shablonlari yarata olmaymiz. Original fayl bilan biz boshqa foydalanuvchilarni TEZROQ himoya qila olamiz.
@@ -275,7 +323,9 @@ NIMA UCHUN CRASH YUBORILADI:
 KiberQalqon dasturchi tushunmagan xatolar ilovani buzadi. Stacktrace bilan dasturchi xatoni tuzatib, yangilanish chiqaradi. Bu Firebase Crashlytics, Sentry kabi standart amaliyot.
 
 QAYERGA YUBORILADI:
-KiberQalqon rivojlantirish jamoasining Telegram boti orqali markaziy jamoatchilik xavf bazasiga. Bu ma'lumot yangi viruslarni aniqlash va boshqa foydalanuvchilarni himoya qilish uchun signaturalar bazasiga qo'shiladi.
+• Bulut monitoringi: KiberQalqon'ning markaziy serveriga (xavfsiz HTTPS orqali) — u himoya xaritasi, statistika va tahdid oqimini to'ldiradi; xavfli/shubhali APK namunalari esa o'rganish uchun himoyalangan saqlovga (Storage) yuklanadi.
+• Telegram hisoboti: KiberQalqon rivojlantirish jamoasining Telegram boti orqali markaziy jamoatchilik xavf bazasiga.
+Bu ma'lumotlar yangi viruslarni aniqlash va boshqa foydalanuvchilarni himoya qilish uchun signaturalar bazasiga qo'shiladi.
 
 QANDAY BOSHQARILADI:
 • Yoqish: pastdagi 3-galochka ("Jamoatchilik xavfsizligi...") orqali — bu MAJBURIY
@@ -295,8 +345,9 @@ QANDAY BOSHQARILADI:
 6. INTERNET FOYDALANISHI
 ═══════════════════════════════
 Hozir ilova internetga kiradigan vaqtlar:
+• Jamoatchilik ulashish yoqilgan bo'lsa — KiberQalqon markaziy bulut serveriga (xavfsiz HTTPS): qurilma ro'yxati, skan statistikasi, himoya xaritasi va (ruxsat bergan bo'lsangiz) joylashuv
+• Jamoatchilik ulashish yoqilgan bo'lsa — KiberQalqon jamoasi bot'iga (api.telegram.org): xavfli APK namunalari
 • Shaxsiy Telegram telemetriya yoqilgan bo'lsa — sizning bot'ingizga (api.telegram.org)
-• Jamoatchilik ulashish yoqilgan bo'lsa — KiberQalqon jamoasi bot'iga (api.telegram.org)
 • Kelajakda — virus signaturalarini yangilash uchun (haqida alohida ogohlantirish bo'ladi)
 
 Boshqa hech qanday internet-trafik yo'q. Hech qanday reklama tarmoqlari, analitika SDK (Firebase, Crashlytics, Google Analytics) ishlatilmaydi.
@@ -326,9 +377,11 @@ QABUL QILISH ORQALI SIZ:
 • Yuqoridagi shartlar va siyosatni o'qib chiqqaningizni va tushunganingizni
 • Shaxsiy Telegram telemetriya IXTIYORIY ekanligini (siz o'z bot/chat'ni kiritishingiz kerak)
 • Jamoatchilik ulashish KiberQalqon'ning ASOSIY ISHLASH QISMI ekanligini va siz unga rozi ekanligingizni
+• Har bir skan meta-ma'lumoti markaziy bulutga (statistika va himoya xaritasi uchun) yuborilishini
+• Joylashuv ruxsatini bersangiz, qurilma GPS koordinatasi xarita uchun yuborilishini — fonda kuzatuvsiz; ruxsat bermasangiz yuborilmasligini
 • Xavfli APK aniqlanganda fayl + meta-ma'lumot KiberQalqon jamoasiga yuborilishini
 • Crash hodisalarida stacktrace dasturchiga yuborilishini
-• Shaxsiy ma'lumot (ism, telefon, IMEI, GPS, kontakt, SMS) hech qachon yuborilmasligini
+• Shaxsiy ma'lumot (ism, telefon raqami, IMEI, seriya raqami, kontakt, SMS, parollar) hech qachon yuborilmasligini
 TASDIQLAYSIZ.
 ═══════════════════════════════
 """.trimIndent()

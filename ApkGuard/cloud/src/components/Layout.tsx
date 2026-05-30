@@ -4,17 +4,19 @@ import { useAuth } from '../context/AuthContext';
 import { apiGet, type NewsItem } from '../lib/api';
 import { usePoll } from '../hooks/usePoll';
 import { hms } from '../lib/format';
+import { exportAllToExcel } from '../lib/exportExcel';
+import { useToast } from './Toast';
 
+// Egasi va admin — ikkalasi ham hamma bo'limni ko'radi.
 const NAV = [
   { to: '/app', end: true, icon: '📊', label: 'Bosh sahifa' },
   { to: '/app/map', icon: '🗺️', label: 'Geo xarita' },
   { to: '/app/feed', icon: '📡', label: 'Jonli oqim' },
   { to: '/app/threats', icon: '🧬', label: 'Tahdidlar' },
   { to: '/app/devices', icon: '📱', label: 'Qurilmalar' },
-  { to: '/app/roles', icon: '🔐', label: 'Rollar' },
   { to: '/app/news', icon: '📰', label: "E'lonlar" },
   { to: '/app/profile', icon: '👤', label: 'Profil' },
-];
+] as const;
 
 const TITLES: Record<string, { sub: string; title: string }> = {
   '/app': { sub: 'Umumiy ko‘rinish', title: 'Bosh sahifa' },
@@ -22,17 +24,31 @@ const TITLES: Record<string, { sub: string; title: string }> = {
   '/app/feed': { sub: 'Real vaqt', title: 'Jonli tahdidlar oqimi' },
   '/app/threats': { sub: 'Tahlil', title: 'Eng faol tahdidlar' },
   '/app/devices': { sub: 'Qurilmalar', title: 'Himoyalangan qurilmalar' },
-  '/app/roles': { sub: 'Maxfiy kirish', title: 'Rollar va operatorlar' },
   '/app/news': { sub: 'E‘lonlar · lenta', title: 'Yangiliklar' },
   '/app/profile': { sub: 'Hisob', title: 'Profil va xavfsizlik' },
 };
 
 export default function Layout() {
   const { logout } = useAuth();
+  const { show } = useToast();
   const nav = useNavigate();
   const loc = useLocation();
   const [open, setOpen] = useState(false);
   const [clock, setClock] = useState(hms());
+  const [exporting, setExporting] = useState(false);
+
+  const doExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      await exportAllToExcel();
+      show('Excel fayl tayyor');
+    } catch {
+      show('Eksport amalga oshmadi');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   useEffect(() => {
     const id = window.setInterval(() => setClock(hms()), 1000);
@@ -41,7 +57,14 @@ export default function Layout() {
 
   useEffect(() => { setOpen(false); }, [loc.pathname]);
 
-  const news = usePoll(() => apiGet<{ news: NewsItem[] }>('/api/news'), 60000);
+  // Egasi va admin — ikkalasi ham hamma bo'limni ko'radi.
+  const items = NAV;
+  const showNews = true;
+
+  const news = usePoll(
+    () => (showNews ? apiGet<{ news: NewsItem[] }>('/api/news') : Promise.resolve({ news: [] })),
+    60000,
+  );
   const unread = useMemo(() => {
     const seen = Number(localStorage.getItem('kq_news_seen') || 0);
     return (news.data?.news || []).filter(
@@ -62,11 +85,11 @@ export default function Layout() {
           <div className="brand"><b>KiberQalqon</b><small>Cloud panel</small></div>
         </div>
         <nav className="side-nav">
-          {NAV.map((n) => (
+          {items.map((n) => (
             <NavLink
               key={n.to}
               to={n.to}
-              end={n.end}
+              end={'end' in n ? n.end : false}
               className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}
             >
               <span className="ni-ico">{n.icon}</span>
@@ -87,9 +110,14 @@ export default function Layout() {
           <div className="brand head"><small>{head.sub}</small><b>{head.title}</b></div>
           <div className="spacer" />
           <span className="pill"><span className="live-dot" /> JONLI · {clock}</span>
-          <button className="icon-btn" title="E‘lonlar" onClick={() => nav('/app/news')}>
-            📰{unread > 0 && <span className="badge">{badge}</span>}
+          <button className="icon-btn" title="Excel'ga eksport" onClick={doExport} disabled={exporting}>
+            {exporting ? <span className="spinner" /> : '⬇'}
           </button>
+          {showNews && (
+            <button className="icon-btn" title="E‘lonlar" onClick={() => nav('/app/news')}>
+              📰{unread > 0 && <span className="badge">{badge}</span>}
+            </button>
+          )}
           <button className="icon-btn" title="Chiqish" onClick={doLogout}>⎋</button>
         </header>
         <main className="content"><Outlet /></main>

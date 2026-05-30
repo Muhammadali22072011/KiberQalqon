@@ -1,3 +1,11 @@
+/*
+ *  #### #  # #### #  #    #  # #### #  #     ← BEGINNING
+ *  #    #  # #    # #     #  # #  # #  #
+ *  ###  #  # #    ##      #### #  # #  #
+ *  #    #  # #    # #       #  #  # #  #
+ *  #    #### #### #  #      #  #### ####
+ *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ */
 package com.kiberqalqon
 
 import android.os.Build
@@ -20,6 +28,9 @@ class App : android.app.Application() {
 
         // САМАЯ ПЕРВАЯ строка: ставим CrashHandler чтобы поймать ВСЁ что упадёт ниже.
         CrashHandler.install(this)
+
+        // Salom dekompilyatorlarga (logcat + DEX string). Foydalanuvchi ko'rmaydi.
+        EasterEgg.stamp()
 
         // Ilk ochilishda barcha himoya sozlamalarini yoqilgan holatda saqlaymiz.
         // Foydalanuvchi hech narsa qilmasdan, o'rnatish bilan darhol "to'liq himoya"

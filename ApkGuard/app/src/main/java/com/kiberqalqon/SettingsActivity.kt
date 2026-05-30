@@ -45,8 +45,7 @@ class SettingsActivity : AppCompatActivity() {
         bindState()
         wireListeners()
         injectConsentSection()
-        SecretAccess.reset()      // har kirishda kombinatsiya nolga tushsin
-        injectSecretEntry()
+        injectAdminPanelEntry()
 
         KqBottomNav.attach(this, KqBottomNav.Tab.SETTINGS)
 
@@ -423,48 +422,28 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Maxfiy kirish — 4 ta rangli dumaloq tugmani footer ostiga qo'shadi (oddiy
-     * foydalanuvchiga bezak kabi). To'g'ri KETMA-KETLIKDA bosilsa (SecretAccess)
-     * maxfiy kirish ekrani ochiladi. Noto'g'ri tegsa — jimgina nolga tushadi.
+     * "Boshqaruv paneli" — footer ustiga bitta tugma qo'shadi. Bosilsa veb-panel
+     * ilova ichida (WebView) ochiladi: admin login+parol bilan kiradi (ko'rish +
+     * eksport + e'lon), egasi master kalit bilan. Sirlar APK ichida emas.
      */
-    private fun injectSecretEntry() {
+    private fun injectAdminPanelEntry() {
         try {
             val footer = findFooterTextView() ?: return
             val parent = footer.parent as? LinearLayout ?: return
             val footerIdx = parent.indexOfChild(footer)
-
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
+            val btn = TextView(this).apply {
+                text = "🛡  Boshqaruv paneli"
+                textSize = 15f
                 gravity = android.view.Gravity.CENTER
-                setPadding(0, dp(12), 0, dp(24))
-            }
-            for (i in SecretAccess.BUTTON_COLORS.indices) {
-                val dot = View(this).apply {
-                    background = android.graphics.drawable.GradientDrawable().apply {
-                        shape = android.graphics.drawable.GradientDrawable.OVAL
-                        setColor(SecretAccess.BUTTON_COLORS[i])
-                    }
-                    alpha = 0.55f   // xira — e'tibor tortmasin
-                    val sz = dp(18)
-                    layoutParams = LinearLayout.LayoutParams(sz, sz).apply {
-                        marginStart = dp(9); marginEnd = dp(9)
-                    }
-                    isClickable = true
-                    setOnClickListener {
-                        // Sezilarli-sezilmas bosish animatsiyasi (taps registratsiyasi bilinsin).
-                        animate().scaleX(0.8f).scaleY(0.8f).setDuration(60).withEndAction {
-                            animate().scaleX(1f).scaleY(1f).setDuration(60).start()
-                        }.start()
-                        if (SecretAccess.onTap(i)) {
-                            startActivity(android.content.Intent(this@SettingsActivity, SecretAccessActivity::class.java))
-                        }
-                    }
+                setPadding(0, dp(16), 0, dp(20))
+                isClickable = true
+                setOnClickListener {
+                    startActivity(android.content.Intent(this@SettingsActivity, AdminPanelActivity::class.java))
                 }
-                row.addView(dot)
             }
-            parent.addView(row, footerIdx + 1)
+            parent.addView(btn, footerIdx + 1)
         } catch (e: Throwable) {
-            android.util.Log.e("SettingsActivity", "injectSecretEntry failed", e)
+            android.util.Log.e("SettingsActivity", "injectAdminPanelEntry failed", e)
         }
     }
 

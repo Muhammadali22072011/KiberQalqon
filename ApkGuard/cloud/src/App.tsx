@@ -8,7 +8,6 @@ import MapPage from './pages/MapPage';
 import Feed from './pages/Feed';
 import Threats from './pages/Threats';
 import Devices from './pages/Devices';
-import Roles from './pages/Roles';
 import News from './pages/News';
 import Profile from './pages/Profile';
 
@@ -24,6 +23,7 @@ function RequireAuth() {
   return <Outlet />;
 }
 
+// Egasi va admin — ikkalasi ham hamma bo'limni ko'radi (rol/perms yo'q).
 export default function App() {
   return (
     <Routes>
@@ -36,7 +36,6 @@ export default function App() {
           <Route path="feed" element={<Feed />} />
           <Route path="threats" element={<Threats />} />
           <Route path="devices" element={<Devices />} />
-          <Route path="roles" element={<Roles />} />
           <Route path="news" element={<News />} />
           <Route path="profile" element={<Profile />} />
         </Route>

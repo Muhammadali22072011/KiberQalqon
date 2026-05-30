@@ -84,8 +84,20 @@ class InitialScanActivity : AppCompatActivity() {
         binding.btnSkip.setOnClickListener { goToDashboard() }
         binding.btnContinue.setOnClickListener { goToDashboard() }
         binding.btnDeleteAll.setOnClickListener { confirmDeleteAll() }
+        // Skan onResume'da boshlanadi — avval "Barcha fayllarga ruxsat" tekshiriladi.
+    }
 
-        startScan()
+    // Skan faqat BIR marta va faqat fayl ruxsati bo'lganda ishga tushadi.
+    private var scanStarted = false
+    private var askingAccess = false
+
+    override fun onResume() {
+        super.onResume()
+        if (scanStarted) return
+        // Ruxsatsiz skaner fayllarni KO'RA OLMAYDI va NOTO'G'RI "toza" deb ko'rsatardi —
+        // antivirusda eng xavfli xato. Shuning uchun ruxsatsiz umuman skanlamaymiz.
+        if (VersionCompat.hasFileScanAccess(this)) startScan()
+        else showNeedAccessDialog()
     }
 
     override fun onDestroy() {
@@ -94,7 +106,28 @@ class InitialScanActivity : AppCompatActivity() {
         VoiceVerdict.shutdown()
     }
 
+    // Fayl ruxsati yo'q — "toza" deb ko'rsatish o'rniga ochiq ogohlantiramiz va
+    // to'g'ridan-to'g'ri tegishli sozlamalar ekraniga olib boramiz.
+    private fun showNeedAccessDialog() {
+        if (askingAccess) return
+        askingAccess = true
+        AlertDialog.Builder(this)
+            .setTitle("Ruxsat kerak")
+            .setMessage(
+                "Telefon fayllarini (Yuklamalar, Telegram va boshqalar) tekshirish uchun " +
+                    "\"Barcha fayllarga ruxsat\" yoqilishi shart. Busiz skaner fayllarni " +
+                    "KO'RA OLMAYDI va xavfni topa olmaydi."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Ruxsat berish") { _, _ -> openManageStorage() }
+            .setNegativeButton("Keyinroq") { _, _ -> goToDashboard() }
+            .setOnDismissListener { askingAccess = false }
+            .show()
+    }
+
     private fun startScan() {
+        if (scanStarted) return
+        scanStarted = true
         scope.launch {
             try {
                 val apks = withContext(Dispatchers.IO) {
