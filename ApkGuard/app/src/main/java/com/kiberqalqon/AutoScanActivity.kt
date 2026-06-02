@@ -46,6 +46,14 @@ class AutoScanActivity : AppCompatActivity() {
      */
     private var installedPkg: String? = null
 
+    /**
+     * "Open with → KiberQalqon" / "Share → KiberQalqon" oqimida ASL faylning manbasi
+     * (Telegram/Downloads'dagi content:// yoki file:// URI). Bunday holatda [apkPath]
+     * — bu faqat tahlil uchun cacheDir'ga olingan NUSXA. "O'chirish" bosilganda esa
+     * foydalanuvchi ASL faylni o'chirishni kutadi. Bo'sh bo'lsa — apkPath o'zi asl fayl.
+     */
+    private var originUri: Uri? = null
+
     // Один общий Handler с очисткой в onDestroy — иначе postDelayed-колбэки выстреливают
     // после finish() и крашат app на binding.* (Activity destroyed but view accessed).
     private val handler = Handler(Looper.getMainLooper())
@@ -144,6 +152,9 @@ class AutoScanActivity : AppCompatActivity() {
         apkPath = incomingPath
         apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
         installedPkg = intent.getStringExtra("installed_pkg")?.takeIf { it.isNotBlank() }
+        originUri = intent.getStringExtra("apk_origin_uri")
+            ?.takeIf { it.isNotBlank() }
+            ?.let { runCatching { Uri.parse(it) }.getOrNull() }
 
         setupUI()
         // "already_handled" — fayl fonida (GuardWorker) allaqachon karantinga olingan/o'chirilgan.
@@ -710,6 +721,16 @@ class AutoScanActivity : AppCompatActivity() {
             return
         }
 
+        // "Open with → KiberQalqon" oqimi: skan cacheDir'dagi NUSXA'da bo'ldi, lekin
+        // ASL faylni (Telegram/Downloads'dagi virusni) o'chirishimiz kerak. Ilgari bu
+        // yerda faqat ichki nusxa o'chirilardi — foydalanuvchi "opasnaya deydi-yu, lekin
+        // o'chirmaydi" deb shikoyat qilgan: asl fayl telefonda qolib ketardi.
+        val origin = originUri
+        if (origin != null) {
+            deleteSharedOriginal(origin)
+            return
+        }
+
         val path = apkPath
         if (path.isNullOrBlank()) {
             binding.tvResultMessage.text = getString(R.string.autoscan_no_path)
@@ -736,52 +757,186 @@ class AutoScanActivity : AppCompatActivity() {
         }
 
         try {
-            when (val result = FileDeleter.delete(this, path)) {
-                FileDeleter.Result.Deleted -> {
-                    reportDelete("O'chirildi", path)
-                    onFileSuccessfullyDeleted()
-                }
-
-                is FileDeleter.Result.NeedsUserConsent -> {
-                    reportDelete("Foydalanuvchi tasdiqlashi kerak (MediaStore)", path)
-                    binding.tvResultMessage.text = getString(R.string.autoscan_confirm_in_system_dialog)
-                    val req = IntentSenderRequest.Builder(result.sender).build()
-                    deleteConsentLauncher.launch(req)
-                }
-
-                FileDeleter.Result.NeedsManageStorage -> {
-                    reportDelete("To'liq xotira ruxsati kerak", path)
-                    // Нет разрешения "Доступ ко всем файлам" — превращаем кнопку
-                    // в "RUXSAT BERISH" и при нажатии открываем системные настройки.
-                    binding.tvResultMessage.text = getString(R.string.autoscan_need_all_files)
-                    binding.btnDelete.text = getString(R.string.autoscan_grant_btn)
-                    binding.btnDelete.isEnabled = true
-                    binding.btnDelete.setOnClickListener { openManageStorageSettings() }
-                }
-
-                is FileDeleter.Result.SandboxedByOwner -> {
-                    reportDelete("Boshqa ilova papkasida", path, extra = result.ownerPackage)
-                    // Файл в /Android/data/<owner>/ — даже с MANAGE_EXTERNAL_STORAGE
-                    // Android отказывает. Юзеру надо удалять через само приложение.
-                    binding.tvResultMessage.text =
-                        getString(R.string.autoscan_sandboxed_owner, result.ownerPackage)
-                    binding.btnDelete.text = getString(R.string.btn_ok)
-                    binding.btnDelete.isEnabled = true
-                    binding.btnDelete.setOnClickListener { finish() }
-                }
-
-                is FileDeleter.Result.Failed -> {
-                    reportDelete("Bajarilmadi", path, extra = result.message)
-                    binding.tvResultMessage.text = "❌ ${result.message}\n\nPapka: ${File(path).parent}"
-                    binding.btnDelete.isEnabled = true
-                }
-            }
+            handleDeleteResult(FileDeleter.delete(this, path), path)
         } catch (e: Throwable) {
             android.util.Log.e("AutoScanActivity", "deleteApk crashed", e)
             reportDelete("Istisno xatosi", path, extra = "${e.javaClass.simpleName}: ${e.message}")
             binding.tvResultMessage.text = "❌ Xatolik: ${e.message}"
             binding.btnDelete.isEnabled = true
         }
+    }
+
+    /**
+     * [FileDeleter.delete] natijasini UI'da ko'rsatadi. deleteApk() va
+     * deleteSharedOriginal() — ikkalasi ham shu yagona nuqtadan foydalanadi.
+     */
+    private fun handleDeleteResult(result: FileDeleter.Result, path: String) {
+        when (result) {
+            FileDeleter.Result.Deleted -> {
+                reportDelete("O'chirildi", path)
+                onFileSuccessfullyDeleted()
+            }
+
+            is FileDeleter.Result.NeedsUserConsent -> {
+                reportDelete("Foydalanuvchi tasdiqlashi kerak (MediaStore)", path)
+                binding.tvResultMessage.text = getString(R.string.autoscan_confirm_in_system_dialog)
+                val req = IntentSenderRequest.Builder(result.sender).build()
+                deleteConsentLauncher.launch(req)
+            }
+
+            FileDeleter.Result.NeedsManageStorage -> {
+                reportDelete("To'liq xotira ruxsati kerak", path)
+                // Нет разрешения "Доступ ко всем файлам" — превращаем кнопку
+                // в "RUXSAT BERISH" и при нажатии открываем системные настройки.
+                binding.tvResultMessage.text = getString(R.string.autoscan_need_all_files)
+                binding.btnDelete.text = getString(R.string.autoscan_grant_btn)
+                binding.btnDelete.isEnabled = true
+                binding.btnDelete.setOnClickListener { openManageStorageSettings() }
+            }
+
+            is FileDeleter.Result.SandboxedByOwner -> {
+                reportDelete("Boshqa ilova papkasida", path, extra = result.ownerPackage)
+                // Файл в /Android/data/<owner>/ — даже с MANAGE_EXTERNAL_STORAGE
+                // Android отказывает. Юзеру надо удалять через само приложение.
+                binding.tvResultMessage.text =
+                    getString(R.string.autoscan_sandboxed_owner, result.ownerPackage)
+                binding.btnDelete.text = getString(R.string.btn_ok)
+                binding.btnDelete.isEnabled = true
+                binding.btnDelete.setOnClickListener { finish() }
+            }
+
+            is FileDeleter.Result.Failed -> {
+                reportDelete("Bajarilmadi", path, extra = result.message)
+                binding.tvResultMessage.text = "❌ ${result.message}\n\nPapka: ${File(path).parent}"
+                binding.btnDelete.isEnabled = true
+            }
+        }
+    }
+
+    /**
+     * "Open with / Share → KiberQalqon" oqimida ASL faylni o'chiradi.
+     *
+     * [apkPath] — bu cacheDir'dagi tahlil NUSXASI; uni har doim tozalaymiz. Asosiy
+     * vazifa — ASL faylni (Telegram/Downloads'dagi virusni) o'chirish:
+     *   1) URI'dan haqiqiy fayl yo'lini aniqlaymiz (file:// / MediaStore DATA / nom+hajm
+     *      bo'yicha skan papkalaridan moslik) → odatdagi [FileDeleter] yo'li bilan
+     *      o'chiramiz (MANAGE_EXTERNAL_STORAGE / MediaStore consent darvozalari bilan).
+     *   2) Yo'l aniqlanmasa — URI orqali (SAF deleteDocument / ContentResolver.delete).
+     *   3) Hech biri ishlamasa — qo'lda o'chirishga yo'naltiramiz (soxta "o'chirildi" yo'q).
+     *
+     * Hammasi IO oqimida: resolveRealPath() skan papkalarini kezishi mumkin — UI'ni
+     * bloklamaslik kerak.
+     */
+    private fun deleteSharedOriginal(uri: Uri) {
+        binding.btnDelete.isEnabled = false
+        binding.tvResultMessage.text = "⏳ Asl fayl o'chirilmoqda…"
+        scope.launch {
+            // Tahlil nusxasini (cacheDir) tozalaymiz — ichki, har doim o'chadi.
+            apkPath?.let { c -> withContext(Dispatchers.IO) { runCatching { File(c).delete() } } }
+
+            val real = withContext(Dispatchers.IO) { resolveRealPath(uri) }
+            if (real != null) {
+                // Bundan keyingi qayta urinishlar (ruxsat berilgach onResume) ham asl
+                // faylni nishonga olishi uchun apkPath'ni yangilaymiz.
+                apkPath = real
+                originUri = null
+                val result = withContext(Dispatchers.IO) {
+                    try { FileDeleter.delete(this@AutoScanActivity, real) }
+                    catch (e: Throwable) { FileDeleter.Result.Failed(e.message ?: "xatolik") }
+                }
+                if (!isFinishing && !isDestroyed) handleDeleteResult(result, real)
+                return@launch
+            }
+
+            // Yo'l aniqlanmadi — URI orqali o'chirishga urinamiz.
+            val viaUri = withContext(Dispatchers.IO) { tryDeleteViaUri(uri) }
+            if (isFinishing || isDestroyed) return@launch
+            if (viaUri) {
+                reportDelete("Asl fayl URI orqali o'chirildi", uri.toString())
+                onFileSuccessfullyDeleted()
+            } else {
+                reportDelete("Asl faylni avtomatik o'chirib bo'lmadi", uri.toString())
+                binding.tvResultMessage.text =
+                    "❌ Asl faylni avtomatik o'chirib bo'lmadi.\n" +
+                    "Fayl menejeri orqali qo'lda o'chiring (Telegram/Yuklab olishlar papkasi)."
+                binding.btnDelete.isEnabled = true
+            }
+        }
+    }
+
+    /**
+     * content:// yoki file:// URI'dan haqiqiy fayl yo'lini aniqlashga urinadi.
+     * Topilmasa null. IO oqimida chaqirilishi kerak (skan papkalarini kezishi mumkin).
+     */
+    private fun resolveRealPath(uri: Uri): String? {
+        // 1) file:// — to'g'ridan-to'g'ri.
+        if (uri.scheme == "file") {
+            return uri.path?.takeIf { File(it).exists() }
+        }
+        // 2) MediaStore / DATA ustuni (ko'p provayderlar buni beradi).
+        runCatching {
+            contentResolver.query(
+                uri, arrayOf(android.provider.MediaStore.MediaColumns.DATA), null, null, null
+            )?.use { c ->
+                if (c.moveToFirst()) {
+                    val idx = c.getColumnIndex(android.provider.MediaStore.MediaColumns.DATA)
+                    if (idx >= 0) {
+                        val p = c.getString(idx)
+                        if (!p.isNullOrBlank() && File(p).exists()) return p
+                    }
+                }
+            }
+        }
+        // 3) Nom (+ hajm) bo'yicha skan papkalaridan moslik — Telegram FileProvider
+        //    DATA bermaydi, lekin fayl Telegram/Downloads papkasida turadi va biz uni
+        //    findApkFiles bilan topa olamiz (MANAGE_EXTERNAL_STORAGE bilan o'qiymiz).
+        val (name, size) = queryNameSize(uri)
+        if (!name.isNullOrBlank()) {
+            runCatching {
+                val cands = ApkScanner.findApkFiles(applicationContext).filter { it.file.exists() }
+                val match = cands.firstOrNull {
+                    it.file.name == name && (size == null || it.file.length() == size)
+                } ?: cands.firstOrNull { it.file.name == name }
+                if (match != null) return match.file.absolutePath
+            }
+        }
+        return null
+    }
+
+    /** SAF document URI yoki MediaStore URI bo'lsa — URI orqali o'chirishga urinadi. */
+    private fun tryDeleteViaUri(uri: Uri): Boolean {
+        runCatching {
+            if (android.provider.DocumentsContract.isDocumentUri(this, uri) &&
+                android.provider.DocumentsContract.deleteDocument(contentResolver, uri)) {
+                return true
+            }
+        }
+        runCatching {
+            if (contentResolver.delete(uri, null, null) > 0) return true
+        }
+        return false
+    }
+
+    /** URI'dan ko'rsatiladigan nom va hajmni o'qiydi (resolveRealPath fallback'i uchun). */
+    private fun queryNameSize(uri: Uri): Pair<String?, Long?> = try {
+        contentResolver.query(
+            uri,
+            arrayOf(
+                android.provider.OpenableColumns.DISPLAY_NAME,
+                android.provider.OpenableColumns.SIZE
+            ),
+            null, null, null
+        )?.use { c ->
+            if (c.moveToFirst()) {
+                val ni = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                val si = c.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                val n = if (ni >= 0) c.getString(ni) else null
+                val s = if (si >= 0 && !c.isNull(si)) c.getLong(si) else null
+                n to s
+            } else null to null
+        } ?: (null to null)
+    } catch (_: Throwable) {
+        null to null
     }
 
     /**
