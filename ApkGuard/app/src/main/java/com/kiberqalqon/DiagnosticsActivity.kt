@@ -247,7 +247,7 @@ class DiagnosticsActivity : AppCompatActivity() {
      * Telegram kanaliga sozlanmagan bo'lsa, oddiy "ulashish" oynasiga qaytamiz.
      */
     private fun showSendToDevDialog() {
-        if (BuildConfig.DEV_TG_BOT_TOKEN.isBlank() || BuildConfig.DEV_TG_CHAT_ID.isBlank()) {
+        if (Secrets.tgBotToken().isBlank() || Secrets.tgChatId().isBlank()) {
             Toast.makeText(this, "Telegram kanal sozlanmagan — boshqa usulda yuboring", Toast.LENGTH_LONG).show()
             shareDiagnostics()
             return

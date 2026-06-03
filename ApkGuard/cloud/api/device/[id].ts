@@ -1,7 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
-import { canRead, checkDeviceSecret } from '../../lib/auth.js';
+import { canRead } from '../../lib/auth.js';
+import { verifyDeviceWrite, issueDeviceToken } from '../../lib/devauth.js';
+import { readRaw } from '../../lib/rawbody.js';
 import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
+
+// register XOM tanani o'qiydi (imzo tekshiruvi uchun). GET'da tana yo'q — ta'sir qilmaydi.
+export const config = { api: { bodyParser: false } };
 
 // Ikkita yo'l bitta dinamik route'da (Hobby 12-funksiya limiti uchun):
 //   /api/device/register → handleRegister (x-device-secret, POST) — qurilma o'zini yozadi
@@ -61,11 +66,21 @@ type RegisterBody = {
 
 async function handleRegister(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
-  if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
-
-  const b = req.body as RegisterBody;
+  // Per-device imzo (yangi) YOKI eski umumiy x-device-secret (o'tish davri). Dual-accept.
+  const rawBody = await readRaw(req);
+  if (!(await verifyDeviceWrite(req, rawBody, 'device/register'))) {
+    return res.status(401).json({ ok: false, error: 'auth' });
+  }
+  let b: RegisterBody;
+  try { b = JSON.parse(rawBody || '{}') as RegisterBody; } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
   if (!b?.device_token || b.device_token.length < 16) {
     return res.status(400).json({ ok: false, error: 'bad token' });
+  }
+  // Imzolangan yo'lda sarlavha x-device-token tana device_token bilan mos kelishi shart.
+  // Eski (x-device-secret) yo'lda sarlavha yo'q → tekshirilmaydi.
+  const hdrTok = req.headers['x-device-token'];
+  if (typeof hdrTok === 'string' && hdrTok.length > 0 && hdrTok !== b.device_token) {
+    return res.status(401).json({ ok: false, error: 'token/body mismatch' });
   }
 
   const sb = db();
@@ -118,5 +133,10 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     .single();
 
   if (error) return res.status(500).json({ ok: false, error: error.message });
-  return res.status(200).json({ ok: true, device_id: data?.id });
+
+  // Per-device token beramiz — qurilma keyingi yozuvlarni shu bilan IMZOLAYDI (HMAC).
+  // Determinik (HMAC(device_token, DEVICE_TOKEN_SECRET)), serverda saqlanmaydi. Kalit
+  // o'rnatilmagan bo'lsa null — mijoz eski x-device-secret yo'lida qoladi (buzilmaydi).
+  const deviceAuthToken = issueDeviceToken(b.device_token);
+  return res.status(200).json({ ok: true, device_id: data?.id, device_auth_token: deviceAuthToken });
 }

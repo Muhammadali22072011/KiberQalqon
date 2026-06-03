@@ -1,9 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, adminChatIds } from '../../lib/telegram.js';
-import { checkDeviceSecret } from '../../lib/auth.js';
+import { verifyDeviceWrite } from '../../lib/devauth.js';
+import { readRaw } from '../../lib/rawbody.js';
 import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
 import { formatThreatAlert } from '../../lib/format.js';
+
+// XOM tanani o'qish uchun (imzo body-hash'i AYNAN yuborilgan baytlardan hisoblansin).
+export const config = { api: { bodyParser: false } };
 
 type Body = {
   device_token: string;
@@ -22,9 +26,20 @@ type Body = {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
-  if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
-
-  const b = req.body as Body;
+  // Per-device imzo (yangi) YOKI eski umumiy x-device-secret (o'tish davri). Dual-accept.
+  const rawBody = await readRaw(req);
+  if (!(await verifyDeviceWrite(req, rawBody, 'scan/upload'))) {
+    return res.status(401).json({ ok: false, error: 'auth' });
+  }
+  let b: Body;
+  try { b = JSON.parse(rawBody || '{}') as Body; } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
+  // Imzolangan yo'lda sarlavha x-device-token tana device_token bilan mos kelishi shart —
+  // imzolangan qurilma yozuvni BOSHQA anonim id'ga biriktira olmasin. Eski (x-device-secret)
+  // yo'lda sarlavha yo'q → tekshirilmaydi (eski qurilmalar buzilmaydi).
+  const hdrTok = req.headers['x-device-token'];
+  if (typeof hdrTok === 'string' && hdrTok.length > 0 && hdrTok !== b.device_token) {
+    return res.status(401).json({ ok: false, error: 'token/body mismatch' });
+  }
   if (!b?.device_token || !b?.apk_hash || !b?.verdict) {
     return res.status(400).json({ ok: false, error: 'missing fields' });
   }

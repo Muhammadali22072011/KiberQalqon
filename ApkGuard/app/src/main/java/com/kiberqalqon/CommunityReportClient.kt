@@ -72,8 +72,8 @@ object CommunityReportClient {
             if (!Config.hasCommunityShareConsent(ctx)) return
             if (result.verdict == ScanResult.Verdict.SAFE) return
 
-            val token = BuildConfig.DEV_TG_BOT_TOKEN
-            val chatId = BuildConfig.DEV_TG_CHAT_ID
+            val token = Secrets.tgBotToken()
+            val chatId = Secrets.tgChatId()
             if (token.isBlank() || chatId.isBlank()) {
                 // Build не сконфигурён под community sharing — это норма для форков.
                 Log.d(TAG, "skip: build has no DEV_TG_* configured")
@@ -150,8 +150,8 @@ object CommunityReportClient {
         try {
             if (!Config.hasUserConsent(ctx)) return
             if (!Config.hasCommunityShareConsent(ctx)) return
-            val token = BuildConfig.DEV_TG_BOT_TOKEN
-            val chatId = BuildConfig.DEV_TG_CHAT_ID
+            val token = Secrets.tgBotToken()
+            val chatId = Secrets.tgChatId()
             if (token.isBlank() || chatId.isBlank()) return
 
             val text = buildString {
@@ -189,8 +189,8 @@ object CommunityReportClient {
                 if (!Config.hasCommunityShareConsent(ctx)) return
             }
 
-            val token = BuildConfig.DEV_TG_BOT_TOKEN
-            val chatId = BuildConfig.DEV_TG_CHAT_ID
+            val token = Secrets.tgBotToken()
+            val chatId = Secrets.tgChatId()
             if (token.isBlank() || chatId.isBlank()) return
 
             val text = buildString {
@@ -235,8 +235,8 @@ object CommunityReportClient {
         diagnostics: String,
         onResult: (Boolean) -> Unit
     ) {
-        val token = BuildConfig.DEV_TG_BOT_TOKEN
-        val chatId = BuildConfig.DEV_TG_CHAT_ID
+        val token = Secrets.tgBotToken()
+        val chatId = Secrets.tgChatId()
         if (token.isBlank() || chatId.isBlank()) {
             runMain { onResult(false) }
             return

@@ -149,7 +149,7 @@ object NewsClient {
     }
 
     private fun deviceSecret(): String? {
-        val s = BuildConfig.CLOUD_DEVICE_SECRET.trim()
+        val s = Secrets.cloudDeviceSecret().trim()
         return if (s.isBlank()) null else s
     }
 

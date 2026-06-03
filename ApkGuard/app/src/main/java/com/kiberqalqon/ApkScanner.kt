@@ -975,6 +975,12 @@ object ApkScanner {
             //  high  — agressivroq pastroq threshold.
             val sensitivity = try { Config.getSensitivityLevel(context) } catch (_: Throwable) { "medium" }
 
+            // Verdikt CHEGARALARI masofaviy (imzolangan) config'dan — yuklab olingan APK ichida
+            // "qaysi ball DANGER beradi" degan ANIQ raqamlar turmasin. get() faqat keshdan
+            // o'qiydi (skan issiq yo'lida TARMOQ YO'Q); masofaviy faqat KUCHAYTIRA oladi (clamp=min).
+            // Har qanday xato → baked standartlar (quyidagi joriy qiymatlar bilan AYNAN bir xil).
+            val rc = RemoteConfig.get(context)
+
             // Anti-analysis (evasion) belgilari soni — Anti-Frida/Anti-Magisk/TracerPid/tmp-probe
             // /Anti-debug. Real ilovalar bunday hech qachon qilmaydi. 2+ ta birga
             // bo'lsa — bu sof virus, score'dan qat'iy nazar DANGER.
@@ -992,7 +998,7 @@ object ApkScanner {
             // Eng kuchli YAKKA combo (OTP-grabber=90, Full-banker=100) — malware-specifik.
             // Bir nechta ZAIF combo'ni qo'shib DANGER bermaymiz (legit super-app shunday
             // yig'iladi); faqat yakka kuchli combo mgновen DANGER beradi.
-            val strongCombo = comboMatches.any { it.combo.score >= 90 }
+            val strongCombo = comboMatches.any { it.combo.score >= rc.strongComboMin }
 
             // Soxta "xavfsizlik/tozalash" ilovasi: ko'rinadigan nomi (label) antivirus/
             // cleaner/booster/shield/guard/VPN deydi, LEKIN mikrofon (RECORD_AUDIO) so'raydi.
@@ -1021,13 +1027,11 @@ object ApkScanner {
                     dropperFindings.score + filenameFindings.score + nativeFindings.score +
                     fakeSecurityScore
 
-            // Threshold'lar headroom bilan — bir nechta yumshoq signal yig'ilib legit
-            // ilovani DANGER qilmasligi uchun medium DANGER 65→85 ko'tarildi.
-            val (dangerThreshold, suspiciousThreshold) = when (sensitivity) {
-                "high" -> 55 to 28
-                "low" -> 120 to 60
-                else -> 85 to 40
-            }
+            // Threshold'lar masofaviy config'dan (RemoteConfig). Baked standartlar avvalgi
+            // qiymatlar bilan AYNAN bir xil (high 55/28, medium 85/40, low 120/60); masofaviy
+            // faqat pasaytira oladi (= ko'proq aniqlash), hech qachon zaiflashtira olmaydi.
+            val dangerThreshold = rc.dangerThreshold(sensitivity)
+            val suspiciousThreshold = rc.suspiciousThreshold(sensitivity)
 
             val verdict = when {
                 // === 1) QAT'IY signallar — reputatsiyadan QAT'IY NAZAR DANGER ===
@@ -1052,8 +1056,8 @@ object ApkScanner {
                 // hiylasiga bog'liq emas: zloumyshlennik shifrlashni tashlab ketsa ham tutamiz.
                 // Yolg'iz nom yoki yolg'iz random-pkg DANGER bermaydi (FP xavfi) — faqat birga.
                 // verifiedTrusted'dan KEYIN: ishonchli paket hech qachon random ko'rinmaydi, ziddiyat yo'q.
-                randomPkg && filenameFindings.score >= 40 -> ScanResult.Verdict.DANGER
-                randomPkg && dangerousFound.size >= 3 -> ScanResult.Verdict.DANGER  // tasodifiy paket + ko'p ruxsat
+                randomPkg && filenameFindings.score >= rc.randomPkgFilenameMin -> ScanResult.Verdict.DANGER
+                randomPkg && dangerousFound.size >= rc.randomPkgDangerousPermsMin -> ScanResult.Verdict.DANGER  // tasodifiy paket + ko'p ruxsat
                 totalScore >= suspiciousThreshold -> ScanResult.Verdict.SUSPICIOUS
                 evasionCount >= 1 -> ScanResult.Verdict.SUSPICIOUS
                 randomPkg && sensitivity != "low" -> ScanResult.Verdict.SUSPICIOUS

@@ -39,8 +39,16 @@ object SecurityGuard {
      * иначе приложение, установленное ИЗ Play, само себя закроет. Текущее значение —
      * для sideload/прямой установки APK, подписанного этим release.keystore.
      */
-    private const val EXPECTED_RELEASE_SIGNATURE_SHA256 =
-        "1CB3F378189D6EF38985B3AE234D859E750029AB353246FA496349A8FF14D983"
+    // Shield ([Shield]) shifrida — `strings`/jadx DEX'da imzo-xeshini OCHIQ ko'rmasin
+    // (tekshiruvni topib patch qilishni qiyinlashtiradi). Plaintext faqat kommentda.
+    // Asl (autoritativ) gate — native nSigInvalid (libkqguard.so); bu Kotlin qiymati
+    // .so yo'q bo'lgandagi fallback. Ikkalasi AYNAN bir xil qiymatni ushlaydi.
+    private val EXPECTED_RELEASE_SIGNATURE_SHA256: String by lazy {
+        try {
+            // 1CB3F378189D6EF38985B3AE234D859E750029AB353246FA496349A8FF14D983
+            Shield.dec("355d7564bd6c21760a38236d372aa14d67daa9bb461873810286d53057c2dc0d628db9f3ed6a8fadd0d5e8c1a6d0e86a987561c55462d647bb19b776ec5258bd")
+        } catch (_: Throwable) { "" }
+    }
 
     /**
      * Разрешённые источники установки. Если APK поставили не из этих источников
@@ -77,6 +85,7 @@ object SecurityGuard {
             "signature" to { isSignatureInvalid(ctx) },
             "root"     to { isRooted() },
             "debug"    to { isBeingDebugged() },
+            "native"   to { NativeBridge.antiDebugTripped() },
             "frida"    to { isFridaPresent() },
             "xposed"   to { isXposedPresent() },
             "emulator" to { isEmulator() },
@@ -131,8 +140,9 @@ object SecurityGuard {
      */
     @Suppress("DEPRECATION")
     private fun isSignatureInvalid(ctx: Context): Boolean {
-        // Если эталонная подпись не задана — пропускаем (на этапе разработки).
-        if (EXPECTED_RELEASE_SIGNATURE_SHA256.isBlank()) return false
+        // Kotlin const bo'sh (dev) VA native gate ham yo'q bo'lsa — tekshirib bo'lmaydi, o'tkazamiz.
+        // Native (libkqguard.so) yuklangan bo'lsa const bo'sh bo'lsa ham u tekshiradi.
+        if (EXPECTED_RELEASE_SIGNATURE_SHA256.isBlank() && !NativeBridge.isLoaded()) return false
 
         val pm = ctx.packageManager
         val signatures = try {
@@ -151,8 +161,12 @@ object SecurityGuard {
         for (sig in signatures) {
             val md = java.security.MessageDigest.getInstance("SHA-256")
             val hash = md.digest(sig.toByteArray()).joinToString("") { "%02X".format(it) }
-            if (hash.equals(EXPECTED_RELEASE_SIGNATURE_SHA256, ignoreCase = true)) {
-                return false // ok, нашли совпадение
+            // Native gate (libkqguard.so) — DEX'dan qiyin patch qilinadi → .so yuklangan
+            // bo'lsa AVTORITATIV. .so yo'q bo'lsa Kotlin const (Shield) fallback'i hal qiladi.
+            val nativeOk = NativeBridge.isLoaded() && !NativeBridge.signatureInvalid(hash)
+            val kotlinOk = hash.equals(EXPECTED_RELEASE_SIGNATURE_SHA256, ignoreCase = true)
+            if (nativeOk || kotlinOk) {
+                return false // imzo to'g'ri
             }
         }
         Log.w(TAG, "Signature does not match expected fingerprint")

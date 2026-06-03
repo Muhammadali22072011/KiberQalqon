@@ -29,6 +29,11 @@ class App : android.app.Application() {
         // САМАЯ ПЕРВАЯ строка: ставим CrashHandler чтобы поймать ВСЁ что упадёт ниже.
         CrashHandler.install(this)
 
+        // Native himoya kutubxonasini (libkqguard.so) erta yuklab qo'yamiz, SecurityGuard'gacha.
+        // Yuklanmasa (test JVM / ABI mos emas / NDK'siz build) crash BO'LMAYDI — NativeBridge
+        // ichida ushlanadi, chaqiruvchilar Kotlin fallback'iga tushadi.
+        NativeBridge.init()
+
         // Salom dekompilyatorlarga (logcat + DEX string). Foydalanuvchi ko'rmaydi.
         EasterEgg.stamp()
 
@@ -163,6 +168,13 @@ class App : android.app.Application() {
                 CloudTelemetry.registerDevice(this@App)
             } catch (e: Exception) {
                 Log.e("KiberQalqon", "Cloud register failed", e)
+            }
+            // Imzolangan masofaviy config (verdikt chegaralari) ni fonda yangilaymiz — skan
+            // chegaralari APK ichida ANIQ turmasin. Xato/oflayn/imzo noto'g'ri → baked standartlar.
+            try {
+                RemoteConfig.refresh(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "RemoteConfig refresh failed", e)
             }
         }
 

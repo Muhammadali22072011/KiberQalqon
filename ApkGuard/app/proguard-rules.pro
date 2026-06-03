@@ -105,3 +105,12 @@
 # --- Reflection: предупреждения, на которые можно забить ---
 -dontwarn java.lang.invoke.**
 -dontwarn javax.annotation.**
+
+# --- JNI / Native (libkqguard.so) ---
+# JNI_OnLoad ichida RegisterNatives FindClass("com/kiberqalqon/NativeBridge") bo'yicha
+# bog'lanadi — shuning uchun klass NOMI R8'dan keyin ham saqlanishi SHART, aks holda
+# native binding yiqiladi (UnsatisfiedLinkError → loaded=false → himoya kuchsizlanadi).
+-keep class com.kiberqalqon.NativeBridge { *; }
+-keepclasseswithmembernames,includedescriptorclasses class * {
+    native <methods>;
+}
