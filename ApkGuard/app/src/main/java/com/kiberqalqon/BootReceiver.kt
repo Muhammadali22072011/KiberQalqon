@@ -67,8 +67,11 @@ class BootReceiver : BroadcastReceiver() {
             val request = androidx.work.PeriodicWorkRequestBuilder<GuardWorker>(
                 15, java.util.concurrent.TimeUnit.MINUTES
             ).build()
+            // #34: App.scheduleGuardWork bilan BIR XIL unique nom — aks holda KEEP dedup
+            // qila olmasdi va reboot'dan keyin IKKITA parallel 15 daq'lik GuardWorker
+            // zanjiri ishlab (ikki barobar skan/alert) batareyani behuda yer edi.
             androidx.work.WorkManager.getInstance(app).enqueueUniquePeriodicWork(
-                "guard_work_boot",
+                "kiberqalqon_scan",
                 androidx.work.ExistingPeriodicWorkPolicy.KEEP,
                 request
             )

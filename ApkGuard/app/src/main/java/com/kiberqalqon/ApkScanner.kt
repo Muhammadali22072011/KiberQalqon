@@ -659,26 +659,30 @@ object ApkScanner {
                 Log.w(TAG, "maliciousFamily failed", e); null
             }
 
+            // #14: Qora ro'yxatdagi imzo — HARD-DANGER. Avval bu tekshiruv quyidagi
+            // getPackageArchiveInfo try-bloki ICHIDA edi; ba'zi OEM'larda/buzilgan yoki
+            // juda katta APK'da getPackageArchiveInfo throw qiladi, catch esa faqat log
+            // yozib DAVOM etardi → qora ro'yxatdagi imzo bosib qolinib, soxta SAFE chiqishi
+            // mumkin edi. Endi imzo hisoblangach DARHOL, try'dan TASHQARIDA tekshiramiz.
+            if (maliciousFamily != null) {
+                return finalizeResult(context, apkPath, ScanResult(
+                    verdict = ScanResult.Verdict.DANGER,
+                    reason = "Qora ro'yxatdagi imzo: $maliciousFamily",
+                    details = listOf(
+                        "APK raqamli imzosi ma'lum zararli guruh imzosi bilan mos keladi.",
+                        "O'rnatish qat'iyan tavsiya etilmaydi."
+                    ),
+                    dangerousPermissions = emptyList(),
+                    malwareSignatures = listOf("cert:$maliciousFamily")
+                ), certFingerprint)
+            }
+
             try {
                 val pm = context.packageManager
                 val flags = PackageManager.GET_PERMISSIONS
                 val info = pm.getPackageArchiveInfo(apkPath, flags)
                 val packageName = info?.packageName
                 packageNameForHeuristic = packageName
-
-                // 1) Известный малварный сертификат → DANGER без оглядки на остальное.
-                if (maliciousFamily != null) {
-                    return finalizeResult(context, apkPath, ScanResult(
-                        verdict = ScanResult.Verdict.DANGER,
-                        reason = "Qora ro'yxatdagi imzo: $maliciousFamily",
-                        details = listOf(
-                            "APK raqamli imzosi ma'lum zararli guruh imzosi bilan mos keladi.",
-                            "O'rnatish qat'iyan tavsiya etilmaydi."
-                        ),
-                        dangerousPermissions = emptyList(),
-                        malwareSignatures = listOf("cert:$maliciousFamily")
-                    ), certFingerprint)
-                }
 
                 // 1b) Ma'lum malware paket nomi (Ajina.Banker / RoundRift) — DANGER
                 //     hatto agar APK qayta o'ralgan bo'lsa va hash boshqacha bo'lsa ham.
@@ -839,6 +843,21 @@ object ApkScanner {
             // INTERNET / BIND_ACCESSIBILITY_SERVICE / RECEIVE_BOOT_COMPLETED kabi
             // ruxsatlar DANGEROUS_PERMISSIONS to'plamida yo'q, lekin Dropper /
             // OTP-grabber / Full banker combo'lari aynan ularni talab qiladi.
+            //
+            // #16 KOʻPRIK: BIND_ACCESSIBILITY_SERVICE / BIND_DEVICE_ADMIN /
+            // BIND_NOTIFICATION_LISTENER_SERVICE <uses-permission> emas, balki
+            // <service/receiver android:permission> da e'lon qilinadi — shuning uchun
+            // PackageInfo.requestedPermissions' da YO'Q. Ularsiz eng kuchli combo'lar
+            // (OTP-grabber=90, Full banker=100, Persistent botnet=70, Ransomware,
+            // Notification interception) HECH QACHON ishlamasdi. Manifest topilmalarini
+            // permission to'plamiga qo'shamiz.
+            if (manifestFindings.declaresAccessibility)
+                allRequestedPerms.add("android.permission.BIND_ACCESSIBILITY_SERVICE")
+            if (manifestFindings.declaresDeviceAdmin)
+                allRequestedPerms.add("android.permission.BIND_DEVICE_ADMIN")
+            if (manifestFindings.declaresNotificationListener)
+                allRequestedPerms.add("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE")
+
             val comboMatches = try {
                 PermissionCombos.evaluate(allRequestedPerms)
             } catch (e: Throwable) {

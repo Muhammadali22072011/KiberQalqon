@@ -408,8 +408,15 @@ class DashboardNewActivity : AppCompatActivity() {
     }
 
     private fun getWeekData(prefs: android.content.SharedPreferences): List<Int> {
+        // #23: staleness-aware — slot oxirgi 7 kun ichida yangilanmagan bo'lsa (o'tgan
+        // haftadagi shu kun) 0. Aks holda grafik "bu hafta" emas, "butun tarix"ni ko'rsatardi.
+        val cal = java.util.Calendar.getInstance()
+        val today = (cal.timeInMillis +
+            cal.get(java.util.Calendar.ZONE_OFFSET) +
+            cal.get(java.util.Calendar.DST_OFFSET)) / 86_400_000L
         return (0..6).map { day ->
-            prefs.getInt("day_$day", 0)
+            val stamp = prefs.getLong("day_${day}_epochday", -1L)
+            if (stamp >= 0 && today - stamp in 0..6) prefs.getInt("day_$day", 0) else 0
         }
     }
 

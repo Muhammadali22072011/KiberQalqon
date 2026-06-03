@@ -58,6 +58,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, []);
 
+  // Token muddati tugaganda — aniq o'sha vaqtda avtomatik chiqish (UI dead-token bilan
+  // ortda qolmasin, keraksiz polling bo'lmasin). Allaqachon o'tgan bo'lsa — darhol.
+  useEffect(() => {
+    if (!session?.exp) return;
+    const delay = session.exp * 1000 - Date.now();
+    if (delay <= 0) { logout(); return; }
+    const id = window.setTimeout(logout, delay);
+    return () => window.clearTimeout(id);
+  }, [session, logout]);
+
   const doLogin = useCallback(async (secret: string, otp: string) => {
     const r = await apiLogin(secret, otp);
     const s: Session = { token: r.token, kind: 'owner', exp: r.exp };
@@ -75,9 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthCtx>(() => {
     const isOwner = session?.kind === 'owner';
     const isAdmin = session?.kind === 'admin';
+    // authed faqat sessiya bor emas, balki token muddati ham o'tmagan bo'lsa true.
+    const valid = Boolean(session) && !isExpired(session);
     return {
       ready,
-      authed: Boolean(session),
+      authed: valid,
       kind: session?.kind ?? null,
       isOwner,
       isAdmin,

@@ -57,7 +57,11 @@ object ZipEncryptionDetector {
      * Bounded by [maxHeaders] to keep runtime predictable on huge APKs.
      */
     fun analyze(apkPath: String, maxHeaders: Int = 5000): Findings {
-        var encrypted = 0
+        // #28/#30: LFH va CD bir XIL entry'ni ikki marta sanab, fractionEncrypted > 100%
+        // ko'rsatardi. Endi alohida sanaymiz va max'ini olamiz (LFH-faqat yoki CD-faqat
+        // flag bo'lsa ham musbat qoladi — aniqlash buzilmaydi).
+        var lfhEncrypted = 0
+        var cdEncrypted = 0
         var total = 0
         val sample = mutableListOf<String>()
         try {
@@ -82,7 +86,7 @@ object ZipEncryptionDetector {
                     val extraLen = raf.readUnsignedShort16LE()
 
                     if ((gpFlag and 0x0001) != 0) {
-                        encrypted++
+                        lfhEncrypted++
                         if (sample.size < 5 && nameLen in 1..512) {
                             val nameBytes = ByteArray(nameLen)
                             raf.seek(pos + 30)
@@ -98,18 +102,29 @@ object ZipEncryptionDetector {
                 }
 
                 // === 2) Central directory scan ===
-                // EOCD bo'shliq ichida (max 64KB tail-da) joylashgan. CD offset uni o'qib olamiz.
+                // EOCD bo'shliq ichida (max 64KB tail-da). #15: hujumchi ZIP-comment ichiga
+                // SOXTA ikkinchi EOCD qo'yib, CD-skanini haqiqiy (flag'li) CD'dan chetga
+                // burishi mumkin (findLast eng oxirgi EOCD'ni topadi). Shuning uchun EOCD
+                // nomzodlarini oxiridan boshlab kezamiz va FAQAT cd_offset'i haqiqiy CDH_SIG
+                // (PK\x01\x02) ga ishora qiladigan EOCD'ni qabul qilamiz.
                 val tailSize = minOf(len, 65_557L).toInt()  // EOCD + 64KB max comment
                 val tailStart = (len - tailSize).coerceAtLeast(0L)
                 raf.seek(tailStart)
                 val tail = ByteArray(tailSize)
                 raf.readFully(tail)
-                val eocdOff = findLastSubarray(tail, EOCD_SIG)
-                if (eocdOff >= 0) {
+                val eocdCandidates = findAllSubarray(tail, EOCD_SIG)
+                for (ci in eocdCandidates.indices.reversed()) {
+                    val eocdOff = eocdCandidates[ci]
                     // EOCD layout: sig(4) ds_no(2) ds_cd(2) entries_this(2) entries_total(2)
                     //              cd_size(4) cd_offset(4) comment_len(2)
+                    if (eocdOff + 20 > tail.size) continue
                     val cdSize = readUInt32LE(tail, eocdOff + 12)
                     val cdOffset = readUInt32LE(tail, eocdOff + 16)
+                    if (cdOffset < 0 || cdOffset + 4 > len) continue
+                    // Validatsiya: cd_offset haqiqiy CDH'ga ishora qilishi shart (spoof'ni rad etadi).
+                    raf.seek(cdOffset)
+                    if (raf.read(sig) != 4 || !sig.contentEquals(CDH_SIG)) continue
+
                     var cdPos = cdOffset
                     var cdScanned = 0
                     val cdEnd = (cdOffset + cdSize).coerceAtMost(len)
@@ -126,7 +141,7 @@ object ZipEncryptionDetector {
                         val commentLen = raf.readUnsignedShort16LE()
 
                         if ((gpFlag and 0x0001) != 0) {
-                            encrypted++  // CD-only marker — alohida hisoblanadi
+                            cdEncrypted++  // CD-only marker — alohida hisoblanadi
                             if (sample.size < 5 && nameLen in 1..512) {
                                 val nameBytes = ByteArray(nameLen)
                                 raf.seek(cdPos + 46)
@@ -140,13 +155,14 @@ object ZipEncryptionDetector {
                     }
                     // CD'dagi total — eng ishonchli "fayllar soni" o'lchami.
                     if (cdScanned > total) total = cdScanned
+                    break  // valid EOCD topildi — qidiruvni to'xtatamiz
                 }
             }
         } catch (e: Throwable) {
             Log.w(TAG, "ZIP scan failed", e)
         }
         return Findings(
-            encryptedCount = encrypted,
+            encryptedCount = maxOf(lfhEncrypted, cdEncrypted),
             totalEntries = total,
             sampleNames = sample,
         )
@@ -160,16 +176,21 @@ object ZipEncryptionDetector {
         return (b3 shl 24) or (b2 shl 16) or (b1 shl 8) or b0
     }
 
-    private fun findLastSubarray(buf: ByteArray, needle: ByteArray): Int {
-        if (needle.isEmpty() || buf.size < needle.size) return -1
-        for (i in (buf.size - needle.size) downTo 0) {
+    /** Barcha mos joylashuvlar (o'sish tartibida). #15 spoof tekshiruvi uchun. */
+    private fun findAllSubarray(buf: ByteArray, needle: ByteArray): List<Int> {
+        if (needle.isEmpty() || buf.size < needle.size) return emptyList()
+        val out = ArrayList<Int>()
+        val last = buf.size - needle.size
+        var i = 0
+        while (i <= last) {
             var ok = true
             for (j in needle.indices) {
                 if (buf[i + j] != needle[j]) { ok = false; break }
             }
-            if (ok) return i
+            if (ok) out.add(i)
+            i++
         }
-        return -1
+        return out
     }
 
     private fun RandomAccessFile.readUnsignedShort16LE(): Int {

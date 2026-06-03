@@ -211,14 +211,15 @@ object FilenameHeuristic {
             hard = HardDanger.HomoglyphScript(mixedScript)
         }
 
-        // L4 + L5 — brand impersonation: exact match + typosquat.
-        val lowerName = stripExtension(filename).lowercase()
+        // L4 + L5 — brand impersonation: exact match + typosquat + qo'shilgan (camelCase).
+        val rawName = stripExtension(filename)
+        val lowerName = rawName.lowercase()
         // Toklenize по non-alnum:
         val tokens = Regex("[a-z][a-z0-9]{2,}").findAll(lowerName).map { it.value }.toSet()
 
         var brandHit: HardDanger.BrandImpersonation? = null
         for ((brand, expected) in KNOWN_BRANDS) {
-            val (kind, matchedToken) = matchBrand(brand, tokens) ?: continue
+            val (kind, matchedToken) = matchBrand(brand, tokens, rawName) ?: continue
 
             val pkgOk = packageName?.lowercase()?.startsWith(expected.lowercase()) == true
             if (!pkgOk) {
@@ -230,6 +231,7 @@ object FilenameHeuristic {
                 )
                 val niceKind = when (kind) {
                     "exact" -> "aniq nom"
+                    "concat" -> "qo'shilgan nom (camelCase): '$matchedToken'"
                     "typosquat" -> "buzilgan nom (typosquat): '$matchedToken'"
                     else -> kind
                 }
@@ -280,11 +282,18 @@ object FilenameHeuristic {
 
     /**
      * Поиск бренда в множестве токенов:
-     *  1) exact substring match
-     *  2) typosquat: любой токен в пределах Levenshtein ≤ 2 от бренда (длина ≥ 5)
+     *  1) exact token match
+     *  2) concat (camelCase): TelegramPlus / ClickPro / PaymeUpdate — токенизатор склеивает
+     *     их в один токен, поэтому ищем бренд внутри исходного имени на границе слова
+     *     (#17). Граница = заглавная буква / цифра / разделитель — это отсекает FP
+     *     вроде "payment" (после "payme" идёт строчная 'n').
+     *  3) typosquat: любой токен в пределах Levenshtein ≤ 2 от бренда (длина ≥ 5)
      */
-    private fun matchBrand(brand: String, tokens: Set<String>): Pair<String, String>? {
+    private fun matchBrand(brand: String, tokens: Set<String>, rawName: String): Pair<String, String>? {
         if (brand in tokens) return "exact" to brand
+        if (brand.length >= 5) {
+            matchConcatenatedBrand(brand, rawName)?.let { return "concat" to it }
+        }
         if (brand.length < 5) return null  // короткие бренды (imo) — не делаем typosquat (FP)
         for (tok in tokens) {
             if (tok.length !in (brand.length - 1)..(brand.length + 2)) continue
@@ -293,6 +302,30 @@ object FilenameHeuristic {
             if (d in 1..2) return "typosquat" to tok
         }
         return null
+    }
+
+    /**
+     * Бренд внутри слитного имени (камелкейс), только на границе слова, чтобы не ловить
+     * обычные слова. "ClickPro"→Click, "PaymeUpdate"→Payme, "WhatsAppGold"→WhatsApp;
+     * "payment" / "clicker" НЕ матчатся (после бренда идёт строчная буква).
+     */
+    private fun matchConcatenatedBrand(brand: String, rawName: String): String? {
+        val low = rawName.lowercase()
+        var from = 0
+        while (true) {
+            val i = low.indexOf(brand, from)
+            if (i < 0) return null
+            val before = if (i == 0) null else rawName[i - 1]
+            val afterIdx = i + brand.length
+            val after = if (afterIdx >= rawName.length) null else rawName[afterIdx]
+            val beforeOk = before == null || !before.isLetter() || before.isUpperCase()
+            val afterOk = after == null || !after.isLetter() || after.isUpperCase() || after.isDigit()
+            // Игнорируем случай "бренд = всё имя целиком" (это уже exact-токен).
+            if (beforeOk && afterOk && !(before == null && after == null)) {
+                return rawName.substring(i, afterIdx)
+            }
+            from = i + 1
+        }
     }
 
     /**

@@ -29,6 +29,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -54,6 +55,10 @@ SAMPLES_DIR.mkdir(exist_ok=True)
 # Лимит размера файла: бесплатные Telegram-боты получают до 20 MB через getFile.
 # Большие файлы можно принимать только через MTProto (TelegramAPI), что сложнее.
 MAX_APK_SIZE = 20 * 1024 * 1024
+
+# apk_analyzer.py to'liq muvaffaqiyatli tahlilda doim shu bo'limni chiqaradi.
+# Bu satr yo'q bo'lsa — tahlil yarim qolgan, natija ishonchsiz (hech qachon "safe" deb hisoblamaymiz).
+_ANALYZER_SUCCESS_SENTINEL = "--- РЕКОМЕНДАЦИИ ---"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -157,12 +162,15 @@ def _run_analyzer(apk_path: Path) -> dict:
 
     analyzer = PROJECT_ROOT / "apk_analyzer.py"
     if not analyzer.is_file():
+        shutil.rmtree(workdir, ignore_errors=True)
         return {"risk": "error", "reasons": ["apk_analyzer.py topilmadi"], "perms": []}
 
     try:
-        # Работаем в workdir, чтобы apk_analyzer нашёл sample.apk и не трогал основной проект.
+        # APK yo'lini VA chiqish papkasini analizatorga ANIQ argument qilib beramiz —
+        # u faylni cwd'dan emas, aniq berilgan yo'ldan oladi. (Avval cwd'ga tayanardi,
+        # lekin analizator faylni o'z papkasidan qidirardi → har doim "topilmadi" → soxta SAFE.)
         proc = subprocess.run(
-            [sys.executable, str(analyzer)],
+            [sys.executable, str(analyzer), str(target_apk), str(workdir)],
             cwd=str(workdir),
             timeout=120,
             capture_output=True,
@@ -170,11 +178,22 @@ def _run_analyzer(apk_path: Path) -> dict:
             encoding="utf-8",
             errors="replace",
         )
-        out = proc.stdout
     except subprocess.TimeoutExpired:
         return {"risk": "error", "reasons": ["tahlil 2 daqiqadan oshib ketdi"], "perms": []}
     except Exception as e:
         return {"risk": "error", "reasons": [f"analizator ishlamadi: {e}"], "perms": []}
+    finally:
+        # work_* (nusxa sample.apk + apk_extracted) — vaqtinchalik, doim tozalaymiz.
+        # To'plangan asl namuna (save_path) saqlanadi.
+        shutil.rmtree(workdir, ignore_errors=True)
+
+    out = proc.stdout or ""
+    # POSITIV ISBOTSIZ "safe" YO'Q: exit kod 0 bo'lishi VA to'liq hisobot belgisi bo'lishi shart.
+    # Aks holda (kod != 0, bo'sh/buzilgan/tushunarsiz chiqish) — error, hech qachon safe emas.
+    if proc.returncode != 0:
+        return {"risk": "error", "reasons": [f"analiz xato (kod {proc.returncode})"], "perms": []}
+    if _ANALYZER_SUCCESS_SENTINEL not in out:
+        return {"risk": "error", "reasons": ["tahlil to'liq tugamadi — natija ishonchsiz"], "perms": []}
 
     return _parse_analyzer_output(out)
 

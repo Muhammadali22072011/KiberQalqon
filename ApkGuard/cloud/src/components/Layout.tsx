@@ -36,6 +36,9 @@ export default function Layout() {
   const [open, setOpen] = useState(false);
   const [clock, setClock] = useState(hms());
   const [exporting, setExporting] = useState(false);
+  // kq_news_seen localStorage'da; React uni ko'rmaydi, shuning uchun state'da kuzatamiz
+  // (memo qayta hisoblansin, e'lonlar o'qilgach badge darhol tozalansin).
+  const [seenAt, setSeenAt] = useState<number>(() => Number(localStorage.getItem('kq_news_seen') || 0));
 
   const doExport = async () => {
     if (exporting) return;
@@ -57,6 +60,22 @@ export default function Layout() {
 
   useEffect(() => { setOpen(false); }, [loc.pathname]);
 
+  // kq_news_seen o'zgarganini sezish: boshqa tab → 'storage'; shu tab (NewsCarousel /
+  // News sahifasi setItem qiladi, 'storage' otmaydi) → focus/visibilitychange'da qayta o'qiymiz.
+  useEffect(() => {
+    const sync = () => setSeenAt(Number(localStorage.getItem('kq_news_seen') || 0));
+    const onStorage = (e: StorageEvent) => { if (e.key === 'kq_news_seen') sync(); };
+    const onVisible = () => { if (document.visibilityState === 'visible') sync(); };
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('focus', sync);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('focus', sync);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
+
   // Egasi va admin — ikkalasi ham hamma bo'limni ko'radi.
   const items = NAV;
   const showNews = true;
@@ -65,12 +84,11 @@ export default function Layout() {
     () => (showNews ? apiGet<{ news: NewsItem[] }>('/api/news') : Promise.resolve({ news: [] })),
     60000,
   );
-  const unread = useMemo(() => {
-    const seen = Number(localStorage.getItem('kq_news_seen') || 0);
-    return (news.data?.news || []).filter(
-      (n) => (new Date(n.created_at).getTime() || 0) > seen,
-    ).length;
-  }, [news.data]);
+  const unread = useMemo(() => (
+    (news.data?.news || []).filter(
+      (n) => (new Date(n.created_at).getTime() || 0) > seenAt,
+    ).length
+  ), [news.data, seenAt]);
   const badge = unread > 99 ? '99+' : String(unread);
 
   const head = TITLES[loc.pathname] || { sub: 'KiberQalqon', title: 'Panel' };

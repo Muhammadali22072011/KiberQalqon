@@ -1,4 +1,5 @@
 import type { VercelRequest } from '@vercel/node';
+import { timingSafeEqual as cryptoTimingSafeEqual } from 'crypto';
 import { verifySession, readSession } from './session.js';
 
 export function checkDeviceSecret(req: VercelRequest): boolean {
@@ -52,9 +53,13 @@ export function checkTelegramSecret(req: VercelRequest): boolean {
   return typeof got === 'string' && timingSafeEqual(got, expected);
 }
 
+// #45: avval bu yerda charCodeAt bilan o'z-o'zidan yozilgan solishtirish bor edi —
+// u UTF-16 kod birliklari bo'yicha ishlardi (baytma bayt emas) va login.ts/session.ts
+// ishlatadigan crypto.timingSafeEqual'dan farq qilardi. Endi hamma joyda bir xil,
+// baytma bayt doimiy-vaqtli solishtirish ishlatamiz (uzunlik guard'i login.ts kabi).
 function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
+  const ba = Buffer.from(a, 'utf8');
+  const bb = Buffer.from(b, 'utf8');
+  if (ba.length !== bb.length) return false;
+  return cryptoTimingSafeEqual(ba, bb);
 }

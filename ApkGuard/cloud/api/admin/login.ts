@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { timingSafeEqual } from 'crypto';
-import { verifyTotp } from '../../lib/totp.js';
+import { verifyTotpCounter } from '../../lib/totp.js';
 import { issueSession, issueAdminSession } from '../../lib/session.js';
+import { db } from '../../lib/supabase.js';
 
 // Veb-panelga kirish — IKKI xil odam uchun:
 //   • EGASI (dasturchi) — ADMIN_SECRET (master kalit) + ixtiyoriy TOTP. TO'LIQ huquq.
@@ -49,8 +50,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const totpSecret = process.env.ADMIN_TOTP_SECRET;
   if (totpSecret) {
-    if (!verifyTotp(otp, totpSecret)) {
+    const counter = verifyTotpCounter(otp, totpSecret);
+    if (counter == null) {
       return res.status(401).json(FAIL);
+    }
+    // #44 replay himoyasi: bir xil (yoki undan eski) qadamdagi kod qayta ishlatilmasin.
+    // Eng katta qabul qilingan counter'ni Supabase'da saqlaymiz. Best-effort: jadval
+    // bo'lmasa / DB xato bo'lsa egasini bloklamaymiz (migratsiyasiz ham TOTP ishlayveradi,
+    // migratsiya qo'llanilgach himoya aktiv bo'ladi).
+    try {
+      const sb = db();
+      const { data: st } = await sb
+        .from('auth_totp').select('last_counter').eq('id', 'owner').maybeSingle();
+      const last = (st?.last_counter as number | undefined) ?? 0;
+      if (counter <= last) {
+        return res.status(401).json({ ok: false, error: 'Kod allaqachon ishlatilgan' });
+      }
+      await sb.from('auth_totp').upsert(
+        { id: 'owner', last_counter: counter, used_at: new Date().toISOString() },
+        { onConflict: 'id' },
+      );
+    } catch (e) {
+      console.error(`[login] totp replay-guard skipped: ${(e as Error).message}`);
     }
   }
 
@@ -72,6 +93,11 @@ function loginAdmin(res: VercelResponse, b: Body) {
   const expPassword = process.env.ADMIN_PASSWORD;
   if (!expLogin || !expPassword) {
     return res.status(500).json({ ok: false, error: 'ADMIN_LOGIN/ADMIN_PASSWORD sozlanmagan' });
+  }
+  // #46: imzo kaliti (SESSION_SECRET yoki ADMIN_SECRET) bo'lmasa, chiqarilgan admin tokeni
+  // HECH QACHON tasdiqlanmaydi (admin har doim 401 oladi). Aniq xato bilan to'xtatamiz.
+  if (!process.env.SESSION_SECRET && !process.env.ADMIN_SECRET) {
+    return res.status(500).json({ ok: false, error: 'SESSION_SECRET/ADMIN_SECRET sozlanmagan' });
   }
 
   // Ikkala maydon ham doimiy-vaqtli solishtiriladi (enumeration'ga qarshi bir xil xato).

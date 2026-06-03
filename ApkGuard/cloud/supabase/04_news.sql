@@ -33,11 +33,16 @@ alter table news enable row level security;
 -- ============================================================================
 -- Namuna e'lon (ixtiyoriy) — panel bo'sh ko'rinmasligi uchun.
 -- ============================================================================
+-- #50: news.id tasodifiy uuid (default), boshqa UNIQUE ustun yo'q — shuning uchun
+-- `on conflict do nothing` HECH QACHON ishlamasdi (har gal yangi uuid → konflikt yo'q)
+-- va qayta ishga tushirilsa namuna e'lon DUBLIKAT bo'lardi. Endi mavjudligini tekshirib
+-- (where not exists) faqat bir marta qo'shamiz — haqiqatan idempotent.
 insert into news (title, body, level, pinned)
-values (
+select
   'KiberQalqon Cloud ishga tushdi',
   'Markaziy panel faol: xarita, jonli oqim, rollar va yangiliklar. Yangi e''lonlar shu yerda chiqadi.',
   'info',
   true
-)
-on conflict do nothing;
+where not exists (
+  select 1 from news where title = 'KiberQalqon Cloud ishga tushdi'
+);

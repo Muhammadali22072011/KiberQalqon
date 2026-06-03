@@ -134,15 +134,19 @@ class ScanHistoryActivity : AppCompatActivity() {
         threats: List<ScanHistory.Entry>,
     ) {
         val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+        // #23: staleness-aware o'qish — slot oxirgi 7 kun ichida yangilanmagan bo'lsa 0
+        // (aks holda grafik "butun tarix"ni ko'rsatardi).
+        val today = java.util.Calendar.getInstance().let {
+            (it.timeInMillis + it.get(java.util.Calendar.ZONE_OFFSET) +
+                it.get(java.util.Calendar.DST_OFFSET)) / 86_400_000L
+        }
+        fun dayCount(d: Int): Int {
+            val stamp = prefs.getLong("day_${d}_epochday", -1L)
+            return if (stamp >= 0 && today - stamp in 0..6) prefs.getInt("day_$d", 0) else 0
+        }
         // [day_1 (Mon), day_2 (Tue), day_3 (Wed), day_4 (Thu), day_5 (Fri), day_6 (Sat), day_0 (Sun)]
         val scansPerDay = intArrayOf(
-            prefs.getInt("day_1", 0),
-            prefs.getInt("day_2", 0),
-            prefs.getInt("day_3", 0),
-            prefs.getInt("day_4", 0),
-            prefs.getInt("day_5", 0),
-            prefs.getInt("day_6", 0),
-            prefs.getInt("day_0", 0),
+            dayCount(1), dayCount(2), dayCount(3), dayCount(4), dayCount(5), dayCount(6), dayCount(0),
         )
 
         // Threat counts per UI-day-index (Mon..Sun) — recalculated from history

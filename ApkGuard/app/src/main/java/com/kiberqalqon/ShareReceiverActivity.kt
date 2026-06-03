@@ -9,6 +9,8 @@ import android.util.Log
 import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -30,10 +32,17 @@ import java.io.File
 // Plain Activity (not AppCompat): manifest theme is platform Theme.Translucent.NoTitleBar — AppCompatActivity requires a Theme.AppCompat descendant and would crash in createSubDecor.
 class ShareReceiverActivity : Activity() {
 
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
+    }
+
+    override fun onDestroy() {
+        // Activity yopilsa, davom etayotgan nusxalash coroutine'ini bekor qilamiz —
+        // aks holda u Activity'ni (Toast/Intent) ushlab leak qilardi.
+        scope.cancel()
+        super.onDestroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +62,8 @@ class ShareReceiverActivity : Activity() {
 
         scope.launch {
             val copied = withContext(Dispatchers.IO) { copyToCache(uri) }
+            // Nusxalash davomida Activity yopilgan bo'lishi mumkin — UI'ga tegmaymiz.
+            if (isFinishing || isDestroyed) return@launch
             if (copied == null) {
                 Toast.makeText(this@ShareReceiverActivity, R.string.share_copy_failed, Toast.LENGTH_LONG).show()
                 finish()

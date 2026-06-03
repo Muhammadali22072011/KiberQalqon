@@ -93,17 +93,38 @@ class AdminPanelActivity : AppCompatActivity() {
             cacheMode = android.webkit.WebSettings.LOAD_DEFAULT
         }
         w.webChromeClient = WebChromeClient()
+        val baseHost = Uri.parse(base).host
         w.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                // Faqat o'z panelimiz ichida qolamiz; tashqi havola — tashqi brauzerda.
-                val url = request.url?.toString().orEmpty()
-                if (url.startsWith(base)) return false
+            // Faqat o'z panelimiz ichida qolamiz; tashqi havola — tashqi brauzerda.
+            // Xost (host) bo'yicha solishtiramiz, satr prefiksi bo'yicha EMAS — aks holda
+            // "panel.kiberqalqon.app.evil.com" kabi soxta xost ham startsWith'ni qanoatlantirib,
+            // ishonchli panel ichida ochilib ketardi.
+            private fun isInternal(uri: Uri): Boolean {
+                if (uri.scheme != "https") return false
+                val host = uri.host ?: return false
+                val bh = baseHost ?: return false
+                return host == bh || host.endsWith(".$bh")
+            }
+
+            private fun handle(uri: Uri): Boolean {
+                if (isInternal(uri)) return false
                 return try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    startActivity(Intent(Intent.ACTION_VIEW, uri))
                     true
                 } catch (_: Throwable) {
                     true
                 }
+            }
+
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val uri = request.url ?: return true
+                return handle(uri)
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
+                val uri = url?.let { Uri.parse(it) } ?: return true
+                return handle(uri)
             }
 
             override fun onReceivedError(

@@ -65,7 +65,10 @@ object NativeLibAnalyzer {
             ZipFile(apkPath).use { zip ->
                 for (entry in zip.entries()) {
                     if (!entry.name.endsWith(".so", ignoreCase = true)) continue
-                    if (entry.isDirectory || entry.size <= 0 || entry.size > MAX_SO_SIZE) continue
+                    // #32: avval >5MB .so'lar BUTUNLAY o'tkazib yuborilardi — dropper payload'ni
+                    //      katta .so ichiga joylab, importlar+entropy tahlilidan qochishi mumkin edi.
+                    //      Endi katta .so ham birinchi SAMPLE_SIZE (256KB) bo'yicha tahlil qilinadi.
+                    if (entry.isDirectory || entry.size <= 0) continue
 
                     val baseName = entry.name.substringAfterLast('/').lowercase()
                     if (SAFE_LIB_NAMES.any { baseName.startsWith(it) || baseName == it }) continue

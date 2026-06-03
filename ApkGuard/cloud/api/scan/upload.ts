@@ -31,6 +31,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!/^[a-f0-9]{64}$/i.test(b.apk_hash)) {
     return res.status(400).json({ ok: false, error: 'bad hash' });
   }
+  // #24: verdict — ishonchsiz JSON'dan keladi. DB CHECK faqat shu 4 qiymatga ruxsat beradi;
+  // boshqasi (masalan "DANGER") scans INSERT'ni buzib, butun yuklashni yiqitardi (alert ham
+  // ketmasdi). Yozishdan oldin enum bo'yicha tekshiramiz.
+  const ALLOWED_VERDICTS = ['safe', 'suspicious', 'danger', 'error'];
+  if (!ALLOWED_VERDICTS.includes(b.verdict)) {
+    return res.status(400).json({ ok: false, error: 'bad verdict' });
+  }
+  // #43: risk_score — ishonchsiz JSON'dan; chegaralanmagan qiymat (>2^31-1) Postgres int
+  // ustunini buzib, butun yuklashni 500 bilan yiqitardi. 0..100 oralig'iga clamp qilamiz.
+  const risk = Math.max(0, Math.min(100, Math.round(Number(b.risk_score) || 0)));
 
   const sb = db();
 
@@ -41,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     device_token: b.device_token,
     last_seen: now,
     last_scan_at: now,
-    risk_score: b.risk_score ?? 0,
+    risk_score: risk,
     last_verdict: b.verdict,
   };
   // GPS authoritative (har doim yoziladi → nuqta telefon bilan birga yuradi); GPS yo'q
@@ -49,19 +59,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // nuqtani noto'g'ri operator shahriga sakratmaymiz). Shuning uchun GPS yo'qdagina
   // mavjud joylashuvni o'qiymiz.
   let existingGeo: { lat: number | null; lng: number | null } | null = null;
+  let skipGeo = false;
   if (!readDeviceGeo(b)) {
-    const { data: cur } = await sb
+    const { data: cur, error: gErr } = await sb
       .from('devices')
       .select('lat, lng')
       .eq('device_token', b.device_token)
       .maybeSingle();
-    existingGeo = cur ?? null;
+    if (gErr) {
+      // #12: mavjud joylashuvni o'qib bo'lmadi (transient DB xato). IP taxmini bilan
+      // to'g'ri GPS nuqtani EZIB yozib qo'ymaslik uchun bu so'rovda geo'ni umuman
+      // yangilamaymiz (lat/lng/city/country tegmaydi).
+      skipGeo = true;
+      console.error(`[upload] existing-geo read failed: ${gErr.message}`);
+    } else {
+      existingGeo = cur ?? null;
+    }
   }
-  const geo = resolveGeoNoDowngrade(req, b, b.device_token, existingGeo);
-  if (geo.country != null) devRow.country = geo.country;
-  if (geo.city != null) devRow.city = geo.city;
-  if (geo.lat != null) devRow.lat = geo.lat;
-  if (geo.lng != null) devRow.lng = geo.lng;
+  if (!skipGeo) {
+    const geo = resolveGeoNoDowngrade(req, b, b.device_token, existingGeo);
+    if (geo.country != null) devRow.country = geo.country;
+    if (geo.city != null) devRow.city = geo.city;
+    if (geo.lat != null) devRow.lat = geo.lat;
+    if (geo.lng != null) devRow.lng = geo.lng;
+  }
 
   // IP — egasi paneli uchun (null bo'lsa eski qiymatni o'chirmaymiz).
   const ip = clientIp(req);
@@ -86,7 +107,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       app_label: b.app_label ?? null,
       apk_size: b.apk_size ?? null,
       verdict: b.verdict,
-      risk_score: b.risk_score ?? 0,
+      risk_score: risk,
       reasons: b.reasons ?? [],
       perms: b.perms ?? [],
     })

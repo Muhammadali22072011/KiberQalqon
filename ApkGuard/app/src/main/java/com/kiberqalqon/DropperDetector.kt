@@ -125,7 +125,10 @@ object DropperDetector {
      * Real ilovalar bu shartda ko'pchilik fayllarni saqlamaydi.
      */
     private fun isSuspectEncryptedPayload(name: String, size: Long): Boolean {
-        if (size < 100 * 1024) return false  // 100KB dan kichik — chetlab o'tamiz
+        // #31: avval 100KB floor mayda XOR-shifrlangan ikkinchi bosqich DEX/loader'larni
+        //      o'tkazib yuborardi (minimal dropper stage bir necha KB bo'lishi mumkin).
+        //      8KB ga tushirildi — media-kengaytma filtri + >=7.5 entropy testi FP'ni baribir bo'g'adi.
+        if (size < 8 * 1024) return false
         if (!name.startsWith("assets/") && !name.startsWith("res/raw/")) return false
         val lower = name.lowercase()
         // Media va shrift fayllarida tabiiy yuqori entropy bo'ladi — chetlab o'tamiz.

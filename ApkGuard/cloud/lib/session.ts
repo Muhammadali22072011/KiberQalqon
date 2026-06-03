@@ -56,6 +56,9 @@ export function readSession(token: string): SessionPayload | null {
 
 // Egasi (master panel) tokeni — kind yo'q. To'liq huquq.
 export function issueSession(ttlSec: number = DEFAULT_TTL_SEC): { token: string; exp: number } {
+  // #46: imzo kaliti yo'q bo'lsa token chiqarmaymiz — aks holda readSession uni HECH QACHON
+  // tasdiqlay olmaydi (jim verifikatsiya qilinmaydigan token → foydalanuvchi bloklanadi).
+  if (!key()) throw new Error('SESSION_SECRET/ADMIN_SECRET sozlanmagan — token imzolab bo\'lmaydi');
   const exp = Math.floor(Date.now() / 1000) + ttlSec;
   const payloadB64 = b64urlEncode(JSON.stringify({ exp }));
   const token = `${payloadB64}.${sign(payloadB64)}`;
@@ -68,6 +71,7 @@ export function issueAdminSession(
   login: string,
   ttlSec: number = DEFAULT_TTL_SEC,
 ): { token: string; exp: number } {
+  if (!key()) throw new Error('SESSION_SECRET/ADMIN_SECRET sozlanmagan — token imzolab bo\'lmaydi');
   const exp = Math.floor(Date.now() / 1000) + ttlSec;
   const payloadB64 = b64urlEncode(JSON.stringify({ exp, kind: 'admin', login }));
   const token = `${payloadB64}.${sign(payloadB64)}`;

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import java.io.File
 
 private const val TAG = "GuardWorker"
 
@@ -20,19 +21,32 @@ class GuardWorker(
                 return Result.success()
             }
             
-            val list = try {
-                ApkScanner.findApkFiles(applicationContext)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error finding APK files", e)
-                return Result.success()
+            // #10/#11: ProtectionService aniqlangan YANGI APK yo'l(lar)ini bevosita uzatadi.
+            // Shunda backdated (eski mtime) virus ham, mtime bo'yicha saralangan 10 talikdan
+            // tashqaridagi fayl ham real vaqtda skanlanadi (avval bare worker faqat
+            // findApkFiles().take(10) ni ko'rardi va aynan shularni o'tkazib yuborardi).
+            val explicitPaths = inputData.getStringArray(KEY_APK_PATHS)
+            val list: List<ApkItem> = if (!explicitPaths.isNullOrEmpty()) {
+                explicitPaths.mapNotNull { p ->
+                    val f = File(p)
+                    if (f.exists()) ApkItem(f, f.name, f.absolutePath, f.length()) else null
+                }
+            } else {
+                try {
+                    ApkScanner.findApkFiles(applicationContext)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error finding APK files", e)
+                    return Result.success()
+                }
             }
-            
+
             var uploaded = 0
             val serverUrl = Config.getServerUrl(applicationContext)
             val uploadEnabled = Config.isUploadEnabled(applicationContext) && serverUrl.isNotBlank()
 
-            // Проверяем максимум 10 файлов за раз
-            for (item in list.take(10)) {
+            // Aniq yo'llar berilgan bo'lsa hammasini skanlaymiz; aks holda max 10 ta (discovery).
+            val toScan = if (!explicitPaths.isNullOrEmpty()) list else list.take(10)
+            for (item in toScan) {
                 try {
                     if (!item.file.exists()) continue
                     
@@ -241,5 +255,10 @@ class GuardWorker(
         } catch (_: Throwable) {
             false
         }
+    }
+
+    companion object {
+        /** ProtectionService aniqlagan aniq APK yo'llari (String[]) — #10/#11. */
+        const val KEY_APK_PATHS = "apk_paths"
     }
 }

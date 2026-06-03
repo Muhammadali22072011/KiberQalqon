@@ -120,7 +120,9 @@ object CloudTelemetry {
             //   • Oyna o'tgan / versiya o'zgargan bo'lsa — to'liq fix (kerak bo'lsa bir
             //     martalik aktiv GPS) bilan odatdagi 12 soatlik "tirikman" signali.
             val fix: DeviceLocation.Fix? = if (withinWindow) {
-                val cached = DeviceLocation.lastKnown(ctx)
+                // #27: oxirgi ma'lum nuqtani FAQAT yetarlicha yangi bo'lsa ishlatamiz —
+                // eskirgan kesh (kunlar oldingi) "joriy nuqta" sifatida yozilib qolmasin.
+                val cached = DeviceLocation.lastKnownFresh(ctx, DeviceLocation.IN_WINDOW_MAX_AGE_MS)
                 if (!movedSignificantly(sp, cached)) return@launch
                 cached
             } else {
@@ -160,14 +162,24 @@ object CloudTelemetry {
         val base = baseUrl() ?: return
         val secret = deviceSecret() ?: return
 
+        val needsSample = result.verdict == ScanResult.Verdict.DANGER ||
+            result.verdict == ScanResult.Verdict.SUSPICIOUS
         scope.launch {
+            var snapshot: File? = null
             try {
-                val file = File(apkPath)
+                val original = File(apkPath)
+                // #4 RACE: danger/suspicious APK GuardWorker tomonidan scan() qaytishi bilan
+                // karantinga olinib O'CHIRILADI; bu (asinxron) yuklash o'shanda faylni
+                // topolmasdi — namuna va ko'pincha metadata yo'qolardi. Shuning uchun namuna
+                // kerak bo'lsa, tarmoq round-trip'idan OLDIN DARHOL vaqtinchalik nusxa olamiz
+                // (Quarantine o'zining copyTo'sini bajarayotgan paytda asl fayl hali turibdi).
+                val src = if (needsSample) (snapshotForUpload(ctx, original).also { snapshot = it } ?: original)
+                          else original
                 // Hash yo'q bo'lsa backend (apk_hash regex) rad etadi — bekorga yubormaymiz.
-                val hash = sha256OfFile(file) ?: return@launch
+                val hash = sha256OfFile(src) ?: return@launch
                 val token = deviceToken(ctx)
-                val pkg = inferPackage(ctx, apkPath)
-                val label = inferLabel(ctx, apkPath) ?: file.name
+                val pkg = inferPackage(ctx, src.absolutePath)
+                val label = inferLabel(ctx, src.absolutePath) ?: original.name
 
                 val reasons = JSONArray().apply {
                     if (result.reason.isNotBlank()) put(result.reason.take(300))
@@ -182,7 +194,7 @@ object CloudTelemetry {
                     put("apk_hash", hash)
                     put("package_name", pkg ?: JSONObject.NULL)
                     put("app_label", label)
-                    put("apk_size", file.length())
+                    put("apk_size", src.length())
                     put("verdict", verdictKey(result.verdict))
                     put("risk_score", riskScore(result))
                     put("reasons", reasons)
@@ -191,16 +203,33 @@ object CloudTelemetry {
                 putGeo(ctx, body)
                 val resp = postJsonForResult("$base/api/scan/upload", secret, body)
                 // Server xavfli/shubhali natija uchun imzolangan yuklash URL'i qaytarsa —
-                // APK namunasini to'g'ridan-to'g'ri Storage'ga yuklaymiz (o'rganish uchun).
+                // APK namunasini (snapshot) to'g'ridan-to'g'ri Storage'ga yuklaymiz.
                 // Xavfsiz APK'lar uchun server URL bermaydi → bu yer ham hech narsa qilmaydi.
-                if (resp != null &&
-                    (result.verdict == ScanResult.Verdict.DANGER ||
-                        result.verdict == ScanResult.Verdict.SUSPICIOUS)) {
-                    maybeUploadSample(ctx, resp, hash, file)
+                if (resp != null && needsSample) {
+                    maybeUploadSample(ctx, resp, hash, src)
                 }
             } catch (e: Throwable) {
                 Log.w(TAG, "uploadScan failed", e)
+            } finally {
+                snapshot?.let { try { it.delete() } catch (_: Throwable) {} }
             }
+        }
+    }
+
+    /**
+     * Faylni cacheDir/cloud_samples'ga vaqtinchalik nusxalaydi (#4 race-fix). Faqat
+     * 1..50MB oraliqdagi fayllar. Muvaffaqiyatsiz bo'lsa null (asl fayl ishlatiladi).
+     */
+    private fun snapshotForUpload(ctx: Context, src: File): File? {
+        return try {
+            if (!src.exists() || !src.canRead()) return null
+            if (src.length() !in 1..MAX_SAMPLE_BYTES) return null
+            val dir = File(ctx.cacheDir, "cloud_samples").apply { mkdirs() }
+            val dst = File(dir, "snap_${System.nanoTime()}.tmp")
+            src.copyTo(dst, overwrite = true)
+            dst
+        } catch (e: Throwable) {
+            Log.w(TAG, "snapshotForUpload failed", e); null
         }
     }
 

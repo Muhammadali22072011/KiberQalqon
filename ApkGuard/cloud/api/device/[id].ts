@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
-import { checkAdminSecret, checkDeviceSecret } from '../../lib/auth.js';
+import { canRead, checkDeviceSecret } from '../../lib/auth.js';
 import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
 
 // Ikkita yo'l bitta dinamik route'da (Hobby 12-funksiya limiti uchun):
@@ -11,10 +11,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (id === 'register') return handleRegister(req, res);
 
-  // --- /api/device/<uuid> — bitta qurilma + oxirgi skanlari (faqat ADMIN_SECRET) ---
+  // --- /api/device/<uuid> — bitta qurilma + oxirgi skanlari (panel foydalanuvchisi) ---
   // Kalit sifatida device id (uuid). device_token (yozuv kaliti) panelga ochilmaydi.
+  // #25: avval checkAdminSecret (FAQAT egasi) edi — lekin panelning Devices ro'yxati
+  // cheklangan admin uchun ham ochiq va qatorga bosish shu endpointni chaqiradi → admin
+  // tokeni rad etilib, admin tizimdan chiqarib yuborilardi. Bu faqat O'QISH endpointi
+  // (admin baribir /api/devices va /api/feed orqali shu ma'lumotni ko'radi), shuning
+  // uchun canRead (egasi YOKI admin) bilan himoyalaymiz. device-secret bu yerda ishlamaydi.
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
-  if (!checkAdminSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+  if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
   if (!id || !/^[0-9a-fA-F-]{36}$/.test(id)) {
     return res.status(400).json({ ok: false, error: 'bad id' });
@@ -78,19 +83,29 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
   // Shuning uchun GPS yo'q bo'lsagina mavjud joylashuvni o'qiymiz. Null qiymatlarni
   // ustiga yozmaymiz (lokal dev'da IP sarlavhalari bo'lmaydi).
   let existingGeo: { lat: number | null; lng: number | null } | null = null;
+  let skipGeo = false;
   if (!readDeviceGeo(b)) {
-    const { data: cur } = await sb
+    const { data: cur, error: gErr } = await sb
       .from('devices')
       .select('lat, lng')
       .eq('device_token', b.device_token)
       .maybeSingle();
-    existingGeo = cur ?? null;
+    if (gErr) {
+      // #13: mavjud joylashuvni o'qib bo'lmadi — IP taxmini bilan to'g'ri GPS nuqtani
+      // EZIB yozmaslik uchun bu register'da geo'ni umuman yangilamaymiz.
+      skipGeo = true;
+      console.error(`[register] existing-geo read failed: ${gErr.message}`);
+    } else {
+      existingGeo = cur ?? null;
+    }
   }
-  const geo = resolveGeoNoDowngrade(req, b, b.device_token, existingGeo);
-  if (geo.country != null) row.country = geo.country;
-  if (geo.city != null) row.city = geo.city;
-  if (geo.lat != null) row.lat = geo.lat;
-  if (geo.lng != null) row.lng = geo.lng;
+  if (!skipGeo) {
+    const geo = resolveGeoNoDowngrade(req, b, b.device_token, existingGeo);
+    if (geo.country != null) row.country = geo.country;
+    if (geo.city != null) row.city = geo.city;
+    if (geo.lat != null) row.lat = geo.lat;
+    if (geo.lng != null) row.lng = geo.lng;
+  }
 
   // IP — egasi paneli uchun (null bo'lsa eski qiymatni o'chirmaymiz).
   const ip = clientIp(req);

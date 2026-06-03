@@ -287,6 +287,11 @@ object Statistics {
     private fun statsPrefs(context: Context): SharedPreferences =
         context.getSharedPreferences(STATS_PREFS, Context.MODE_PRIVATE)
     
+    // #42: hisoblagichlar bir nechta thread'dan (GuardWorker / PeriodicCheckWorker /
+    // PackageInstallReceiver / observer'lar) bir vaqtda oshiriladi — get-then-put
+    // sinxronlanmagani uchun increment'lar yo'qolardi. @Synchronized object Statistics
+    // instansiyasida qulflaydi (process ichida serializatsiya). (Process'lararo emas.)
+    @Synchronized
     fun incrementScanned(context: Context) {
         val prefs = statsPrefs(context)
         val current = prefs.getInt("total_scanned", 0)
@@ -311,18 +316,44 @@ object Statistics {
         }
     }
     
+    @Synchronized
     fun incrementBlocked(context: Context) {
         val prefs = statsPrefs(context)
         val current = prefs.getInt("total_blocked", 0)
         prefs.edit { putInt("total_blocked", current + 1) }
     }
-    
+
+    @Synchronized
     fun incrementSafe(context: Context) {
         val prefs = statsPrefs(context)
         val current = prefs.getInt("total_safe", 0)
         prefs.edit { putInt("total_safe", current + 1) }
     }
     
+    /**
+     * 7 kunlik grafik uchun kun bo'yicha hisob (indeks 0..6 = DAY_OF_WEEK-1). #23: har bir
+     * slot stamp'ini joriy kun bilan solishtiramiz — slot oxirgi 7 kun ichida yangilanmagan
+     * bo'lsa (o'tgan haftadagi shu kun) 0 deb qaytaramiz. Avval o'quvchilar (Dashboard /
+     * ScanHistory) stamp'ni e'tiborsiz qoldirib day_0..6 ni to'g'ridan-to'g'ri o'qirdi —
+     * natijada grafik "bu hafta" emas, "butun tarix"ni ko'rsatardi. resetWeekData esa
+     * hech qachon chaqirilmasdi (dead code).
+     */
+    fun weekCounts(context: Context): IntArray {
+        val prefs = statsPrefs(context)
+        val cal = java.util.Calendar.getInstance()
+        val todayEpochDay = (cal.timeInMillis +
+            cal.get(java.util.Calendar.ZONE_OFFSET) +
+            cal.get(java.util.Calendar.DST_OFFSET)) / 86_400_000L
+        val out = IntArray(7)
+        for (d in 0..6) {
+            val stamp = prefs.getLong("day_${d}_epochday", -1L)
+            val ageDays = todayEpochDay - stamp
+            // Joriy hafta oynasi: slot bugun yoki oxirgi 6 kun ichida yangilangan bo'lsa.
+            out[d] = if (stamp >= 0 && ageDays in 0..6) prefs.getInt("day_$d", 0) else 0
+        }
+        return out
+    }
+
     fun resetWeekData(context: Context) {
         val prefs = statsPrefs(context)
         prefs.edit {

@@ -38,6 +38,10 @@ object TelegramBot {
     private const val KEY_UPDATE_OFFSET = "tg_update_offset"
     private const val KEY_LISTEN = "tg_listen_commands"
     private const val KEY_SEND_APK = "tg_send_apk"
+    // Numericheskiy Telegram user.id vladel'tsa. Zapominaetsya pri pervom privatnom /start
+    // (chat.type == "private" => chat.id == from.id == vladelets). Posle etogo privilegirovannye
+    // update'y trebuyut from.id == etomu znaceniyu — chtoby chleny gruppy ne mogli upravlyat' botom.
+    private const val KEY_OWNER_USER_ID = "tg_owner_user_id"
 
     private val client by lazy {
         OkHttpClient.Builder()
@@ -266,6 +270,9 @@ object TelegramBot {
                     val updateId = u.optLong("update_id", 0L)
                     if (updateId > 0 && updateId >= maxId) maxId = updateId + 1
                     val parsed = TelegramUpdate.parse(u, ownChat) ?: continue
+                    // Owner-gate: chat.id whitelist nedostatochen, esli chat_id — gruppa
+                    // (lyuboy uchastnik mog by nazhat' knopki). Trebuem from.id == vladel'tsu.
+                    if (!passesOwnerGate(ctx, parsed)) continue
                     out.add(parsed)
                 }
                 // Soxranyaem offset chtoby v sleduyushij raz ne zabrat' eti zhe updates.
@@ -286,6 +293,39 @@ object TelegramBot {
 
     private fun prefs(ctx: Context) =
         ctx.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    /**
+     * Owner-gate dlya vhodyaschih update'ov.
+     *
+     * Chat.id whitelist (proverennyy v parse) zaschischaet ot chuzhih chatov, no ne ot
+     * chuzhih uchastnikov, esli nash chat_id — gruppa: lyuboy chlen gruppy smog by nazhat'
+     * inline-knopki ili napisat' /start i dergat' privilegirovannye deystviya. Poetomu
+     * dopolnitel'no svyazyvaem upravlenie s konkretnym Telegram user.id vladel'tsa.
+     *
+     * Bootstrap: pri pervom privatnom /start (chat.type == "private" => chat.id == from.id)
+     * my zapominaem from.id kak vladel'tsa. Poka vladelets ne zapomnen — propuskaem po
+     * staromu chat.id whitelist'u (chtoby samyj pervyj /start srabotal i samo-zapisal id).
+     */
+    private fun passesOwnerGate(ctx: Context, update: TelegramUpdate): Boolean {
+        val stored = prefs(ctx).getLong(KEY_OWNER_USER_ID, 0L)
+        return when (update) {
+            is TelegramUpdate.TextMessage -> {
+                val fromId = update.fromUserId
+                // Pervyj privatnyj /start v lichke samo-zapisyvaet vladel'tsa.
+                if (stored <= 0L && update.isPrivate && fromId != null && fromId > 0) {
+                    prefs(ctx).edit().putLong(KEY_OWNER_USER_ID, fromId).apply()
+                    Log.d(TAG, "owner user-id bootstrapped from private /start")
+                    return true
+                }
+                if (stored <= 0L) return true // ещё нет владельца — fallback na chat.id whitelist
+                fromId == stored
+            }
+            is TelegramUpdate.Callback -> {
+                if (stored <= 0L) return true // fallback poka vladelets ne zapomnen
+                update.fromUserId == stored
+            }
+        }
+    }
 
     private fun postJson(token: String, method: String, body: JSONObject): JSONObject? {
         return try {
@@ -344,7 +384,11 @@ sealed class TelegramUpdate {
         val chatId: String,
         val messageId: Long,
         val text: String,
-        val fromUsername: String?
+        val fromUsername: String?,
+        /** Telegram user.id otpravitelya (dlya owner-gate). null esli ne razobran. */
+        val fromUserId: Long?,
+        /** true esli eto privatnyy 1:1 chat (chat.type == "private"). */
+        val isPrivate: Boolean
     ) : TelegramUpdate()
 
     /** Polzovatel' nazhal inline-knopku. */
@@ -354,7 +398,9 @@ sealed class TelegramUpdate {
         val messageId: Long?,
         val callbackId: String,
         val data: String,
-        val fromUsername: String?
+        val fromUsername: String?,
+        /** Telegram user.id nazhavshego knopku (dlya owner-gate). null esli ne razobran. */
+        val fromUserId: Long?
     ) : TelegramUpdate()
 
     companion object {
@@ -366,16 +412,20 @@ sealed class TelegramUpdate {
             val updateId = obj.optLong("update_id", 0L)
             val msg = obj.optJSONObject("message")
             if (msg != null) {
-                val chatId = msg.optJSONObject("chat")?.optLong("id")?.toString() ?: return null
+                val chat = msg.optJSONObject("chat")
+                val chatId = chat?.optLong("id")?.toString() ?: return null
                 if (chatId != ownChat) return null
                 val text = msg.optString("text", "").trim()
                 if (text.isEmpty()) return null
+                val from = msg.optJSONObject("from")
                 return TextMessage(
                     updateId = updateId,
                     chatId = chatId,
                     messageId = msg.optLong("message_id", 0L),
                     text = text,
-                    fromUsername = msg.optJSONObject("from")?.optString("username", "")?.ifBlank { null }
+                    fromUsername = from?.optString("username", "")?.ifBlank { null },
+                    fromUserId = from?.optLong("id", 0L)?.takeIf { it > 0 },
+                    isPrivate = chat.optString("type", "") == "private"
                 )
             }
             val cb = obj.optJSONObject("callback_query")
@@ -389,7 +439,8 @@ sealed class TelegramUpdate {
                     messageId = cbMsg.optLong("message_id", 0L).takeIf { it > 0 },
                     callbackId = cb.optString("id"),
                     data = cb.optString("data", ""),
-                    fromUsername = cb.optJSONObject("from")?.optString("username", "")?.ifBlank { null }
+                    fromUsername = cb.optJSONObject("from")?.optString("username", "")?.ifBlank { null },
+                    fromUserId = cb.optJSONObject("from")?.optLong("id", 0L)?.takeIf { it > 0 }
                 )
             }
             return null

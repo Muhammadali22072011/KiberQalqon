@@ -37,6 +37,12 @@ class SplashActivity : AppCompatActivity() {
     // har safar shu bosqichga qaytib, dialog cheksiz takrorlanardi va foydalanuvchi
     // keyingi bosqichlarga (joylashuv / bildirishnoma / Dashboard) umuman o'ta olmasdi.
     private var batteryAskedThisSession = false
+
+    // Marshrutga FAQAT bir marta o'tamiz. Android 13+ da bildirishnoma ruxsati dialogidan
+    // keyin ham onResume (firstResume'dan keyingi kelish), ham onRequestPermissionsResult
+    // oqimni davom ettirishga urinadi — guardsiz goToMainActivity ikki marta chaqirilib,
+    // back-stack'da kirish ekranining IKKI nusxasi paydo bo'lardi.
+    private var routed = false
     
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -466,8 +472,10 @@ class SplashActivity : AppCompatActivity() {
             checkPermissions()
         } else if (requestCode == 103) {
             // POST_NOTIFICATIONS — rad etilsa ham davom etamiz, faqat bildirishnoma ishlamaydi.
-            // Foydalanuvchi keyinroq Settings'dan o'zi yoqishi mumkin.
-            goToMainActivity()
+            // Foydalanuvchi keyinroq Settings'dan o'zi yoqishi mumkin. 104 branch'i kabi
+            // checkPermissions'ga qaytamiz (to'g'ridan-to'g'ri goToMainActivity emas) — shunda
+            // keyingi bosqich (OEM guide) ham o'tkazib yuborilmaydi va marshrut yagona joydan.
+            checkPermissions()
         }
     }
     
@@ -517,6 +525,9 @@ class SplashActivity : AppCompatActivity() {
     }
     
     private fun goToMainActivity() {
+        // Idempotent: bir martadan ortiq marshrutlamaymiz (yuqoridagi `routed` izohiga qarang).
+        if (routed || isFinishing) return
+        routed = true
         // Маршрут запуска (после редизайна §3):
         //   1. Если юзер ещё не дал согласие на ToS+Privacy → ConsentActivity
         //   2. Если согласие есть + первый запуск → OnboardingActivity
