@@ -13,6 +13,10 @@ class PhishingNotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn == null || !Config.isPhishingBlockerEnabled(this)) return
         if (sbn.packageName == packageName) return
+        // Ishonchli yuboruvchilar (banklar, Payme/Click/Uzcard, telekom, SMS/dialer,
+        // messenjerlar, tizim ilovalari) hech qachon bloklanmaydi — aks holda haqiqiy
+        // OTP/SMS/o'tkazma bildirishnomalari yashirilib qolardi.
+        if (AppReputation.isTrusted(sbn.packageName)) return
         val text = notificationText(sbn)
         if (isPhishingLike(text)) {
             try {
@@ -32,18 +36,26 @@ class PhishingNotificationService : NotificationListenerService() {
         return builder.toString().lowercase()
     }
 
+    /**
+     * Faqat HAQIQIY fishingni bloklaydi: bitta keng kalit so'z ("bank", "click", ...)
+     * yetarli EMAS. Verdict uchun ikkala shart birga bo'lishi shart:
+     *   1) bildirishnomada havola bor (http/https yoki t.me/), VA
+     *   2) moliyaviy/maxfiy kalit so'z bor (kod/parol/karta/o'tkazma/OTP ...).
+     * Bu kombinatsiya odatda ishonchsiz paketdan keladigan "havolaga bos va kodni
+     * kirit" turidagi soxta xabarlarga xos. (Yuboruvchi paketi onNotificationPosted'da
+     * AppReputation.isTrusted orqali allaqachon oqlangan bo'ladi.)
+     */
     private fun isPhishingLike(text: String): Boolean {
         if (text.isBlank()) return false
-        val triggers = listOf(
-            "kod", "код", "пароль", "password", "payme", "uzcard", "humo",
-            "bank", "банк", "karta", "карта", "confirm", "подтвердит",
-            "t.me/", "http://", "https://", "перейди", "нажми", "click",
-            "sms", "смс", "pin", "пин", "otp", "перевод", "transfer"
+        val hasLink = text.contains("http://") || text.contains("https://") ||
+            text.contains("t.me/") || URL_PATTERN.matcher(text).find()
+        if (!hasLink) return false
+        val financialKeywords = listOf(
+            "kod", "код", "parol", "пароль", "password", "payme", "uzcard", "humo",
+            "bank", "банк", "karta", "карта", "tasdiq", "confirm", "подтвердит",
+            "click", "sms", "смс", "pin", "пин", "otp", "о'tkazma", "перевод", "transfer"
         )
-        for (t in triggers) {
-            if (text.contains(t)) return true
-        }
-        return URL_PATTERN.matcher(text).find()
+        return financialKeywords.any { text.contains(it) }
     }
 
     companion object {

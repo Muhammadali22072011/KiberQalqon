@@ -302,6 +302,16 @@ class _Tee:
 
 
 def main():
+    # Аргументы (для вызова из бота): argv[1] = путь к APK, argv[2] = выходная папка.
+    # Без аргументов — старое поведение: ищем APK в папке скрипта (standalone-режим).
+    global OUT_DIR
+    args = sys.argv[1:]
+    apk_arg = args[0] if len(args) >= 1 else None
+    out_base = Path(args[1]).resolve() if len(args) >= 2 else BASE
+    # Выходную папку делаем per-invocation, чтобы параллельные запуски бота не затирали
+    # друг другу apk_extracted / result_analiza.txt.
+    OUT_DIR = out_base / "apk_extracted"
+
     from io import StringIO
     buf = StringIO()
     # Подмена stdout ДО любых print() — иначе сообщение "APK не найден" не попадёт в отчёт.
@@ -309,10 +319,16 @@ def main():
     sys.stdout = _Tee(buf)
     try:
         print("=== Анализатор APK ===\n")
-        apk = find_apk()
-        if not apk:
-            print("В папке не найден подозрительный .apk файл (исключая KiberQalqon*.apk).")
-            return 1
+        if apk_arg:
+            apk = Path(apk_arg)
+            if not apk.is_file():
+                print(f"Указанный APK не найден: {apk_arg}")
+                return 1
+        else:
+            apk = find_apk()
+            if not apk:
+                print("В папке не найден подозрительный .apk файл (исключая KiberQalqon*.apk).")
+                return 1
         print(f"APK: {apk.name}\n")
         extract_apk(apk)
         list_structure()
@@ -339,7 +355,7 @@ def main():
         return 0
     finally:
         sys.stdout = old_stdout
-        report_path = BASE / "result_analiza.txt"
+        report_path = out_base / "result_analiza.txt"
         try:
             report_path.write_text(buf.getvalue(), encoding="utf-8")
             print(f"\n[+] Отчёт сохранён: {report_path}")

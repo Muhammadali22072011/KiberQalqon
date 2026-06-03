@@ -103,14 +103,19 @@ object Quarantine {
         }
         saveIndex(context, loadIndex(context) + entry)
 
-        // Удаляем оригинал. Если не получилось — карантинный файл оставляем,
-        // т.к. он защищает (юзер всё равно не установит .quar).
-        try {
-            if (!originalFile.delete()) {
-                Log.w(TAG, "original delete failed after quarantine: ${originalFile.absolutePath}")
-            }
+        // Удаляем оригинал. Карантинная .quar-копия остаётся как бэкап в любом случае.
+        // (#8) Если оригинал НЕ удалён и всё ещё на диске — это НЕ успех: реальный
+        // вредоносный APK по-прежнему установим. Возвращаем Failed, чтобы вызывающий
+        // (GuardWorker) не сказал пользователю «вирус удалён», а попросил удалить вручную.
+        val removed = try {
+            originalFile.delete()
         } catch (e: Throwable) {
             Log.w(TAG, "original delete threw", e)
+            false
+        }
+        if (!removed && originalFile.exists()) {
+            Log.w(TAG, "original delete failed after quarantine: ${originalFile.absolutePath}")
+            return Result.Failed("Asl zararli faylni o'chirib bo'lmadi — uni qo'lda o'chiring")
         }
 
         return Result.Ok(entry)

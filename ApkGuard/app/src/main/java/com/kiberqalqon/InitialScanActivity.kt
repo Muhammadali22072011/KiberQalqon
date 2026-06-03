@@ -66,8 +66,14 @@ class InitialScanActivity : AppCompatActivity() {
         if (target != null && result.resultCode == android.app.Activity.RESULT_OK) {
             onItemDeleted(target)
         }
+        // Bitta-bitta navbat bilan: oldingisi hal bo'lgach keyingisini so'raymiz.
+        // Bir vaqtda bir nechta launch() chaqirilsa, faqat oxirgisi saqlanib qolardi.
+        launchNextConsentDelete()
     }
     private var pendingDeleteTarget: DangerEntry? = null
+
+    /** Consent talab qiladigan o'chirishlar navbati — ketma-ket bajariladi. */
+    private val consentDeleteQueue = ArrayDeque<DangerEntry>()
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -403,8 +409,11 @@ class InitialScanActivity : AppCompatActivity() {
             when (val r = FileDeleter.delete(this, entry.path)) {
                 FileDeleter.Result.Deleted -> onItemDeleted(entry)
                 is FileDeleter.Result.NeedsUserConsent -> {
-                    pendingDeleteTarget = entry
-                    deleteConsentLauncher.launch(IntentSenderRequest.Builder(r.sender).build())
+                    // Navbatga qo'shamiz; agar hozir hech narsa kutilmayotgan bo'lsa,
+                    // darhol birinchisini ishga tushiramiz. Aks holda oldingi consent
+                    // hal bo'lgach launcher callback keyingisini chaqiradi.
+                    consentDeleteQueue.addLast(entry)
+                    if (pendingDeleteTarget == null) launchNextConsentDelete()
                 }
                 FileDeleter.Result.NeedsManageStorage -> {
                     AlertDialog.Builder(this)
@@ -428,6 +437,37 @@ class InitialScanActivity : AppCompatActivity() {
         } catch (e: Throwable) {
             android.util.Log.e("InitialScan", "delete failed", e)
             Toast.makeText(this, "❌ Xatolik: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * Navbatdagi keyingi consent-talab qiluvchi o'chirishni ishga tushiradi.
+     * Faqat BITTA IntentSender dialogi bir vaqtda ochiq bo'ladi — launcher callback
+     * oldingisi hal bo'lgach buni qayta chaqiradi.
+     */
+    private fun launchNextConsentDelete() {
+        if (pendingDeleteTarget != null) return // allaqachon biri kutilmoqda
+        val entry = consentDeleteQueue.removeFirstOrNull() ?: return
+        try {
+            when (val r = FileDeleter.delete(this, entry.path)) {
+                FileDeleter.Result.Deleted -> {
+                    // Oraliqda boshqa yo'l bilan o'chirilgan bo'lishi mumkin.
+                    onItemDeleted(entry)
+                    launchNextConsentDelete()
+                }
+                is FileDeleter.Result.NeedsUserConsent -> {
+                    pendingDeleteTarget = entry
+                    deleteConsentLauncher.launch(IntentSenderRequest.Builder(r.sender).build())
+                }
+                else -> {
+                    // Boshqa holatlar (ruxsat/sandbox/xato) — bu entryni o'tkazib,
+                    // navbatdagi keyingisiga o'tamiz.
+                    launchNextConsentDelete()
+                }
+            }
+        } catch (e: Throwable) {
+            android.util.Log.e("InitialScan", "consent delete failed", e)
+            launchNextConsentDelete()
         }
     }
 

@@ -33,7 +33,10 @@ object ManifestAnalyzer {
         val declaresAccessibility: Boolean,
         val declaresDeviceAdmin: Boolean,
         val highPriorityReceivers: List<String>,
-        val exportedWithoutPermission: List<String>
+        val exportedWithoutPermission: List<String>,
+        // #16: notification-listener xizmati (OTP/bildirishnoma o'qish vektori). Default'i
+        // bor — eski pozitsion konstruktor chaqiruvlari buzilmaydi.
+        val declaresNotificationListener: Boolean = false
     )
 
     /** Главный API. */
@@ -111,6 +114,15 @@ object ManifestAnalyzer {
             red.add("Accessibility xizmati e'lon qilingan: $firstName$suffix (banking trojan vektori)")
         }
 
+        // Notification-listener xizmatlar — bank OTP/bildirishnomalarini o'qish vektori.
+        var declaresNotificationListener = false
+        val notifListeners = info?.services?.filter { isNotificationListener(it) }.orEmpty()
+        if (notifListeners.isNotEmpty()) {
+            declaresNotificationListener = true
+            val firstName = notifListeners.first().name ?: "?"
+            orange.add("Notification listener xizmati e'lon qilingan: $firstName (bildirishnoma/OTP o'qish)")
+        }
+
         // Exported components без permission protection — потенциальные intent-hijack
         info?.activities?.forEach { collectExported(it, exposed) }
         info?.services?.forEach { collectExported(it, exposed) }
@@ -137,7 +149,8 @@ object ManifestAnalyzer {
             declaresAccessibility = declaresAccessibility,
             declaresDeviceAdmin = declaresDeviceAdmin,
             highPriorityReceivers = highPrio,
-            exportedWithoutPermission = exposed
+            exportedWithoutPermission = exposed,
+            declaresNotificationListener = declaresNotificationListener
         )
     }
 
@@ -164,6 +177,11 @@ object ManifestAnalyzer {
         // android.permission.BIND_ACCESSIBILITY_SERVICE — обязательное permission
         // для зарегистрированного Accessibility-сервиса.
         return svc.permission == "android.permission.BIND_ACCESSIBILITY_SERVICE"
+    }
+
+    private fun isNotificationListener(svc: ServiceInfo): Boolean {
+        // BIND_NOTIFICATION_LISTENER_SERVICE — обязателен для NotificationListenerService.
+        return svc.permission == "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
     }
 
     /**

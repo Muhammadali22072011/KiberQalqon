@@ -63,18 +63,27 @@ function hotp(secret: Buffer, counter: number): string {
 }
 
 /**
+ * Kodni tekshiradi va MOS KELGAN qadam (counter)ni qaytaradi — yoki mos kelmasa null.
+ * Replay himoyasi uchun chaqiruvchi shu counter'ni saqlab/solishtiradi (#44).
+ * window=1 → joriy ±1 qadam (soat farqiga chidamli).
+ */
+export function verifyTotpCounter(token: string, base32Secret: string, window = 1): number | null {
+  const t = (token ?? '').replace(/\s+/g, '');
+  if (!/^\d{6}$/.test(t)) return null;
+  const secret = base32Decode(base32Secret);
+  if (secret.length === 0) return null;
+  const counter = Math.floor(Date.now() / 1000 / PERIOD);
+  for (let w = -window; w <= window; w++) {
+    if (hotp(secret, counter + w) === t) return counter + w;
+  }
+  return null;
+}
+
+/**
  * Kiritilgan kodni tekshiradi. window=1 → joriy ±1 qadam (soat farqiga chidamli).
  */
 export function verifyTotp(token: string, base32Secret: string, window = 1): boolean {
-  const t = (token ?? '').replace(/\s+/g, '');
-  if (!/^\d{6}$/.test(t)) return false;
-  const secret = base32Decode(base32Secret);
-  if (secret.length === 0) return false;
-  const counter = Math.floor(Date.now() / 1000 / PERIOD);
-  for (let w = -window; w <= window; w++) {
-    if (hotp(secret, counter + w) === t) return true;
-  }
-  return false;
+  return verifyTotpCounter(token, base32Secret, window) !== null;
 }
 
 // ── Sozlash yordamchilari (bir martalik) ────────────────────────────────────

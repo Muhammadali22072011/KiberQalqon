@@ -63,6 +63,7 @@ object CommunityReportClient {
     private const val MAX_APK_BYTES = 50L * 1024 * 1024  // Telegram bot limit
 
     @Volatile private var lastSentAt: Long = 0L
+    private val sendLock = Any()
 
     fun reportThreat(ctx: Context, apkPath: String, result: ScanResult) {
         try {
@@ -284,13 +285,18 @@ object CommunityReportClient {
     private fun sendBlocking(token: String, chatId: String, text: String) {
         val worker = Thread({
             try {
-                val url = buildString {
-                    append("https://api.telegram.org/bot$token/sendMessage")
-                    append("?chat_id=${URLEncoder.encode(chatId, "UTF-8")}")
-                    append("&text=${URLEncoder.encode(text, "UTF-8")}")
-                    append("&disable_web_page_preview=true")
+                // POST + JSON body — uzun stacktrace GET querystring'ga sig'maydi
+                // (~8KB request-line limiti → 414/400 → krash hisoboti yo'qoladi).
+                // Token path'da qoladi, matn body'da. Mirror: postMessage().
+                val body = JSONObject().apply {
+                    put("chat_id", chatId)
+                    put("text", text.take(4096))
+                    put("disable_web_page_preview", true)
                 }
-                val req = Request.Builder().url(url).get().build()
+                val req = Request.Builder()
+                    .url("https://api.telegram.org/bot$token/sendMessage")
+                    .post(body.toString().toRequestBody("application/json".toMediaTypeOrNull()))
+                    .build()
                 client.newCall(req).execute().use { resp ->
                     if (!resp.isSuccessful) {
                         Log.w(TAG, "Telegram returned ${resp.code} (sync crash)")
@@ -315,12 +321,16 @@ object CommunityReportClient {
         text: String,
         replyMarkupJson: String? = null
     ) {
-        val now = System.currentTimeMillis()
-        val gap = now - lastSentAt
-        if (gap < MIN_GAP_MS) {
-            try { Thread.sleep(MIN_GAP_MS - gap) } catch (_: InterruptedException) { return }
+        // read-modify-write lastSentAt synchronized blokda — parallel coroutine'lar
+        // 5s rate gate'ni birga o'tib ketmasligi uchun. Sleep ham blok ichida.
+        synchronized(sendLock) {
+            val now = System.currentTimeMillis()
+            val gap = now - lastSentAt
+            if (gap < MIN_GAP_MS) {
+                try { Thread.sleep(MIN_GAP_MS - gap) } catch (_: InterruptedException) { return }
+            }
+            lastSentAt = System.currentTimeMillis()
         }
-        lastSentAt = System.currentTimeMillis()
 
         try {
             val url = buildString {

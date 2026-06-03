@@ -5,7 +5,8 @@
 Запуск: python test_apk_server.py
 """
 import os
-from flask import Flask, send_file, render_template_string
+from flask import Flask, send_from_directory, render_template_string, abort
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -150,14 +151,18 @@ def index():
 
 @app.route('/download/<filename>')
 def download(filename):
-    """Скачивание тестового APK"""
+    """Скачивание тестового APK (только .apk, имя санитизируется — без обхода каталога)."""
     test_dir = os.path.join(os.path.dirname(__file__), 'test_apk_files')
-    filepath = os.path.join(test_dir, filename)
-    
+    safe = secure_filename(filename)
+    # Отклоняем всё, что изменилось после санитизации или не .apk (защита от path traversal).
+    if not safe or safe != filename or not safe.lower().endswith('.apk'):
+        abort(404)
+
+    filepath = os.path.join(test_dir, safe)
     if not os.path.exists(filepath):
-        return f"Файл {filename} не найден. Запустите create_test_apk.py для создания тестовых файлов.", 404
-    
-    return send_file(filepath, as_attachment=True, download_name=filename)
+        return f"Файл {safe} не найден. Запустите create_test_apk.py для создания тестовых файлов.", 404
+
+    return send_from_directory(test_dir, safe, as_attachment=True, download_name=safe)
 
 if __name__ == '__main__':
     print("=" * 60)

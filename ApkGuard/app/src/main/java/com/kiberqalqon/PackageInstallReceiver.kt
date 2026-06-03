@@ -76,10 +76,41 @@ class PackageInstallReceiver : BroadcastReceiver() {
             val info = pm.getApplicationInfo(pkg, 0)
             val apkPath = info.sourceDir
             val label = info.loadLabel(pm).toString()
-            val verdict = if (apkPath != null && java.io.File(apkPath).exists()) {
-                try { ApkScanner.scan(context, apkPath).verdict.name } catch (_: Throwable) { "?" }
-            } else "?"
+            val result = if (apkPath != null && File(apkPath).exists()) {
+                try { ApkScanner.scan(context, apkPath) } catch (_: Throwable) { null }
+            } else null
+            val verdict = result?.verdict?.name ?: "?"
             TelemetryReporter.reportPackageReplaced(context, pkg, label, verdict)
+            // Obnovlenie tozhe mozhet byt' opasnym — predupreждaem/karantin tak zhe,
+            // kak pri svezhej ustanovke (BUG #18: ran'she update prokhodil molcha).
+            if (result != null && apkPath != null) {
+                when (result.verdict) {
+                    ScanResult.Verdict.DANGER -> {
+                        Log.w(TAG, "Replaced DANGER package: $pkg — $result")
+                        if (ImprovedApkFileObserver.canLaunchActivityFromBackground(context)) {
+                            try {
+                                val intent = Intent(context, AutoScanActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    putExtra("apk_path", apkPath)
+                                    putExtra("apk_name", "$label.apk")
+                                    putExtra("installed_pkg", pkg)
+                                }
+                                context.startActivity(intent)
+                            } catch (e: Throwable) {
+                                Log.w(TAG, "popup launch failed", e)
+                            }
+                        }
+                        NotificationHelper.showInstalledDangerNotification(context, pkg, label, result)
+                    }
+                    ScanResult.Verdict.SUSPICIOUS -> {
+                        Log.w(TAG, "Replaced SUSPICIOUS package: $pkg — $result")
+                        NotificationHelper.showInstalledSuspiciousNotification(context, pkg, label, result)
+                    }
+                    ScanResult.Verdict.SAFE -> {
+                        Log.d(TAG, "Replaced safe package: $pkg")
+                    }
+                }
+            }
         } catch (e: Exception) {
             Log.w(TAG, "rescanReplacedPackage failed for $pkg", e)
             // Vse-ravno otpravim event — tol'ko bez verdikta.

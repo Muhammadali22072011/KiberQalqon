@@ -185,11 +185,21 @@ class ProtectionService : Service() {
      * ko'rsatadi (u ham aynan shu oynani ochadi).
      */
     private fun presentNewApks(newOnes: List<ApkItem>) {
+        if (newOnes.isEmpty()) return
         val ctx = applicationContext
-        val newest = newOnes.maxByOrNull { it.file.lastModified() } ?: return
+        // Eng yangisidan boshlab — jonli oynani aynan eng so'nggi kelgan fayl uchun ochamiz.
+        val sorted = newOnes.sortedByDescending { it.file.lastModified() }
+        val canLaunch = isScreenInteractiveAndUnlocked(ctx) &&
+            ImprovedApkFileObserver.canLaunchActivityFromBackground(ctx)
 
-        if (isScreenInteractiveAndUnlocked(ctx) &&
-            ImprovedApkFileObserver.canLaunchActivityFromBackground(ctx)) {
+        // #11: avval FAQAT eng yangi fayl ko'rsatilardi, qolgan bir vaqtda kelgan yangi
+        //      APK'lar (jumladan backdated virus) seenPaths'ga belgilanib TASHLAB yuborilardi.
+        //      Endi eng yangisini jonli oynada ko'rsatamiz, QOLGANLARINI GuardWorker'ga aniq
+        //      yo'l bilan uzatamiz (skan + DANGER karantin + full-screen notification).
+        val remaining = ArrayList<ApkItem>(sorted)
+        if (canLaunch) {
+            val newest = sorted.first()
+            var launched = false
             try {
                 val intent = Intent(ctx, AutoScanActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -199,16 +209,28 @@ class ProtectionService : Service() {
                     putExtra("apk_name", newest.name)
                 }
                 ctx.startActivity(intent)
-                return
+                launched = true
             } catch (t: Throwable) {
                 android.util.Log.w(TAG, "direct AutoScan launch failed, falling back to GuardWorker", t)
             }
+            // Jonli oynada ko'rsatilgan faylni ro'yxatdan olib tashlaymiz; launch
+            // muvaffaqiyatsiz bo'lsa u ham worker'ga tushadi.
+            if (launched) remaining.remove(newest)
         }
 
-        try {
-            WorkManager.getInstance(ctx).enqueue(OneTimeWorkRequestBuilder<GuardWorker>().build())
-        } catch (t: Throwable) {
-            android.util.Log.w(TAG, "GuardWorker enqueue failed", t)
+        // #10: qulflangan ekran / overlay yo'q / launch muvaffaqiyatsiz — aniq yo'llarni
+        //      bevosita GuardWorker'ga beramiz (bare worker emas), shunda mtime bo'yicha
+        //      10 talikdan tashqaridagi/backdated fayl ham aniq skanlanadi.
+        if (remaining.isNotEmpty()) {
+            try {
+                val paths = remaining.map { it.file.absolutePath }.toTypedArray()
+                val req = OneTimeWorkRequestBuilder<GuardWorker>()
+                    .setInputData(androidx.work.workDataOf(GuardWorker.KEY_APK_PATHS to paths))
+                    .build()
+                WorkManager.getInstance(ctx).enqueue(req)
+            } catch (t: Throwable) {
+                android.util.Log.w(TAG, "GuardWorker enqueue failed", t)
+            }
         }
     }
 

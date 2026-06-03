@@ -540,6 +540,8 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         // Ekran ko'rinmasa — lentani to'xtatamiz (Handler callback'lari osilib qolmasin).
         stopTicker()
+        // attachTickerTouchPause postDelayed bilan qo'ygan anonim lambda'larni ham tozalaymiz.
+        tickerHandler.removeCallbacksAndMessages(null)
     }
 
     override fun onDestroy() {
@@ -547,6 +549,9 @@ class MainActivity : AppCompatActivity() {
         scope.cancel()
         stopFileObserver()
         stopTicker()
+        // BARCHA kutilayotgan callback'larni (scroll runnable + touch-pause lambda'lar)
+        // o'chiramiz, aks holda ular destroy'dan keyin Activity'ni ushlab turardi.
+        tickerHandler.removeCallbacksAndMessages(null)
     }
     
     private fun startFileObserver() {

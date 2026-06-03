@@ -42,12 +42,14 @@ object IconImpersonationDetector {
         "org.telegram.messenger" to "Telegram",
         "org.thunderdog.challegram" to "Telegram X",
         "com.whatsapp" to "WhatsApp",
-        "com.click.evolve" to "Click",
-        "uz.payme.pay" to "Payme",
-        "uz.aab.uzcardmobile" to "Uzcard",
+        // #7: paket nomlari noto'g'ri edi → ikona-bazasi yuklanmasdi, bu banklar fishingi
+        //     umuman aniqlanmasdi. Kanonik nomlar (AppReputation/FilenameHeuristic bilan bir xil).
+        "uz.click.evo" to "Click",
+        "uz.dida.payme" to "Payme",
+        "uz.uzcard.uzcard" to "Uzcard",
         "uz.dida.smartbank" to "Smart Bank",
         "uz.mobiuz.android" to "Mobiuz",
-        "uz.beeline.android" to "Beeline UZ",
+        "uz.beeline.odp" to "Beeline UZ",
         "uz.ums.tenge" to "Apelsin",
         "com.google.android.apps.nbu.paisa.user" to "Google Pay",
         "com.android.chrome" to "Chrome",

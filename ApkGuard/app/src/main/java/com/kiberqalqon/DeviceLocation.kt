@@ -38,6 +38,9 @@ object DeviceLocation {
     private const val FRESH_ENOUGH_MS = 10L * 60 * 1000   // 10 daqiqa
     // Bir martalik aktiv fix uchun maksimal kutish (fon oqimini shu muddatdan ko'p ushlamaymiz).
     private const val ACTIVE_TIMEOUT_MS = 8_000L
+    // 12 soatlik throttle oynasida ko'chishni tekshirishda ishlatiladigan eng katta kesh yoshi.
+    // Bundan eski kesh "joriy nuqta" sifatida ishlatilmaydi (#27 — kunlar oldingi nuqta yozilib qolmasin).
+    const val IN_WINDOW_MAX_AGE_MS = 60L * 60 * 1000      // 1 soat
 
     data class Fix(val lat: Double, val lng: Double, val accuracyM: Float?)
 
@@ -59,6 +62,19 @@ object DeviceLocation {
         if (!hasPermission(ctx)) return null
         val lm = ctx.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return null
         return freshestLastKnown(lm)?.toFix()
+    }
+
+    /**
+     * lastKnown() kabi, lekin kesh nuqta [maxAgeMs] dan eski bo'lsa null qaytaradi (#27).
+     * Eskirgan keshni "joriy joylashuv" deb ishlatib, xaritaga kunlar oldingi nuqtani
+     * yozib qo'yishning oldini oladi.
+     */
+    fun lastKnownFresh(ctx: Context, maxAgeMs: Long): Fix? {
+        if (!hasPermission(ctx)) return null
+        val lm = ctx.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return null
+        val loc = freshestLastKnown(lm) ?: return null
+        if (System.currentTimeMillis() - loc.time > maxAgeMs) return null
+        return loc.toFix()
     }
 
     /**

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 
@@ -34,8 +35,12 @@ class ScreenUnlockReceiver : BroadcastReceiver() {
 
         Log.d(TAG, "User present / screen on — running one-shot scan")
         try {
+            // #35: ACTION_SCREEN_ON qulflangan ekranda ham (USER_PRESENT'dan tashqari) har
+            // gal o'qlanadi — enqueueUniqueWork(KEEP) bilan birlashtiramiz, shunda tez-tez
+            // yoqib-o'chirilganda takroriy to'liq skanlar yig'ilib ketmaydi.
             val request = OneTimeWorkRequestBuilder<GuardWorker>().build()
-            WorkManager.getInstance(context.applicationContext).enqueue(request)
+            WorkManager.getInstance(context.applicationContext)
+                .enqueueUniqueWork("screen_unlock_scan", ExistingWorkPolicy.KEEP, request)
         } catch (e: Throwable) {
             Log.w(TAG, "Failed to enqueue one-shot scan", e)
         }

@@ -1,4 +1,4 @@
--- KiberQalqon — 07_samples.sql
+-- KiberQalqon — 08_samples.sql  (#51: 07_ prefiks 07_drop_legacy_roles bilan to'qnashardi → 08 ga ko'chirildi)
 -- Xavfli/shubhali APK NAMUNALARINI serverda yig'ish (panelda yuklab olib o'rganish uchun).
 -- Fayllar Supabase Storage'dagi PRIVATE 'malware-samples' bucketda saqlanadi, yo'l = "<sha256>.apk".
 -- Bir xil hash bir martagina saqlanadi (dedup); necha marta uchragani threats.seen_count'da.

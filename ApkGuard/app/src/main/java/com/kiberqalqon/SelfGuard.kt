@@ -51,7 +51,6 @@ object SelfGuard {
     fun isOwnApk(context: Context, apkPath: String): Boolean {
         try {
             val path = apkPath.replace('\\', '/').lowercase()
-            val fileName = File(apkPath).name.lowercase()
 
             // 1) Системные пути установленного приложения.
             //    Android хранит APK как /data/app/<package>-<hash>/base.apk, а на
@@ -111,16 +110,18 @@ object SelfGuard {
                 }
             }
 
-            // 5) Filename heuristic — *faqat* PackageManager APK'ni umuman o'qiy olmagan
-            //    holatda yordam beradi (scoped storage, corrupted file). Imzo solishtiruvi
-            //    yuqorida muvaffaqiyatsiz bo'lganini bilamiz (theirSig null), shuning uchun
-            //    bu — eng oxirgi himoya chizig'i. Yolg'iz nomga ishonib bo'lmaydi
-            //    (zararli APK "kiberqalqon-virus.apk" deb nomlanishi mumkin), shuning uchun
-            //    faqat info==null bo'lganda (parse failed) ishlatamiz.
-            if (info == null && OWN_FILENAME_PREFIXES.any { fileName.startsWith(it) }) {
-                Log.w(TAG, "Self APK detected by filename fallback (parse failed): $fileName")
-                return true
-            }
+            // 5) Filename heuristic — OLIB TASHLANDI "o'ziniki=SAFE" sifatida (#6 false-safe).
+            //    Avval: info==null va nom "kiberqalqon"/"apkguard" bilan boshlansa true qaytarardi.
+            //    Lekin bu HUJUMCHI NAZORATIDAGI nom bilan boshqariladigan ягона shart edi:
+            //    "kiberqalqon_update.apk" deb nomlangan va PackageManager parse qila olmaydigan
+            //    qilib yasalgan dropper SAFE bo'lib, umuman skanlanmasdan o'tib ketardi.
+            //    Bizning HAQIQIY APK valid ZIP — uni PM doim parse qiladi (info != null) va
+            //    paket nomi (2) tutadi; demak bu fallback faqat "parse failed" holatda, ya'ni
+            //    aynan hujumchi yasagan buzuq faylda ishlardi. Endi bunday faylni SAFE deb
+            //    o'tkazmaymiz — uni odatdagidek skanlaymiz (zararli bo'lsa SUSPICIOUS/DANGER).
+            //
+            //    Eslatma: o'zimizning haqiqiy build artefakti (com.kiberqalqon[.debug]) baribir
+            //    (2) paket / (3) sourceDir / (4) imzo orqali tanaladi.
         } catch (e: Exception) {
             Log.w(TAG, "isOwnApk check failed", e)
             // При сомнении возвращаем false — лучше просканировать лишний раз,

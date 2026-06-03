@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -148,6 +149,40 @@ class AutoScanActivity : AppCompatActivity() {
         setupUI()
         // "already_handled" — fayl fonida (GuardWorker) allaqachon karantinga olingan/o'chirilgan.
         // Qayta skanlamaymiz (fayl yo'q): to'g'ridan-to'g'ri "virus topildi va o'chirildi" oynasi.
+        if (intent.getBooleanExtra("already_handled", false)) {
+            presentHandledResult()
+        } else {
+            startScanning()
+        }
+    }
+
+    /**
+     * #3: Activity launchMode=singleTop + FLAG_ACTIVITY_SINGLE_TOP bilan ishga tushiriladi,
+     * lekin avval onNewIntent YO'Q edi — natija oynasi (masalan SAFE) ochiq turganda
+     * KELGAN YANGI APK (masalan virus) jim TASHLAB yuborilardi, umuman skanlanmasdan.
+     * Endi yangi intent kelganda eski (tugamagan) skanni to'xtatib, yangisini boshlaymiz.
+     */
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        val incomingPath = intent.getStringExtra("apk_path")
+        // Bir xil fayl 20s ichida qayta kelsa — e'tiborsiz (oynani yopmaymiz).
+        if (incomingPath != null && isDuplicateLaunch(incomingPath)) {
+            android.util.Log.d("AutoScanActivity", "skip dup onNewIntent: $incomingPath")
+            return
+        }
+
+        // Avvalgi skan korutinalari va kechiktirilgan kolbeklar — bekor.
+        handler.removeCallbacksAndMessages(null)
+        scope.coroutineContext.cancelChildren()
+
+        resultShown = false
+        apkPath = incomingPath
+        apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
+        installedPkg = intent.getStringExtra("installed_pkg")?.takeIf { it.isNotBlank() }
+
+        setupUI()
         if (intent.getBooleanExtra("already_handled", false)) {
             presentHandledResult()
         } else {

@@ -45,11 +45,21 @@ object ScanCache {
         val details: List<String>,
         val dangerousPermissions: List<String>,
         val malwareSignatures: List<String>,
+        val stamp: String,     // ta'riflar (versionCode + bazа yangilanish vaqti) muhri
         val cachedAt: Long
     )
 
+    /**
+     * Ta'riflar (definitions) muhri: ilova versiyasi + bazа oxirgi yangilanish vaqti.
+     * Yangi qora ro'yxat/ta'riflar kelganda muhr o'zgaradi → eski kesh AVTOMATIK
+     * bekor bo'ladi. Aks holda avval SAFE deb keshlangan, keyin qora ro'yxatga
+     * tushgan zararli APK keshdan SAFE bo'lib qolaverardi (#5 false-safe).
+     */
+    private fun currentStamp(ctx: Context): String =
+        "${BuildConfig.VERSION_CODE}:${Config.lastDatabaseUpdate(ctx)}"
+
     /** Faylga mos kesh yozuvi bo'lsa va mtime+size mos kelsa — ScanResult qaytar. */
-    fun get(ctx: Context, apkPath: String): ScanResult? {
+    fun get(ctx: Context, apkPath: String): ScanResult? = synchronized(this) {
         val file = File(apkPath)
         if (!file.exists()) return null
         val mtime = file.lastModified()
@@ -58,6 +68,8 @@ object ScanCache {
 
         val entry = loadAll(ctx).firstOrNull { it.pathHash == hash } ?: return null
         if (entry.mtime != mtime || entry.size != size) return null
+        // Ta'riflar o'zgargan bo'lsa — keshni ishonchsiz deb bekor qilamiz (qayta skan).
+        if (entry.stamp != currentStamp(ctx)) return null
 
         val verdict = try {
             ScanResult.Verdict.valueOf(entry.verdict)
@@ -74,7 +86,7 @@ object ScanCache {
     }
 
     /** Skan natijasini saqlash. Eski yozuv almashtiriladi, eng eskisi evict. */
-    fun put(ctx: Context, apkPath: String, result: ScanResult) {
+    fun put(ctx: Context, apkPath: String, result: ScanResult): Unit = synchronized(this) {
         val file = File(apkPath)
         if (!file.exists()) return
         val mtime = file.lastModified()
@@ -92,6 +104,7 @@ object ScanCache {
             details = result.details,
             dangerousPermissions = result.dangerousPermissions,
             malwareSignatures = result.malwareSignatures,
+            stamp = currentStamp(ctx),
             cachedAt = now
         )
 
@@ -107,7 +120,7 @@ object ScanCache {
     }
 
     /** Barcha keshni tozalash — masalan Settings → "Keshni tozalash" tugmasi uchun. */
-    fun clear(ctx: Context) {
+    fun clear(ctx: Context): Unit = synchronized(this) {
         prefs(ctx).edit { remove(KEY_ENTRIES) }
     }
 
@@ -136,6 +149,7 @@ object ScanCache {
                             details = jsonArrToList(o.optJSONArray("d")),
                             dangerousPermissions = jsonArrToList(o.optJSONArray("dp")),
                             malwareSignatures = jsonArrToList(o.optJSONArray("ms")),
+                            stamp = o.optString("st"),
                             cachedAt = o.optLong("c", 0L)
                         )
                     )
@@ -159,6 +173,7 @@ object ScanCache {
                 put("d", JSONArray(e.details))
                 put("dp", JSONArray(e.dangerousPermissions))
                 put("ms", JSONArray(e.malwareSignatures))
+                put("st", e.stamp)
                 put("c", e.cachedAt)
             })
         }

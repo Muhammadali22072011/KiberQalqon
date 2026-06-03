@@ -170,7 +170,10 @@ object FileDeleter {
             val dataIdx = c.getColumnIndex(MediaStore.MediaColumns.DATA)
             while (c.moveToNext()) {
                 val path = if (dataIdx >= 0) c.getString(dataIdx) else null
-                if (path == null || path.equals(absPath, ignoreCase = false)) {
+                // #33: avval `path == null` ham mos deb hisoblanardi — Android 11+ da DATA
+                // ko'pincha null bo'lib, AYNAN SHU NOMDAGI BOSHQA fayl (boshqa papkada)
+                // o'chirilishi mumkin edi. Endi faqat HAQIQIY yo'l mosligida o'chiramiz.
+                if (path != null && path.equals(absPath, ignoreCase = false)) {
                     val id = c.getLong(idIdx)
                     return ContentUris.withAppendedId(collection, id)
                 }
