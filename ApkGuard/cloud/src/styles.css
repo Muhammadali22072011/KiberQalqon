@@ -130,6 +130,16 @@ button{font-family:inherit}
 .leaflet-bar a{background:var(--elev)!important;color:var(--ink)!important;border-color:var(--hair-2)!important}
 .uz-shape{filter:drop-shadow(0 0 8px rgba(45,227,180,.35))}
 .dev-hi{filter:drop-shadow(0 0 6px rgba(255,80,70,.85))}
+/* Xarita qurilma nuqtalari — bir xil o'lchamli, to'q, xavf rangiga mos halo bilan */
+.kq-dot{cursor:pointer}
+.kq-dot-safe{filter:drop-shadow(0 0 5px rgba(37,224,176,.65))}
+.kq-dot-suspicious{filter:drop-shadow(0 0 6px rgba(255,176,32,.8))}
+.kq-dot-error{filter:drop-shadow(0 0 5px rgba(154,167,194,.6))}
+.kq-dot-danger{animation:kqPulse 2s ease-in-out infinite}
+@keyframes kqPulse{
+  0%,100%{filter:drop-shadow(0 0 4px rgba(255,59,92,.85))}
+  50%{filter:drop-shadow(0 0 10px rgba(255,59,92,1))}
+}
 .legend{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--ink-2);font-family:var(--mono)}
 .grad-bar{display:inline-block;width:120px;height:8px;border-radius:99px;background:linear-gradient(90deg,#25e0b0,#9be03a,#ffb020,#ff6a3d,#ff3b5c)}
 
