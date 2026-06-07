@@ -550,6 +550,9 @@ object ApkScanner {
         val signaturesFound = mutableListOf<String>()
         // SCAN-02: g'ayritabiiy katta DEX (skanlash chegarasidan oshgan) uchun kichik jazo.
         var oversizedDexPenalty = 0
+        // O'rnatilgan + ishonchli stor/tizim ilova (o'z sourceDir'i skanlandi). Funksiya darajasida —
+        // verdict `when` undan foydalanadi (try blokidan tashqarida hisoblanmasin).
+        var trustedInstalledApp = false
         var packageNameForHeuristic: String? = null
         // Imzo bilan tasdiqlangan reputatsiya — packageName + certFingerprint o'qilgach
         // hisoblanadi (pastda). SIGNATURE_MISMATCH darhol DANGER, VERIFIED esa
@@ -699,6 +702,16 @@ object ApkScanner {
                 val packageName = info?.packageName
                 packageNameForHeuristic = packageName
 
+                // FALSE-POSITIVE himoyasi: skanlanayotgan fayl AYNAN o'rnatilgan ilovaning o'z
+                // base.apk'si (sourceDir) bo'lsa — bu HAQIQIY o'rnatilgan ilova: uning /data/app
+                // dagi faylini boshqa ilova ALMASHTIRA OLMAYDI. Ishonchli stordan (Play/Galaxy...)
+                // yoki tizim ilovasi bo'lsa, QAT'IY signal yo'qligida yumshoq-ochkoli DANGER bosiladi
+                // (o'rnatilgan legit ilovalar — YouTube/Payme/Soliq/ELSA... — "virus" deb belgilanmasin).
+                // Telegram'dan kelgan sideload malware bu yo'lga TUSHMAYDI (sourceDir emas) va baribir
+                // qat'iy signallar (random paket, ZIP-shifr, dropper...) bilan DANGER bo'ladi.
+                val selfInstalled = isInstalledSelfScan(context, packageName, apkPath)
+                trustedInstalledApp = selfInstalled && installedFromTrustedSource(context, packageName)
+
                 // 1b) Ma'lum malware paket nomi (Ajina.Banker / RoundRift) — DANGER
                 //     hatto agar APK qayta o'ralgan bo'lsa va hash boshqacha bo'lsa ham.
                 val maliciousByPkg = try {
@@ -743,6 +756,13 @@ object ApkScanner {
                 } catch (e: Throwable) {
                     Log.w(TAG, "AppReputation.evaluate failed", e)
                     AppReputation.Reputation.UNKNOWN
+                }
+                // O'rnatilgan ilovaning O'Z faylini skanlayapmiz — u o'ziga nisbatan "soxta imzo"
+                // bo'la olmaydi. SIGNATURE_MISMATCH bu yerda cert o'qishdagi nomuvofiqlik
+                // (getPackageArchiveInfo fayldan vs getPackageInfo PM'dan — split/rotatsiya/null),
+                // soxtalik emas. Haqiqiy o'rnatilgan ilova → VERIFIED (false-DANGER tuzatildi).
+                if (selfInstalled && reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {
+                    reputation = AppReputation.Reputation.VERIFIED
                 }
                 if (reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {
                     return finalizeResult(context, apkPath, ScanResult(
@@ -1080,6 +1100,7 @@ object ApkScanner {
                     strongCombo = strongCombo,
                     evasionCount = evasionCount,
                     verifiedTrusted = verifiedTrusted,
+                    trustedInstalledApp = trustedInstalledApp,
                     totalScore = totalScore,
                     dangerThreshold = dangerThreshold,
                     suspiciousThreshold = suspiciousThreshold,
@@ -1219,6 +1240,9 @@ internal data class VerdictSignals(
     val strongCombo: Boolean,
     val evasionCount: Int,
     val verifiedTrusted: Boolean,
+    // O'rnatilgan, ishonchli stordan/tizimdan kelgan ilova (o'z sourceDir'i skanlandi). verifiedTrusted
+    // kabi — faqat QAT'IY signal yo'qligida SAFE qiladi (yumshoq ochkolarni bosadi).
+    val trustedInstalledApp: Boolean,
     val totalScore: Int,
     val dangerThreshold: Int,
     val suspiciousThreshold: Int,
@@ -1248,6 +1272,9 @@ internal fun decideVerdict(s: VerdictSignals): ScanResult.Verdict = when {
     s.strongCombo -> ScanResult.Verdict.DANGER
     s.evasionCount >= 2 -> ScanResult.Verdict.DANGER
     s.verifiedTrusted -> ScanResult.Verdict.SAFE
+    // O'rnatilgan + ishonchli stor/tizim + qat'iy signal yo'q → SAFE (yuqoridagi barcha QAT'IY
+    // bloklardan KEYIN — dropper/ikonka/blacklist/ZIP-shifr ham bunday ilovada baribir DANGER).
+    s.trustedInstalledApp -> ScanResult.Verdict.SAFE
     s.totalScore >= s.dangerThreshold -> ScanResult.Verdict.DANGER
     s.randomPkg && s.filenameScore >= s.randomPkgFilenameMin -> ScanResult.Verdict.DANGER
     s.randomPkg && s.dangerousPermCount >= s.randomPkgDangerousPermsMin -> ScanResult.Verdict.DANGER
@@ -1256,4 +1283,52 @@ internal fun decideVerdict(s: VerdictSignals): ScanResult.Verdict = when {
     s.randomPkg && s.sensitivity != "low" -> ScanResult.Verdict.SUSPICIOUS
     s.dangerousPermCount >= 4 && s.sensitivity == "high" -> ScanResult.Verdict.SUSPICIOUS
     else -> ScanResult.Verdict.SAFE
+}
+
+/**
+ * Skanlanayotgan fayl AYNAN o'rnatilgan [pkg] ilovaning o'z base.apk'si (sourceDir)mi?
+ * Agar shunday bo'lsa — bu HAQIQIY o'rnatilgan ilova (/data/app dagi faylni boshqa ilova
+ * almashtira olmaydi), demak o'ziga nisbatan "soxta" bo'la olmaydi. Telegram'dan kelgan
+ * sideload fayl (Downloads/cache) bu shartga TUSHMAYDI → soxta-tekshiruv unga ishlaydi.
+ */
+private fun isInstalledSelfScan(context: Context, pkg: String?, apkPath: String): Boolean {
+    if (pkg.isNullOrBlank()) return false
+    return try {
+        context.packageManager.getApplicationInfo(pkg, 0).sourceDir == apkPath
+    } catch (_: Exception) {
+        false
+    }
+}
+
+/** Ishonchli store installerlari — bulardan o'rnatilgan ilova juda kam hollarda malware. */
+private val TRUSTED_INSTALLERS = setOf(
+    "com.android.vending",                  // Google Play
+    "com.google.android.feedback",
+    "com.sec.android.app.samsungapps",      // Galaxy Store
+    "com.huawei.appmarket",                 // AppGallery
+    "com.xiaomi.market", "com.xiaomi.mipicks",
+    "com.heytap.market", "com.oppo.market",
+    "com.vivo.appstore",
+    "com.amazon.venezia",
+    "ru.vk.store",                          // RuStore
+)
+
+/** [pkg] tizim (yoki yangilangan-tizim) ilovasimi YOKI ishonchli stordan o'rnatilganmi? */
+private fun installedFromTrustedSource(context: Context, pkg: String?): Boolean {
+    if (pkg.isNullOrBlank()) return false
+    return try {
+        val pm = context.packageManager
+        val ai = pm.getApplicationInfo(pkg, 0)
+        val isSystem = (ai.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0 ||
+                (ai.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+        if (isSystem) return true
+        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            pm.getInstallSourceInfo(pkg).installingPackageName
+        } else {
+            @Suppress("DEPRECATION") pm.getInstallerPackageName(pkg)
+        }
+        installer != null && installer in TRUSTED_INSTALLERS
+    } catch (_: Exception) {
+        false
+    }
 }

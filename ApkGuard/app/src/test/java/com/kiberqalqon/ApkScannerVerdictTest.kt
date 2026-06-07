@@ -23,6 +23,7 @@ class ApkScannerVerdictTest {
         strongCombo: Boolean = false,
         evasionCount: Int = 0,
         verifiedTrusted: Boolean = false,
+        trustedInstalledApp: Boolean = false,
         totalScore: Int = 0,
         dangerThreshold: Int = 55,
         suspiciousThreshold: Int = 28,
@@ -35,6 +36,7 @@ class ApkScannerVerdictTest {
     ) = VerdictSignals(
         iconImpersonation, hiddenApkOrDex, hiddenElfOrDroppedSo, encryptedPayloadWithSignal,
         deviceAdminWithCombo, obfuscatedSignature, strongCombo, evasionCount, verifiedTrusted,
+        trustedInstalledApp,
         totalScore, dangerThreshold, suspiciousThreshold, randomPkg, filenameScore,
         randomPkgFilenameMin, dangerousPermCount, randomPkgDangerousPermsMin, sensitivity,
     )
@@ -50,6 +52,19 @@ class ApkScannerVerdictTest {
     @Test fun verifiedTrusted_withNoHardSignal_isSafe() {
         // Yumshoq score yuqori bo'lsa ham VERIFIED uni bosadi (verifiedTrusted score'dan OLDIN).
         assertEquals(SAFE, decideVerdict(base(verifiedTrusted = true, totalScore = 999)))
+    }
+
+    @Test fun trustedInstalledApp_suppressesSoftScore_isSafe() {
+        // O'rnatilgan + ishonchli stor/tizim ilova: yuqori score'da ham SAFE (false-DANGER tuzatildi).
+        assertEquals(SAFE, decideVerdict(base(trustedInstalledApp = true, totalScore = 999)))
+        assertEquals(SAFE, decideVerdict(base(trustedInstalledApp = true, randomPkg = true, dangerousPermCount = 5)))
+    }
+
+    @Test fun trustedInstalledApp_doesNotOverrideHardSignals_isDanger() {
+        // Qat'iy signal (yashirin dropper / blacklist / ikonka...) o'rnatilgan ilovada ham DANGER beradi.
+        assertEquals(DANGER, decideVerdict(base(trustedInstalledApp = true, hiddenApkOrDex = true)))
+        assertEquals(DANGER, decideVerdict(base(trustedInstalledApp = true, obfuscatedSignature = true)))
+        assertEquals(DANGER, decideVerdict(base(trustedInstalledApp = true, iconImpersonation = true)))
     }
 
     @Test fun hiddenApkOrDex_overridesVerified_isDanger() {
