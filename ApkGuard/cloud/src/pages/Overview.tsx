@@ -16,7 +16,7 @@ export default function Overview() {
   const stats = usePoll(() => apiGet<{ stats: Stats }>('/api/stats'), 15000);
   const feed = usePoll(() => apiGet<{ feed: FeedItem[] }>('/api/feed'), 8000);
   const threats = usePoll(() => apiGet<{ threats: ThreatFamily[] }>('/api/threats'), 30000);
-  const perf = usePoll(() => apiGet<{ perf: ScanPerf }>('/api/scan-perf'), 15000);
+  const perf = usePoll(() => apiGet<{ perf: ScanPerf }>('/api/stats?perf=1'), 15000);
 
   const [selectedScan, setSelectedScan] = useState<FeedItem | null>(null);
 
