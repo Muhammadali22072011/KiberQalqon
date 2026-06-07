@@ -33,5 +33,7 @@ as $$
   limit 2000;
 $$;
 
--- Eslatma: server service_role kaliti bilan chaqiradi (RLS'ni aylanib o'tadi).
--- anon kaliti bu funksiyani chaqira olmasligi uchun qo'shimcha grant BERILMAYDI.
+-- Server service_role kaliti bilan chaqiradi (grant/RLS'ni aylanib o'tadi). anon/authenticated
+-- to'g'ridan-to'g'ri PostgREST orqali rpc/corroborated_threats ni chaqirib, imzolangan feed'ni
+-- chetlab o'tib, tahdid ro'yxatini olmasin — execute huquqini olib tashlaymiz.
+revoke execute on function corroborated_threats(int) from public, anon, authenticated;
