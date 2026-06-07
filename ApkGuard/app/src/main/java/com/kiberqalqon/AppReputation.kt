@@ -113,11 +113,20 @@ object AppReputation {
         "uz.ucell.selfcare",                 // Ucell
         "uz.ums.mobile",                     // UMS
         "uz.dunyo.mobile",
-        "uz.soliq.mygov",                    // Soliq / MyGov
+        "uz.soliq.mygov",                    // (eski yozuv — saqlanadi)
         "uz.yt.dyhcm",                       // YuzAbo / e-gov
         "uz.aab.online",
         "com.oson.app",                      // OSON
         "com.paynet.android",                // Paynet
+        // Panelda false-DANGER bo'lib chiqqan haqiqiy O'zbek ilovalari — to'g'ri paket nomlari.
+        // (Reputatsiya sertifikat bilan tasdiqlanadi, shuning uchun bu "backdoor" emas: soxta
+        //  nusxa imzosi mos kelmasa baribir DANGER bo'ladi.)
+        "com.ipakyulibank.mobile",           // Ipak Yo'li (haqiqiy paket — ro'yxatdagi uz.* noto'g'ri edi)
+        "uz.soliq.mobile",                   // Soliq (haqiqiy paket)
+        "uz.uzinfocom.mygov",                // MyGov (uzinfocom — davlat IT)
+        "com.kundalik.uz",                   // Kundalik (maktab e-kundaligi)
+        "uz.mib.center.phoenix",             // ProfInspector (davlat)
+        "uz.lawapp.uzcodes",                 // UzCodes (qonun hujjatlari)
     )
 
     /**
