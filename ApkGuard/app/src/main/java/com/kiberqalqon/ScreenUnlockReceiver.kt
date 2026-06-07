@@ -41,6 +41,10 @@ class ScreenUnlockReceiver : BroadcastReceiver() {
             val request = OneTimeWorkRequestBuilder<GuardWorker>().build()
             WorkManager.getInstance(context.applicationContext)
                 .enqueueUniqueWork("screen_unlock_scan", ExistingWorkPolicy.KEEP, request)
+            // Ekran ochilganda accessibility-abuse'ni ham darhol tekshiramiz (banker aynan
+            // shu paytda "telefonni yangilash kerak" deb a11y so'raydi).
+            AccessibilityWatcher.checkNow(context.applicationContext)
+            NotificationAccessWatcher.checkNow(context.applicationContext)
         } catch (e: Throwable) {
             Log.w(TAG, "Failed to enqueue one-shot scan", e)
         }

@@ -138,8 +138,15 @@ class AdminPanelActivity : AppCompatActivity() {
             }
         }
 
-        // Eksport (fayl yuklab olish) — tashqi yuklab oluvchiga uzatamiz.
+        // Eksport (fayl yuklab olish) — tashqi yuklab oluvchiga uzatamiz. FAQAT http(s):
+        // sahifa boshqaradigan URL bo'lgani uchun intent:/file:/content:/javascript: kabi
+        // sxemalarni rad etamiz (ACTION_VIEW orqali suiiste'molni oldini olish).
         w.setDownloadListener { url, _, _, _, _ ->
+            val lower = url.trim().lowercase()
+            if (!lower.startsWith("https://") && !lower.startsWith("http://")) {
+                Toast.makeText(this, "Yuklab bo'lmadi", Toast.LENGTH_SHORT).show()
+                return@setDownloadListener
+            }
             try {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             } catch (_: Throwable) {

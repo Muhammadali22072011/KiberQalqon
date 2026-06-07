@@ -115,11 +115,11 @@ export default function Threats() {
                     <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{uzDateSafe(t.first_seen)}</td>
                     <td style={{ color: 'var(--ink-2)', fontSize: 12 }}>{agoSafe(t.last_seen)}</td>
                     <td>
-                      {t.sample_url ? (
+                      {t.sample_url && /^https:\/\//.test(t.sample_url) ? (
                         <a
                           href={t.sample_url}
                           download
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           title="APK namunasini yuklab olish (o‘rganish uchun)"
                           style={{ color: 'var(--accent, #25e0b0)', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}
                         >

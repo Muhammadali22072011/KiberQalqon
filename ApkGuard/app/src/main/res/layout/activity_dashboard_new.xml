@@ -491,14 +491,6 @@
                     android:paddingVertical="4dp" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Kept hidden so DashboardNewActivity.statsGraph binding still resolves;
-                 the weekly chart now lives on Statistics screen. -->
-            <com.kiberqalqon.StatsGraphView
-                android:id="@+id/statsGraph"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="24dp" />

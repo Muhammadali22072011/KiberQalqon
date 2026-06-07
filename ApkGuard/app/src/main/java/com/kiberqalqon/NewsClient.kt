@@ -84,13 +84,17 @@ object NewsClient {
         }
     }
 
+    private const val MAX_IMAGE_BYTES = 5 * 1024 * 1024  // 5MB — decompression-bomb chegarasi
+    private const val MAX_IMAGE_DIM = 1024                // namuna olishdan keyingi maksimal o'lcham
+
     /**
      * E'lon rasmini yuklaydi (ixtiyoriy). Tashqi havola — auth sarlavhasi yo'q.
-     * Faqat http(s); xato/yo'q bo'lsa null qaytadi (rasm ko'rsatilmaydi).
+     * FAQAT https; hajmi cheklangan (5MB) va namuna bilan dekodlanadi (OOM/bomb himoyasi).
+     * Xato/yo'q bo'lsa null qaytadi (rasm ko'rsatilmaydi).
      */
     fun loadImage(url: String, onResult: (Bitmap?) -> Unit) {
         val u = url.trim()
-        if (!u.startsWith("http://") && !u.startsWith("https://")) {
+        if (!u.startsWith("https://")) {
             runMain { onResult(null) }
             return
         }
@@ -99,7 +103,11 @@ object NewsClient {
                 val req = Request.Builder().url(u).get().build()
                 client.newCall(req).execute().use { resp ->
                     if (!resp.isSuccessful) null
-                    else resp.body?.byteStream()?.use { BitmapFactory.decodeStream(it) }
+                    else {
+                        val declared = resp.body?.contentLength() ?: -1L
+                        if (declared > MAX_IMAGE_BYTES) null
+                        else resp.body?.byteStream()?.use { readCapped(it, MAX_IMAGE_BYTES) }?.let { decodeBounded(it) }
+                    }
                 }
             } catch (e: Throwable) {
                 Log.w(TAG, "image load failed", e)
@@ -107,6 +115,32 @@ object NewsClient {
             }
             runMain { onResult(bmp) }
         }
+    }
+
+    /** Oqimdan [cap] baytgacha o'qiydi; oshib ketsa null (juda katta/bomb). */
+    private fun readCapped(input: java.io.InputStream, cap: Int): ByteArray? {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        var total = 0
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            total += n
+            if (total > cap) return null
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
+    }
+
+    /** Avval o'lchamni o'qiydi (piksel ajratmasdan), so'ng inSampleSize bilan kichraytirib dekodlaydi. */
+    private fun decodeBounded(bytes: ByteArray): Bitmap? {
+        val probe = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, probe)
+        if (probe.outWidth <= 0 || probe.outHeight <= 0) return null
+        var sample = 1
+        while (probe.outWidth / sample > MAX_IMAGE_DIM || probe.outHeight / sample > MAX_IMAGE_DIM) sample *= 2
+        val opts = BitmapFactory.Options().apply { inSampleSize = sample }
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
     }
 
     private fun parse(httpCode: Int, text: String): Result {

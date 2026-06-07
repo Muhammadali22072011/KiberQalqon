@@ -8,8 +8,6 @@ import android.util.Log
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.net.InetSocketAddress
-import java.net.Socket
 
 /**
  * SecurityGuard — комплексная защита APK от взлома и анализа.
@@ -380,14 +378,10 @@ object SecurityGuard {
      * Стратегия — multi-vector: каждая проверка независима, любая срабатывает → DANGER.
      */
     private fun isFridaPresent(): Boolean {
-        // Проверка №1 — стандартные + пара "тихих" портов, которые Frida-вариации
-        // иногда используют (RPC и file-transfer).
-        for (port in FRIDA_PORTS) {
-            if (isPortOpen(port)) {
-                Log.w(TAG, "Frida port open: $port")
-                return true
-            }
-        }
+        // SECGUARD-01: avval bu yerda 5 ta portga AKTIV TCP-connect (har biri 150ms timeout =
+        // sovuq startda ~750ms bloklash, main-thread'da) bor edi. Olib tashlandi — pastdagi
+        // №4 tekshiruvi (/proc/self/net/tcp) AYNAN shu Frida portlarini soketsiz, bloklamasdan
+        // aniqlaydi. Shunday qilib startup tezlashadi, Frida aniqlash saqlanadi.
 
         // Проверка №2 — frida-gadget / GumJS библиотека загружена в наш процесс.
         try {
@@ -462,17 +456,6 @@ object SecurityGuard {
             "626c5e339a",         // frida
             "7471583bd63964275f61" // pool-frida
         )
-    }
-
-    private fun isPortOpen(port: Int): Boolean {
-        return try {
-            Socket().use { s ->
-                s.connect(InetSocketAddress("127.0.0.1", port), 150)
-                true
-            }
-        } catch (_: Exception) {
-            false
-        }
     }
 
     private fun isXposedPresent(): Boolean {

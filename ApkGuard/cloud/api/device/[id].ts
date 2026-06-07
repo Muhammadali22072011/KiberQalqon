@@ -26,7 +26,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
   if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
-  if (!id || !/^[0-9a-fA-F-]{36}$/.test(id)) {
+  // Kanonik UUID (avval bo'sh `[0-9a-fA-F-]{36}` har qanday 36-belgi-aralashmasini qabul qilardi).
+  if (!id || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id)) {
     return res.status(400).json({ ok: false, error: 'bad id' });
   }
 

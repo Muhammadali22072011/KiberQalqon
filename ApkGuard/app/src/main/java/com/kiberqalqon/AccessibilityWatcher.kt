@@ -5,6 +5,8 @@ import android.provider.Settings
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -53,6 +55,15 @@ class AccessibilityWatcher(
                 try {
                     TelemetryReporter.reportAccessibilityGranted(ctx, pkg)
                 } catch (_: Throwable) {}
+                // Telegram'dan tashqari — QURILMADA ham heads-up alert (foydalanuvchi
+                // Telegram'ni sozlamagan bo'lishi mumkin; banker aynan shu paytda boshqaradi).
+                val label = try {
+                    val pm = ctx.packageManager
+                    pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
+                } catch (_: Throwable) { pkg }
+                try {
+                    NotificationHelper.showAccessibilityThreatNotification(ctx, pkg, label)
+                } catch (_: Throwable) {}
             }
 
             prefs.edit().putString(KEY_PREV, current.joinToString("|")).apply()
@@ -86,6 +97,7 @@ class AccessibilityWatcher(
         private const val PREFS = "kiberqalqon_a11y"
         private const val KEY_PREV = "prev_services"
         private const val WORK_NAME = "kiberqalqon_a11y_watch"
+        private const val WORK_NOW = "kiberqalqon_a11y_check_now"
 
         private val WHITELIST_PACKAGES = setOf(
             "com.google.android.marvin.talkback",
@@ -104,6 +116,25 @@ class AccessibilityWatcher(
                 ExistingPeriodicWorkPolicy.KEEP,
                 req
             )
+        }
+
+        /**
+         * Bir martalik DARHOL tekshiruv — paket o'rnatilganda / ekran ochilganda chaqiriladi,
+         * shunda accessibility-abuse 4 soat kutmasdan, real vaqtda ushlanadi. KEEP bilan
+         * tez-tez chaqirilsa ham bir necha soniya ichida takrorlanmaydi.
+         */
+        fun checkNow(ctx: Context) {
+            try {
+                val req = OneTimeWorkRequestBuilder<AccessibilityWatcher>().build()
+                // APPEND_OR_REPLACE: ikkita ivent ketma-ket kelsa (paket o'rnatildi + darhol
+                // accessibility yoqildi), KEEP ikkinchisini TASHLAB yuborardi va yangi xizmat
+                // faqat 4 soatlik periodikda tutilardi. Endi har real-time ivent tekshiriladi.
+                WorkManager.getInstance(ctx).enqueueUniqueWork(
+                    WORK_NOW, ExistingWorkPolicy.APPEND_OR_REPLACE, req
+                )
+            } catch (e: Throwable) {
+                Log.w(TAG, "checkNow failed", e)
+            }
         }
     }
 }

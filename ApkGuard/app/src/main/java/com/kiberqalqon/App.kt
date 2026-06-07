@@ -111,6 +111,9 @@ class App : android.app.Application() {
         // skandan OLDIN tayyor bo'lishi shart (ProtectionService/receiver'lar pastroqda).
         try {
             ThreatDb.init(this)
+            // Bulutdan yangilanadigan qora ro'yxat (keshlangan) — assets ustiga qo'shamiz.
+            // Tarmoq YO'Q: faqat avval tekshirilgan keshni ThreatDb'ga merge qiladi.
+            CloudBlacklist.loadCached(this)
         } catch (e: Throwable) {
             Log.e("KiberQalqon", "ThreatDb init failed", e)
         }
@@ -145,8 +148,10 @@ class App : android.app.Application() {
             }
         }
 
-        // WorkManager.getInstance() трогает диск — выносим в IO, чтобы не блокировать UI thread.
-        appScope.launch {
+        // WorkManager.getInstance() диск, CloudBlacklist.refresh/RemoteConfig — сеть (OkHttp .execute),
+        // captureInstalledTrusted — PackageManager IO. Всё это блокирующее → Dispatchers.IO, а не
+        // Default (CPU-пул): не занимаем вычислительные потоки сетевым ожиданием.
+        appScope.launch(Dispatchers.IO) {
             try {
                 scheduleGuardWork()
             } catch (e: Exception) {
@@ -175,6 +180,20 @@ class App : android.app.Application() {
                 RemoteConfig.refresh(this@App)
             } catch (e: Throwable) {
                 Log.w("KiberQalqon", "RemoteConfig refresh failed", e)
+            }
+            // Bulut qora ro'yxatini fonda yangilaymiz (yangi hash/paketlar ilovani
+            // yangilamasdan bloklanadi). Imzo majburiy; xato/oflayn → assets bazasi qoladi.
+            try {
+                CloudBlacklist.refresh(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "CloudBlacklist refresh failed", e)
+            }
+            // Qurilmadagi o'rnatilgan ishonchli ilovalarning (Play'dan) sertifikatini pin
+            // qilamiz — offline skanda false-positive'ni kamaytiradi (TrustedSignatures).
+            try {
+                TrustedSignatures.captureInstalledTrusted(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "TrustedSignatures capture failed", e)
             }
         }
 
@@ -212,6 +231,9 @@ class App : android.app.Application() {
             // Любая новая запись — алерт в Telegram, потому что accessibility — главный
             // вектор современных банковских троянов.
             try { AccessibilityWatcher.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "a11y", e) }
+            // Каждые 4 часа смотрим enabled_notification_listeners — кража OTP через доступ
+            // к уведомлениям (банкеры воруют коды без RECEIVE_SMS).
+            try { NotificationAccessWatcher.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "notifaccess", e) }
         }
 
         // Slushaem state SIM/airplane/screen — vse v odnom dinamicheskom receivere,
@@ -250,11 +272,7 @@ class App : android.app.Application() {
     }
 
     private fun scheduleGuardWork() {
-        val request = PeriodicWorkRequestBuilder<GuardWorker>(15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "kiberqalqon_scan",
-            ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+        // Yagona periodik full-sweep skaner (avvalgi GuardWorker + PeriodicCheckWorker birlashtirildi).
+        GuardWorker.schedulePeriodic(this)
     }
 }

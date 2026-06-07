@@ -51,7 +51,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await sendMessage(chatId, "❓ Buyruq tanilmadi. /help yozing.");
     }
   } catch (e) {
-    await sendMessage(chatId, `⚠️ Xato: ${String(e).slice(0, 200)}`);
+    // Xom istisnani chatga aks ettirmaymiz (jadval nomlari va h.k. oshkor bo'lishi mumkin) —
+    // serverga loglaymiz, foydalanuvchiga umumiy xabar.
+    console.error(`[webhook] handler error: ${(e as Error).message}`);
+    await sendMessage(chatId, '⚠️ Ichki xato. Keyinroq urinib ko\'ring.');
   }
 
   return res.status(200).json({ ok: true });

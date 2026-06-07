@@ -204,7 +204,13 @@ def _parse_analyzer_output(text: str) -> dict:
     reasons: list[str] = []
     in_perms = False
     in_threats = False
+    dex_count = 0  # «--- DEX файлы (код приложения): N ---» — позитивное доказательство, что код реально извлечён
     for line in text.splitlines():
+        if "DEX" in line and "код приложения" in line:
+            digits = "".join(ch for ch in line.split(":")[-1] if ch.isdigit())
+            if digits:
+                dex_count = int(digits)
+            continue
         if "ОПАСНЫЕ" in line and "РАЗРЕШЕНИЯ" in line:
             in_perms, in_threats = True, False
             continue
@@ -233,6 +239,12 @@ def _parse_analyzer_output(text: str) -> dict:
         risk = "danger"
     elif score >= 1 or perms:
         risk = "suspicious"
+    elif dex_count == 0:
+        # Hech qanday DEX chiqmadi — analizator haqiqiy kodni ko'rmadi (GP-bit evaziya / buzuq ZIP).
+        # POZITIV dalilsiz "safe" YO'Q: hech bo'lmaganda "shubhali" (oltin qoida #1).
+        risk = "suspicious"
+        if not reasons:
+            reasons = ["[BO'SH] kod (DEX) topilmadi — tahlil ishonchsiz, ehtiyot bo'ling"]
     else:
         risk = "safe"
     return {"risk": risk, "reasons": reasons[:5], "perms": perms[:8]}

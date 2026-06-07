@@ -93,7 +93,9 @@ object TelegramBot {
         val sb = StringBuilder(s.length + 8)
         for (c in s) {
             when (c) {
-                '_', '*', '`', '[' -> { sb.append('\\'); sb.append(c) }
+                // ']' '(' ')' ham qo'shildi — aks holda krafтнутое nom Markdown havola sintaksisini
+                // buzib, butun xabar plaintext'ga tushib ketardi (yoki noto'g'ri render bo'lardi).
+                '_', '*', '`', '[', ']', '(', ')' -> { sb.append('\\'); sb.append(c) }
                 else -> sb.append(c)
             }
         }
@@ -311,17 +313,29 @@ object TelegramBot {
         return when (update) {
             is TelegramUpdate.TextMessage -> {
                 val fromId = update.fromUserId
-                // Pervyj privatnyj /start v lichke samo-zapisyvaet vladel'tsa.
-                if (stored <= 0L && update.isPrivate && fromId != null && fromId > 0) {
+                // Egasi hali biriktirilmagan bo'lsa — whitelistlangan chatdagi BIRINCHI buyruq
+                // (/start, /panel, /menu) yuboruvchisini egasi qilib biriktiramiz. parse()
+                // allaqachon chat.id == ownChat ni kafolatlagan, demak bu egasining o'z chatidagi
+                // birinchi real foydalanuvchi — GURUH bo'lsa ham, LICHKA bo'lsa ham ishlaydi.
+                // (Eski xato: faqat privatnoy /start dan biriktirardi, lekin guruh konfiguratsiyada
+                //  privatnoy /start parse'da rad etilardi → egasi HECH QACHON biriktirilmasdi →
+                //  darvoza doimiy "stored<=0 -> hammaga ochiq" holatda qolardi: TG-01/TG-02.)
+                if (stored <= 0L && fromId != null && fromId > 0 && update.text.startsWith("/")) {
                     prefs(ctx).edit().putLong(KEY_OWNER_USER_ID, fromId).apply()
-                    Log.d(TAG, "owner user-id bootstrapped from private /start")
+                    Log.d(TAG, "owner user-id bootstrapped from first command in whitelisted chat")
                     return true
                 }
-                if (stored <= 0L) return true // ещё нет владельца — fallback na chat.id whitelist
+                // Egasi biriktirilmagan va bu buyruq emas — o'tkazmaymiz (HAMMAGA OCHIQ fallback YO'Q).
+                // Egasi /start yuborib o'zini biriktirsin.
+                if (stored <= 0L) return false
                 fromId == stored
             }
             is TelegramUpdate.Callback -> {
-                if (stored <= 0L) return true // fallback poka vladelets ne zapomnen
+                // Tugma bosishi bilan egani biriktirib bo'lmaydi (guruhning istalgan a'zosi bosishi
+                // mumkin). Egasi avval /start orqali biriktirilgan bo'lishi shart — panel ham
+                // /start'dan ochiladi, shuning uchun normal oqimda callback'lar doim egasi
+                // biriktirilgandan keyin keladi.
+                if (stored <= 0L) return false
                 update.fromUserId == stored
             }
         }

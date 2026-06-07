@@ -126,7 +126,7 @@ class InitialScanActivity : AppCompatActivity() {
             )
             .setCancelable(false)
             .setPositiveButton("Ruxsat berish") { _, _ -> openManageStorage() }
-            .setNegativeButton("Keyinroq") { _, _ -> goToDashboard() }
+            .setNegativeButton("Keyinroq") { _, _ -> goToDashboard(markDone = false) }
             .setOnDismissListener { askingAccess = false }
             .show()
     }
@@ -526,8 +526,10 @@ class InitialScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToDashboard() {
-        Config.setInitialScanDone(this)
+    // markDone=false: foydalanuvchi skanni KEYINGA qoldirdi (ruxsat bermay "Keyinroq") — bir
+    // martalik to'liq tekshiruv "bajarildi" deb belgilanmaydi, keyingi safar yana taklif qilinadi.
+    private fun goToDashboard(markDone: Boolean = true) {
+        if (markDone) Config.setInitialScanDone(this)
         startActivity(Intent(this, DashboardNewActivity::class.java))
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

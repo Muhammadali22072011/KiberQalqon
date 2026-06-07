@@ -109,6 +109,12 @@ export async function adminLogin(login: string, password: string): Promise<Admin
 export interface Stats {
   total_scans?: number; danger_count?: number; suspicious_count?: number;
   safe_count?: number; active_devices?: number;
+  // Tekshiruv tezligi (v_stats_today'dan; faqat o'lchangan skanlar)
+  perf_count?: number; avg_duration_ms?: number; median_duration_ms?: number; p95_duration_ms?: number;
+}
+export interface ScanPerf {
+  median_ms: number; p95_ms: number; avg_ms: number; count: number;
+  slowest: Array<{ app_label?: string | null; package_name?: string | null; apk_size?: number | null; duration_ms: number }>;
 }
 export interface MapPoint {
   id: string; name?: string | null; city?: string | null; country?: string | null; ip?: string | null;

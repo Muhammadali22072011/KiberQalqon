@@ -17,6 +17,7 @@ type Body = {
   apk_size?: number;
   verdict: 'safe' | 'suspicious' | 'danger' | 'error';
   risk_score?: number;
+  scan_duration_ms?: number;
   reasons?: string[];
   perms?: string[];
   lat?: number | string;
@@ -43,6 +44,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!b?.device_token || !b?.apk_hash || !b?.verdict) {
     return res.status(400).json({ ok: false, error: 'missing fields' });
   }
+  // CLOUD-02: eski (x-device-secret) yo'lda device_token faqat tana JSON'idan keladi va hech
+  // narsaga bog'lanmaydi — soxtalashtirilishi (boshqa qurilma yozuvini ezish) mumkin. Per-device
+  // imzoga (x-device-token) o'tilgach bu yo'l YOPILADI. Hozircha sunset tayyorligini va
+  // suiiste'molni kuzatish uchun loglaymiz.
+  const legacyAuth = !(typeof hdrTok === 'string' && hdrTok.length > 0);
+  if (legacyAuth) {
+    console.warn(`[upload] legacy device-secret write token=${String(b.device_token).slice(0, 8)}… ip=${clientIp(req) ?? '?'}`);
+  }
   if (!/^[a-f0-9]{64}$/i.test(b.apk_hash)) {
     return res.status(400).json({ ok: false, error: 'bad hash' });
   }
@@ -56,6 +65,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // #43: risk_score — ishonchsiz JSON'dan; chegaralanmagan qiymat (>2^31-1) Postgres int
   // ustunini buzib, butun yuklashni 500 bilan yiqitardi. 0..100 oralig'iga clamp qilamiz.
   const risk = Math.max(0, Math.min(100, Math.round(Number(b.risk_score) || 0)));
+  // scan_duration_ms — ishonchsiz JSON'dan; chegaralanmagan/manfiy qiymat int ustunini
+  // buzishi mumkin. 0..600000 ms (0..10 daqiqa) oralig'iga clamp qilamiz (risk_score kabi).
+  const scanDurationMs = Math.max(0, Math.min(600000, Math.round(Number(b.scan_duration_ms) || 0)));
 
   const sb = db();
 
@@ -123,6 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       apk_size: b.apk_size ?? null,
       verdict: b.verdict,
       risk_score: risk,
+      scan_duration_ms: scanDurationMs,
       reasons: b.reasons ?? [],
       perms: b.perms ?? [],
     })

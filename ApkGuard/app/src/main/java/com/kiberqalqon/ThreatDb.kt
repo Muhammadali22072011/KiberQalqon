@@ -34,8 +34,11 @@ object ThreatDb {
 
     @Volatile private var loaded = false
 
-    private val fileHashes = HashMap<String, String>()   // sha256(apk fayl) -> oila
-    private val certHashes = HashMap<String, String>()    // sha256(sertifikat) -> oila
+    // ConcurrentHashMap: bulut feed ([CloudBlacklist]) fon thread'da mergeqilishi mumkin,
+    // skan esa boshqa thread'da o'qiydi — oddiy HashMap bo'lsa bu xavfli (data race) edi.
+    private val fileHashes = java.util.concurrent.ConcurrentHashMap<String, String>()   // sha256(apk fayl) -> oila
+    private val certHashes = java.util.concurrent.ConcurrentHashMap<String, String>()    // sha256(sertifikat) -> oila
+    private val packages = java.util.concurrent.ConcurrentHashMap<String, String>()      // package name (lowercase) -> oila (faqat bulut feed)
 
     /** assets'dagi bazani xotiraga yuklaydi. Idempotent, thread-safe, hech qachon throw qilmaydi. */
     fun init(context: Context) {
@@ -95,8 +98,35 @@ object ThreatDb {
         return certHashes[sha256.lowercase()]
     }
 
+    /** Paket nomi bulut feed'da bo'lsa — oila nomi, aks holda null. */
+    fun packageFamily(packageName: String?): String? {
+        if (packageName.isNullOrBlank()) return null
+        return packages[packageName.lowercase()]
+    }
+
+    /**
+     * Bulutdan ([CloudBlacklist]) kelgan yozuvlarni qo'shadi. Qo'lda kiritilgan baza
+     * ([MaliciousHashes]/[MaliciousPackages]) BIRINCHI tekshiriladi — bu feed fallback,
+     * shuning uchun bulut yozuvi qo'lda kiritilganni "yenga" olmaydi. Thread-safe (ConcurrentHashMap).
+     */
+    fun mergeCloud(cloudHashes: Map<String, String>, cloudPackages: Map<String, String>): Boolean {
+        var changed = false
+        for ((h, fam) in cloudHashes) {
+            val key = h.lowercase()
+            // put() avvalgi qiymatni qaytaradi — yangi kalit (null) yoki boshqa oila bo'lsa, baza o'zgargan.
+            if (isSha256(key) && fileHashes.put(key, fam) != fam) changed = true
+        }
+        for ((p, fam) in cloudPackages) {
+            val key = p.lowercase()
+            if (key.isNotEmpty() && packages.put(key, fam) != fam) changed = true
+        }
+        Log.i(TAG, "after cloud merge: fileHashes=${fileHashes.size} packages=${packages.size} changed=$changed")
+        return changed
+    }
+
     /** Diagnostika uchun: yuklangan yozuvlar soni. */
     fun fileHashCount(): Int = fileHashes.size
     fun certHashCount(): Int = certHashes.size
+    fun packageCount(): Int = packages.size
     fun isLoaded(): Boolean = loaded
 }

@@ -201,7 +201,9 @@ object Quarantine {
         val md = MessageDigest.getInstance("SHA-256")
         val raw = "$path|${System.currentTimeMillis()}".toByteArray(Charsets.UTF_8)
         val hash = md.digest(raw)
-        return hash.take(6).joinToString("") { "%02x".format(it) }
+        // 12 bayt (96-bit): avval 6 bayt (48-bit) edi — kollizyon avvalgi karantin yozuvini
+        // ezib/yashirib qo'yishi mumkin edi (restore token bo'yicha, overwrite bilan).
+        return hash.take(12).joinToString("") { "%02x".format(it) }
     }
 
     private fun prefs(context: Context) =

@@ -477,3 +477,73 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
   .car-title{font-size:16px}
   .car-nav{width:34px;height:34px;font-size:20px}
 }
+
+/* ============================================================================
+   YANGI WIDJETLAR — tekshiruv tezligi, jonli puls, mamlakat himoya darajasi,
+   anatomiya skaneri, xaritadagi "Tahdid yashin"
+   ========================================================================== */
+
+/* ── Tekshiruv tezligi (speed duel) ── */
+.perf-hero{display:flex;align-items:baseline;gap:8px;padding:14px 18px 6px}
+.perf-hero b{font-family:var(--mono);font-size:38px;font-weight:800;line-height:1;color:var(--primary);text-shadow:0 0 22px rgba(37,224,176,.35)}
+.perf-hero small{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.perf-foot{padding:4px 18px 16px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);line-height:1.55}
+.perf-foot b{color:var(--ink-2)}
+.duel-row{display:grid;grid-template-columns:160px 1fr 66px;align-items:center;gap:12px;padding:9px 0}
+.duel-row+.duel-row{border-top:1px solid var(--hair)}
+.duel-name{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);min-width:0}
+.duel-name i{width:9px;height:9px;border-radius:50%;flex:none}
+.duel-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.duel-cnt{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right}
+
+/* ── Jonli himoya pulsi (EKG) ── */
+.ekg-box{padding:16px 16px 4px}
+.ekg{width:100%;height:96px;display:block;overflow:visible}
+.ekg-line{fill:none;stroke:var(--primary);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;
+  filter:drop-shadow(0 0 4px rgba(37,224,176,.45));transition:none}
+.ekg-legend{display:flex;gap:16px;justify-content:center;padding:8px 16px 18px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.ekg-legend span{display:inline-flex;align-items:center;gap:6px}
+.ekg-legend i{width:8px;height:8px;border-radius:50%}
+
+/* ── Mamlakat himoya darajasi (gauge) ── */
+.gauge-box{display:grid;place-items:center;padding:20px 16px 2px}
+.gauge{width:210px;max-width:100%;height:auto;display:block}
+.gauge-fill{transition:stroke-dasharray 1s cubic-bezier(.22,1,.36,1)}
+.gauge-num{text-align:center;font-family:var(--mono);font-size:30px;font-weight:800;line-height:1;padding-top:4px}
+.gauge-sub{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:6px 0 16px}
+
+/* ── Anatomiya skaneri (detektorlar kaskadi) ── */
+.anat-modal{position:fixed;left:50%;bottom:48px;transform:translateX(-50%);width:min(540px,94vw);z-index:210;
+  background:linear-gradient(160deg,var(--card),var(--card-2));border:1px solid var(--hair-2);border-radius:18px;
+  box-shadow:var(--shadow);animation:anat-pop .26s cubic-bezier(.22,1,.36,1)}
+@keyframes anat-pop{from{opacity:0;transform:translateX(-50%) translateY(18px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.anat-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:1px solid var(--hair-2);
+  background:rgba(255,255,255,.03);color:var(--ink-3);font-size:15px;cursor:pointer;transition:.15s;z-index:1}
+.anat-close:hover{color:var(--ink);border-color:var(--danger)}
+.anat-head{padding:16px 20px;border-bottom:1px solid var(--hair)}
+.anat-title{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:30px}
+.anat-sub{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--primary);margin-top:4px}
+.anat-body{display:flex;gap:16px;padding:14px 20px 18px}
+.anat-dets{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.anat-det{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:10px;background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.05);opacity:0;transform:translateX(-10px);transition:all .3s ease;font-size:13px;color:var(--ink-3)}
+.anat-det.on{opacity:1;transform:none;color:var(--ink);border-color:rgba(37,224,176,.3);background:rgba(37,224,176,.08)}
+.anat-det i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);flex:none;transition:all .4s ease}
+.anat-det.on i{background:var(--primary);box-shadow:0 0 12px rgba(37,224,176,.85)}
+.anat-det span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.anat-empty{padding:18px 12px;text-align:center;color:var(--ink-3);font-family:var(--mono);font-size:12px}
+.anat-risk{width:104px;flex:none;display:flex;flex-direction:column;gap:7px;align-items:center;justify-content:center;
+  border-left:1px solid var(--hair);padding-left:14px}
+.anat-risk small{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.anat-risk b{font-family:var(--mono);font-size:34px;font-weight:800;line-height:1}
+
+/* ── Tahdid yashin (xaritadagi shockwave halqasi + toast ustunligi) ── */
+.kq-strike{z-index:1300}
+.kq-ring-marker{pointer-events:none!important;background:none!important;border:none!important}
+.kq-shockwave{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;
+  border:2px solid #ff3b5c;animation:kqShock 1.4s ease-out forwards}
+@keyframes kqShock{
+  0%{width:8px;height:8px;opacity:.95;box-shadow:0 0 10px 2px rgba(255,59,92,.9)}
+  70%{opacity:.45}
+  100%{width:130px;height:130px;opacity:0;box-shadow:0 0 0 0 rgba(255,59,92,0)}
+}

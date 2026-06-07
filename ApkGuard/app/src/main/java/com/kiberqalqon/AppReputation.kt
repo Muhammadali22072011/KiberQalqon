@@ -139,6 +139,12 @@ object AppReputation {
     fun isTrusted(pkg: String?): Boolean = trustedName(pkg) != null
 
     /**
+     * Aniq ishonchli paketlar ro'yxati — [TrustedSignatures.captureInstalledTrusted]
+     * ish vaqtida qurilmadagi shu ilovalarning sertifikatini "pin" qilish uchun ishlatadi.
+     */
+    internal fun exactTrustedPackages(): Set<String> = TRUSTED_EXACT
+
+    /**
      * Imzo bilan tasdiqlangan reputatsiya natijasi.
      *
      * Faqat paket nomiga ([trustedName]) tayanish XAVFLI: har qanday APK o'zini

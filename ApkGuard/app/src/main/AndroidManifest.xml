@@ -90,10 +90,12 @@
             </intent-filter>
         </activity>
 
-        <!-- Splash Screen - запускается из LanguageSelectActivity (или из notification). -->
+        <!-- Splash Screen - запускается из LanguageSelectActivity (или из notification).
+             exported=false: tashqi intent bilan ochilmaydi (LAUNCHER — LanguageSelect; ichki
+             PendingIntent'lar exported talab qilmaydi). Keraksiz attack surface'ni yopadi. -->
         <activity
             android:name=".SplashActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.KiberQalqon"
             android:screenOrientation="portrait" />
         
@@ -129,6 +131,12 @@
         <activity
             android:name=".DiagnosticsActivity"
             android:exported="false" />
+
+        <!-- Yashirin / o'chmaydigan tahdidlar skaneri (HiddenThreatScanner + qadamma-qadam o'chirish). -->
+        <activity
+            android:name=".HiddenThreatsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
 
         <activity
             android:name=".TelemetrySettingsActivity"
@@ -268,6 +276,23 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Real-time APK and installed app malware protection — antivirus security monitoring" />
         </service>
+
+        <!-- TAJRIBAVIY (opt-in, default OFF): DNS-sinkhole VPN — ma'lum C2 domenlarini bloklaydi.
+             HOZIRCHA O'CHIRILGAN (deactivated): hech qayerda ulanmagan (settings toggle + VpnService.prepare
+             oqimi hali yo'q), shuning uchun manifestdan ham olib qo'yildi — yoqib bo'lmaydigan service
+             keraksiz hujum yuzasi (attack surface) bo'lib qolmasligi uchun. Manbаа (VpnFilterService.kt)
+             saqlanadi va fail-open qilib mustahkamlandi; opt-in UI tayyor bo'lgach, quyidagi blokni
+             qayta yoqing.
+        <service
+            android:name=".VpnFilterService"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+        -->
+        <!-- /VpnFilterService (o'chirilgan) -->
 
         <service
             android:name=".PhishingNotificationService"

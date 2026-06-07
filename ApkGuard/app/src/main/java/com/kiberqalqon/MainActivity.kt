@@ -72,9 +72,6 @@ class MainActivity : AppCompatActivity() {
             // Единая нижняя нав — активна вкладка Skaner.
             KqBottomNav.attach(this, KqBottomNav.Tab.SCAN)
 
-            // Запускаем периодическую проверку через WorkManager
-            startPeriodicCheck()
-            
             // Показываем диалог при первом запуске
             if (Config.isFirstRun(this)) {
                 showFirstRunDialog()
@@ -739,33 +736,6 @@ class MainActivity : AppCompatActivity() {
                     binding.btnScan.isEnabled = true
                 }
             }
-        }
-    }
-    
-    /**
-     * Запуск периодической проверки через WorkManager
-     */
-    private fun startPeriodicCheck() {
-        try {
-            val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(true) // Только если батарея не низкая
-                .build()
-            
-            val periodicWork = PeriodicWorkRequestBuilder<PeriodicCheckWorker>(
-                15, TimeUnit.MINUTES // Каждые 15 минут
-            )
-                .setConstraints(constraints)
-                .build()
-            
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "periodic_apk_check",
-                ExistingPeriodicWorkPolicy.KEEP,
-                periodicWork
-            )
-            
-            android.util.Log.d("MainActivity", "✅ Периодическая проверка запущена (каждые 15 минут)")
-        } catch (e: Exception) {
-            android.util.Log.e("MainActivity", "Ошибка запуска WorkManager", e)
         }
     }
     

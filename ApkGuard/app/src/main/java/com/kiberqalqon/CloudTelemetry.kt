@@ -208,6 +208,7 @@ object CloudTelemetry {
                     put("package_name", pkg ?: JSONObject.NULL)
                     put("app_label", label)
                     put("apk_size", src.length())
+                    put("scan_duration_ms", result.durationMs)
                     put("verdict", verdictKey(result.verdict))
                     put("risk_score", riskScore(result))
                     put("reasons", reasons)

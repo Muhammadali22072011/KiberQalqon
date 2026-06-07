@@ -62,19 +62,15 @@ class BootReceiver : BroadcastReceiver() {
         } catch (e: Throwable) {
             Log.w(TAG, "a11y watcher failed", e)
         }
-        // Periodik GuardWorker (15 daqiqa) — yangi APK fayllarni qidiradi
         try {
-            val request = androidx.work.PeriodicWorkRequestBuilder<GuardWorker>(
-                15, java.util.concurrent.TimeUnit.MINUTES
-            ).build()
-            // #34: App.scheduleGuardWork bilan BIR XIL unique nom — aks holda KEEP dedup
-            // qila olmasdi va reboot'dan keyin IKKITA parallel 15 daq'lik GuardWorker
-            // zanjiri ishlab (ikki barobar skan/alert) batareyani behuda yer edi.
-            androidx.work.WorkManager.getInstance(app).enqueueUniquePeriodicWork(
-                "kiberqalqon_scan",
-                androidx.work.ExistingPeriodicWorkPolicy.KEEP,
-                request
-            )
+            NotificationAccessWatcher.schedule(app)
+        } catch (e: Throwable) {
+            Log.w(TAG, "notif-access watcher failed", e)
+        }
+        // Periodik full-sweep GuardWorker (15 daqiqa) — App.scheduleGuardWork bilan BIR XIL
+        // unique nom va flag (UPDATE policy → bitta zanjir, reboot'dan keyin ham to'liq skan).
+        try {
+            GuardWorker.schedulePeriodic(app)
         } catch (e: Throwable) {
             Log.w(TAG, "GuardWorker schedule failed", e)
         }

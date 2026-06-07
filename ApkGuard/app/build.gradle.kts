@@ -179,9 +179,18 @@ android {
                 "META-INF/*.kotlin_module",
                 "META-INF/proguard/**",
                 "kotlin/**",
-                "**.txt"
+                // Faqat META-INF/*.txt (litsenziyalar) chiqarib tashlanadi. Avval keng `**.txt`
+                // edi — kelajakda kerakli .txt resursni jim yo'qotishi mumkin edi (footgun).
+                // Eslatma: assets/malicious_hashes.txt — bu Android ASSET, packaging.resources
+                // unga umuman tegmaydi (faqat java-resurslarga).
+                "META-INF/*.txt"
             )
         }
+    }
+
+    testOptions {
+        // android.util.Log kabi stub'lar test'da exception emas, default qiymat qaytarsin.
+        unitTests.isReturnDefaultValues = true
     }
 
     compileOptions {
@@ -192,12 +201,15 @@ android {
     buildFeatures { viewBinding = true; buildConfig = true }
 
     // Native himoya kutubxonasi (libkqguard.so) — CMake orqali quriladi.
-    // NDK yo'q bo'lsa qurilish shu yerda yiqiladi; .so'siz qurish kerak bo'lsa
-    // bu blokni vaqtincha kommentlab qo'ying (ilova .so'siz ham ishlaydi — Kotlin fallback).
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
+    // NDK yo'q hamkor/CI sborkalari qurilishni shu yerda yiqitmasligi uchun gate qo'shildi:
+    //   -Pkq.skipNative=true  → CMake umuman chaqirilmaydi (ilova .so'siz ham ishlaydi — Kotlin fallback).
+    // Default (egasi sborkasi) — native YOQILGAN, .so o'z joyida qoladi.
+    if ((project.findProperty("kq.skipNative") as String?)?.toBoolean() != true) {
+        externalNativeBuild {
+            cmake {
+                path = file("src/main/cpp/CMakeLists.txt")
+                version = "3.22.1"
+            }
         }
     }
 }

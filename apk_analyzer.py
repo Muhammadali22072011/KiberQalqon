@@ -19,7 +19,7 @@ APK_DIR = BASE
 OUT_DIR = BASE / "apk_extracted"
 
 # Не считаем кандидатами на анализ — это наш собственный антивирус и его сборки.
-SELF_PREFIXES = ("kiberqalqon", "kiberqalqon")
+SELF_PREFIXES = ("kiberqalqon", "apkguard")
 
 # Защита от zip-bomb: суммарный распакованный размер и одиночный файл.
 MAX_TOTAL_UNPACKED = 500 * 1024 * 1024  # 500 MB суммарно
@@ -103,12 +103,35 @@ def _safe_target(out_dir: Path, name: str):
 
 
 def extract_apk(apk_path):
-    """Распаковать APK как ZIP с защитой от path-traversal и zip-bomb."""
+    """Распаковать APK как ZIP с защитой от path-traversal и zip-bomb.
+
+    Возвращает статистику распаковки. Она нужна, чтобы НИКОГДА не выдать ложный
+    «safe» на эвазивном/битом/пустом контейнере — см. report_structural_threats().
+    """
     OUT_DIR.mkdir(exist_ok=True)
     skipped = 0
     total_written = 0
-    with zipfile.ZipFile(apk_path, "r") as z:
+    written = 0
+    encrypted_flag = 0
+    read_errors = 0
+    try:
+        zf = zipfile.ZipFile(apk_path, "r")
+    except Exception as e:
+        # Намеренно битый контейнер (мусор перед EOCD и т.п.) — НЕ молчим, это сам по себе признак.
+        print(f"[!] APK ZIP sifatida ochilmadi: {e}")
+        return {"written": 0, "skipped": 0, "encrypted_flag": 0,
+                "read_errors": 1, "has_manifest": False, "open_failed": True}
+    with zf as z:
         for info in z.infolist():
+            # ZIP GP-bit-0 «шифрование» — ГОЛОВНАЯ эвазия семейства (Ajina.Banker / TAKLIFNOMA):
+            # бит выставлен, но данные НЕ зашифрованы. Android ставит APK как обычно, а
+            # zipfile/большинство AV отказываются читать «password-protected» запись → 0 файлов →
+            # пустой отчёт → ложный SAFE. Снимаем бит (как analysis/06_unpack.py), чтобы прочитать
+            # НАСТОЯЩИЙ контент, и считаем сам факт жёстким признаком (report_structural_threats).
+            if info.flag_bits & 0x1:
+                encrypted_flag += 1
+                info.flag_bits &= ~0x1
+
             if info.file_size > MAX_SINGLE_FILE:
                 print(f"  [skip] слишком большой файл: {info.filename} ({info.file_size} bytes)")
                 skipped += 1
@@ -138,10 +161,16 @@ def extract_apk(apk_path):
                         dst.write(chunk)
                         remaining -= len(chunk)
                         total_written += len(chunk)
+                written += 1
             except Exception as e:
                 print(f"  [skip] {info.filename}: {e}")
                 skipped += 1
-    print(f"[+] Распаковано в: {OUT_DIR} (пропущено: {skipped})")
+                read_errors += 1
+    has_manifest = (OUT_DIR / "AndroidManifest.xml").exists()
+    print(f"[+] Распаковано в: {OUT_DIR} (файлов: {written}, пропущено: {skipped}, "
+          f"soxta-shifr GP-bit: {encrypted_flag})")
+    return {"written": written, "skipped": skipped, "encrypted_flag": encrypted_flag,
+            "read_errors": read_errors, "has_manifest": has_manifest, "open_failed": False}
 
 
 def list_structure():
@@ -262,6 +291,25 @@ def scan_for_threat_strings():
         print("  (Подозрительные строки не найдены в бинарниках; полный разбор — в JADX по коду.)")
 
 
+def report_structural_threats(stats):
+    """Жёсткие СТРУКТУРНЫЕ признаки контейнера. Печатаются ВНУТРИ секции
+    «ПРИЗНАКИ ПОВЕДЕНИЯ» строками вида ``[ ... ]`` — бот разбирает их как reasons.
+
+    Это страховка инварианта «никогда не false-SAFE»: эвазивный / битый / пустой
+    APK всегда оставляет явный признак в отчёте, а не молчит."""
+    if not stats:
+        return
+    if stats.get("encrypted_flag", 0) > 0:
+        print(f"  [ZIP-EVAZIYA] {stats['encrypted_flag']} ta ZIP element soxta-shifrlangan "
+              f"(GP-bit) — Ajina.Banker/TAKLIFNOMA evaziyasi, JUDA XAVFLI")
+    if stats.get("open_failed"):
+        print("  [BUZILGAN-ZIP] APK ZIP sifatida ochilmadi — qasddan buzilgan konteyner")
+    elif not stats.get("has_manifest"):
+        print("  [MANIFEST-YO'Q] AndroidManifest.xml chiqmadi — paketlangan/yashirilgan kod")
+    elif stats.get("written", 0) == 0:
+        print("  [BO'SH] ZIP'dan birorta fayl chiqarib bo'lmadi — tahlil ishonchsiz")
+
+
 def analyze_dex():
     """Проверить наличие .dex файлов (код приложения)."""
     if not OUT_DIR.exists():
@@ -330,13 +378,16 @@ def main():
                 print("В папке не найден подозрительный .apk файл (исключая KiberQalqon*.apk).")
                 return 1
         print(f"APK: {apk.name}\n")
-        extract_apk(apk)
+        stats = extract_apk(apk)
         list_structure()
         analyze_dex()
         # Передаём apk напрямую — если androguard установлен, спарсит manifest
         # без оглядки на распакованный AXML (надёжнее).
         perms = read_manifest_permissions(apk)
         scan_for_threat_strings()
+        # Структурные признаки (GP-bit эвазия / битый / пустой контейнер) печатаем ВНУТРИ
+        # секции ПРИЗНАКИ ПОВЕДЕНИЯ — до заголовка РАЗРЕШЕНИЙ, чтобы бот разобрал их как reasons.
+        report_structural_threats(stats)
         print("\n--- ОПАСНЫЕ / ПОДОЗРИТЕЛЬНЫЕ РАЗРЕШЕНИЯ ---")
         if perms:
             for p in perms:

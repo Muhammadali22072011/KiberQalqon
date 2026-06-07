@@ -333,16 +333,20 @@ object CommunityReportClient {
         }
 
         try {
-            val url = buildString {
-                append("https://api.telegram.org/bot$token/sendMessage")
-                append("?chat_id=${URLEncoder.encode(chatId, "UTF-8")}")
-                append("&text=${URLEncoder.encode(text, "UTF-8")}")
-                append("&disable_web_page_preview=true")
+            // POST+JSON (avval GET edi — uzun "text" URL'ni 414/400 ga olib kelib, xabarni jim
+            // tashlardi). Token YO'L'da qoladi (invariant #2 — query'da emas), postMessage bilan bir xil.
+            val body = JSONObject().apply {
+                put("chat_id", chatId)
+                put("text", text)
+                put("disable_web_page_preview", true)
                 if (!replyMarkupJson.isNullOrBlank()) {
-                    append("&reply_markup=${URLEncoder.encode(replyMarkupJson, "UTF-8")}")
+                    try { put("reply_markup", JSONObject(replyMarkupJson)) } catch (_: Throwable) {}
                 }
             }
-            val req = Request.Builder().url(url).get().build()
+            val req = Request.Builder()
+                .url("https://api.telegram.org/bot$token/sendMessage")
+                .post(body.toString().toRequestBody("application/json".toMediaTypeOrNull()))
+                .build()
             client.newCall(req).execute().use { resp ->
                 if (!resp.isSuccessful) {
                     Log.w(TAG, "Telegram returned ${resp.code}")

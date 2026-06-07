@@ -100,6 +100,18 @@ class DiagnosticsActivity : AppCompatActivity() {
         }
         root.addView(btnTelemetry)
 
+        val btnHidden = Button(this).apply {
+            text = "🔍 Yashirin / o'chmaydigan tahdidlar"
+            setOnClickListener {
+                try {
+                    startActivity(android.content.Intent(this@DiagnosticsActivity, HiddenThreatsActivity::class.java))
+                } catch (e: Exception) {
+                    Toast.makeText(this@DiagnosticsActivity, "Xato: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+        root.addView(btnHidden)
+
         // 🧪 Test scanner — генерирует синтетические "вирусы" и прогоняет через
         // наш ApkScanner. ТОЛЬКО в debug: TestVirusGenerator встраивает реальные IOC
         // (elrxzx.com, ydbllnjd.com, frida-server…) как тестовые образцы. В release

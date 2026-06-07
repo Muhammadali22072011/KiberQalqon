@@ -96,9 +96,19 @@ object ZipEncryptionDetector {
                         }
                     }
 
+                    // DET-03: GP-bit-3 (data descriptor) bo'lsa compSize LFH'da 0 — oddiy advance
+                    // data ichiga sakraydi, keyingi imzo LFH_SIG bo'lmay sikl uzilardi va keyingi
+                    // (ehtimol flag'li) entry'lar o'tkazib yuborilardi. Bu holda keyingi LFH/CDH
+                    // imzosini oldinga qidiramiz (CDH topilsa — LFH bosqichi tabiiy tugaydi).
+                    val hasDataDescriptor = (gpFlag and 0x0008) != 0
                     val advance = 30L + nameLen + extraLen + compSize
-                    if (advance <= 0) break
-                    pos += advance
+                    if (hasDataDescriptor || compSize == 0L || advance <= 30L) {
+                        val next = findNextHeaderSignature(raf, pos + 30L, len)
+                        if (next < 0) break
+                        pos = next
+                    } else {
+                        pos += advance
+                    }
                 }
 
                 // === 2) Central directory scan ===
@@ -166,6 +176,34 @@ object ZipEncryptionDetector {
             totalEntries = total,
             sampleNames = sample,
         )
+    }
+
+    /**
+     * [from] dan boshlab keyingi LFH (PK\x03\x04) yoki CDH (PK\x01\x02) imzosini qidiradi.
+     * Data-descriptor entry'lardan keyin LFH-skanini davom ettirish uchun (DET-03). -1 = topilmadi.
+     */
+    private fun findNextHeaderSignature(raf: RandomAccessFile, from: Long, len: Long): Long {
+        var p = from.coerceAtLeast(0L)
+        val chunk = ByteArray(8192)
+        while (p + 4 <= len) {
+            raf.seek(p)
+            val n = raf.read(chunk)
+            if (n < 4) break
+            var i = 0
+            while (i <= n - 4) {
+                if (chunk[i] == 0x50.toByte() && chunk[i + 1] == 0x4B.toByte()) {
+                    val c2 = chunk[i + 2]; val c3 = chunk[i + 3]
+                    if ((c2 == 0x03.toByte() && c3 == 0x04.toByte()) ||
+                        (c2 == 0x01.toByte() && c3 == 0x02.toByte())) {
+                        return p + i
+                    }
+                }
+                i++
+            }
+            // Imzo chunk chegarasida bo'linib qolmasligi uchun 3 bayt ustma-ust qoldiramiz.
+            p += (n - 3).coerceAtLeast(1)
+        }
+        return -1
     }
 
     private fun readUInt32LE(buf: ByteArray, off: Int): Long {
