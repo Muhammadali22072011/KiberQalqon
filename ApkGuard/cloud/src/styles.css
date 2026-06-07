@@ -426,6 +426,13 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 .lstats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;text-align:center}
 .lstat b{display:block;font-family:var(--mono);font-size:26px;color:var(--primary)}
 .lstat span{font-size:12px;color:var(--ink-3)}
+.lregions{margin-top:40px}
+.lregions h3{font-size:15px;color:var(--ink-2);margin:0 0 14px;font-weight:600}
+.lreg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.lreg{background:var(--card);border:1px solid var(--hair-2);border-radius:14px;padding:14px 16px}
+.lreg-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.lreg-meta{display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.lreg-danger{color:var(--danger)}
 .lfoot{text-align:center;margin-top:54px;color:var(--ink-3);font-family:var(--mono);font-size:11px}
 
 .gate{position:fixed;inset:0;display:grid;place-items:center;
@@ -453,7 +460,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
   .map-grid{grid-template-columns:1fr}
   .geo-side{max-height:none;min-height:0}
   .cols-2,.cols-3{grid-template-columns:1fr}
-  .lfeatures,.lstats{grid-template-columns:1fr 1fr}
+  .lfeatures,.lstats,.lreg-grid{grid-template-columns:1fr 1fr}
   .map-box.tall{height:480px}
 }
 @media(max-width:860px){
@@ -471,6 +478,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 @media(max-width:560px){
   .kpis{grid-template-columns:1fr 1fr}
   .lfeatures,.lstats{grid-template-columns:1fr}
+  .lreg-grid{grid-template-columns:1fr 1fr}
   .topbar .pill{display:none}
   .car-stage{height:210px}
   .car-info{padding:14px 15px 15px}

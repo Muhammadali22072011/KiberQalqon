@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiGet } from '../lib/api';
 
 const FEATURES = [
   {
@@ -18,8 +20,8 @@ const FEATURES = [
   },
   {
     icon: '🔐',
-    title: 'Maxfiy rol tizimi',
-    text: 'Soatlik kod + login + parol. Operatorlarga aniq huquqlar beriladi, har bir kirish audit qilinadi.',
+    title: 'Egasi + admin kirishi',
+    text: 'Egasi master kalit (+2FA) bilan to‘liq huquqqa, bitta cheklangan admin esa login+parol bilan ko‘rish/eksportga kiradi. Token soatlik — kalit brauzerda saqlanmaydi.',
   },
   {
     icon: '🛡',
@@ -33,7 +35,27 @@ const FEATURES = [
   },
 ];
 
+interface PubStats {
+  devices: number;
+  scans: number;
+  blocked: number;
+  regionsCount: number;
+  regions: Array<{ region: string; devices: number; danger: number }>;
+}
+
+const fmt = (n: number) => n.toLocaleString('ru-RU');
+
 export default function Landing() {
+  const [pub, setPub] = useState<PubStats | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    apiGet<{ pub: PubStats }>('/api/stats?public=1')
+      .then((r) => { if (alive) setPub(r.pub); })
+      .catch(() => { /* ochiq sahifa — xato bo'lsa statik raqamlar ko'rinadi */ });
+    return () => { alive = false; };
+  }, []);
+
   return (
     <div className="landing">
       <div className="lwrap">
@@ -58,6 +80,39 @@ export default function Landing() {
             <a className="btn ghost lg" href="#feat">Imkoniyatlar</a>
           </div>
         </header>
+
+        {/* Jonli himoya raqamlari — bazadan (ochiq, auth'siz yig'ma sonlar) */}
+        <section className="lstats">
+          <div className="lstat">
+            <b>{pub ? fmt(pub.blocked) : '—'}</b><span>bloklangan tahdid</span>
+          </div>
+          <div className="lstat">
+            <b>{pub ? fmt(pub.devices) : '—'}</b><span>himoyalangan qurilma</span>
+          </div>
+          <div className="lstat">
+            <b>{pub ? fmt(pub.scans) : '—'}</b><span>o‘tkazilgan tekshiruv</span>
+          </div>
+          <div className="lstat">
+            <b>{pub ? pub.regionsCount : '—'}</b><span>qamrab olingan hudud</span>
+          </div>
+        </section>
+
+        {pub && pub.regions.length > 0 && (
+          <section className="lregions">
+            <h3>Hududlar bo‘yicha qamrov</h3>
+            <div className="lreg-grid">
+              {pub.regions.map((r) => (
+                <div className="lreg" key={r.region}>
+                  <div className="lreg-name">{r.region}</div>
+                  <div className="lreg-meta">
+                    <span>{fmt(r.devices)} qurilma</span>
+                    {r.danger > 0 && <span className="lreg-danger">{fmt(r.danger)} xavfli</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="lfeatures" id="feat">
           {FEATURES.map((f) => (
