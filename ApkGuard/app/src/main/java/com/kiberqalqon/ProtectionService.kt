@@ -118,7 +118,8 @@ class ProtectionService : Service() {
      *
      * Telegram yangi APK'ni o'z papkasiga (/Android/media/org.telegram.messenger/...)
      * saqlaganda, ko'p qurilmalarda FileObserver inotify event bermaydi. Shuning uchun
-     * har 15 soniyada MediaStore + papka ro'yxati orqali yangi APK qidiramiz (bu ishonchli).
+     * vaqti-vaqti bilan (ADAPTIV interval — pastdagi POLL_INTERVAL_* ga qarang) MediaStore +
+     * papka ro'yxati orqali yangi APK qidiramiz (bu ishonchli).
      * Yangi fayl topilsa — DARHOL AutoScanActivity oynasini ochamiz (jonli "tekshirilmoqda"
      * animatsiyasi → verdikt), xuddi FileObserver yo'li kabi. Ekran qulflangan / overlay
      * ruxsati yo'q bo'lsa — GuardWorker'ga o'tamiz (u skanlaydi, DANGER'ni karantinga oladi
@@ -143,7 +144,10 @@ class ProtectionService : Service() {
             val seenPaths = HashSet<String>(256)
             var seeded = false
             while (isActive) {
-                delay(POLL_INTERVAL_MS)
+                // Adaptiv interval: ekran ochiq bo'lsa tez-tez, aks holda kamdan-kam —
+                // shunda fon'da telefon qizimaydi (eski qat'iy 1s loop asosiy qizish sababi edi).
+                val interactive = isScreenInteractiveAndUnlocked(applicationContext)
+                delay(if (interactive) POLL_INTERVAL_ACTIVE_MS else POLL_INTERVAL_IDLE_MS)
                 try {
                     if (!Config.isBackgroundEnabled(applicationContext)) continue
                     val list = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = FAST_SCAN_BUDGET_MS)
@@ -255,15 +259,27 @@ class ProtectionService : Service() {
         private const val CHANNEL_NAME = "Himoya holati"
         const val NOTIFICATION_ID = 1010
 
-        /** Tezkor avtomatik skan oralig'i — yangi yuklab olingan APK ~1s ichida ushlanadi. */
-        private const val POLL_INTERVAL_MS = 1_000L
+        /**
+         * Tezkor avtomatik skan oralig'i — ADAPTIV (batareya/qizish uchun muhim).
+         *
+         * ILGARI qat'iy 1s edi: har soniyada butun xotira MediaStore so'rovi + rekursiv
+         * fayl yurish bilan skanlanardi → protsessor 24/7 yuklanib telefon QIZIRDI va
+         * batareya tez tugardi. Aslida real-vaqt aniqlash MultiPathFileObserver (inotify)
+         * zimmasida; bu poll faqat inotify ishlamaydigan papkalar (ba'zi qurilmalarda
+         * Telegram media) uchun ZAXIRA. Shuning uchun:
+         *   - ekran ochiq + qulfsiz (foydalanuvchi shu yerda, APK yuklab/o'rnatishi mumkin)
+         *     → tez-tez tekshiramiz (lekin baribir 1s emas);
+         *   - ekran o'chiq/qulflangan (foydalanuvchi APK o'rnatolmaydi) → kamdan-kam —
+         *     FileObserver + 15 daqiqalik GuardWorker + ekran ochilishidagi bir martalik
+         *     skan baribir qamrab oladi.
+         */
+        private const val POLL_INTERVAL_ACTIVE_MS = 12_000L
+        private const val POLL_INTERVAL_IDLE_MS = 90_000L
 
         /**
-         * Bitta poll iteratsiyasi uchun vaqt byudjeti. 1s oraliqda ishlagani uchun u
-         * oraliqdan kichik bo'lishi SHART — aks holda skanlar bir-birining ustiga chiqib,
-         * real oraliq cho'ziladi va batareyani behuda yeydi. MediaStore so'rovi odatda
-         * shundan ancha tez tugaydi; rekursiv fallback har iteratsiyada qisman yuradi,
-         * lekin 1s'da takror ishlagani uchun baribir hammasini qamrab oladi.
+         * Bitta poll iteratsiyasi uchun vaqt byudjeti. Eng kichik oraliq (active)dan
+         * sezilarli kichik bo'lishi SHART — aks holda skanlar bir-birining ustiga chiqadi.
+         * MediaStore so'rovi odatda bundan ancha tez tugaydi.
          */
         private const val FAST_SCAN_BUDGET_MS = 800L
 
