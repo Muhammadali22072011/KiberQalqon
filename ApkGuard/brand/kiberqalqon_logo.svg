@@ -1,0 +1,55 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="KiberQalqon — Anor-Qalqon logo">
+  <defs>
+    <!-- Anor (granat) gradient — firmennyy cvet, uhodim ot sине-zelenogo AV-klishe -->
+    <linearGradient id="anor" x1="120" y1="40" x2="392" y2="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E11D48"/>
+      <stop offset="0.55" stop-color="#C2143D"/>
+      <stop offset="1" stop-color="#8E0E2C"/>
+    </linearGradient>
+    <linearGradient id="seed" x1="170" y1="220" x2="342" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E11D48"/>
+      <stop offset="1" stop-color="#A50F33"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#5A0A20" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Qalqon (shchit) -->
+  <path filter="url(#soft)"
+        d="M256 40 L432 104 V252 C432 360 352 432 256 474 C160 432 80 360 80 252 V104 Z"
+        fill="url(#anor)"/>
+  <!-- Vnutrenniy kontur dlya glubiny -->
+  <path d="M256 70 L406 124 V250 C406 344 338 408 256 446 C174 408 106 344 106 250 V124 Z"
+        fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="6"/>
+
+  <!-- Anor: kaliks (korona) -->
+  <path d="M256 120
+           C247 137 233 140 222 134 C231 152 231 166 256 172
+           C281 166 281 152 290 134 C279 140 265 137 256 120 Z"
+        fill="#FBE9EE"/>
+
+  <!-- Anor: telo ploda (svetloe okno) -->
+  <circle cx="256" cy="300" r="96" fill="#FBE9EE"/>
+  <circle cx="256" cy="300" r="96" fill="none" stroke="#8E0E2C" stroke-opacity="0.10" stroke-width="4"/>
+
+  <!-- Zerna anora -->
+  <g fill="url(#seed)">
+    <circle cx="256" cy="252" r="16"/>
+    <circle cx="214" cy="274" r="15"/>
+    <circle cx="298" cy="274" r="15"/>
+    <circle cx="232" cy="312" r="16"/>
+    <circle cx="280" cy="312" r="16"/>
+    <circle cx="256" cy="300" r="15"/>
+    <circle cx="206" cy="316" r="13"/>
+    <circle cx="306" cy="316" r="13"/>
+    <circle cx="256" cy="348" r="15"/>
+  </g>
+
+  <!-- Safe-check: zashchita podtverzhdena (zelenyy tol'ko dlya statusa) -->
+  <g transform="translate(322 348)">
+    <circle cx="0" cy="0" r="34" fill="#10331F"/>
+    <circle cx="0" cy="0" r="34" fill="#27AE60" fill-opacity="0.18"/>
+    <path d="M-15 1 L-4 12 L16 -12" fill="none" stroke="#39D27E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

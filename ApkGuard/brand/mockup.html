@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiberQalqon — yangi dizayn (mockup)</title>
+<style>
+  :root{
+    --anor:#C2143D; --anor-2:#E11D48; --anor-deep:#8E0E2C;
+    --ink:#1A1A1F; --ink-2:#26262E; --line:#33333D;
+    --cream:#FBE9EE; --safe:#27AE60; --safe-2:#39D27E;
+    --warn:#F59E0B; --danger:#EF4444; --muted:#9A9AA8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #2a1119 0%, #0e0e12 55%);
+    color:#fff; min-height:100vh; padding:48px 20px;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  h1{font-size:22px;font-weight:700;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+  .stage{display:flex;gap:40px;flex-wrap:wrap;justify-content:center}
+  .col{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .cap{font-size:13px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+
+  /* Telefon ramka */
+  .phone{
+    width:300px;height:620px;border-radius:42px;background:var(--ink);
+    border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 0 6px #000;
+    padding:16px 14px;position:relative;overflow:hidden;
+  }
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    width:120px;height:24px;background:#000;border-radius:0 0 16px 16px;z-index:5}
+  .scr{height:100%;border-radius:30px;overflow:hidden;display:flex;flex-direction:column}
+
+  /* ---------- EKRAN 1: ASOSIY ---------- */
+  .s1{background:linear-gradient(180deg,#1b0d12 0%, #141319 60%);padding:34px 20px 0}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+  .brand .dot{width:26px;height:26px}
+  .gear{color:var(--muted);font-size:18px}
+
+  .hero{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px}
+  .ring{
+    width:172px;height:172px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(39,174,96,.22), transparent 62%),
+      conic-gradient(var(--safe-2) 0 86%, #2a2a33 86% 100%);
+    position:relative;
+  }
+  .ring::before{content:"";position:absolute;inset:12px;border-radius:50%;background:#15141a}
+  .ring .ic{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .ring .ic svg{width:54px;height:54px}
+  .status{font-size:19px;font-weight:800;color:var(--safe-2);letter-spacing:.3px}
+  .status.warn{color:var(--warn)} .status.dng{color:var(--danger)}
+  .substatus{color:var(--muted);font-size:12.5px;margin-top:2px}
+
+  .cta{
+    margin:20px 4px 18px;padding:16px;border:none;border-radius:18px;cursor:pointer;
+    background:linear-gradient(180deg,var(--anor-2),var(--anor));color:#fff;
+    font-size:16px;font-weight:700;letter-spacing:.3px;
+    box-shadow:0 12px 26px rgba(194,20,61,.45);
+  }
+  .stats{display:flex;gap:10px;margin:0 2px}
+  .stat{flex:1;background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:13px 8px;text-align:center}
+  .stat b{display:block;font-size:20px} .stat span{font-size:11px;color:var(--muted)}
+  .stat.s-safe b{color:var(--safe-2)} .stat.s-dng b{color:var(--danger)}
+
+  /* bottom nav */
+  .nav{margin-top:auto;display:flex;justify-content:space-around;padding:14px 6px 18px;border-top:1px solid var(--line)}
+  .nav div{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted)}
+  .nav .on{color:var(--anor-2)}
+  .nav .gi{font-size:18px}
+
+  /* ---------- EKRAN 2: RUXSATLAR ---------- */
+  .s2{background:#141319;padding:40px 20px 0}
+  .s2 h2{font-size:21px;font-weight:800;margin-bottom:6px}
+  .s2 .lead{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:22px}
+  .perm{display:flex;align-items:center;gap:13px;background:var(--ink-2);border:1px solid var(--line);
+    border-radius:16px;padding:14px;margin-bottom:11px}
+  .perm .pi{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:19px;background:rgba(194,20,61,.14)}
+  .perm .pt{flex:1}
+  .perm .pt b{font-size:14px;display:block} .perm .pt span{font-size:11.5px;color:var(--muted)}
+  .badge{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .badge.ok{background:rgba(39,174,96,.18);color:var(--safe-2)}
+  .badge.todo{background:transparent;border:2px solid var(--anor-2);color:var(--anor-2);font-size:18px;font-weight:700}
+  .hint{font-size:11px;color:var(--muted);text-align:center;margin:6px 0 14px}
+  .cont{margin-top:6px;padding:16px;border:none;border-radius:18px;background:linear-gradient(180deg,var(--anor-2),var(--anor));
+    color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px rgba(194,20,61,.4)}
+  .progress{display:flex;gap:6px;justify-content:center;margin:2px 0 20px}
+  .progress i{width:34px;height:4px;border-radius:3px;background:#2c2c35}
+  .progress i.on{background:var(--anor-2)}
+</style>
+</head>
+<body>
+  <h1>KiberQalqon — yangi dizayn</h1>
+  <div class="sub">Anor-brend · sodda · tushunarli (mockup, 2 ta asosiy ekran)</div>
+
+  <div class="stage">
+
+    <!-- ============ ASOSIY ============ -->
+    <div class="col">
+      <div class="cap">Asosiy ekran</div>
+      <div class="phone"><div class="notch"></div><div class="scr s1">
+        <div class="topbar">
+          <div class="brand">
+            <svg class="dot" viewBox="0 0 512 512"><path d="M256 40 L432 104 V252 C432 360 352 432 256 474 C160 432 80 360 80 252 V104 Z" fill="#C2143D"/><circle cx="256" cy="296" r="78" fill="#FBE9EE"/><g fill="#C2143D"><circle cx="256" cy="262" r="13"/><circle cx="224" cy="288" r="12"/><circle cx="288" cy="288" r="12"/><circle cx="240" cy="320" r="13"/><circle cx="272" cy="320" r="13"/></g></svg>
+            KiberQalqon
+          </div>
+          <div class="gear">⚙️</div>
+        </div>
+
+        <div class="hero">
+          <div class="ring"><div class="ic">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L20 5 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V5 Z" fill="#27AE60" fill-opacity=".2" stroke="#39D27E" stroke-width="1.6"/><path d="M8.5 12 L11 14.5 L15.5 9.5" stroke="#39D27E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </div></div>
+          <div class="status">Himoyalangan</div>
+          <div class="substatus">Bugun 14 ta fayl tekshirildi · 0 xavf</div>
+        </div>
+
+        <button class="cta">Tekshirish</button>
+
+        <div class="stats">
+          <div class="stat"><b>312</b><span>Tekshirildi</span></div>
+          <div class="stat s-dng"><b>7</b><span>Bloklandi</span></div>
+          <div class="stat s-safe"><b>24/7</b><span>Himoya</span></div>
+        </div>
+
+        <div class="nav">
+          <div class="on"><span class="gi">🛡️</span>Asosiy</div>
+          <div><span class="gi">🔍</span>Skaner</div>
+          <div><span class="gi">📊</span>Tarix</div>
+          <div><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ RUXSATLAR ============ -->
+    <div class="col">
+      <div class="cap">Ruxsatlar (just-in-time)</div>
+      <div class="phone"><div class="notch"></div><div class="scr s2">
+        <div class="progress"><i class="on"></i><i class="on"></i><i></i></div>
+        <h2>Himoyani yoqamiz</h2>
+        <div class="lead">Faqat kerakli ruxsatlar. Har birini bosib yoqing — qolganini keyin so'raymiz.</div>
+
+        <div class="perm">
+          <div class="pi">📁</div>
+          <div class="pt"><b>Fayllarni ko'rish</b><span>APK fayllarni topish uchun</span></div>
+          <div class="badge ok">✓</div>
+        </div>
+        <div class="perm">
+          <div class="pi">🔔</div>
+          <div class="pt"><b>Bildirishnoma</b><span>Xavf topilsa ogohlantirish</span></div>
+          <div class="badge ok">✓</div>
+        </div>
+        <div class="perm">
+          <div class="pi">🪟</div>
+          <div class="pt"><b>Oyna ko'rsatish</b><span>Virusni darhol ko'rsatish</span></div>
+          <div class="badge todo">+</div>
+        </div>
+
+        <div class="hint">«Barcha fayllarga ruxsat» — kerak bo'lganda so'raladi</div>
+        <button class="cont">Davom etish</button>
+
+        <div class="nav" style="margin-top:auto">
+          <div><span class="gi">🛡️</span>Himoya 24/7 · maxfiy · offline</div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</body>
+</html>
