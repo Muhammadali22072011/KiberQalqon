@@ -530,7 +530,20 @@ class InitialScanActivity : AppCompatActivity() {
     // martalik to'liq tekshiruv "bajarildi" deb belgilanmaydi, keyingi safar yana taklif qilinadi.
     private fun goToDashboard(markDone: Boolean = true) {
         if (markDone) Config.setInitialScanDone(this)
-        startActivity(Intent(this, DashboardNewActivity::class.java))
+        // Ilk skandan keyin — agar himoya hali tasdiqlanmagan yoki majburiy ruxsatlardan
+        // biri yetishmasa — BITTA ekranli ro'yxatga (ProtectionStatus) yo'naltiramiz: o'sha
+        // yerda overlay/bildirishnoma/JOYLASHUV bir joyda yoqiladi. Splash'dan marafon
+        // olib tashlangani uchun bu — ruxsatlarni so'raydigan yagona, sodda joy.
+        // Skan "keyinroq"ga qoldirilgan bo'lsa (markDone=false) — to'g'ridan Dashboard.
+        val next = if (markDone &&
+            (!Config.isProtectionAcked(this) ||
+                !ProtectionStatusActivity.allCriticalPermissionsGranted(this))
+        ) {
+            ProtectionStatusActivity::class.java
+        } else {
+            DashboardNewActivity::class.java
+        }
+        startActivity(Intent(this, next))
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }

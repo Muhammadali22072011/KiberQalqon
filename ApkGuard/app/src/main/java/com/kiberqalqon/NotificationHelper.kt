@@ -312,10 +312,11 @@ object NotificationHelper {
         val context = LocaleHelper.apply(context)
         createChannels(context)
         val oem = OemAutostartGuide.detect()
-        // Tap → SplashActivity orqali autostart guide qayta ochiladi
-        val intent = Intent(context, SplashActivity::class.java).apply {
+        // Tap → ProtectionStatusActivity: u yerda "Avtomatik ishga tushirish (OEM)" qatori
+        // bor — foydalanuvchi autostart'ni qayta yoqadi. (Ilgari Splash marafoni orqali
+        // ochilardi; marafon olib tashlangach, ro'yxat ekraniga to'g'ridan-to'g'ri o'tamiz.)
+        val intent = Intent(context, ProtectionStatusActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("show_oem_guide", true)
         }
         val pi = PendingIntent.getActivity(
             context, 7002, intent,
