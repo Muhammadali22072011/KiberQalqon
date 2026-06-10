@@ -251,10 +251,11 @@ object Config {
         prefs(context).edit { putBoolean("community_thanks_shown", true) }
     }
     
-    // Tema rejimi. Default = "dark" (2026-06 Anor redesign — brand/mockup.html
-    // qorong'i ekranlar; foydalanuvchi Sozlamalardan light'ga o'tkaza oladi).
+    // Tema rejimi. Default = "light" (design v4 «Milliy Kiber Himoya»: warm-cream
+    // yorug' tema asosiy, warm-dark Sozlamalardan tanlanadi). Eski "dark" default
+    // rad etilgan v1 mockup'dan qolgan regressiya edi.
     fun getDarkThemeMode(context: Context): String =
-        prefs(context).getString(KEY_DARK_THEME, "dark") ?: "dark"
+        prefs(context).getString(KEY_DARK_THEME, "light") ?: "light"
 
     fun setDarkThemeMode(context: Context, mode: String) {
         prefs(context).edit { putString(KEY_DARK_THEME, mode) }

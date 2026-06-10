@@ -113,10 +113,14 @@ android {
             abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
 
-        // libkqguard.so build argumentlari. KQ_EXPECTED_SIG — release imzo sertifikati
+        // libkqguard.so build argumentlari. KQ_EXPECTED_SIG — release imzo sertifikat(lar)i
         // SHA-256'i (OCHIQ qiymat — APK'dan baribir hisoblab olsa bo'ladi), nativega
         // build vaqtida beriladi (qo'lda literal emas). SecurityGuard.kt'dagi Kotlin
-        // fallback qiymati bilan AYNAN bir xil bo'lishi shart.
+        // fallback to'plami bilan AYNAN bir xil bo'lishi shart.
+        // SD-01: Play App Signing yoqilganda Play Console → App Integrity'dagi
+        // "App signing key certificate" SHA-256'ini VERGUL orqali ikkinchi qiymat
+        // sifatida shu yerga (va SecurityGuard.kt ro'yxatiga) qo'shish SHART —
+        // aks holda Play'dan o'rnatilgan ilova o'zini o'ldiradi (boot-loop).
         externalNativeBuild {
             cmake {
                 arguments += listOf(
