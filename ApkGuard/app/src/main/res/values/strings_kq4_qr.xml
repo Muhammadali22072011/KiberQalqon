@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v4 dizayn — QR-skaner («QR-kod tekshiruvi») ekrani satrlari.
+  Kamera orqali QR o'qiladi; havola bo'lsa LinkCheckActivity ga uzatiladi.
+-->
+<resources>
+    <string name="kq4_qr_eyebrow">QR XAVFSIZLIGI</string>
+    <string name="kq4_qr_title">QR-kodni tekshirish</string>
+    <string name="kq4_qr_instruction">QR-kodni ramka ichiga joylashtiring — havola bo\'lsa, xavfsizligini tekshiramiz.</string>
+    <string name="kq4_qr_scanning">Skanlanmoqda…</string>
+
+    <!-- Kamera ruxsati -->
+    <string name="kq4_qr_perm_title">Kamera ruxsati kerak</string>
+    <string name="kq4_qr_perm_body">QR-kodni o\'qish uchun kameradan foydalanamiz. Suratlar saqlanmaydi va hech qayerga yuborilmaydi.</string>
+    <string name="kq4_qr_perm_grant">Ruxsat berish</string>
+    <string name="kq4_qr_perm_denied">Kamera ruxsati berilmadi. Sozlamalardan qo\'lda yoqishingiz mumkin.</string>
+    <string name="kq4_qr_perm_open_settings">Sozlamalarni ochish</string>
+
+    <!-- Kamera mavjud emas -->
+    <string name="kq4_qr_no_camera">Bu qurilmada kamera topilmadi — QR-kodni skanlab bo\'lmaydi.</string>
+
+    <!-- Natija: havola emas -->
+    <string name="kq4_qr_not_url_title">QR-kod o\'qildi</string>
+    <string name="kq4_qr_not_url">Bu QR-kod havola emas. Quyidagi matn aniqlandi:</string>
+    <string name="kq4_qr_close">Yopish</string>
+</resources>

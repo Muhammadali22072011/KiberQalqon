@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — новые строки входа в Настройках (Защита банковских приложений,
+     Рентген разрешений, Еженедельный отчёт). Волна 5 функций, A6. Русский. -->
+<resources>
+
+    <!-- Аудит банковских приложений → BankGuardActivity -->
+    <string name="kq4_set_row_bankguard">Защита банковских приложений</string>
+    <string name="kq4_set_row_bankguard_sub">Находит поддельные банковские приложения и предупреждает</string>
+
+    <!-- Рентген разрешений → PermissionXrayActivity -->
+    <string name="kq4_set_row_xray">Рентген разрешений</string>
+    <string name="kq4_set_row_xray_sub">Показывает, какое приложение запрашивает лишние разрешения</string>
+
+    <!-- Переключатель еженедельного отчёта (Config.isWeeklyReportEnabled) -->
+    <string name="kq4_set_row_weekly">Еженедельный отчёт</string>
+    <string name="kq4_set_row_weekly_sub">Каждую неделю присылает уведомление с итогами проверки</string>
+</resources>

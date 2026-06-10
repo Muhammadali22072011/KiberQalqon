@@ -29,6 +29,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- QR-skaner (havola tekshiruvi): kamera FAQAT QrScanActivity ochilganda so'raladi.
+         required=false — kamerasiz qurilmalarda ham ilova o'rnatiladi (QR funksiyasi yashiriladi). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <!-- Geo-monitoring: qurilma o'z aniq joylashuvini markaziy xaritaga yuboradi.
          FAQAT "Jamoatchilik xavfsizligi" opt-in yoqilgan bo'lsa so'raladi va yuboriladi
          (CloudTelemetry darvozasi). Rad etilsa — server IP'dan shahar darajasida taxminlaydi.
@@ -211,6 +216,34 @@
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon" />
 
+        <!-- Havola tekshiruvchi — Telegram/SMS'dan kelgan URL'ni offline tahlil qiladi. -->
+        <activity
+            android:name=".LinkCheckActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+
+        <!-- QR-skaner — kamera orqali QR o'qiydi va ichidagi havolani tekshiruvga uzatadi. -->
+        <activity
+            android:name=".QrScanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+
+        <!-- Soxta bank ilovalari auditi — bank brendiga taqlid qiluvchi ilovalarni topadi. -->
+        <activity
+            android:name=".BankGuardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+
+        <!-- Ruxsatlar rentgeni — o'rnatilgan ilovalarni xavfli ruxsat kombinatsiyalari bo'yicha baholaydi. -->
+        <activity
+            android:name=".PermissionXrayActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+
         <!-- Birinchi to'liq tekshiruv — odin raz srazu posle Onboarding,
              pokazyvayet vse opasnye APK na ustroystve s knopkami "O'chirish". -->
         <activity
@@ -266,6 +299,22 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.apk" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.apk" />
                 <data android:host="*" />
+            </intent-filter>
+        </activity>
+
+        <!-- "Ulashish → KiberQalqon" matn (text/plain) uchun: Telegram/SMS/brauzerdan havolani
+             ulashganda URL'ni ushlaб, LinkCheckActivity'ga uzatadi. Ko'rinmas (translucent) —
+             EXTRA_TEXT'dan birinchi URL'ni olib darhol yopiladi. -->
+        <activity
+            android:name=".ShareUrlReceiverActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — haftalik xulosa bildirishnomasi (WeeklyReportWorker). -->
+<resources>
+    <!-- Bildirishnoma sarlavhasi -->
+    <string name="kq4_weekly_notif_title">Haftalik himoya hisoboti</string>
+
+    <!-- Qisqa matn: %1$d = tekshirilgan, %2$d = bloklangan -->
+    <string name="kq4_weekly_notif_text">%1$d ta tekshirildi · %2$d ta bloklandi</string>
+
+    <!-- Kengaytirilgan matn: %1$d = tekshirilgan, %2$d = bloklangan, %3$d = karantinda -->
+    <string name="kq4_weekly_notif_big">Bu hafta %1$d ta fayl tekshirildi, %2$d ta xavfli fayl bloklandi. Hozir %3$d ta fayl karantinda. Batafsil ko\'rish uchun bosing.</string>
+</resources>

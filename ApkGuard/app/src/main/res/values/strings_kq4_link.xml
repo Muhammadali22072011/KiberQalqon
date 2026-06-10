@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — «Havola tekshirgich» (link checker) ekran satrlari (o'zbekcha). -->
+<resources>
+
+    <!-- ═══ Sarlavha ═══ -->
+    <string name="kq4_link_eyebrow">HAVOLA XAVFSIZLIGI</string>
+    <string name="kq4_link_title">Havolani tekshirish</string>
+
+    <!-- ═══ Kirish (havolani yopishtirish) ═══ -->
+    <string name="kq4_link_input_label">Havolani shu yerga qo\'ying</string>
+    <string name="kq4_link_input_hint">https://…</string>
+    <string name="kq4_link_paste">Qo\'yish</string>
+    <string name="kq4_link_check">Tekshirish</string>
+    <string name="kq4_link_clip_empty">Buferda havola yo\'q</string>
+
+    <!-- ═══ Maslahat ═══ -->
+    <string name="kq4_link_hint">Telegram yoki SMS\'dan kelgan shubhali havolani shu yerga joylashtiring — ochishdan oldin tekshiring.</string>
+    <string name="kq4_link_host_line">Domen: %1$s</string>
+    <string name="kq4_link_reasons_title">Nega bunday?</string>
+
+    <!-- ═══ Banner ostidagi qisqa sabab ═══ -->
+    <string name="kq4_link_reason_safe">Xavfli belgilar topilmadi. Lekin baribir ehtiyot bo\'ling.</string>
+    <string name="kq4_link_reason_suspicious">Shubhali belgilar bor — ochishdan oldin yaxshilab o\'ylab ko\'ring.</string>
+    <string name="kq4_link_reason_danger">Bu havola XAVFLI ko\'rinadi — OCHMANG va hech kimga yubormang.</string>
+    <string name="kq4_link_reason_unparsable">Havolani o\'qib bo\'lmadi — ishonchsiz, ochmang.</string>
+
+    <!-- ═══ Belgilar (Flag → tushuntirish) ═══ -->
+    <string name="kq4_link_flag_blacklisted">Bu domen ma\'lum firibgar/virus ro\'yxatida</string>
+    <string name="kq4_link_flag_typosquat">Bank nomiga o\'xshatib yasalgan soxta domen</string>
+    <string name="kq4_link_flag_punycode">Yashirin harflar bilan yasalgan (homoglyph) hiyla</string>
+    <string name="kq4_link_flag_lookalike_tld">Bank nomi noto\'g\'ri manzilda (\.uz emas)</string>
+    <string name="kq4_link_flag_ip">Domen o\'rniga raqamli IP manzil — shubhali</string>
+    <string name="kq4_link_flag_at">Manzilda «@» belgisi — haqiqiy saytni yashiradi</string>
+    <string name="kq4_link_flag_subdomains">Juda ko\'p qism — chalg\'ituvchi manzil</string>
+    <string name="kq4_link_flag_tld">Arzon/firibgarlar ishlatadigan domen turi</string>
+    <string name="kq4_link_flag_shortener">Qisqartirgich — haqiqiy manzil yashiringan</string>
+    <string name="kq4_link_flag_financial">Bank/parol/kod so\'zlari bor — fishing alomati</string>
+    <string name="kq4_link_flag_nonhttps">Shifrlanmagan (http) ulanish — xavfsiz emas</string>
+    <string name="kq4_link_flag_unparsable">Havolani o\'qib bo\'lmadi — ishonchsiz</string>
+
+    <!-- ═══ Share qabul qiluvchi ═══ -->
+    <string name="kq4_link_no_url">Matnda havola topilmadi</string>
+
+</resources>

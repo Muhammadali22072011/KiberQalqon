@@ -219,6 +219,8 @@ class App : android.app.Application() {
         appScope.launch {
             try { HeartbeatWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "heartbeat", e) }
             try { DailyReportWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "daily", e) }
+            // Haftalik hisobot bildirishnomasi (skanlar/bloklangan/karantin) — har hafta 20:00.
+            try { WeeklyReportWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "weekly schedule", e) }
             // Кажные сутки сканируем уже-установленные приложения с СВЕЖЕЙ базой —
             // если blacklist обновился, ловим эти приложения как threat.
             try { InstalledAppsRescanWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "rescan", e) }

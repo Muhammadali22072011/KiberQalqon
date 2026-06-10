@@ -32,6 +32,29 @@ function isNeverBlockPackage(pkg: string): boolean {
   return NEVER_BLOCK_PREFIXES.some((pre) => p.startsWith(pre));
 }
 
+// B1 (link checker): domen feed allowlist'i — gov.uz, *.gov.uz va ma'lum O'zbekiston bank/
+// fintech domenlari HECH QACHON qora ro'yxatga tushmaydi (bitta soxta "device_report" butun
+// parkning bank saytini bloklab qo'ymasligi uchun — CLOUD-01 mantig'ining domen oynasi).
+// KnownBanks.kt + AppReputation.TRUSTED_EXACT bilan mosligi: payme/click/uzcard/kapitalbank...
+const NEVER_FEED_DOMAINS = new Set<string>([
+  'gov.uz', 'soliq.uz', 'my.gov.uz',
+  'payme.uz', 'click.uz', 'uzcard.uz', 'humo.uz', 'oson.uz', 'paynet.uz', 'apelsin.uz',
+  'kapitalbank.uz', 'uzumbank.uz', 'tbcbank.uz', 'hamkorbank.uz', 'agrobank.uz',
+  'ipakyulibank.uz', 'infinbank.uz', 'davrbank.uz', 'anorbank.uz', 'asakabank.uz',
+  'qishloqqurilishbank.uz',
+]);
+const NEVER_FEED_DOMAIN_SUFFIXES = ['.gov.uz'];
+function isNeverFeedDomain(host: string): boolean {
+  const h = host.toLowerCase().replace(/\.$/, '');
+  if (NEVER_FEED_DOMAINS.has(h)) return true;
+  // Suffiks: bank/gov domenining istalgan subdomeni ham himoyalangan.
+  if (NEVER_FEED_DOMAIN_SUFFIXES.some((suf) => h.endsWith(suf))) return true;
+  for (const d of NEVER_FEED_DOMAINS) {
+    if (h.endsWith(`.${d}`)) return true;
+  }
+  return false;
+}
+
 /**
  * GET /api/threats
  *
@@ -94,14 +117,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const packages = rows
       .filter((t) => t.package_name && !isNeverBlockPackage(String(t.package_name)))
       .map((t) => ({ p: String(t.package_name).toLowerCase(), f: t.category || 'Cloud.feed' }));
-    // Monotonik versiya — feed mazmuniga bog'liq (eng katta last_seen, sekundlarda). Avval qattiq
+
+    // B1 — domen feed'i (URL/link checker uchun). threat_domains jadvalidan high/critical
+    // yozuvlar. Allowlist (gov.uz/bank) chiqarib tashlanadi. FAIL-SOFT: jadval yo'q bo'lsa
+    // (migratsiya hali ishlamagan) — try/catch domenlarni shunchaki o'tkazib yuboradi, feed
+    // hash/paket bilan ishlayveradi.
+    //
+    // CLOUD-01 (domen oynasi): domenlar QASDDAN faqat EGA tomonidan qo'lda kiritiladi — hozircha
+    // hech bir qurilma-yo'nalishli endpoint threat_domains'ga YOZMAYDI (upload.ts faqat devices/
+    // scans/threats'ga yozadi), shuning uchun hash/paketdagi kabi korroboratsiya gate'i shart emas.
+    // Lekin himoyaga: kelajakda "device_report" yozish yo'li qo'shilsa, korroboratsiyasiz zaharlangan
+    // satr DANGER feed'ga oqib ketmasligi uchun selekt EGA-manbasi bilan cheklanadi (source owner/null).
+    type DomainRow = { domain?: string | null; category?: string | null; last_seen?: string | null };
+    let domains: { d: string; f: string }[] = [];
+    let domainMaxSeen = 0;
+    try {
+      const dq = await sb
+        .from('threat_domains')
+        .select('domain, category, severity, last_seen')
+        .in('severity', ['high', 'critical'])
+        .or('source.is.null,source.eq.owner')
+        .order('last_seen', { ascending: false })
+        .limit(2000);
+      if (dq.error) {
+        // Jadval yo'q yoki o'qib bo'lmadi — domensiz davom etamiz (fail-soft).
+        console.error(`[threats] threat_domains skipped: ${dq.error.message}`);
+      } else {
+        const drows = (dq.data ?? []) as DomainRow[];
+        domains = drows
+          .filter((t) => t.domain && !isNeverFeedDomain(String(t.domain)))
+          .map((t) => ({ d: String(t.domain).toLowerCase().replace(/\.$/, ''), f: t.category || 'Cloud.feed' }));
+        domainMaxSeen = drows.reduce((m, t) => {
+          const sec = t.last_seen ? Math.floor(new Date(t.last_seen).getTime() / 1000) : 0;
+          return sec > m ? sec : m;
+        }, 0);
+      }
+    } catch (e) {
+      console.error(`[threats] threat_domains exception: ${(e as Error).message}`);
+    }
+
+    // Monotonik versiyalar — feed mazmuniga bog'liq (eng katta last_seen, sekundlarda). Avval qattiq
     // `v:1` edi → mijozdagi rollback-guard (remoteV < KEY_V) hech qachon ishlamasdi. Endi yangi tahdid
-    // kelsa v oshadi; eski (replay) feed esa past v bilan kelib rad etiladi.
-    const maxSeen = rows.reduce((m, t) => {
+    // kelsa versiya oshadi; eski (replay) feed esa past versiya bilan kelib rad etiladi.
+    //
+    // MUHIM: hash/paket (`v`) va domen (`dv`) versiyalari ALOHIDA. Ilgari ular bitta `max`'ga
+    // qo'shilardi → threat_domains o'qishi VAQTINCHA xato bersa (fail-soft), domainMaxSeen 0 ga
+    // tushib `v` regress bo'lardi va mijozdagi rollback-guard BUTUN konvertni (yangi hash/paket
+    // bilan birga) rad etardi. Endi har bir manba o'z versiyasi bilan mustaqil baholanadi:
+    // bir jadvalning vaqtinchalik nosozligi ikkinchisining yangilanishini bloklamaydi.
+    const threatMaxSeen = rows.reduce((m, t) => {
       const sec = t.last_seen ? Math.floor(new Date(t.last_seen).getTime() / 1000) : 0;
       return sec > m ? sec : m;
     }, 0);
-    const payload = { v: maxSeen || 1, ts: Date.now(), hashes, packages };
+    const payload = { v: threatMaxSeen || 1, dv: domainMaxSeen, ts: Date.now(), hashes, packages, domains };
     res.setHeader('Cache-Control', 'public, max-age=300');
     return res.status(200).json({ ok: true, feed: signEnvelope(payload) });
   }

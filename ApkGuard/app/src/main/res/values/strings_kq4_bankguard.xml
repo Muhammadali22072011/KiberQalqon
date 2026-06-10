@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Bank himoyasi» (BankGuardActivity / BankAppAudit) — soxta bank ilovalari auditi.
+  Standart (Uzbek-Latin) til. Ruscha tarjima values-ru/strings_kq4_bankguard.xml da.
+  Apostroflar \' bilan ekranlanadi.
+-->
+<resources>
+
+    <!-- Sarlavha -->
+    <string name="kq4_bank_eyebrow">Himoya</string>
+    <string name="kq4_bank_title">Bank himoyasi</string>
+    <string name="kq4_bank_intro">Telefoningizdagi ilovalar orasidan haqiqiy bank yoki to\'lov ilovasiga taqlid qiluvchi SOXTA ilovalarni qidiramiz. Bunday ilovalar bir xil nom va ikonkani ishlatib parol va SMS-kodlaringizni o\'g\'irlashga urinadi.</string>
+
+    <!-- Holat satri -->
+    <string name="kq4_bank_checking">Ilovalar tekshirilmoqda…</string>
+    <string name="kq4_bank_safe_status">Barcha ilovalar tekshirildi</string>
+    <string name="kq4_bank_count">%1$d ta soxta bank ilovasi topildi</string>
+
+    <!-- Soxta karta -->
+    <string name="kq4_bank_fake_title">Soxta bank ilovasi</string>
+    <string name="kq4_bank_mimics">Taqlid qilmoqda: %1$s</string>
+
+    <!-- Sabablar -->
+    <string name="kq4_bank_reason_label">Nomi haqiqiy bankka o\'xshatilgan, lekin paketi boshqa</string>
+    <string name="kq4_bank_reason_icon">Ikonkasi haqiqiy bank ikonkasiga deyarli teng</string>
+    <string name="kq4_bank_reason_notplay">Play Store\'dan emas — ishonchsiz manbadan o\'rnatilgan</string>
+    <string name="kq4_bank_reason_cert">Imzosi haqiqiy bankning rasmiy imzosiga to\'g\'ri kelmaydi</string>
+    <string name="kq4_bank_reason_typosquat">Paket nomi bank brendiga juda yaqin (typosquat)</string>
+
+    <!-- Bo'sh holat (toza) -->
+    <string name="kq4_bank_none_title">Soxta bank ilovasi topilmadi</string>
+    <string name="kq4_bank_none_body">Hozircha haqiqiy bankka taqlid qiluvchi ilova aniqlanmadi. Bank ilovalarini faqat Play Store yoki bankning rasmiy saytidan o\'rnating.</string>
+
+    <!-- Xato holati (skan bajarilmadi — yashil "toza" EMAS) -->
+    <string name="kq4_bank_failed_status">Tekshirib bo\'lmadi</string>
+    <string name="kq4_bank_failed_title">Tekshiruvni yakunlab bo\'lmadi</string>
+    <string name="kq4_bank_failed_body">Ilovalar ro\'yxatini o\'qib bo\'lmadi, shuning uchun natija ishonchli emas. Iltimos, qaytadan urinib ko\'ring.</string>
+    <string name="kq4_bank_retry">Qayta urinish</string>
+
+    <!-- Amallar -->
+    <string name="kq4_bank_act_uninstall">Ilovani o\'chirish</string>
+    <string name="kq4_bank_act_appinfo">Ilova haqida</string>
+    <string name="kq4_bank_open_fail">Ochib bo\'lmadi: %1$s</string>
+
+</resources>

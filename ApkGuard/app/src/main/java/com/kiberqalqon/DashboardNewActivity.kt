@@ -75,6 +75,19 @@ class DashboardNewActivity : AppCompatActivity() {
             startActivity(Intent(this, ProtectionStatusActivity::class.java))
         }
 
+        // ── Tezkor tekshiruv plitkalari (havola / QR) ─────────────────────
+        binding.tileLinkCheck.setOnClickListener {
+            startActivity(Intent(this, LinkCheckActivity::class.java))
+        }
+        binding.tileQrCheck.setOnClickListener {
+            startActivity(Intent(this, QrScanActivity::class.java))
+        }
+
+        // "Bank himoyasi" katagi → soxta bank ilovalari auditi.
+        binding.kq4GuardBankCell.setOnClickListener {
+            startActivity(Intent(this, BankGuardActivity::class.java))
+        }
+
         // "Hammasi" → to'liq skaner ro'yxati.
         binding.cardApkList.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))

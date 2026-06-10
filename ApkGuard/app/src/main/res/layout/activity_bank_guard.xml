@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Bank himoyasi» — v4 dizayn (Permissions ekrani anatomiyasidan).
+  Sarlavha (icon-btn back + eyebrow + h-title) → intro → dinamik ro'yxat (bankContainer):
+  soxta bank ilovalari kartalari YOKI xavfsiz bo'sh holat.
+  Skan asosiy thread'dan tashqarida ([BankAppAudit.scan]); satrlar kodda quriladi.
+
+  BankGuardActivity.kt IDlari: btnBack, tvCount, bankContainer.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="30dp">
+
+        <!-- Sarlavha qatori -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/kq4_icon_btn"
+                android:contentDescription="@string/kq4_back"
+                android:padding="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic4_back"
+                app:tint="@color/kq_ink" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/KQ4.Eyebrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kq4_bank_eyebrow" />
+
+                <TextView
+                    style="@style/KQ4.HTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/kq4_bank_title"
+                    android:textSize="22sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Intro -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:fontFamily="@font/onest_regular"
+            android:lineSpacingMultiplier="1.4"
+            android:text="@string/kq4_bank_intro"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="13.5sp" />
+
+        <!-- Holat satri (tekshirilmoqda / soni) -->
+        <TextView
+            android:id="@+id/tvCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/onest_regular"
+            android:text="@string/kq4_bank_checking"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="14sp" />
+
+        <!-- Dinamik ro'yxat (kodda to'ldiriladi) -->
+        <LinearLayout
+            android:id="@+id/bankContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

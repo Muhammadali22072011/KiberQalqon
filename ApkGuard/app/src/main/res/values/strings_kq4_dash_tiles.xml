@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Dashboard tezkor tekshiruv plitkalari (Havola / QR). -->
+<resources>
+    <!-- Havola (URL) tekshiruvi plitkasi → LinkCheckActivity -->
+    <string name="kq4_dash_tile_link">Havola tekshiruvi</string>
+    <string name="kq4_dash_tile_link_sub">Shubhali URL\'larni tekshiring</string>
+
+    <!-- QR-kod tekshiruvi plitkasi → QrScanActivity -->
+    <string name="kq4_dash_tile_qr">QR tekshiruvi</string>
+    <string name="kq4_dash_tile_qr_sub">QR-kodni xavfsizlikka tekshiring</string>
+</resources>

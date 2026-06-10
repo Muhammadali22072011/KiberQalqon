@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Sozlamalardagi yangi kirish satrlari (Bank himoyasi, Ruxsatlar X-nuri,
+     Haftalik hisobot). 5-funksiya to'lqini A6. O'zbekcha (default). -->
+<resources>
+
+    <!-- Bank himoyasi auditi → BankGuardActivity -->
+    <string name="kq4_set_row_bankguard">Bank ilovalari himoyasi</string>
+    <string name="kq4_set_row_bankguard_sub">Soxta bank ilovalarini topib ogohlantiradi</string>
+
+    <!-- Ruxsatlar X-nuri → PermissionXrayActivity -->
+    <string name="kq4_set_row_xray">Ruxsatlar X-nuri</string>
+    <string name="kq4_set_row_xray_sub">Qaysi ilova ortiqcha ruxsat so\'raganini ko\'rsatadi</string>
+
+    <!-- Haftalik hisobot toggle (Config.isWeeklyReportEnabled) -->
+    <string name="kq4_set_row_weekly">Haftalik hisobot</string>
+    <string name="kq4_set_row_weekly_sub">Har hafta tekshiruv natijasini bildirishnoma qiladi</string>
+</resources>

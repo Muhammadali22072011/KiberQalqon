@@ -32,7 +32,8 @@ object CloudBlacklist {
 
     private const val TAG = "CloudBlacklist"
     private const val PREFS = "kiberqalqon_cloud_bl"
-    private const val KEY_V = "cbl_v"
+    private const val KEY_V = "cbl_v"      // hash/paket feed versiyasi (threatMaxSeen)
+    private const val KEY_DV = "cbl_dv"    // domen feed versiyasi (domainMaxSeen) — MUSTAQIL rollback-guard
     private const val KEY_PAYLOAD = "cbl_payload"
     private const val KEY_FETCHED_AT = "cbl_fetched_at"
 
@@ -55,7 +56,9 @@ object CloudBlacklist {
             // rooted/backup-restore orqali prefs'ga yozib qo'yilgan soxta payload (masalan benign
             // paketni "zararli" qilib) shartsiz merge bo'lardi. Endi imzosiz kesh rad etiladi.
             val payload = verifyAndDecode(envelope, signingKey) ?: return
-            mergeIntoThreatDb(payload)
+            // Keshlangan konvert — oxirgi qabul qilingan (imzo tekshirilgan) feed; ikkala manbani ham
+            // (hash/paket + domen) qo'llaymiz (ThreatDb merge faqat QO'SHADI, hech qachon zaiflashtirmaydi).
+            mergeIntoThreatDb(payload, applyThreats = true, applyDomains = true)
         } catch (e: Throwable) {
             Log.w(TAG, "loadCached failed", e)
         }
@@ -92,43 +95,58 @@ object CloudBlacklist {
             val sp = ctx.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val remoteV = payload.optInt("v", -1)
             if (remoteV < 0) return
-            // Rollback guard: eski versiyani qabul qilmaymiz.
-            if (remoteV < sp.getInt(KEY_V, -1)) {
+            // Domen versiyasi alohida (eski feed'da bo'lmasligi mumkin — 0 = neytral, regress emas).
+            val remoteDv = payload.optInt("dv", 0)
+
+            // MUSTAQIL rollback-guard'lar: hash/paket (v) va domen (dv) ALOHIDA baholanadi. Bir
+            // jadvalning vaqtinchalik nosozligi (server domainMaxSeen=0 berishi) endi BUTUN konvertni
+            // emas, faqat o'sha manbani bloklaydi. Aks holda yangi hash/paket yangilanishi domen
+            // o'qish xatosi tufayli rad etilardi.
+            val applyThreats = remoteV >= sp.getInt(KEY_V, -1)
+            val applyDomains = remoteDv >= sp.getInt(KEY_DV, -1)
+            if (!applyThreats && !applyDomains) {
                 Log.w(TAG, "feed versiyasi eski — rad etildi")
                 return
             }
             // CC-03: imzolangan KONVERTni saqlaymiz (dekodlangan JSON emas) — loadCached uni
-            // qayta tekshira oladi (prefs'ga soxta yozuvga qarshi).
-            sp.edit()
+            // qayta tekshira oladi (prefs'ga soxta yozuvga qarshi). Faqat qo'llaniladigan manba
+            // versiyasini oshiramiz — qo'llanmaganini regress qildirmaymiz.
+            val ed = sp.edit()
                 .putString(KEY_PAYLOAD, envelope)
-                .putInt(KEY_V, remoteV)
                 .putLong(KEY_FETCHED_AT, System.currentTimeMillis())
-                .apply()
-            // Faqat HAQIQATAN yangi hash/paket qo'shilganda skan keshini bekor qilamiz.
+            if (applyThreats) ed.putInt(KEY_V, remoteV)
+            if (applyDomains) ed.putInt(KEY_DV, remoteDv)
+            ed.apply()
+            // Faqat HAQIQATAN yangi hash/paket/domen qo'shilganda skan keshini bekor qilamiz.
             // Aks holda (xuddi shu feed har sovuq startda qayta merge bo'ladi) kesh
             // har ochilishda yo'qolib, foydasiz bo'lib qolardi. Yangi tahdid kelganda esa
             // avval SAFE keshlangan (endi qora ro'yxatdagi) fayl qayta skan qilinadi (#1 false-safe).
-            if (mergeIntoThreatDb(payload)) {
+            if (mergeIntoThreatDb(payload, applyThreats, applyDomains)) {
                 Config.markDatabaseUpdated(ctx)
             }
-            Log.i(TAG, "cloud blacklist qo'llandi (v=$remoteV)")
+            Log.i(TAG, "cloud blacklist qo'llandi (v=$remoteV, dv=$remoteDv, threats=$applyThreats, domains=$applyDomains)")
         } catch (e: Throwable) {
             Log.w(TAG, "refresh failed (assets bazasi saqlanadi)", e)
         }
     }
 
-    /** @return true — agar ThreatDb'ga yangi/o'zgargan yozuv qo'shilgan bo'lsa (kesh bekor qilinishi kerak). */
-    private fun mergeIntoThreatDb(payload: JSONObject): Boolean {
+    /**
+     * @param applyThreats hash/paket manbasini qo'llash (v rollback-guard'idan o'tgan bo'lsa).
+     * @param applyDomains domen manbasini qo'llash (dv rollback-guard'idan o'tgan bo'lsa).
+     * @return true — agar ThreatDb'ga yangi/o'zgargan yozuv qo'shilgan bo'lsa (kesh bekor qilinishi kerak).
+     */
+    private fun mergeIntoThreatDb(payload: JSONObject, applyThreats: Boolean, applyDomains: Boolean): Boolean {
         val hashes = HashMap<String, String>()
         val packages = HashMap<String, String>()
-        payload.optJSONArray("hashes")?.let { arr ->
+        val domains = HashMap<String, String>()
+        if (applyThreats) payload.optJSONArray("hashes")?.let { arr ->
             for (i in 0 until arr.length()) {
                 val o = arr.optJSONObject(i) ?: continue
                 val h = o.optString("h", "").trim().lowercase()
                 if (h.length == 64) hashes[h] = o.optString("f", "Cloud.feed").ifBlank { "Cloud.feed" }
             }
         }
-        payload.optJSONArray("packages")?.let { arr ->
+        if (applyThreats) payload.optJSONArray("packages")?.let { arr ->
             for (i in 0 until arr.length()) {
                 val o = arr.optJSONObject(i) ?: continue
                 val p = o.optString("p", "").trim().lowercase()
@@ -138,10 +156,27 @@ object CloudBlacklist {
                 }
             }
         }
-        if (hashes.isNotEmpty() || packages.isNotEmpty()) {
-            return ThreatDb.mergeCloud(hashes, packages)
+        // B1 — domen feed'i: {"domains":[{"d":host,"f":family}]} (URL/link checker uchun).
+        // d — kichik harf host (trailing nuqtasiz ThreatDb'da normallashtiriladi); default oila "Cloud.feed".
+        // O'zimizning domen yo'q (skip qiladigan narsa yo'q). Fail-soft: massiv yo'q bo'lsa o'tkazib yuboramiz.
+        if (applyDomains) payload.optJSONArray("domains")?.let { arr ->
+            for (i in 0 until arr.length()) {
+                val o = arr.optJSONObject(i) ?: continue
+                val d = o.optString("d", "").trim().lowercase().trimEnd('.')
+                if (d.isNotEmpty() && d.contains('.')) {
+                    domains[d] = o.optString("f", "Cloud.feed").ifBlank { "Cloud.feed" }
+                }
+            }
         }
-        return false
+        var changed = false
+        if (hashes.isNotEmpty() || packages.isNotEmpty()) {
+            // OR-in: hash/paket VA domen o'zgarishi — ikkalasi ham markDatabaseUpdated'ni yoqishi kerak.
+            if (ThreatDb.mergeCloud(hashes, packages)) changed = true
+        }
+        if (domains.isNotEmpty()) {
+            if (ThreatDb.mergeCloudDomains(domains)) changed = true
+        }
+        return changed
     }
 
     /** Bulut paket-feed'i o'zimizni yoki tizim paketini bloklab qo'ymasligi uchun istisno. */

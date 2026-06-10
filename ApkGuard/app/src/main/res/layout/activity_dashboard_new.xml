@@ -293,6 +293,111 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- ▌ 2 ta tezkor tekshiruv plitkasi: Havola tekshiruvi / QR tekshiruvi -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <!-- Havola (URL) tekshiruvi → LinkCheckActivity -->
+                    <LinearLayout
+                        android:id="@+id/tileLinkCheck"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/kq4_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+                        <FrameLayout
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/kq4_av_primary">
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_link"
+                                app:tint="@color/kq_primary" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="13dp"
+                            android:fontFamily="@font/onest_bold"
+                            android:letterSpacing="-0.01"
+                            android:text="@string/kq4_dash_tile_link"
+                            android:textColor="@color/kq_ink"
+                            android:textSize="14.5sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="@font/onest_regular"
+                            android:lineSpacingMultiplier="1.35"
+                            android:text="@string/kq4_dash_tile_link_sub"
+                            android:textColor="@color/kq_ink_3"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- QR-kod tekshiruvi → QrScanActivity -->
+                    <LinearLayout
+                        android:id="@+id/tileQrCheck"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/kq4_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+                        <FrameLayout
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/kq4_av_primary">
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_qr"
+                                app:tint="@color/kq_primary" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="13dp"
+                            android:fontFamily="@font/onest_bold"
+                            android:letterSpacing="-0.01"
+                            android:text="@string/kq4_dash_tile_qr"
+                            android:textColor="@color/kq_ink"
+                            android:textSize="14.5sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="@font/onest_regular"
+                            android:lineSpacingMultiplier="1.35"
+                            android:text="@string/kq4_dash_tile_qr_sub"
+                            android:textColor="@color/kq_ink_3"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
                 <!-- ▌ "Bugun bloklangan" + Hammasi -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -439,13 +544,17 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <!-- Bank himoyasi -->
+                    <!-- Bank himoyasi → soxta bank ilovalari auditi (BankGuardActivity) -->
                     <LinearLayout
+                        android:id="@+id/kq4GuardBankCell"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:background="@drawable/kq4_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         android:orientation="vertical"
                         android:padding="15dp">
 

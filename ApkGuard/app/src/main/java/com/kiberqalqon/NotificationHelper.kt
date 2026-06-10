@@ -373,6 +373,42 @@ object NotificationHelper {
     }
 
     /**
+     * Haftalik xulosa bildirishnomasi — WeeklyReportWorker tomonidan ~20:00 da, haftada
+     * bir marta yuboriladi. Tahdid emas, ma'lumot xarakteridagi xabar (welcome bilan bir xil
+     * shablon): PRIORITY_DEFAULT, full-screen intent yo'q. Tap → ScanHistoryActivity
+     * (statistika ekrani), u yerda haftalik grafik va tahdid tarixi ko'rinadi.
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showWeeklyReportNotification(
+        context: Context,
+        scanned: Int,
+        blocked: Int,
+        quarantined: Int
+    ) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val openIntent = Intent(context, ScanHistoryActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = PendingIntent.getActivity(
+            context, 7004, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.kq4_weekly_notif_title))
+            .setContentText(context.getString(R.string.kq4_weekly_notif_text, scanned, blocked))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(
+                context.getString(R.string.kq4_weekly_notif_big, scanned, blocked, quarantined)
+            ))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(7004, builder.build())
+    }
+
+    /**
      * SD-02: SecurityGuard ilovani to'xtatishdan OLDIN sababни узбекча tushuntiradi. Avval
      * jim killProcess bo'lardi — root/kastom-proshivkali legit foydalanuvchi (O'zbek bozorida ko'p)
      * ilova "sababsiz yo'qolib" ketganini ko'rardi (sindi deb o'ylaydi). Bildirishnoma тизим

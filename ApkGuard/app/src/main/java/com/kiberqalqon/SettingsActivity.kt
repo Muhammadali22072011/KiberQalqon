@@ -114,6 +114,13 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.set_row_upload_sub),
             icon = R.drawable.ic4_wifi,
         )
+        // QO'SHIMCHA — haftalik hisobot bildirishnomasi.
+        bindRow(
+            binding.rowWeeklyReport.root,
+            title = getString(R.string.kq4_set_row_weekly),
+            sub = getString(R.string.kq4_set_row_weekly_sub),
+            icon = R.drawable.ic4_chart,
+        )
     }
 
     private fun bindRow(root: View, title: String, sub: String, icon: Int) {
@@ -133,6 +140,19 @@ class SettingsActivity : AppCompatActivity() {
         bindChevron(binding.rowHiddenThreats.root, getString(R.string.kq4_set_row_hidden), R.drawable.ic4_eye)
         bindChevron(binding.rowTelegram.root, getString(R.string.kq4_set_row_telegram), R.drawable.ic4_bell)
         bindChevron(binding.rowProtectionStatus.root, getString(R.string.kq4_set_row_protection), R.drawable.ic4_shield_check)
+        // Yangi flagman ekranlar (subtitr bilan): soxta bank skaneri + ruxsatlar X-nuri.
+        bindChevronWithSub(
+            binding.rowBankGuard.root,
+            getString(R.string.kq4_set_row_bankguard),
+            getString(R.string.kq4_set_row_bankguard_sub),
+            R.drawable.ic4_card,
+        )
+        bindChevronWithSub(
+            binding.rowPermXray.root,
+            getString(R.string.kq4_set_row_xray),
+            getString(R.string.kq4_set_row_xray_sub),
+            R.drawable.ic4_layers,
+        )
         bindChevron(binding.rowPrivacy.root, getString(R.string.privacy_title), R.drawable.ic4_lock)
         bindChevron(binding.rowAdminPanel.root, getString(R.string.kq4_set_row_admin), R.drawable.ic4_key)
     }
@@ -144,6 +164,17 @@ class SettingsActivity : AppCompatActivity() {
         } catch (_: Throwable) { /* icon optional */ }
     }
 
+    /** bindChevron + subtitr (tvChevronSub sukut bo'yicha gone → ko'rsatamiz). */
+    private fun bindChevronWithSub(root: View, title: String, sub: String, icon: Int) {
+        bindChevron(root, title, icon)
+        try {
+            root.findViewById<TextView>(R.id.tvChevronSub).apply {
+                text = sub
+                visibility = View.VISIBLE
+            }
+        } catch (_: Throwable) { /* sub optional */ }
+    }
+
     /** Snapshots current Config values into the UI. */
     private fun bindState() {
         // Toggle rows
@@ -152,6 +183,7 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowPhishing.root).isChecked = Config.isPhishingBlockerEnabled(this)
         toggleOf(binding.rowBackground.root).isChecked = Config.isAutoUpdateEnabled(this)
         toggleOf(binding.rowUpload.root).isChecked = Config.isUploadEnabled(this)
+        toggleOf(binding.rowWeeklyReport.root).isChecked = Config.isWeeklyReportEnabled(this)
 
         // Server URL display
         val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
@@ -227,6 +259,11 @@ class SettingsActivity : AppCompatActivity() {
             Config.setUploadEnabled(this, on)
             toastSaved()
         }
+        toggleOf(binding.rowWeeklyReport.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setWeeklyReportEnabled(this, on)
+            toastSaved()
+        }
 
         // Server URL → edit dialog. Привязываем клик ко ВСЕМУ ряду (rowServerUrl),
         // не только к маленькому TextView c URL — раньше тап на иконку или пустую
@@ -274,6 +311,13 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.rowProtectionStatus.root.setOnClickListener {
             startActivity(Intent(this, ProtectionStatusActivity::class.java))
+        }
+        // Yangi flagman ekranlar — soxta bank skaneri + ruxsatlar X-nuri.
+        binding.rowBankGuard.root.setOnClickListener {
+            startActivity(Intent(this, BankGuardActivity::class.java))
+        }
+        binding.rowPermXray.root.setOnClickListener {
+            startActivity(Intent(this, PermissionXrayActivity::class.java))
         }
         binding.rowPrivacy.root.setOnClickListener { ConsentActivity.openForReview(this) }
         // Boshqaruv paneli — veb-panel ilova ichida (WebView): admin login+parol bilan

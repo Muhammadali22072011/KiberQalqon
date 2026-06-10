@@ -16,6 +16,7 @@ private const val KEY_SENSITIVITY = "sensitivity_level"
 private const val KEY_SOUND = "sound_enabled"
 private const val KEY_VIBRATION = "vibration_enabled"
 private const val KEY_AUTO_UPDATE = "auto_update_enabled"
+private const val KEY_WEEKLY_REPORT = "weekly_report_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
 private const val KEY_DARK_THEME = "dark_theme"
@@ -155,6 +156,15 @@ object Config {
 
     fun setAutoUpdateEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_AUTO_UPDATE, enabled) }
+    }
+
+    // Haftalik hisobot bildirishnomasi (WeeklyReportWorker) — default YOQILGAN
+    // (getter default `true`; ensureFirstRunDefaults o'zgartirilmaydi).
+    fun isWeeklyReportEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_WEEKLY_REPORT, true)
+
+    fun setWeeklyReportEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_WEEKLY_REPORT, enabled) }
     }
 
     fun lastDatabaseUpdate(context: Context): Long =
