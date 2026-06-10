@@ -121,7 +121,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select('id, name')
     .single();
   if (devErr || !dev) {
-    return res.status(500).json({ ok: false, error: 'device upsert', detail: devErr?.message });
+    console.error(`[upload] device upsert db error: ${devErr?.message ?? 'no row'}`);
+    return res.status(500).json({ ok: false, error: 'device upsert' });
   }
 
   // 2) Scan yozish
@@ -142,7 +143,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select('id')
     .single();
   if (scanErr) {
-    return res.status(500).json({ ok: false, error: 'scan insert', detail: scanErr.message });
+    console.error(`[upload] scan insert db error: ${scanErr.message}`);
+    return res.status(500).json({ ok: false, error: 'scan insert' });
   }
 
   // Xavfli/shubhali bo'lsa — qurilma APK namunasini Storage'ga yuklashi uchun

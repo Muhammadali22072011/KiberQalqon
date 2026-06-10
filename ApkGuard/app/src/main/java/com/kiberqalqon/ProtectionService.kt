@@ -76,11 +76,15 @@ class ProtectionService : Service() {
                 startForeground(NOTIFICATION_ID, notification)
             }
         } catch (t: Throwable) {
-            // Foreground start ba'zi qurilmalarda rad etiladi (masalan Android 12+
-            // background dan startForegroundService chaqirilgan bo'lsa). Bu holatda
-            // crash qilmasdan oddiy service sifatida davom etamiz — notification
-            // bo'lmaydi, lekin process tirik qoladi.
-            android.util.Log.w(TAG, "startForeground failed", t)
+            // BG-08: startForeground rad etilsa (Android 12+ fon-start cheklovi, OEM, FGS-type),
+            // "oddiy service sifatida davom etamiz" ISHLAMAYDI — startForegroundService→startForeground
+            // shartnomasi bajarilmagani uchun tizim baribir RemoteServiceException/ANR bilan yiqitadi
+            // (START_STICKY esa qayta-qayta urinib siklik crash beradi). To'g'ri yo'l: shartnomani
+            // stopSelf bilan yopamiz va START_NOT_STICKY qaytaramiz; qayta urinish foreground-Activity
+            // onResume'da yoki 15 daqiqalik WorkManager orqali bo'ladi.
+            android.util.Log.w(TAG, "startForeground failed — stopping self to avoid system kill", t)
+            try { stopSelf() } catch (_: Throwable) {}
+            return START_NOT_STICKY
         }
         return START_STICKY
     }
@@ -142,7 +146,24 @@ class ProtectionService : Service() {
             // eski fayllar uchun oyna chiqarmaymiz; faqat SHUNDAN keyin paydo bo'lganlar uchun.
             // Yangilik aniqlash mantig'i NewApkDetector'da (sof funksiya, unit-test bilan qoplangan).
             val seenPaths = HashSet<String>(256)
-            var seeded = false
+
+            // BG-05: SEED'ni alohida SAXIY byudjet bilan qilamiz (loop ichidagi 800ms emas).
+            // Sovuq startda (ребут/обновление/рестарт сервиса) I/O sekin — 800ms butun ro'yxatga
+            // yetmay, eng ESKI fayllar (MediaStore DATE_MODIFIED DESC oxiri) seed'ga tushmasdi va
+            // keyingi pollda "yangi" deb ochilib ketardi. To'liq listing tugaguncha seed qilamiz.
+            try {
+                if (Config.isBackgroundEnabled(applicationContext)) {
+                    val initial = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = SEED_SCAN_BUDGET_MS)
+                        .filter { it.file.exists() }
+                    NewApkDetector.seed(
+                        initial.map { NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified()) },
+                        seenPaths,
+                    )
+                }
+            } catch (t: Throwable) {
+                android.util.Log.w(TAG, "seed scan failed", t)
+            }
+
             while (isActive) {
                 // Adaptiv interval: ekran ochiq bo'lsa tez-tez, aks holda kamdan-kam —
                 // shunda fon'da telefon qizimaydi (eski qat'iy 1s loop asosiy qizish sababi edi).
@@ -154,12 +175,6 @@ class ProtectionService : Service() {
                         .filter { it.file.exists() }
                     val stamps = list.map {
                         NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified())
-                    }
-
-                    if (!seeded) {
-                        NewApkDetector.seed(stamps, seenPaths)
-                        seeded = true
-                        continue
                     }
 
                     val newPaths = NewApkDetector.pickNew(stamps, seenPaths, System.currentTimeMillis())
@@ -283,6 +298,12 @@ class ProtectionService : Service() {
          */
         private const val FAST_SCAN_BUDGET_MS = 800L
 
+        /**
+         * Birinchi (seed) listing uchun saxiyroq byudjet. Bu bir martalik — loop tezligiga ta'sir
+         * qilmaydi, lekin sovuq startda butun ro'yxat seed'ga tushishini ta'minlaydi (BG-05).
+         */
+        private const val SEED_SCAN_BUDGET_MS = 10_000L
+
         /** Service'ni ishga tushiradi. Idempotent — qayta chaqirish bezarar. */
         fun start(context: Context) {
             try {
@@ -308,6 +329,10 @@ class ProtectionService : Service() {
         /** Status matnini yangilash (scan tugagach yoki sozlama o'zgargach). */
         fun refresh(context: Context) {
             try {
+                // BG-02: fon himoyasi O'CHIRILGAN bo'lsa "KIBER QALQON faol" bildirishnomasini
+                // TIKLAMAYMIZ — aks holda foydalanuvchi himoyani o'chirgach ham har skandан keyin
+                // belgi qayta paydo bo'lib, "o'chirdim-ku" degan holatga zid yolg'on ko'rsatardi.
+                if (!Config.isBackgroundEnabled(context)) return
                 ensureChannel(context)
                 val mgr = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 mgr.notify(NOTIFICATION_ID, buildNotification(context))

@@ -320,11 +320,14 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/tileQuarantine"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/kq_stat_tile"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:orientation="vertical"
                     android:padding="12dp">
 

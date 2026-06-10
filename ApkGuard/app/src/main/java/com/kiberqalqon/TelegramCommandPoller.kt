@@ -2,8 +2,10 @@ package com.kiberqalqon
 
 import android.content.Context
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -56,6 +58,15 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
         private const val TAG = "TgPoller"
         const val WORK_NAME = "tg_command_poller"
 
+        // TG-01: tarmoq SHARTI. Avval comment "Constraints.NetworkType.CONNECTED zaderzhit"
+        // deb va'da berardi, lekin .setConstraints HECH QAYERDA chaqirilmasdi → tarmoqsiz
+        // (aviarejim/lift/yomon signal) har sikl darhol UnknownHostException → 1s'da reschedule →
+        // WorkManager+OkHttp issiq sikli (ProtectionService'da endigina tuzatilgan qizish klassi).
+        // Endi tarmoq yo'q bo'lsa WorkManager ishni ULANISHGACHA kechiktiradi.
+        private val NETWORK_CONSTRAINT = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         /**
          * Postavit' chain na zapusk. Vyzov idempotenten (REPLACE policy),
          * mozhno dergat' iz onCreate i iz settings activity.
@@ -68,6 +79,7 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
             }
             val req = OneTimeWorkRequestBuilder<TelegramCommandPoller>()
                 // Bez setInitialDelay — startuem srazu.
+                .setConstraints(NETWORK_CONSTRAINT)
                 .build()
             WorkManager.getInstance(ctx).enqueueUniqueWork(
                 WORK_NAME,
@@ -91,6 +103,7 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
             val req = OneTimeWorkRequestBuilder<TelegramCommandPoller>()
                 // Mini-buffer 1 sec chtoby Android ne ругалsya na hot-loop
                 .setInitialDelay(1, TimeUnit.SECONDS)
+                .setConstraints(NETWORK_CONSTRAINT)
                 .build()
             WorkManager.getInstance(ctx).enqueueUniqueWork(
                 WORK_NAME,

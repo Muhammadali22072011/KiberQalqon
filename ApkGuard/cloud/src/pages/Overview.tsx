@@ -54,17 +54,21 @@ export default function Overview() {
     : '0,30 300,30';
 
   // ── Mamlakat himoya darajasi (0..100): xavfsizlar ulushidan xavfli/shubhalilar jarimasi ──
-  const health = useMemo(() => {
+  // Maʼlumot yo'q (total=0) bo'lsa null — "100%" KO'RSATMAYMIZ: "maʼlumot yo'q" ni "hammasi
+  // mukammal" deb ko'rsatish movement #1 invariantining buzilishi (xato → yashil tomonga).
+  const health = useMemo<number | null>(() => {
     const total = s.total_scans || 0;
-    if (!total) return 100;
+    if (!total) return null;
     const danger = s.danger_count || 0;
     const susp = s.suspicious_count || 0;
     const safe = s.safe_count || 0;
     return Math.max(0, Math.min(100, Math.round(((safe - danger * 2 - susp) / total) * 100)));
   }, [s.total_scans, s.danger_count, s.suspicious_count, s.safe_count]);
-  const healthColor = health > 70 ? '#25e0b0' : health > 40 ? '#ffb020' : '#ff3b5c';
+  const noHealthData = health == null;
+  const h = health ?? 0;
+  const healthColor = noHealthData ? '#5d6b8a' : h > 70 ? '#25e0b0' : h > 40 ? '#ffb020' : '#ff3b5c';
   const ARC = Math.PI * 50; // yarim doira yoyi uzunligi (r = 50)
-  const knobAng = ((180 - 1.8 * health) * Math.PI) / 180;
+  const knobAng = ((180 - 1.8 * h) * Math.PI) / 180;
   const knobX = 60 + 50 * Math.cos(knobAng);
   const knobY = 60 - 50 * Math.sin(knobAng);
 
@@ -173,13 +177,13 @@ export default function Overview() {
                 stroke={healthColor}
                 strokeWidth="9"
                 strokeLinecap="round"
-                strokeDasharray={`${(health / 100) * ARC} ${ARC}`}
+                strokeDasharray={`${(h / 100) * ARC} ${ARC}`}
               />
               <circle cx={knobX} cy={knobY} r="5.5" fill="#fff" stroke={healthColor} strokeWidth="2" />
             </svg>
           </div>
-          <div className="gauge-num" style={{ color: healthColor }}>{health}%</div>
-          <div className="gauge-sub">Himoyalanganlik darajasi</div>
+          <div className="gauge-num" style={{ color: healthColor }}>{noHealthData ? '—' : `${health}%`}</div>
+          <div className="gauge-sub">{noHealthData ? "Ma‘lumot yetarli emas" : 'Himoyalanganlik darajasi'}</div>
         </Panel>
       </div>
 
@@ -189,6 +193,8 @@ export default function Overview() {
           <div className="feed-scroll">
             {feed.loading && !items.length ? (
               <Spinner label="Yuklanmoqda…" />
+            ) : feed.error && !items.length ? (
+              <Empty>Oqim uzildi — qayta urinilmoqda…</Empty>
             ) : !items.length ? (
               <Empty>Hozircha tahdid yo‘q</Empty>
             ) : (
@@ -222,7 +228,9 @@ export default function Overview() {
             right={<Link className="btn ghost" to="/app/threats">Hammasi</Link>}
           />
           <div className="body-pad">
-            {!top.length ? (
+            {threats.error && !top.length ? (
+              <Empty>Ma‘lumot yuklanmadi — qayta urinilmoqda…</Empty>
+            ) : !top.length ? (
               <Empty />
             ) : (
               top.map((t) => {

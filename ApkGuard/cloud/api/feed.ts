@@ -14,6 +14,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .order('scanned_at', { ascending: false })
     .limit(50);
 
-  if (error) return res.status(500).json({ ok: false, error: error.message });
+  if (error) { console.error(`[feed] db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
   return res.status(200).json({ ok: true, feed: data ?? [] });
 }

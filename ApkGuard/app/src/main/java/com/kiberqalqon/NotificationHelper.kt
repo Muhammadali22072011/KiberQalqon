@@ -372,6 +372,41 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(7001, builder.build())
     }
 
+    /**
+     * SD-02: SecurityGuard ilovani to'xtatishdan OLDIN sababни узбекча tushuntiradi. Avval
+     * jim killProcess bo'lardi — root/kastom-proshivkali legit foydalanuvchi (O'zbek bozorida ko'p)
+     * ilova "sababsiz yo'qolib" ketganini ko'rardi (sindi deb o'ylaydi). Bildirishnoma тизим
+     * jarayoniga binder orqali kill'dan oldin topshiriladi, shu sabab ko'rinadi.
+     *
+     * @param reason SecurityGuard.CheckResult.reason (tekshiruv nomi: signature/tamper/root/...).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showSecurityBlockNotification(context: Context, reason: String?) {
+        try {
+            val context = LocaleHelper.apply(context)
+            createChannels(context)
+            // Перепакетлаш/имзо мос эмас = қатъий бузилиш; қолганлари = муҳит (root/эмулятор).
+            val tamper = reason == "signature" || reason == "tamper"
+            val title = "KiberQalqon ishga tushmadi"
+            val text = if (tamper) {
+                "Ilova buzib ochilgan (qayta paketlangan) bo'lishi mumkin — xavfsizlik uchun to'xtatildi."
+            } else {
+                "Qurilmada root yoki o'zgartirilgan tizim aniqlandi — himoya bu muhitda ishlay olmaydi."
+            }
+            val builder = NotificationCompat.Builder(context, channelFor(context))
+                .setSmallIcon(R.drawable.ic_shield)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+            applyLegacyPrefs(context, builder)
+            NotificationManagerCompat.from(context).notify(7009, builder.build())
+        } catch (_: Throwable) {
+            // Bildirishnoma bermasa ham kill davom etadi — bu best-effort.
+        }
+    }
+
     @Suppress("NAME_SHADOWING")
     fun showInstalledSuspiciousNotification(
         context: Context,

@@ -17,8 +17,14 @@ function b64urlEncode(s: string): string {
   return Buffer.from(s, 'utf8').toString('base64url');
 }
 
+// CRIT-01: doменли prefiks MAJBURIY. Bu imzo issueDeviceToken (devauth.ts) chiqaradigan
+// HMAC bilan AYNAN bir xil kalit ostida ham HECH QACHON to'qnashmasligi kerak — aks holda
+// /api/device/register oraクули owner-sessiya tokenini soxtalashtirishga imkon beradi.
+// devauth.ts "kq-devtok-v1\n" prefiksini ishlatadi; bu yer "kq-session-v1\n" — kesishmaydi.
+const SESSION_DOMAIN = 'kq-session-v1\n';
+
 function sign(payloadB64: string): string {
-  return createHmac('sha256', key()).update(payloadB64).digest('base64url');
+  return createHmac('sha256', key()).update(`${SESSION_DOMAIN}${payloadB64}`).digest('base64url');
 }
 
 // Token ichidagi ma'lumot — IKKI xil foydalanuvchi:

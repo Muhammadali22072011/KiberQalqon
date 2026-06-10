@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { canManageNews, canRead, checkDeviceSecret } from '../lib/auth.js';
+import { canManageNews, canRead, checkAdminSecret, checkDeviceSecret } from '../lib/auth.js';
 
 // Yangiliklar / e'lonlar — panel bosh sahifasidagi lenta + APK bosh ekrani.
 //   GET  → o'qish: panel (x-admin-secret) YOKI qurilma (x-device-secret).
@@ -27,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(100);
-    if (error) return res.status(500).json({ ok: false, error: error.message });
+    if (error) { console.error(`[news] list db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
     return res.status(200).json({ ok: true, news: data ?? [] });
   }
 
@@ -52,23 +52,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .insert({ title, body, level, image_url })
         .select('id, title, body, level, image_url, pinned, created_at')
         .single();
-      if (error) return res.status(500).json({ ok: false, error: error.message });
+      if (error) { console.error(`[news] create db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
       return res.status(200).json({ ok: true, item: data });
     }
 
     if (action === 'delete') {
+      // O'chirish — FAQAT egasi (admin joylaydi, lekin o'chira/o'zgartira olmaydi; Profil shuni va'da qiladi).
+      if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
       const id = String(b.id ?? '').trim();
       if (!id) return res.status(400).json({ ok: false, error: 'id kerak' });
       const { error } = await sb.from('news').delete().eq('id', id);
-      if (error) return res.status(500).json({ ok: false, error: error.message });
+      if (error) { console.error(`[news] delete db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
       return res.status(200).json({ ok: true });
     }
 
     if (action === 'toggle_pin') {
+      // Qadab qo'yish/o'zgartirish — FAQAT egasi (admin faqat joylaydi).
+      if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
       const id = String(b.id ?? '').trim();
       if (!id) return res.status(400).json({ ok: false, error: 'id kerak' });
       const { error } = await sb.from('news').update({ pinned: Boolean(b.pinned) }).eq('id', id);
-      if (error) return res.status(500).json({ ok: false, error: error.message });
+      if (error) { console.error(`[news] toggle_pin db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
       return res.status(200).json({ ok: true });
     }
 
@@ -88,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Bucket bo'lmasa — yaratamiz (idempotent; mavjud bo'lsa xatoni yutamiz).
       await sb.storage.createBucket('news', { public: true }).catch(() => undefined);
       const up = await sb.storage.from('news').upload(name, buf, { contentType, upsert: false });
-      if (up.error) return res.status(500).json({ ok: false, error: up.error.message });
+      if (up.error) { console.error(`[news] image upload error: ${up.error.message}`); return res.status(500).json({ ok: false, error: 'upload' }); }
       const { data: pub } = sb.storage.from('news').getPublicUrl(name);
       return res.status(200).json({ ok: true, url: pub.publicUrl });
     }

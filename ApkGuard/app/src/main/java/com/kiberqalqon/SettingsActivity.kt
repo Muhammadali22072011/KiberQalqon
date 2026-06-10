@@ -1,6 +1,7 @@
 package com.kiberqalqon
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -103,6 +104,10 @@ class SettingsActivity : AppCompatActivity() {
         binding.rowAbout.root.findViewById<TextView>(R.id.tvChevronTitle).text = getString(R.string.about_title)
         binding.rowHelp.root.findViewById<TextView>(R.id.tvChevronTitle).text = getString(R.string.set_help_center)
         binding.rowPrivacy.root.findViewById<TextView>(R.id.tvChevronTitle).text = getString(R.string.privacy_title)
+        // UX-03: flagman ekranlarga kirish.
+        binding.rowHiddenThreats.root.findViewById<TextView>(R.id.tvChevronTitle).text = "Yashirin tahdidlar skaneri"
+        binding.rowTelegram.root.findViewById<TextView>(R.id.tvChevronTitle).text = "Telegram bildirishnomalari"
+        binding.rowProtectionStatus.root.findViewById<TextView>(R.id.tvChevronTitle).text = "Himoya holati va ruxsatlar"
     }
 
     /** Snapshots current Config values into the UI. */
@@ -152,6 +157,20 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowAutoScan.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
             Config.setBackgroundEnabled(this, on)
+            // BG-02: tumbler endi xizmatni HAQIQATAN boshqaradi. Avval faqat Config'ga yozib qo'yardi —
+            // "o'chirdim" deganда ProtectionService va doimiy bildirishnoma turaverardi, "yoqdim" deganда
+            // esa xizmat ishga tushmasdi (real-time himoya qaytmas edi). Endi: yoqilsa start, o'chsa stop.
+            if (on) {
+                ProtectionService.start(this)
+            } else {
+                ProtectionService.stop(this)
+                // Doimiy "faol" bildirishnomasini darhol olib tashlaymiz (xizmat to'xtagach foreground
+                // bildirishnoma odatda o'chadi, lekin refresh() bilan qo'yilgan nusxa qolmasligi uchun).
+                try {
+                    (getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager)
+                        .cancel(ProtectionService.NOTIFICATION_ID)
+                } catch (_: Throwable) {}
+            }
             toastSaved()
         }
         toggleOf(binding.rowAutoDelete.root).setOnCheckedChangeListener { _, on ->
@@ -215,6 +234,16 @@ class SettingsActivity : AppCompatActivity() {
         binding.rowAbout.root.setOnClickListener { showAboutDialog() }
         binding.rowHelp.root.setOnClickListener { showHelpDialog() }
         binding.rowPrivacy.root.setOnClickListener { ConsentActivity.openForReview(this) }
+        // UX-03: flagman ekranlar endi Sozlamalardan ochiladi (avval faqat sploshdagi maxfiy long-press).
+        binding.rowHiddenThreats.root.setOnClickListener {
+            startActivity(Intent(this, HiddenThreatsActivity::class.java))
+        }
+        binding.rowTelegram.root.setOnClickListener {
+            startActivity(Intent(this, TelemetrySettingsActivity::class.java))
+        }
+        binding.rowProtectionStatus.root.setOnClickListener {
+            startActivity(Intent(this, ProtectionStatusActivity::class.java))
+        }
     }
 
     private fun setAccentAndReload(variant: String) {

@@ -17,7 +17,10 @@ import { createHmac } from 'crypto';
  * Kalit faqat serverda (Vercel ENV) + mijoz APK'sida Shield shifrida (RemoteConfig verify).
  */
 const CONFIG = {
-  v: 1,
+  // Monotonik versiya — mijozdagi rollback-guard (remoteV < KEY_V) ishlashi uchun. Avval
+  // qattiq `1` edi → `1 < 1` hech qachon true bo'lmasdi (anti-rollback o'lik). Chegaralarni
+  // o'zgartirganda Vercel ENV'da CONFIG_VERSION'ni oshiring (redeploy) — eski (replay) config past v bilan rad etiladi.
+  v: Number(process.env.CONFIG_VERSION) || 1,
   thresholds: {
     high: { danger: 55, suspicious: 28 },
     medium: { danger: 85, suspicious: 40 },

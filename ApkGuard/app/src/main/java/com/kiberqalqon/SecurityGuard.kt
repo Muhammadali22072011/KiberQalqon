@@ -176,12 +176,18 @@ object SecurityGuard {
     // ============================================================
 
     private fun isRooted(): Boolean {
+        // SD-03/SD-04: checkBootProps() OLIB TASHLANDI. U razlochilangan bootloader
+        // (ro.boot.flash.locked=0), verifiedbootstate=orange (har qanday kastom-ROM uchun ШТАТНЫЙ
+        // holat), ro.debuggable=1, veritymode=logging kabi ZAIF belgilarni root deb sanardi va
+        // bularsiz ham root BO'LMAGAN legit qurilmalarni (O'zbek bozoridagi arzon/инженер proshivkalar)
+        // jim o'ldirardi. Bundan tashqari har bir tekshiruv main-thread'da getprop'ni ProcessBuilder
+        // bilan fork qilardi (cold-start ANR riski). Endi root faqat ISHONCHLI to'g'ridan-to'g'ri
+        // marker bilan aniqlanadi: su binar, root-app, cloaker, Magisk fayllari/tmpfs-mount.
         return checkSuBinary() ||
                 checkRootApps() ||
                 checkRootCloakers() ||
                 checkMagiskFiles() ||
-                checkMagiskAdvanced() ||
-                checkBootProps()
+                checkMagiskAdvanced()
     }
 
     /**
@@ -254,6 +260,9 @@ object SecurityGuard {
      * Эти проверки делаются через `getprop` system-команду; на современных API
      * можно через android.os.SystemProperties (hidden API, требует рефлексию).
      */
+    // SD-03: endi isRooted() kill-yo'lida ISHLATILMAYDI (zaif indikatorlar legit kastom-ROM'ларни
+    // false-root qilardi). Advisory sifatida saqlanadi (kelajakda diagnostika uchun).
+    @Suppress("unused")
     private fun checkBootProps(): Boolean {
         val redFlags = mapOf(
             "ro.boot.flash.locked" to "0",

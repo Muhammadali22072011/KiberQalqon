@@ -251,6 +251,10 @@ class SplashActivity : AppCompatActivity() {
             return
         }
         if (!isFinishing && !isDestroyed) {
+            // Foydalanuvchi "Barcha fayllarga ruxsat" ekranidan ruxsat berib qaytgan bo'lishi mumkin —
+            // shu paytda himoyani yoqamiz va birinchi marta "Himoyangiz yoqildi" chiqaramiz (ruxsatdan
+            // OLDIN emas — endi haqiqiy). Ruxsat hali yo'q bo'lsa activateIfReady no-op.
+            try { ProtectionActivator.activateIfReady(this) } catch (_: Throwable) {}
             try {
                 checkPermissions()
             } catch (e: Throwable) {

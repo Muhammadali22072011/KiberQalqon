@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>KiberQalqon — 5 slaydli taqdimot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg0:#070d11; --bg1:#0f1820; --navy:#0b1014;
+  --ink:#eff6f7; --ink2:#9fb2bb; --ink3:#6c7e88;
+  --teal:#5bcbd3; --teal2:#2d9cb8; --teal-deep:#1f7b92;
+  --saffron:#e0a040; --gold:#cc9442;
+  --danger:#e25a4a; --danger2:#d74536;
+  --safe:#5bcb8a;
+  --hair:rgba(255,255,255,.10); --hair2:rgba(255,255,255,.18);
+  --panel:rgba(255,255,255,.045); --panel2:rgba(255,255,255,.07);
+  --fd:"Space Grotesk","Inter",system-ui,sans-serif;
+  --fb:"Manrope","Inter",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#04080b;overflow:hidden;font-family:var(--fb);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse at 22% 18%, rgba(45,156,184,.22), transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(224,160,64,.12), transparent 55%),
+    var(--bg0);}
+.stage{position:relative;width:1280px;height:720px;transform-origin:center center;
+  background:linear-gradient(165deg,var(--bg1) 0%, var(--navy) 100%);
+  border-radius:18px;overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05) inset;}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 8 L48 32 L72 40 L48 48 L40 72 L32 48 L8 40 L32 32 Z' fill='none' stroke='%235bcbd3' stroke-width='1' opacity='.10'/%3E%3Ccircle cx='0' cy='0' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='80' cy='0' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='0' cy='80' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='80' cy='80' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3C/svg%3E");
+  background-size:80px 80px;}
+.slide{position:absolute;inset:0;padding:56px 70px;opacity:0;visibility:hidden;
+  transition:opacity .5s ease;display:flex;flex-direction:column;}
+.slide.active{opacity:1;visibility:visible;}
+[data-anim]{opacity:0;transform:translateY(20px)}
+.slide.active [data-anim]{animation:rise .62s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+@keyframes rise{to{opacity:1;transform:none}}
+.slide.active [data-anim="fade"]{animation-name:fade}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.slide.active [data-anim="zoom"]{animation-name:zoomin}
+@keyframes zoomin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.slide.active [data-anim="right"]{animation-name:fromright}
+@keyframes fromright{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.eyebrow{font:600 13px/1 var(--fm);letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:inline-flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--teal);border-radius:2px}
+h1{font:700 88px/1.02 var(--fd);letter-spacing:-.03em}
+h2{font:700 46px/1.07 var(--fd);letter-spacing:-.02em;margin-top:12px}
+.sub{font:400 19px/1.5 var(--fb);color:var(--ink2);margin-top:14px;max-width:800px}
+.mono{font-family:var(--fm)}
+b,strong{color:#fff;font-weight:700}
+.teal{color:var(--teal)} .saf{color:var(--saffron)} .dgr{color:var(--danger)}
+.gl{font:400 14px/1.2 var(--fb);color:var(--ink3);letter-spacing:0}
+.row{display:flex;gap:30px}
+.grow{flex:1;min-width:0}
+.center{align-items:center}
+.fill{flex:1;display:flex;flex-direction:column;justify-content:center}
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:18px;padding:20px 22px;backdrop-filter:blur(4px)}
+.card .ct{font:700 18px/1.2 var(--fd);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.card .cd{font:400 14px/1.5 var(--fb);color:var(--ink2)}
+.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(91,203,211,.14);color:var(--teal);flex:none}
+.ic.s{background:rgba(224,160,64,.16);color:var(--saffron)}
+.ic.g{background:rgba(91,203,138,.16);color:var(--safe)}
+.stat{background:var(--panel);border:1px solid var(--hair);border-radius:16px;padding:18px 20px}
+.stat .n{font:700 40px/1 var(--fd);letter-spacing:-.02em}
+.stat .l{font:600 12px/1.3 var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
+.phone{width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 26px 50px rgba(0,0,0,.55))}
+.phone-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.phone-wrap::before{content:"";position:absolute;width:74%;height:60%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(91,203,211,.30),transparent);filter:blur(20px);z-index:0}
+.phone-wrap img{position:relative;z-index:1}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.pill{font:600 13px/1 var(--fm);letter-spacing:.04em;padding:9px 13px;border-radius:999px;border:1px solid var(--hair2);color:var(--ink2);background:rgba(255,255,255,.03)}
+.pill.t{border-color:rgba(91,203,211,.4);color:var(--teal);background:rgba(91,203,211,.08)}
+.pill.d{border-color:rgba(226,90,74,.4);color:#ff9082;background:rgba(226,90,74,.10)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpis{display:grid;gap:14px}
+.lead{font:500 17px/1.55 var(--fb);color:var(--ink2)}
+.tick{color:var(--teal);font-weight:700;margin-right:8px}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:13px}
+ul.clean li{font:500 17px/1.4 var(--fb);display:flex;gap:12px;align-items:flex-start}
+ul.clean li .tick{font-size:19px;line-height:1.3}
+.bar{height:13px;border-radius:7px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar > i{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,var(--teal),var(--teal-deep))}
+.bar.s > i{background:linear-gradient(90deg,var(--saffron),var(--gold))}
+.bar.g > i{background:linear-gradient(90deg,var(--safe),#3a9e6b)}
+.scanwrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:18px}
+.scanline{position:absolute;left:0;right:0;height:2px;top:-10%;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+  box-shadow:0 0 24px var(--teal);animation:sweep 6s linear infinite;opacity:.5}
+@keyframes sweep{0%{top:-5%}100%{top:105%}}
+.brandline{position:absolute;left:70px;bottom:30px;display:flex;align-items:center;gap:10px;font:600 12px/1 var(--fm);letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+.brandline img{width:22px;height:22px;border-radius:6px}
+.bar-prog{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--saffron));z-index:50;transition:width .4s ease}
+.counter{position:fixed;right:18px;bottom:14px;z-index:50;font:600 13px/1 var(--fm);color:var(--ink3);letter-spacing:.1em}
+.dots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;gap:7px}
+.dots b{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:.2s}
+.dots b.on{background:var(--teal);width:22px;border-radius:5px}
+.nav{position:fixed;bottom:12px;z-index:50;display:flex;gap:8px;left:18px}
+.nav button{width:34px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:rgba(255,255,255,.05);color:var(--ink2);cursor:pointer;font-size:15px}
+.nav button:hover{color:var(--teal);border-color:var(--teal)}
+.hint{position:fixed;right:18px;top:14px;z-index:50;font:500 12px/1 var(--fm);color:var(--ink3);letter-spacing:.05em}
+.cover{justify-content:center;align-items:flex-start}
+.cover .logo{width:108px;height:108px;border-radius:26px;box-shadow:0 18px 50px rgba(91,203,211,.3);margin-bottom:22px}
+.badgeRow{display:flex;gap:10px;margin-top:24px}
+.badge{font:600 13px/1 var(--fm);letter-spacing:.08em;padding:11px 16px;border-radius:999px;border:1px solid var(--hair2);color:var(--ink2);text-transform:uppercase}
+.badge.t{border-color:rgba(91,203,211,.45);color:var(--teal)}
+.price{font:700 30px/1 var(--fd);color:var(--ink);letter-spacing:-.02em}
+.price small{font:600 13px/1 var(--fm);color:var(--ink3);letter-spacing:.04em}
+.tag{display:inline-block;font:600 11px/1 var(--fm);letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:7px;margin-left:auto}
+.tag.b2b{background:rgba(91,203,211,.14);color:var(--teal)}
+.tag.b2c{background:rgba(224,160,64,.16);color:var(--saffron)}
+.tag.b2g{background:rgba(91,203,138,.16);color:var(--safe)}
+</style>
+</head>
+<body>
+<div class="bar-prog" id="prog"></div>
+<div class="hint">← / → · bo'sh joy</div>
+<div class="nav"><button id="bPrev">‹</button><button id="bNext">›</button></div>
+<div class="dots" id="dots"></div>
+<div class="counter" id="counter">01 / 05</div>
+
+<div class="deck">
+<div class="stage" id="stage">
+
+<!-- 1 · NIMA (cover + what it is + problem hook) -->
+<section class="slide cover">
+  <div class="scanwrap"><div class="scanline"></div></div>
+  <img class="logo" src="assets/logo.png" alt="KiberQalqon" data-anim="zoom" style="--d:.05s"/>
+  <div class="eyebrow" data-anim style="--d:.15s">KiberQalqon · 2026</div>
+  <h1 data-anim style="--d:.22s">KiberQalqon</h1>
+  <div class="sub" style="font-size:23px;color:var(--ink);max-width:880px" data-anim style="--d:.34s">
+    O'zbekiston uchun <b>mobil antivirus</b> — Telegram orqali tarqaladigan <b>bank troyanlaridan</b> telefonning o'zida, internetsiz himoya qiluvchi qalqon.</div>
+  <div class="row" style="margin-top:26px;gap:14px;width:100%">
+    <div class="stat grow" data-anim="zoom" style="--d:.46s"><div class="n dgr">5</div><div class="l">real troyan tahlil qilingan</div></div>
+    <div class="stat grow" data-anim="zoom" style="--d:.54s"><div class="n teal">v7.9</div><div class="l">ishlaydigan ilova</div></div>
+    <div class="stat grow" data-anim="zoom" style="--d:.62s"><div class="n saf">9</div><div class="l">qatlamli tekshiruv</div></div>
+    <div class="stat grow" data-anim="zoom" style="--d:.7s"><div class="n">~30<span style="font-size:18px"> mln</span></div><div class="l">xavf ostidagi smartfon</div></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>KiberQalqon · Muhammadali · Navoiy</div>
+</section>
+
+<!-- 2 · MAHSULOT (how it works) -->
+<section class="slide">
+  <div class="row grow center" style="gap:48px">
+    <div class="fill grow">
+      <div class="eyebrow" data-anim>Mahsulot · qanday ishlaydi</div>
+      <h2 data-anim style="--d:.08s">Faylni o'rnatishdan <span class="teal">oldin</span> ushlaydi</h2>
+      <div class="sub" data-anim style="--d:.16s">Firibgarlar «rasm» yoki «to'y taklifnomasi» niqobida <span class="mono dgr">.apk</span> yuboradi. KiberQalqon uni darhol, telefonda tekshiradi — bank kodlaringiz o'g'irlanmasdan oldin.</div>
+      <ul class="clean" style="margin-top:18px">
+        <li data-anim style="--d:.26s"><span class="tick">✓</span><div><b>Real vaqtda kuzatuv</b> — yangi APK tushishi bilanoq tekshiradi.</div></li>
+        <li data-anim style="--d:.33s"><span class="tick">✓</span><div><b>9 qatlamli dvigatel</b> — hash, imzo, ruxsat, kod naqshi, C2, native kod.</div></li>
+        <li data-anim style="--d:.4s"><span class="tick">✓</span><div><b>Internetsiz, on-device</b> — fayllar bulutga yuborilmaydi <span class="gl">(maxfiylik)</span>.</div></li>
+        <li data-anim style="--d:.47s"><span class="tick">✓</span><div><b>Hech qachon noto'g'ri «XAVFSIZ» demaydi</b> — shubha bo'lsa = SHUBHALI.</div></li>
+      </ul>
+      <div class="chips" style="margin-top:18px">
+        <span class="pill d" data-anim style="--d:.54s">🔴 XAVFLI — bloklanadi</span>
+        <span class="pill" data-anim style="--d:.6s;border-color:rgba(224,160,64,.4);color:var(--saffron)">🟡 SHUBHALI</span>
+        <span class="pill t" data-anim style="--d:.66s">🟢 XAVFSIZ</span>
+      </div>
+    </div>
+    <div class="phone-wrap" data-anim="right" style="height:580px;flex:none;--d:.3s">
+      <img class="phone" src="assets/screen-alert-result.png" alt="Xavf aniqlandi" style="height:580px"/>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Mahsulot</div>
+</section>
+
+<!-- 3 · BOZOR (market) -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Bozor · nega aynan hozir</div>
+  <h2 data-anim style="--d:.08s">Katta bozor, o'sayotgan tahdid</h2>
+  <div class="grid4" style="margin-top:26px">
+    <div class="stat" data-anim="zoom" style="--d:.16s"><div class="n">~37<span style="font-size:20px"> mln</span></div><div class="l">aholi</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.24s"><div class="n teal">~30<span style="font-size:20px"> mln</span></div><div class="l">smartfon foydalanuvchi</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.32s"><div class="n saf">#1</div><div class="l">Telegram — messenjer</div></div>
+    <div class="stat" data-anim="zoom" style="--d:.4s"><div class="n dgr">↑↑</div><div class="l">troyan kampaniyalari o'smoqda</div></div>
+  </div>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card" data-anim style="--d:.5s"><div class="ct teal" style="font-size:15px">TAM <span class="gl">· umumiy</span></div><div class="cd"><b>Markaziy Osiyo</b> — mobil xavfsizlik, ~80 mln Android qurilma.</div></div>
+    <div class="card" data-anim style="--d:.58s"><div class="ct teal" style="font-size:15px">SAM <span class="gl">· erishsa bo'ladigan</span></div><div class="cd"><b>O'zbekiston</b> — mobil banking + sideload riski yuqori foydalanuvchilar.</div></div>
+    <div class="card" data-anim style="--d:.66s"><div class="ct teal" style="font-size:15px">SOM <span class="gl">· 3 yil</span></div><div class="cd"><b>1–2 mln</b> faol foydalanuvchi + bank/telekom <b>B2B</b> shartnomalari.</div></div>
+  </div>
+  <div class="lead" data-anim style="--d:.74s;margin-top:16px;text-align:center">Global antiviruslar mahalliy tahdidga tayyor emas — <b class="teal">biz aynan shu yerda yutamiz.</b></div>
+  <div class="brandline"><img src="assets/logo.png"/>Bozor</div>
+</section>
+
+<!-- 4 · QANDAY DAROMAD (how we make money) -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Daromad modeli · qanday pul ishlaymiz</div>
+  <h2 data-anim style="--d:.08s">4 ta daromad oqimi</h2>
+  <div class="grid2" style="margin-top:20px;gap:16px">
+    <div class="card" data-anim style="--d:.16s">
+      <div class="ct"><span class="ic s">⭐</span>Pro obuna <span class="tag b2c">B2C</span></div>
+      <div class="cd">Bulutli skaner, cheksiz tekshiruv, reklamasiz, ustuvor yangilanish.</div>
+      <div class="price" style="margin-top:10px">30 000 so'm <small>/ $2.99 bir martalik</small></div>
+      <div class="cd" style="margin-top:4px">yoki obuna <b>$0.99/oy · $9.99/yil</b></div>
+    </div>
+    <div class="card" data-anim style="--d:.24s">
+      <div class="ct"><span class="ic">🏦</span>Banklar & telekom <span class="tag b2b">B2B</span></div>
+      <div class="cd">Bank ilovasiga integratsiya / litsenziya — firibgarlikdan yo'qotishni kamaytiradi. Telekom paketiga qo'shish <span class="gl">(bundling)</span>.</div>
+      <div class="price" style="margin-top:10px">yillik litsenziya <small>/ foydalanuvchiga</small></div>
+    </div>
+    <div class="card" data-anim style="--d:.32s">
+      <div class="ct"><span class="ic g">🏛️</span>Davlat <span class="tag b2g">B2G</span></div>
+      <div class="cd">Kiberxavfsizlik idoralari uchun tahdid ma'lumotlari <span class="gl">(threat-intel)</span> va ommaviy himoya dasturlari.</div>
+      <div class="price" style="margin-top:10px">shartnoma <small>/ loyiha asosida</small></div>
+    </div>
+    <div class="card" data-anim style="--d:.4s">
+      <div class="ct"><span class="ic">🆓</span>Bepul + reklama <span class="tag b2c">B2C</span></div>
+      <div class="cd">Asosiy himoya bepul — ommaviy qamrov va ishonch uchun. Reklama qo'shimcha daromad beradi.</div>
+      <div class="price" style="margin-top:10px">ommaviy qamrov <small>/ konversiya kanali</small></div>
+    </div>
+  </div>
+  <div class="card" data-anim="fade" style="--d:.5s;margin-top:16px">
+    <div class="cd" style="margin-bottom:10px;color:var(--ink)">Daromad tarkibi <span class="gl">(maqsadli · 3-yil)</span></div>
+    <div class="row center" style="gap:14px"><div style="width:130px;font:600 13px/1 var(--fm);color:var(--ink2)">Pro obuna</div><div class="bar s grow"><i style="width:45%"></i></div><div class="mono" style="width:44px">45%</div></div>
+    <div class="row center" style="gap:14px;margin-top:8px"><div style="width:130px;font:600 13px/1 var(--fm);color:var(--ink2)">B2B / B2G</div><div class="bar grow"><i style="width:40%"></i></div><div class="mono" style="width:44px">40%</div></div>
+    <div class="row center" style="gap:14px;margin-top:8px"><div style="width:130px;font:600 13px/1 var(--fm);color:var(--ink2)">Reklama</div><div class="bar g grow"><i style="width:15%"></i></div><div class="mono" style="width:44px">15%</div></div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Daromad modeli</div>
+</section>
+
+<!-- 5 · INVESTITSIYA + NEGA BIZ -->
+<section class="slide">
+  <div class="scanwrap"><div class="scanline"></div></div>
+  <div class="eyebrow" data-anim>Investitsiya · keling birga miqyoslaymiz</div>
+  <h2 data-anim style="--d:.08s">Mahsulot tayyor — endi o'sish</h2>
+  <div class="row grow" style="margin-top:22px;gap:26px">
+    <div class="grow">
+      <div class="grid3" style="gap:14px">
+        <div class="card" data-anim style="--d:.16s"><div class="ct" style="font-size:16px"><span class="ic">📍</span>Mahalliy</div><div class="cd">Faqat O'zbekiston troyanlari bazasi.</div></div>
+        <div class="card" data-anim style="--d:.22s"><div class="ct" style="font-size:16px"><span class="ic">🔐</span>Maxfiylik</div><div class="cd">On-device — fayl bulutga ketmaydi.</div></div>
+        <div class="card" data-anim style="--d:.28s"><div class="ct" style="font-size:16px"><span class="ic">🔬</span>Real RE</div><div class="cd">Detektorlar haqiqiy namunalardan.</div></div>
+      </div>
+      <div class="card" data-anim="fade" style="--d:.36s;margin-top:14px">
+        <div class="cd" style="margin-bottom:12px;color:var(--ink)">Mablag'dan foydalanish</div>
+        <div class="row center" style="gap:14px"><div style="width:200px;font:600 13px/1 var(--fm);color:var(--ink2)">Play'da chiqarish + marketing</div><div class="bar grow"><i style="width:35%"></i></div><div class="mono" style="width:44px">35%</div></div>
+        <div class="row center" style="gap:14px;margin-top:8px"><div style="width:200px;font:600 13px/1 var(--fm);color:var(--ink2)">Bulut & xavfsizlik</div><div class="bar grow"><i style="width:25%"></i></div><div class="mono" style="width:44px">25%</div></div>
+        <div class="row center" style="gap:14px;margin-top:8px"><div style="width:200px;font:600 13px/1 var(--fm);color:var(--ink2)">Tahdid tahlili jamoasi</div><div class="bar s grow"><i style="width:25%"></i></div><div class="mono" style="width:44px">25%</div></div>
+        <div class="row center" style="gap:14px;margin-top:8px"><div style="width:200px;font:600 13px/1 var(--fm);color:var(--ink2)">Bank pilotlari</div><div class="bar s grow"><i style="width:15%"></i></div><div class="mono" style="width:44px">15%</div></div>
+      </div>
+    </div>
+    <div style="width:340px;flex:none;display:flex;flex-direction:column;gap:14px">
+      <div class="card" data-anim="right" style="--d:.4s;text-align:center;background:rgba(91,203,211,.08);border-color:rgba(91,203,211,.3)">
+        <div class="cd" style="color:var(--ink2)">So'rov · seed sarmoya</div>
+        <div style="font:700 46px/1 var(--fd);margin-top:6px" class="teal">$200 000</div>
+        <div class="cd" style="margin-top:8px">Navoiyda pilot → birinchi 10k foydalanuvchi → Play chiqishi.</div>
+      </div>
+      <div class="card" data-anim="right" style="--d:.5s;text-align:center">
+        <img src="assets/logo.png" style="width:60px;height:60px;border-radius:15px;margin:2px auto 10px"/>
+        <div style="font:700 20px/1.1 var(--fd)">Muhammadali</div>
+        <div class="cd" style="margin-top:4px">Asoschi · Navoiy · RE · Android · backend</div>
+      </div>
+    </div>
+  </div>
+  <div class="lead" data-anim="fade" style="--d:.62s;margin-top:14px;text-align:center;color:var(--teal);font:700 22px/1.2 var(--fd)">Keling, O'zbekistonni himoya qilamiz.</div>
+  <div class="brandline"><img src="assets/logo.png"/>KiberQalqon · Rahmat!</div>
+</section>
+
+</div><!-- /stage -->
+</div><!-- /deck -->
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const stage=document.getElementById('stage');
+const prog=document.getElementById('prog');
+const counter=document.getElementById('counter');
+const dotsWrap=document.getElementById('dots');
+let i=0;
+slides.forEach((_,n)=>{const b=document.createElement('b');b.onclick=()=>go(n);dotsWrap.appendChild(b);});
+const dots=[...dotsWrap.children];
+const pad=n=>String(n).padStart(2,'0');
+function go(n){
+  i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+  prog.style.width=((i+1)/slides.length*100)+'%';
+  counter.textContent=pad(i+1)+' / '+pad(slides.length);
+}
+function next(){go(i+1)} function prev(){go(i-1)}
+document.getElementById('bNext').onclick=next;
+document.getElementById('bPrev').onclick=prev;
+addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next();}
+  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev();}
+  else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(slides.length-1)}
+});
+stage.addEventListener('click',e=>{
+  if(e.target.closest('a,button')) return;
+  const r=stage.getBoundingClientRect();
+  (e.clientX-r.left < r.width*0.32)?prev():next();
+});
+function fit(){
+  const m=0.965;
+  const s=Math.min(innerWidth/1280, innerHeight/720)*m;
+  stage.style.transform='scale('+s+')';
+}
+addEventListener('resize',fit); fit();
+var _h=parseInt((location.hash||'').slice(1),10); go(_h>0?_h-1:0);
+addEventListener('hashchange',()=>{var h=parseInt((location.hash||'').slice(1),10);if(h>0)go(h-1);});
+</script>
+</body>
+</html>

@@ -102,9 +102,12 @@ class NotificationAccessWatcher(
         /** Bir martalik DARHOL tekshiruv (paket o'rnatilganda / ekran ochilganda). */
         fun checkNow(ctx: Context) {
             try {
+                // AccessibilityWatcher kabi APPEND_OR_REPLACE: "paket o'rnatildi" + ketма-ket
+                // "bildirishnoma ruxsati berildi" ikki yaqin ivent kelganda, KEEP ikkinchisini
+                // tashlab yuborardi (OTP-stiler faqat 4 soatlik periodikда ushlanardi).
                 val req = OneTimeWorkRequestBuilder<NotificationAccessWatcher>().build()
                 WorkManager.getInstance(ctx).enqueueUniqueWork(
-                    WORK_NOW, ExistingWorkPolicy.KEEP, req
+                    WORK_NOW, ExistingWorkPolicy.APPEND_OR_REPLACE, req
                 )
             } catch (e: Throwable) {
                 Log.w(TAG, "checkNow failed", e)

@@ -49,10 +49,16 @@ export default function Landing() {
   const [pub, setPub] = useState<PubStats | null>(null);
 
   useEffect(() => {
+    // Ochiq sahifa — xato bo'lsa bir necha bor qayta urinamiz (oldin "statik raqamlar"
+    // deb yozilgan edi, lekin kodda statik son yo'q — barcha hero raqamlar abadiy "—" qolardi).
     let alive = true;
-    apiGet<{ pub: PubStats }>('/api/stats?public=1')
-      .then((r) => { if (alive) setPub(r.pub); })
-      .catch(() => { /* ochiq sahifa — xato bo'lsa statik raqamlar ko'rinadi */ });
+    let tries = 0;
+    const attempt = () => {
+      apiGet<{ pub: PubStats }>('/api/stats?public=1')
+        .then((r) => { if (alive) setPub(r.pub); })
+        .catch(() => { if (alive && tries++ < 3) window.setTimeout(attempt, 2000); });
+    };
+    attempt();
     return () => { alive = false; };
   }, []);
 

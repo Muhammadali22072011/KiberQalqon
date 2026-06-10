@@ -23,8 +23,10 @@ class ScreenUnlockReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
-        if (intent.action != Intent.ACTION_USER_PRESENT &&
-            intent.action != Intent.ACTION_SCREEN_ON) return
+        // BG-03/perf: faqat ACTION_USER_PRESENT (haqiqiy qulfdan chiqish). Avval ACTION_SCREEN_ON
+        // ham tutilardi — ekran bildirishnomadan yonganda ham (foydalanuvchi tegmasa ham) har gal
+        // 10s'gacha disk skani yurardi (kuniga 50-150 marta), bu anti-qizish fiksini yeb qo'yardi.
+        if (intent.action != Intent.ACTION_USER_PRESENT) return
 
         // Avval Config tekshiruv — foydalanuvchi background himoyani o'chirgan bo'lsa skipping.
         try {
@@ -33,11 +35,23 @@ class ScreenUnlockReceiver : BroadcastReceiver() {
             // Config o'qib bo'lmasa ham davom etamiz
         }
 
-        Log.d(TAG, "User present / screen on — running one-shot scan")
+        // Troттling: unlock skanlar orasida kamida MIN_INTERVAL. Tez-tez yoqib-o'chirilganda
+        // (yoki tez qulflab-ochilganda) takroriy og'ir storage-walk'ni oldini olamiz.
         try {
-            // #35: ACTION_SCREEN_ON qulflangan ekranda ham (USER_PRESENT'dan tashqari) har
-            // gal o'qlanadi — enqueueUniqueWork(KEEP) bilan birlashtiramiz, shunda tez-tez
-            // yoqib-o'chirilganda takroriy to'liq skanlar yig'ilib ketmaydi.
+            val sp = context.getSharedPreferences("kiberqalqon_lifecycle", Context.MODE_PRIVATE)
+            val last = sp.getLong("last_unlock_scan", 0L)
+            val now = System.currentTimeMillis()
+            if (now - last < MIN_SCAN_INTERVAL_MS) {
+                Log.d(TAG, "Unlock scan throttled (${(now - last) / 1000}s < ${MIN_SCAN_INTERVAL_MS / 1000}s)")
+                return
+            }
+            sp.edit().putLong("last_unlock_scan", now).apply()
+        } catch (_: Throwable) {
+            // Prefs o'qib bo'lmasa ham davom etamiz
+        }
+
+        Log.d(TAG, "User present — running one-shot scan")
+        try {
             val request = OneTimeWorkRequestBuilder<GuardWorker>().build()
             WorkManager.getInstance(context.applicationContext)
                 .enqueueUniqueWork("screen_unlock_scan", ExistingWorkPolicy.KEEP, request)
@@ -52,5 +66,8 @@ class ScreenUnlockReceiver : BroadcastReceiver() {
 
     companion object {
         private const val TAG = "ScreenUnlockReceiver"
+        // Unlock skanlar orasidagi eng kichik interval (10 daqiqa) — fast-loop + 15 daq full-sweep
+        // baribir qoplaydi, shu sabab har unlock'da skan shart emas.
+        private const val MIN_SCAN_INTERVAL_MS = 10 * 60 * 1000L
     }
 }

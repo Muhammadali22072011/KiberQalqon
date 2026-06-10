@@ -24,6 +24,11 @@ SELF_PREFIXES = ("kiberqalqon", "apkguard")
 # Защита от zip-bomb: суммарный распакованный размер и одиночный файл.
 MAX_TOTAL_UNPACKED = 500 * 1024 * 1024  # 500 MB суммарно
 MAX_SINGLE_FILE = 100 * 1024 * 1024     # 100 MB на файл
+# PY-02: лимит на КОЛИЧЕСТВО записей и глубину пути. Размерные лимиты НЕ срабатывают для
+# архива с миллионами 0-байтных entry (total_written почти не растёт) — это исчерпывало бы inode
+# и переполняло каталог. Нормальный APK имеет тысячи записей, не миллионы.
+MAX_ENTRIES = 20000
+MAX_PATH_SEGMENTS = 16
 
 # Опасные разрешения Android (Dangerous / Signature-level)
 DANGEROUS_PERMISSIONS = {
@@ -94,6 +99,9 @@ def _safe_target(out_dir: Path, name: str):
     safe_name = _sanitize(name)
     if not safe_name:
         return None
+    # PY-02: juda chuqur/uzun yo'l (a/a/.../a) — rad etamiz (OSError / FS bosimini oldini olamiz).
+    if safe_name.count("/") + 1 > MAX_PATH_SEGMENTS or len(safe_name) > 1024:
+        return None
     candidate = (out_dir / safe_name).resolve()
     try:
         candidate.relative_to(base)
@@ -122,7 +130,14 @@ def extract_apk(apk_path):
         return {"written": 0, "skipped": 0, "encrypted_flag": 0,
                 "read_errors": 1, "has_manifest": False, "open_failed": True}
     with zf as z:
+        entries = 0
         for info in z.infolist():
+            # PY-02: слишком много записей → zip-bomb (миллионы 0-байтных файлов). Прерываем.
+            entries += 1
+            if entries > MAX_ENTRIES:
+                print(f"  [stop] слишком много записей в архиве (> {MAX_ENTRIES}) — возможна zip-bomb")
+                read_errors += 1
+                break
             # ZIP GP-bit-0 «шифрование» — ГОЛОВНАЯ эвазия семейства (Ajina.Banker / TAKLIFNOMA):
             # бит выставлен, но данные НЕ зашифрованы. Android ставит APK как обычно, а
             # zipfile/большинство AV отказываются читать «password-protected» запись → 0 файлов →
@@ -146,11 +161,17 @@ def extract_apk(apk_path):
                 skipped += 1
                 continue
 
-            if info.is_dir():
-                target.mkdir(parents=True, exist_ok=True)
+            # PY-02: mkdir'larни try ichida — anormal/uzun yo'lда OSError butun tahlilни yiqitmasin.
+            try:
+                if info.is_dir():
+                    target.mkdir(parents=True, exist_ok=True)
+                    continue
+                target.parent.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
+                print(f"  [skip] mkdir {info.filename}: {e}")
+                skipped += 1
                 continue
 
-            target.parent.mkdir(parents=True, exist_ok=True)
             try:
                 with z.open(info) as src, open(target, "wb") as dst:
                     remaining = info.file_size

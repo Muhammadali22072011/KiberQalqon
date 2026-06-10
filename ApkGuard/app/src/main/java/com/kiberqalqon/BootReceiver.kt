@@ -17,11 +17,16 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
+        // BG-01: MY_PACKAGE_REPLACED (ilova yangilangach) ham shu yerda — bu broadcast fon'dan
+        // foreground-service start cheklovidan ISTISNO, shuning uchun yangilanishdan keyin real-time
+        // himoyani ishonchli qaytaradi (App.onCreate fon'dan startForegroundService chaqirsa Android
+        // 12+ da rad etardi va himoya ilova qo'lда ochilmaguncha o'lik qolardi).
         if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_MY_PACKAGE_REPLACED &&
             intent.action != "android.intent.action.QUICKBOOT_POWERON" &&
             intent.action != "com.htc.intent.action.QUICKBOOT_POWERON") return
 
-        Log.d(TAG, "Boot completed")
+        Log.d(TAG, "Boot/package-replaced: ${intent.action}")
         val app = context.applicationContext
         try {
             TelemetryReporter.reportBootCompleted(app)

@@ -13,7 +13,7 @@ const LEVEL_UZ: Record<string, string> = {
 // Slaydga bosilsa — to‘liq matn + rasm modalda ochiladi, u yerda hamma
 // e‘lonlarni varaqlash mumkin (‹ › yoki ←/→, nuqtalar bo‘ylab).
 export default function NewsCarousel() {
-  const { data, loading } = usePoll(() => apiGet<{ news: NewsItem[] }>('/api/news'), 30000);
+  const { data, loading, error } = usePoll(() => apiGet<{ news: NewsItem[] }>('/api/news'), 30000);
   const items = useMemo(() => (data?.news || []).slice(0, 10), [data]);
   const len = items.length;
 
@@ -64,6 +64,8 @@ export default function NewsCarousel() {
 
       {loading && !len ? (
         <Spinner label="Yuklanmoqda…" />
+      ) : error && !len ? (
+        <Empty>E‘lonlarni yuklab bo‘lmadi — qayta urinilmoqda…</Empty>
       ) : !len ? (
         <Empty>Hali e‘lon yo‘q</Empty>
       ) : (

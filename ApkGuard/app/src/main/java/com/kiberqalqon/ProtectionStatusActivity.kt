@@ -377,6 +377,9 @@ class ProtectionStatusActivity : AppCompatActivity() {
 
     private fun proceed(ack: Boolean) {
         if (ack) try { Config.setProtectionAcked(this, true) } catch (_: Throwable) {}
+        // Chek-list to'liq (barcha kritik ruxsatlar berilgan) bo'lib "Davom etish" bosildi — himoya
+        // ENDI haqiqatan tayyor. Xizmatni yoqamiz va birinchi marta "Himoyangiz yoqildi" chiqaramiz.
+        try { ProtectionActivator.activateIfReady(this) } catch (_: Throwable) {}
         try {
             startActivity(Intent(this, DashboardNewActivity::class.java))
         } catch (_: Throwable) {}

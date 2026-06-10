@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>KiberQalqon — Qisqa taqdimot (3 slayd)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg0:#070d11; --bg1:#0f1820; --navy:#0b1014;
+  --ink:#eff6f7; --ink2:#9fb2bb; --ink3:#6c7e88;
+  --teal:#5bcbd3; --teal2:#2d9cb8; --teal-deep:#1f7b92;
+  --saffron:#e0a040; --gold:#cc9442;
+  --danger:#e25a4a; --danger2:#d74536;
+  --safe:#5bcb8a;
+  --hair:rgba(255,255,255,.10); --hair2:rgba(255,255,255,.18);
+  --panel:rgba(255,255,255,.045); --panel2:rgba(255,255,255,.07);
+  --fd:"Space Grotesk","Inter",system-ui,sans-serif;
+  --fb:"Manrope","Inter",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#04080b;overflow:hidden;font-family:var(--fb);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse at 22% 18%, rgba(45,156,184,.22), transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(224,160,64,.12), transparent 55%),
+    var(--bg0);}
+.stage{position:relative;width:1280px;height:720px;transform-origin:center center;
+  background:linear-gradient(165deg,var(--bg1) 0%, var(--navy) 100%);
+  border-radius:18px;overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05) inset;}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 8 L48 32 L72 40 L48 48 L40 72 L32 48 L8 40 L32 32 Z' fill='none' stroke='%235bcbd3' stroke-width='1' opacity='.10'/%3E%3Ccircle cx='0' cy='0' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='80' cy='0' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='0' cy='80' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3Ccircle cx='80' cy='80' r='1.6' fill='%235bcbd3' opacity='.14'/%3E%3C/svg%3E");
+  background-size:80px 80px;}
+.slide{position:absolute;inset:0;padding:58px 70px;opacity:0;visibility:hidden;
+  transition:opacity .5s ease;display:flex;flex-direction:column;}
+.slide.active{opacity:1;visibility:visible;}
+[data-anim]{opacity:0;transform:translateY(20px)}
+.slide.active [data-anim]{animation:rise .62s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+@keyframes rise{to{opacity:1;transform:none}}
+.slide.active [data-anim="fade"]{animation-name:fade}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.slide.active [data-anim="zoom"]{animation-name:zoomin}
+@keyframes zoomin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.slide.active [data-anim="right"]{animation-name:fromright}
+@keyframes fromright{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.eyebrow{font:600 13px/1 var(--fm);letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:inline-flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--teal);border-radius:2px}
+h2{font:700 46px/1.07 var(--fd);letter-spacing:-.02em;margin-top:12px}
+.sub{font:400 19px/1.5 var(--fb);color:var(--ink2);margin-top:14px;max-width:780px}
+.mono{font-family:var(--fm)}
+b,strong{color:#fff;font-weight:700}
+.teal{color:var(--teal)} .saf{color:var(--saffron)} .dgr{color:var(--danger)}
+.gl{font:400 14px/1.2 var(--fb);color:var(--ink3);letter-spacing:0}
+.row{display:flex;gap:30px}
+.grow{flex:1;min-width:0}
+.center{align-items:center}
+.fill{flex:1;display:flex;flex-direction:column;justify-content:center}
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:18px;padding:22px 24px;backdrop-filter:blur(4px)}
+.card .ct{font:700 19px/1.2 var(--fd);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.card .cd{font:400 15px/1.5 var(--fb);color:var(--ink2)}
+.ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgba(91,203,211,.14);color:var(--teal);flex:none}
+.stat{background:var(--panel);border:1px solid var(--hair);border-radius:16px;padding:18px 20px}
+.stat .n{font:700 40px/1 var(--fd);letter-spacing:-.02em}
+.stat .l{font:600 12px/1.3 var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
+.phone{width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 26px 50px rgba(0,0,0,.55))}
+.phone-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.phone-wrap::before{content:"";position:absolute;width:74%;height:60%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(91,203,211,.30),transparent);filter:blur(20px);z-index:0}
+.phone-wrap img{position:relative;z-index:1}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.pill{font:600 13px/1 var(--fm);letter-spacing:.04em;padding:9px 13px;border-radius:999px;border:1px solid var(--hair2);color:var(--ink2);background:rgba(255,255,255,.03)}
+.pill.t{border-color:rgba(91,203,211,.4);color:var(--teal);background:rgba(91,203,211,.08)}
+.pill.d{border-color:rgba(226,90,74,.4);color:#ff9082;background:rgba(226,90,74,.10)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.kpis{display:grid;gap:14px}
+.lead{font:500 17px/1.55 var(--fb);color:var(--ink2)}
+.tick{color:var(--teal);font-weight:700;margin-right:8px}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:14px}
+ul.clean li{font:500 18px/1.45 var(--fb);display:flex;gap:12px;align-items:flex-start}
+ul.clean li .tick{font-size:20px;line-height:1.3}
+.scanwrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:18px}
+.scanline{position:absolute;left:0;right:0;height:2px;top:-10%;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+  box-shadow:0 0 24px var(--teal);animation:sweep 6s linear infinite;opacity:.5}
+@keyframes sweep{0%{top:-5%}100%{top:105%}}
+.brandline{position:absolute;left:70px;bottom:30px;display:flex;align-items:center;gap:10px;font:600 12px/1 var(--fm);letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+.brandline img{width:22px;height:22px;border-radius:6px}
+.bar-prog{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--saffron));z-index:50;transition:width .4s ease}
+.counter{position:fixed;right:18px;bottom:14px;z-index:50;font:600 13px/1 var(--fm);color:var(--ink3);letter-spacing:.1em}
+.dots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;gap:7px}
+.dots b{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:.2s}
+.dots b.on{background:var(--teal);width:22px;border-radius:5px}
+.nav{position:fixed;bottom:12px;z-index:50;display:flex;gap:8px;left:18px}
+.nav button{width:34px;height:30px;border-radius:9px;border:1px solid var(--hair2);background:rgba(255,255,255,.05);color:var(--ink2);cursor:pointer;font-size:15px}
+.nav button:hover{color:var(--teal);border-color:var(--teal)}
+.hint{position:fixed;right:18px;top:14px;z-index:50;font:500 12px/1 var(--fm);color:var(--ink3);letter-spacing:.05em}
+</style>
+</head>
+<body>
+<div class="bar-prog" id="prog"></div>
+<div class="hint">← / → · bo'sh joy</div>
+<div class="nav"><button id="bPrev">‹</button><button id="bNext">›</button></div>
+<div class="dots" id="dots"></div>
+<div class="counter" id="counter">01 / 03</div>
+
+<div class="deck">
+<div class="stage" id="stage">
+
+<!-- 1 · MUAMMO -->
+<section class="slide">
+  <div class="eyebrow" data-anim>Muammo</div>
+  <h2 data-anim style="--d:.08s">Bir «rasm» — bo'sh bank hisobi</h2>
+  <div class="sub" data-anim style="--d:.16s">Firibgarlar <b>«rasm», «video», «to'y taklifnomasi»</b> niqobida <span class="mono dgr">.apk</span> <span class="gl">(dastur fayli)</span> yuboradi. O'rnatilgach troyan <b>SMS-OTP</b> <span class="gl">(bankdan keladigan bir martalik parol)</span> ni o'g'irlaydi — va hisobdan pul yechib olinadi.</div>
+  <div class="row grow center" style="margin-top:24px;gap:40px">
+    <div class="grow">
+      <ul class="clean">
+        <li data-anim style="--d:.24s"><span class="tick">▸</span><div>Tarqalish kanali — <b>Telegram</b> va <b>WhatsApp</b>, Play Market'dan <b>tashqarida</b>.</div></li>
+        <li data-anim style="--d:.32s"><span class="tick">▸</span><div>Oddiy antiviruslar bu faylni <b class="dgr">ko'rmaydi</b> — arxiv «shifrlangan» deb belgilangan (ZIP-hiyla).</div></li>
+        <li data-anim style="--d:.4s"><span class="tick">▸</span><div>Google Play Protect ham do'kondan tashqari faylni <b>tekshirmaydi</b>.</div></li>
+      </ul>
+      <div class="chips" style="margin-top:22px">
+        <span class="pill d mono" data-anim style="--d:.48s">RASMLAR (18).apk</span>
+        <span class="pill d mono" data-anim style="--d:.54s">toydanfotolar(9.jpg).apk</span>
+        <span class="pill d mono" data-anim style="--d:.6s">VIDEO.20.01.2026.mp4.apk</span>
+        <span class="pill d mono" data-anim style="--d:.66s">TAKLIFNOMA TOY.apk</span>
+      </div>
+    </div>
+    <div class="kpis" style="width:280px;flex:none">
+      <div class="stat" data-anim="zoom" style="--d:.4s"><div class="n dgr">5</div><div class="l">real namuna tahlil qilindi</div></div>
+      <div class="stat" data-anim="zoom" style="--d:.5s"><div class="n saf">2</div><div class="l">bank troyani oilasi</div></div>
+      <div class="stat" data-anim="zoom" style="--d:.6s"><div class="n teal">~30<span style="font-size:18px"> mln</span></div><div class="l">xavf ostidagi smartfon</div></div>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>KiberQalqon · Muammo</div>
+</section>
+
+<!-- 2 · YECHIM -->
+<section class="slide">
+  <div class="row grow center" style="gap:50px">
+    <div class="fill grow">
+      <div class="eyebrow" data-anim>Yechim · KiberQalqon</div>
+      <h2 data-anim style="--d:.08s">Telefoningizda yashaydigan qalqon</h2>
+      <div class="sub" data-anim style="--d:.16s">Faylni <b>o'rnatishdan oldin</b>, telefonning o'zida ushlaydi. Har bir fayl <b>9 qatlamli tekshiruv</b>dan o'tadi — bitta qatlam ham xavfni tanisa, fayl darhol bloklanadi.</div>
+      <ul class="clean" style="margin-top:20px">
+        <li data-anim style="--d:.26s"><span class="tick">✓</span><div><b>Real vaqtda kuzatuv</b> — yangi APK tushishi bilanoq darhol tekshiradi.</div></li>
+        <li data-anim style="--d:.34s"><span class="tick">✓</span><div><b>Internetsiz, qurilmaning o'zida</b> <span class="gl">(on-device)</span> — fayllar bulutga yuborilmaydi.</div></li>
+        <li data-anim style="--d:.42s"><span class="tick">✓</span><div><b>Hech qachon noto'g'ri «XAVFSIZ» demaydi</b> — shubha bo'lsa = SHUBHALI.</div></li>
+        <li data-anim style="--d:.5s"><span class="tick">✓</span><div>Detektorlar <b>real o'zbek troyanlarini teskari muhandislik</b> qilishdan olingan.</div></li>
+      </ul>
+    </div>
+    <div class="phone-wrap" data-anim="right" style="height:560px;flex:none;--d:.3s">
+      <img class="phone" src="assets/screen-alert-result.png" alt="Xavf aniqlandi" style="height:560px"/>
+    </div>
+  </div>
+  <div class="brandline"><img src="assets/logo.png"/>Yechim</div>
+</section>
+
+<!-- 3 · NEGA BIZ + INVESTITSIYA -->
+<section class="slide">
+  <div class="scanwrap"><div class="scanline"></div></div>
+  <div class="eyebrow" data-anim>Nega biz · va keyingi qadam</div>
+  <h2 data-anim style="--d:.08s">Mahsulot tayyor — endi miqyoslaymiz</h2>
+  <div class="grid3" style="margin-top:24px">
+    <div class="card" data-anim style="--d:.16s"><div class="ct"><span class="ic">📍</span>O'ta mahalliy</div><div class="cd">Faqat O'zbekiston troyanlari bazasi — global antiviruslar buni ko'rmaydi.</div></div>
+    <div class="card" data-anim style="--d:.24s"><div class="ct"><span class="ic">🔐</span>Maxfiylik · on-device</div><div class="cd">Tekshiruv telefonda, internetsiz — raqobatchilar esa faylni bulutga yuklaydi.</div></div>
+    <div class="card" data-anim style="--d:.32s"><div class="ct"><span class="ic">🛡️</span>v7.9 ishlaydi</div><div class="cd">Tayyor ilova + bulutli boshqaruv paneli. Navoiyda pilot — birinchi 10k foydalanuvchi.</div></div>
+  </div>
+  <div class="row" style="margin-top:20px;gap:20px;align-items:stretch">
+    <div class="card grow" data-anim="fade" style="--d:.42s">
+      <div class="ct" style="font-size:17px">Biznes-model</div>
+      <div class="cd" style="color:var(--ink)">Freemium <span class="gl">(bepul + Pro obuna)</span> · <b>B2B</b> banklar & telekom · <b>B2G</b> davlat kiberxavfsizligi.</div>
+    </div>
+    <div class="card" data-anim="right" style="--d:.5s;width:380px;flex:none;background:rgba(91,203,211,.08);border-color:rgba(91,203,211,.3);display:flex;flex-direction:column;justify-content:center">
+      <div class="cd" style="color:var(--ink2)">So'rov · seed sarmoya</div>
+      <div style="font:700 38px/1 var(--fd)" class="teal">$200 000</div>
+      <div class="cd" style="margin-top:8px">Play'da chiqarish · marketing · bulut · tahdid jamoasi · bank pilotlari.</div>
+    </div>
+  </div>
+  <div class="lead" data-anim="fade" style="--d:.62s;margin-top:18px;text-align:center;color:var(--teal);font:700 22px/1.3 var(--fd)">Keling, O'zbekistonni himoya qilamiz.</div>
+  <div class="brandline"><img src="assets/logo.png"/>KiberQalqon · Rahmat!</div>
+</section>
+
+</div><!-- /stage -->
+</div><!-- /deck -->
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const stage=document.getElementById('stage');
+const prog=document.getElementById('prog');
+const counter=document.getElementById('counter');
+const dotsWrap=document.getElementById('dots');
+let i=0;
+slides.forEach((_,n)=>{const b=document.createElement('b');b.onclick=()=>go(n);dotsWrap.appendChild(b);});
+const dots=[...dotsWrap.children];
+const pad=n=>String(n).padStart(2,'0');
+function go(n){
+  i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+  prog.style.width=((i+1)/slides.length*100)+'%';
+  counter.textContent=pad(i+1)+' / '+pad(slides.length);
+}
+function next(){go(i+1)} function prev(){go(i-1)}
+document.getElementById('bNext').onclick=next;
+document.getElementById('bPrev').onclick=prev;
+addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next();}
+  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev();}
+  else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(slides.length-1)}
+});
+stage.addEventListener('click',e=>{
+  if(e.target.closest('a,button')) return;
+  const r=stage.getBoundingClientRect();
+  (e.clientX-r.left < r.width*0.32)?prev():next();
+});
+function fit(){
+  const m=0.965;
+  const s=Math.min(innerWidth/1280, innerHeight/720)*m;
+  stage.style.transform='scale('+s+')';
+}
+addEventListener('resize',fit); fit();
+var _h=parseInt((location.hash||'').slice(1),10); go(_h>0?_h-1:0);
+addEventListener('hashchange',()=>{var h=parseInt((location.hash||'').slice(1),10);if(h>0)go(h-1);});
+</script>
+</body>
+</html>

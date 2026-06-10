@@ -3,6 +3,12 @@ import {
   apiGet, type Stats, type DeviceRow, type ThreatFamily, type FeedItem, type MapPoint,
 } from './api';
 import { nearestCity } from './uzRegions';
+import { VERDICT_UZ, catUz } from './format';
+
+// Excel'da xom enum chiqmasin (verdict 'danger', severity 'high'): o'zbekcha nomlar.
+const SEV_UZ: Record<string, string> = { critical: 'Juda yuqori', high: 'Yuqori', medium: "O'rta", low: 'Past' };
+const sevUz = (s?: string | null): string => (s ? SEV_UZ[s] || s : '—');
+const verdictUz = (v?: string | null): string => (v ? VERDICT_UZ[v] || v : '—');
 
 // Panel ma'lumotlarini bitta Excel (.xlsx) faylga eksport qiladi — har bo'lim alohida
 // varaq (list). Faqat o'qish endpointlaridan oladi (egasi ham, admin ham eksport qila oladi).
@@ -15,13 +21,19 @@ function sheet(XLSX: typeof XLSXNS, rows: Record<string, unknown>[]): XLSXNS.Wor
 
 export async function exportAllToExcel(): Promise<void> {
   const XLSX = await import('xlsx');
+  // Har bir endpoint xatosini alohida ushlaymiz, lekin HAMMASI yiqilsa — throw qilamiz, aks holda
+  // Layout "Excel fayl tayyor" deb bo'sh fayl bergan bo'lardi (jim muvaffaqiyat = yolg'on).
+  let okCount = 0;
+  const ok = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
+    p.then((v) => { okCount++; return v; }).catch(() => fallback);
   const [statsR, devicesR, threatsR, feedR, geoR] = await Promise.all([
-    apiGet<{ stats: Stats }>('/api/stats').catch(() => ({ stats: {} as Stats })),
-    apiGet<{ devices: DeviceRow[] }>('/api/devices').catch(() => ({ devices: [] as DeviceRow[] })),
-    apiGet<{ threats: ThreatFamily[] }>('/api/threats').catch(() => ({ threats: [] as ThreatFamily[] })),
-    apiGet<{ feed: FeedItem[] }>('/api/feed').catch(() => ({ feed: [] as FeedItem[] })),
-    apiGet<{ points: MapPoint[] }>('/api/geo').catch(() => ({ points: [] as MapPoint[] })),
+    ok(apiGet<{ stats: Stats }>('/api/stats'), { stats: {} as Stats }),
+    ok(apiGet<{ devices: DeviceRow[] }>('/api/devices'), { devices: [] as DeviceRow[] }),
+    ok(apiGet<{ threats: ThreatFamily[] }>('/api/threats'), { threats: [] as ThreatFamily[] }),
+    ok(apiGet<{ feed: FeedItem[] }>('/api/feed'), { feed: [] as FeedItem[] }),
+    ok(apiGet<{ points: MapPoint[] }>('/api/geo'), { points: [] as MapPoint[] }),
   ]);
+  if (okCount === 0) throw new Error('export: barcha endpointlar xato');
 
   const s = statsR.stats || {};
   const statsRows = [
@@ -47,8 +59,8 @@ export async function exportAllToExcel(): Promise<void> {
   const threatRows = (threatsR.threats || []).map((t) => ({
     Ilova: t.app_label ?? t.package_name ?? '',
     Paket: t.package_name ?? '',
-    Toifa: t.category ?? '',
-    Darajasi: t.severity ?? '',
+    Toifa: catUz(t.category),
+    Darajasi: sevUz(t.severity),
     "Ko'rilgan": t.seen_count ?? 0,
     Birinchi: t.first_seen ?? '',
     Oxirgi: t.last_seen ?? '',
@@ -60,7 +72,7 @@ export async function exportAllToExcel(): Promise<void> {
     Ilova: f.app_label ?? f.package_name ?? '',
     Qurilma: f.device_name ?? '',
     Shahar: f.city ?? '',
-    Xulosa: f.verdict ?? '',
+    Xulosa: verdictUz(f.verdict),
     'Xavf bali': f.risk_score ?? '',
   }));
 
@@ -71,7 +83,7 @@ export async function exportAllToExcel(): Promise<void> {
     Lat: p.lat ?? '',
     Lng: p.lng ?? '',
     'Xavf bali': p.risk_score ?? 0,
-    "So'nggi xulosa": p.last_verdict ?? '',
+    "So'nggi xulosa": verdictUz(p.last_verdict),
   }));
 
   const wb = XLSX.utils.book_new();

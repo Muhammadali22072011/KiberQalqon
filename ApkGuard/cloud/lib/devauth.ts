@@ -42,10 +42,16 @@ function eq(a: string, b: string): boolean {
  * Determinik — server saqlamaydi, tekshirish uchun qayta hisoblaydi. Yangilik/replay
  * himoyasini har-so'rovli timestamp+nonce beradi (exp kerak emas). Kalit yo'q → null.
  */
+// CRIT-01: domен-prefiks MAJBURIY. session.ts'dagi imzo "kq-session-v1\n" prefiksini
+// ishlatadi; bu yer "kq-devtok-v1\n". Hatto tokenKey()==session key() bo'lsa ham (eski
+// .env'da DEVICE_TOKEN_SECRET bo'sh) ikki HMAC chiqishi HECH QACHON teng bo'lolmaydi —
+// shu sabab register javobidagi device_auth_token owner-sessiya imzosi sifatida ishlamaydi.
+const DEVTOK_DOMAIN = 'kq-devtok-v1\n';
+
 export function issueDeviceToken(deviceToken: string): string | null {
   const k = tokenKey();
   if (!k) return null;
-  return createHmac('sha256', k).update(deviceToken).digest('base64url');
+  return createHmac('sha256', k).update(`${DEVTOK_DOMAIN}${deviceToken}`).digest('base64url');
 }
 
 function canonical(label: string, ts: string, nonce: string, bodyHashHex: string): string {
@@ -115,5 +121,9 @@ async function verifyDeviceSignature(req: VercelRequest, rawBody: string, label:
  */
 export async function verifyDeviceWrite(req: VercelRequest, rawBody: string, label: string): Promise<boolean> {
   if (await verifyDeviceSignature(req, rawBody, label)) return true;
-  return checkDeviceSecret(req); // legacy yo'l — dala yangilangach olib tashlanadi
+  // CLOUD-02: legacy x-device-secret yo'lining SUNSET kaliti. Park yangilanib hamma per-device
+  // imzoga o'tgach DISABLE_LEGACY_DEVICE_SECRET=1 qo'yiladi → APK'dan chiqarib olingan umumiy
+  // sir endi yozuv qila olmaydi (soxta qurilma/skan, feed korroboratsiyasini sybil bilan to'ldirish yopiladi).
+  if (process.env.DISABLE_LEGACY_DEVICE_SECRET === '1') return false;
+  return checkDeviceSecret(req); // legacy yo'l — dala yangilangach DISABLE_LEGACY_DEVICE_SECRET bilan o'chiriladi
 }

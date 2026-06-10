@@ -4,6 +4,7 @@ import { apiGet, apiPost, type NewsItem } from '../lib/api';
 import { useToast } from '../components/Toast';
 import { Empty, Panel, PanelHead, Spinner } from '../components/ui';
 import { uzDateSafe } from '../lib/format';
+import { useAuth } from '../context/AuthContext';
 
 const LEVELS: { v: string; label: string }[] = [
   { v: 'info', label: 'Oddiy' },
@@ -20,7 +21,10 @@ const fileToDataUrl = (f: File) =>
   });
 
 export default function News() {
-  const canManage = true; // egasi va admin — ikkalasi ham e'lon joylaydi/o'chiradi
+  const { isOwner } = useAuth();
+  const canManage = true; // egasi va admin — ikkalasi ham e'lon JOYLAYDI
+  // Profil sahifasi "o'chirish/o'zgartirish faqat egada" deb va'da beradi — shunga mos: pin/o'chirish FAQAT egasi.
+  const canEdit = isOwner;
   const { data, loading, reload } = usePoll(() => apiGet<{ news: NewsItem[] }>('/api/news'), 20000);
   const { show } = useToast();
   const news = data?.news || [];
@@ -58,6 +62,13 @@ export default function News() {
   const create = async (e: FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
+    // Rasm havolasi http(s) bo'lmasa server uni jim tashlab yuboradi (e'lon rasmsiz chiqadi).
+    // Foydalanuvchiga oldindan aytamiz — "joyladim, rasm yo'q" sirli holatini oldini olamiz.
+    const img = imgUrl.trim();
+    if (img && !/^https?:\/\//i.test(img)) {
+      show("Rasm havolasi noto‘g‘ri — https:// bilan boshlanishi kerak");
+      return;
+    }
     setSaving(true);
     try {
       await apiPost('/api/news', {
@@ -65,7 +76,7 @@ export default function News() {
         title: title.trim(),
         body: body.trim(),
         level,
-        image_url: imgUrl,
+        image_url: img,
       });
       show('E‘lon joylandi');
       setTitle(''); setBody(''); setLevel('info'); setImgUrl('');
@@ -165,7 +176,7 @@ export default function News() {
                       {n.image_url && <img className="nc-thumb" src={n.image_url} alt="" />}
                       <div className="nc-title">{n.title}</div>
                       <span className="nc-date">{uzDateSafe(n.created_at)}</span>
-                      {canManage && (<>
+                      {canEdit && (<>
                         <button className={'nc-act' + (n.pinned ? ' on' : '')} title="Qadab qo‘yish" onClick={() => togglePin(n)}>📌</button>
                         <button className="nc-act" title="O‘chirish" onClick={() => del(n)}>🗑</button>
                       </>)}

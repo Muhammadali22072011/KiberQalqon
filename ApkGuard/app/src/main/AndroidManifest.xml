@@ -50,9 +50,16 @@
          imkonini beradi — periodik 15-daq skan ishonchli ishlashi uchun muhim. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <!-- Видимость установленных приложений на Android 11+ — нужно чтобы после скана
-         APK мы могли проверить getLaunchIntentForPackage() и понять, установлен ли
-         уже пакет. Без этого NameNotFoundException даже для реально установленных. -->
+    <!-- ENG-01: antivirus uchun BARCHA paketlarni ko'rish SHART. Android 11+ da <queries>
+         MAIN/LAUNCHER faqat launcher-ikonkasi BOR ilovalarni ko'rsatadi — ikonkasini yashirgan
+         malware (Ajina-simon dropperlarning asosiy persistensiya hiylasi) "Yashirin tahdidlar"
+         skaneri, kunlik re-scan va Telegram ro'yxatига UMUMAN ko'rinmasdi (yolg'on "toza").
+         QUERY_ALL_PACKAGES — AV ilovalari uchun Play'da ruxsat etilgan kategoriya; sideload'da
+         cheklov yo'q. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <!-- getLaunchIntentForPackage() / launcher tekshiruvi uchun (QUERY_ALL_PACKAGES bo'lmasa ham). -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -152,6 +159,12 @@
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon" />
 
+        <!-- UX-01: Karantin ekrani — tiklash/butunlay o'chirish (Dashboard "Karantin" plitkasidan). -->
+        <activity
+            android:name=".QuarantineActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
+
         <activity
             android:name=".ReportProblemActivity"
             android:exported="false"
@@ -181,6 +194,7 @@
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:excludeFromRecents="true"
@@ -196,7 +210,8 @@
         <activity
             android:name=".InitialScanActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
 
         <!-- Приёмник Share/Open: "Поделиться → KiberQalqon" из Telegram, файл-менеджера,
              браузера и т.п. + перехват "Open with..." для любого APK перед установкой.
@@ -236,7 +251,14 @@
                 <data android:scheme="content" />
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
+                <!-- UX (past): Android PatternMatcher'da `.*` ochko'z emas — `.*\.apk` nomda
+                     QO'SHIMCHA nuqta bo'lsa (app-1.2.3.apk, kiberqalqon-1749...apk) MOS KELMAYDI.
+                     Shu sabab nuqta darajalari bo'yicha bir necha pattern beramiz. -->
                 <data android:pathPattern=".*\\.apk" />
+                <data android:pathPattern=".*\\..*\\.apk" />
+                <data android:pathPattern=".*\\..*\\..*\\.apk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.apk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.apk" />
                 <data android:host="*" />
             </intent-filter>
         </activity>
@@ -329,6 +351,10 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+            <!-- BG-01: ilova yangilangach real-time himoyani qaytaramiz (fon-FGS cheklovidan istisno). -->
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
     </application>

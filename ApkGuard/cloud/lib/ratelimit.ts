@@ -13,11 +13,28 @@ const MAX_FAILS = 5; // shu martadan keyin bloklash boshlanadi
 const BASE_LOCK_SEC = 30; // birinchi blok 30s, keyin 60, 120, ... cap gacha
 const MAX_LOCK_SEC = 3600; // maksimal 1 soat
 
-/** So'rovdan klient IP (x-forwarded-for birinchi qiymati). */
-export function clientKey(req: VercelRequest, scope: string): string {
+/**
+ * CL-01: ISHONCHLI klient IP. x-forwarded-for'ning CHAP qiymati klient tomonidan
+ * yuborilishi mumkin (Vercel uni oxiriga qo'shadi), shuning uchun uni rate-limit kaliti
+ * sifatida ishlatib BO'LMAYDI — brute-force har so'rovda yangi soxta IP yuborib chegarani
+ * aylanib o'tardi. Avval x-real-ip (Vercel o'zi qo'yadi, klient o'zgartira olmaydi),
+ * bo'lmasa XFF'ning OXIRGI hop'i.
+ */
+export function trustedIp(req: VercelRequest): string {
+  const real = req.headers['x-real-ip'];
+  const r = Array.isArray(real) ? real[0] : real;
+  if (typeof r === 'string' && r.trim()) return r.trim();
   const xff = req.headers['x-forwarded-for'];
-  const ip = (typeof xff === 'string' ? xff.split(',')[0].trim() : '') || 'unknown';
-  return `${scope}:${ip}`;
+  const x = Array.isArray(xff) ? xff[0] : xff;
+  if (typeof x === 'string' && x.trim()) {
+    const parts = x.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  return 'unknown';
+}
+
+export function clientKey(req: VercelRequest, scope: string): string {
+  return `${scope}:${trustedIp(req)}`;
 }
 
 /** Bloklangan bo'lsa { locked:true, retryAfter } qaytaradi. DB xato → locked:false (fail-open). */
@@ -34,10 +51,22 @@ export async function checkLocked(key: string): Promise<{ locked: boolean; retry
   }
 }
 
-/** Muvaffaqiyatsiz urinishni qayd qiladi; chegaradan oshsa eksponensial backoff bilan bloklaydi. */
+/**
+ * Muvaffaqiyatsiz urinishni qayd qiladi; chegaradan oshsa eksponensial backoff bilan bloklaydi.
+ *
+ * CL-01: inkremen ATOMAR bo'lishi shart. Eski read-modify-write (select keyin upsert) parallel
+ * so'rovlarda barchasi fail_count=0 o'qib, hammasi 1 yozardi — lockout ishlamasdi. Endi DB tomonida
+ * atomar `record_auth_failure` RPC ishlatamiz (supabase/13_*.sql). RPC bo'lmasa (migratsiya hali
+ * qo'llanmagan) — eski yo'lga fail-open qaytamiz (egasini bloklamaslik uchun).
+ */
 export async function recordFailure(key: string): Promise<void> {
   try {
     const sb = db();
+    const { error } = await sb.rpc('record_auth_failure', {
+      p_key: key, p_max_fails: MAX_FAILS, p_base_lock: BASE_LOCK_SEC, p_max_lock: MAX_LOCK_SEC,
+    });
+    if (!error) return; // atomar yo'l muvaffaqiyatli
+    // RPC topilmadi/xato → eski (atomar bo'lmagan) zaxira yo'l, best-effort.
     const { data } = await sb.from('auth_attempts').select('fail_count').eq('k', key).maybeSingle();
     const fails = (((data?.fail_count as number | undefined) ?? 0) + 1);
     let lockedUntil: string | null = null;

@@ -89,7 +89,9 @@ class MainActivity : AppCompatActivity() {
                     binding.tvCount.text = getString(R.string.scanning)
                     binding.btnScan.isEnabled = false
                     
-                    val result = withTimeout(5000) { // Таймаут 5 секунд на сканирование
+                    // UX-08: 30s (avval 5s edi — bujetli telefonlarda katta APK ulgurmasdi va
+                    // foydalanuvchi faylni umuman tekshira olmasdi; popup yo'lida esa timeout yo'q).
+                    val result = withTimeout(30000) {
                         withContext(Dispatchers.IO) {
                             try {
                                 ApkScanner.scan(this@MainActivity, item.file.absolutePath)
@@ -300,13 +302,14 @@ class MainActivity : AppCompatActivity() {
         binding.btnGrant.setOnClickListener { requestStoragePermission() }
 
         // "Hozir tekshirish" hero CTA — handler bilan birga skanlash chaqiriladi.
+        // UX-08: QO'LDA skan endi fon rejimiga BOG'LIQ EMAS. Avval fon o'chiq bo'lsa tugma faqat
+        // toast berardi — batareyani tejash uchun fon'ni o'chirgan foydalanuvchi skan tugmasini
+        // butunlay yo'qotardi. Qo'lda tekshiruv ruxsat bo'lsa doimo ishlaydi.
         val scanHandler = View.OnClickListener {
-            if (hasPermission && Config.isBackgroundEnabled(this)) {
+            if (hasPermission) {
                 startAutoProtection()
-            } else if (!hasPermission) {
-                Toast.makeText(this, getString(R.string.toast_grant_storage_first), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, getString(R.string.toast_enable_background), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_grant_storage_first), Toast.LENGTH_SHORT).show()
             }
         }
         binding.btnScan.setOnClickListener(scanHandler)
@@ -315,10 +318,16 @@ class MainActivity : AppCompatActivity() {
         binding.switchBackground.isChecked = Config.isBackgroundEnabled(this)
         binding.switchBackground.setOnCheckedChangeListener { _, checked ->
             Config.setBackgroundEnabled(this, checked)
-            
-            // При включении - сразу запускаем автоматическое сканирование
-            if (checked && hasPermission) {
-                startAutoProtection()
+            // BG-02: tumbler xizmatni HAQIQATAN boshqaradi (start/stop), faqat Config'ga yozmaydi.
+            if (checked) {
+                ProtectionService.start(this)
+                if (hasPermission) startAutoProtection()
+            } else {
+                ProtectionService.stop(this)
+                try {
+                    (getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager)
+                        .cancel(ProtectionService.NOTIFICATION_ID)
+                } catch (_: Throwable) {}
             }
         }
 
@@ -517,6 +526,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // BG-01: ilova ochilganda real-time himoyani idempotent qaytaramiz. Ruxsat berilgach shu yerda
+        // xizmat yoqiladi va birinchi marta "Himoyangiz yoqildi" chiqadi (foreground-start har doim ruxsat).
+        ProtectionActivator.activateIfReady(this)
         // Foydalanuvchi tashqi "Barcha fayllarga ruxsat" ekranidan qaytgan bo'lishi
         // mumkin — holatni qayta tekshiramiz va ruxsat ENDIGINA berilgan bo'lsa
         // skanni ishga tushiramiz (scanStarted bilan har resume'da takrorlanmaydi).

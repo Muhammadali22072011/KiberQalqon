@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .eq('device_id', id)
     .order('scanned_at', { ascending: false })
     .limit(20);
-  if (sErr) return res.status(500).json({ ok: false, error: sErr.message });
+  if (sErr) { console.error(`[device] scans db error: ${sErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
 
   return res.status(200).json({ ok: true, device, scans: scans ?? [] });
 }
@@ -133,7 +133,7 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     .select('id')
     .single();
 
-  if (error) return res.status(500).json({ ok: false, error: error.message });
+  if (error) { console.error(`[register] device upsert db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
 
   // Per-device token beramiz — qurilma keyingi yozuvlarni shu bilan IMZOLAYDI (HMAC).
   // Determinik (HMAC(device_token, DEVICE_TOKEN_SECRET)), serverda saqlanmaydi. Kalit

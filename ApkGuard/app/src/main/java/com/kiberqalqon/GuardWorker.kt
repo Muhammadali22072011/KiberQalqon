@@ -110,9 +110,12 @@ class GuardWorker(
                     val capped = if (checked.size > 5000) checked.take(5000).toHashSet() else checked
                     prefs.edit().putStringSet("checked_paths", capped).apply()
 
-                    if (Config.isAutoUpdateEnabled(applicationContext)) {
-                        Config.markDatabaseUpdated(applicationContext)
-                    }
+                    // BG-04: bu yerda Config.markDatabaseUpdated() ATAYIN CHAQIRILMAYDI. Avval har 15
+                    // daqiqada (auto-update yoqilganda) shtamp bekorga yangilanib, BUTUN ScanCache'ni
+                    // bekor qilardi — kesh maksimum 15 daqiqa yashab, har sweep'dan keyin katta APK'lar
+                    // qayta SHA-256/ZIP/DEX bilan skanlanib telefon qizib turardi (anti-qizish fiksini
+                    // bekor qiladi). Shtamp faqat baza HAQIQATAN o'zgarsa yangilanadi — uни CloudBlacklist
+                    // (real merge bo'lsa) va APK versiyasi (versionCode shtampда) hal qiladi.
                     Log.d(TAG, "Full sweep: ${apks.size} APKs, new=$scanned, uploaded=$uploaded")
                     Result.success(workDataOf("scanned" to scanned, "uploaded" to uploaded))
                 }
@@ -124,6 +127,16 @@ class GuardWorker(
                     } catch (e: Exception) {
                         Log.e(TAG, "Error finding APK files", e); return Result.success()
                     }
+                    // BG-03: bu rejim har ekran ochilishida ishlaydi. Avval "uxlab yotgan" eski
+                    // SUSPICIOUS/DANGER fayl uchun HAR unlock'da popup/tovushli full-screen alert
+                    // chiqardi (antivirusni o'chirishning #1 sababi). Endi "allaqachon ogohlantirilgan"
+                    // to'plamini (path|mtime|size) saqlaymiz: o'sha fayl uchun qayta alert chiqmaydi,
+                    // faqat YANGI (yoki o'zgargan) fayl ogohlantiradi. Skan baribir bajariladi.
+                    val prefs = applicationContext.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                    val warned = HashSet<String>().apply {
+                        addAll(prefs.getStringSet("unlock_warned", emptySet()) ?: emptySet())
+                    }
+                    val now = System.currentTimeMillis()
                     var uploaded = 0
                     for (item in list.take(10)) {
                         if (!item.file.exists()) continue
@@ -132,8 +145,20 @@ class GuardWorker(
                         } catch (e: Exception) {
                             Log.w(TAG, "Scan error for ${item.name}", e); continue
                         }
-                        uploaded += handleResult(item, result, uploadEnabled, serverUrl, allowSafeNotification = false)
+                        val key = "${item.file.absolutePath}|${item.file.lastModified()}|${item.file.length()}"
+                        val alreadyWarned = !warned.add(key)
+                        val recentlyDownloaded = (now - item.file.lastModified()) < 30 * 60 * 1000L
+                        uploaded += handleResult(
+                            item, result, uploadEnabled, serverUrl,
+                            allowSafeNotification = false,
+                            // Eski (yangi yuklanmagan) SUSPICIOUS → jim bildirishnoma, popup emas.
+                            suspiciousAsPopup = recentlyDownloaded,
+                            // Bu fayl uchun avval ogohlantirilgan bo'lsa — qayta popup/tovush yo'q.
+                            suppressAlerts = alreadyWarned
+                        )
                     }
+                    val capped = if (warned.size > 5000) warned.take(5000).toHashSet() else warned
+                    prefs.edit().putStringSet("unlock_warned", capped).apply()
                     Log.d(TAG, "Quick scan: ${list.size} found, uploaded=$uploaded")
                     Result.success(workDataOf("scanned" to list.size, "uploaded" to uploaded))
                 }
@@ -162,7 +187,12 @@ class GuardWorker(
         // SUSPICIOUS uchun OYNA ko'rsatilsinmi? Real-time/tezkor skanda — ha (yangi aniqlangan).
         // To'liq periodik sweep'da esa faqat YANGI yuklab olingan fayl uchun — aks holda antivirus
         // eski fayllar uchun o'zicha oyna ochib bezovta qiladi (DANGER esa doim popup/karantin).
-        suspiciousAsPopup: Boolean = true
+        suspiciousAsPopup: Boolean = true,
+        // BG-03: takroriy OGOHLANTIRISHLARNI (popup + bildirishnoma) bostiradi. DANGER+"delete"
+        // rejimida avto-karantin (va birinchi upload) baribir bajariladi. Ekran ochilishidagi tezkor
+        // skan SHU fayl uchun allaqachon ogohlantirgan bo'lsa — har unlock'da qayta popup/tovush
+        // chiqmasin (xavfsizlik buzilmaydi: fayl o'sha-o'sha holatda).
+        suppressAlerts: Boolean = false
     ): Int {
         var uploaded = 0
         val autoDelete = result.verdict == ScanResult.Verdict.DANGER &&
@@ -190,7 +220,7 @@ class GuardWorker(
             when (q) {
                 is Quarantine.Result.Ok -> {
                     Log.w(TAG, "Auto-quarantined: ${item.name} — ${result.reason}")
-                    try {
+                    if (!suppressAlerts) try {
                         showThreatHandledAlert(item.name, result.reason, item.file.absolutePath)
                     } catch (e: Throwable) {
                         Log.w(TAG, "threat-handled alert failed", e)
@@ -208,14 +238,14 @@ class GuardWorker(
                 }
                 is Quarantine.Result.Failed -> {
                     Log.w(TAG, "Auto-quarantine failed for ${item.name}: ${q.message}")
-                    try {
+                    if (!suppressAlerts) try {
                         showAutoScanPopup(item.file.absolutePath, item.name)
                     } catch (e: Exception) {
                         Log.w(TAG, "Could not show popup", e)
                     }
                 }
             }
-        } else if (shouldAlert) {
+        } else if (shouldAlert && !suppressAlerts) {
             val isDanger = result.verdict == ScanResult.Verdict.DANGER
             if (isDanger || suspiciousAsPopup) {
                 try {

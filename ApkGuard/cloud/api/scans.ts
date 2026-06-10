@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { data, error } = await q;
-  if (error) return res.status(500).json({ ok: false, error: error.message });
+  if (error) { console.error(`[scans] db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
   return res.status(200).json({ ok: true, scans: data ?? [] });
 }
 

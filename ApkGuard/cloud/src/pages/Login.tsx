@@ -1,18 +1,31 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 type Mode = 'owner' | 'admin';
 
 export default function Login() {
-  const { doLogin, doAdminLogin } = useAuth();
+  const { doLogin, doAdminLogin, authed } = useAuth();
   const nav = useNavigate();
   const loc = useLocation();
   const from = (loc.state as { from?: string } | null)?.from || '/app';
 
   const [mode, setMode] = useState<Mode>('owner');
+  // Sessiya muddati tugab tashlangan bo'lsa — jim emas, sababini ko'rsatamiz (bir marta).
+  const [info] = useState<string>(() => {
+    try {
+      if (sessionStorage.getItem('kq_logout_reason') === 'expired') {
+        sessionStorage.removeItem('kq_logout_reason');
+        return 'Sessiya muddati tugadi — qaytadan kiring.';
+      }
+    } catch { /* ignore */ }
+    return '';
+  });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // Allaqachon kirgan bo'lsa /login bo'sh forma ko'rsatmaydi — panelga yuboradi.
+  if (authed) return <Navigate to={from} replace />;
 
   // egasi
   const [secret, setSecret] = useState('');
@@ -118,6 +131,7 @@ export default function Login() {
           </>
         )}
 
+        {info && !err && <div className="gate-info">{info}</div>}
         <div className="gate-err">{err}</div>
         <button className="btn block" disabled={busy || !canSubmit}>
           {busy ? <span className="spinner" /> : 'Kirish'}

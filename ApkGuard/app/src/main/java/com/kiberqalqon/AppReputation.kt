@@ -184,10 +184,12 @@ object AppReputation {
     fun evaluate(context: Context, pkg: String?, apkCertSha256: String?): Reputation {
         if (trustedName(pkg) == null) return Reputation.UNKNOWN
         // pkg bu yerda null emas (trustedName null bo'lmagan paketni qaytaradi).
-        val installedCert = CertUtil.installedFingerprintSha256(context, pkg!!)
-            ?: return Reputation.UNVERIFIED          // brend ma'lum, lekin o'rnatilmagan/ko'rinmaydi
+        // ENG-04: faqat joriy imzo emas, KALIT ROTATSIYA TARIXINI ham olamiz — Play App Signing
+        // kalitni almashtirsa legit yangilanish "soxta imzo" deb DANGER bo'lib qolmasin.
+        val installedCerts = CertUtil.installedSigningFingerprints(context, pkg!!)
+        if (installedCerts.isEmpty()) return Reputation.UNVERIFIED  // brend ma'lum, lekin o'rnatilmagan/ko'rinmaydi
         if (apkCertSha256.isNullOrBlank()) return Reputation.UNVERIFIED  // APK imzosi o'qilmadi — SAFE bermaymiz
-        return if (apkCertSha256.equals(installedCert, ignoreCase = true)) {
+        return if (installedCerts.any { it.equals(apkCertSha256, ignoreCase = true) }) {
             Reputation.VERIFIED
         } else {
             Reputation.SIGNATURE_MISMATCH

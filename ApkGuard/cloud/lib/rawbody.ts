@@ -12,11 +12,19 @@ import type { VercelRequest } from '@vercel/node';
  * QAYTA serializatsiya qilamiz. Unda imzo body-hash'i mos kelmasligi mumkin → so'rov eski
  * x-device-secret yo'liga TUSHADI (buzilmaydi), lekin handler tanani BARIBIR to'g'ri oladi.
  */
+// Yozuv tanalari kichik (hash + reasons) — 512KB dan oshiq tana suiiste'mol. Ortiqcha o'qimaymiz
+// (xotirani cheklash). Cheklovdan oshsa qisqartiramiz → imzo/parse mos kelmaydi → 401/400 (xavfsiz).
+const MAX_RAW_BYTES = 512 * 1024;
+
 export async function readRaw(req: VercelRequest): Promise<string> {
   const chunks: Buffer[] = [];
+  let total = 0;
   try {
     for await (const c of req as AsyncIterable<Buffer | string>) {
-      chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c));
+      const buf = Buffer.isBuffer(c) ? c : Buffer.from(c);
+      total += buf.length;
+      if (total > MAX_RAW_BYTES) { console.warn('[rawbody] tana 512KB dan oshdi — qisqartirildi'); break; }
+      chunks.push(buf);
     }
   } catch {
     /* stream o'qib bo'lmadi — quyida req.body fallback */

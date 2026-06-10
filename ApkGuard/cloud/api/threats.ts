@@ -82,7 +82,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .gte('seen_count', MIN_FEED_DEVICES)
         .order('last_seen', { ascending: false })
         .limit(2000);
-      if (fb.error) return res.status(500).json({ ok: false, error: fb.error.message });
+      if (fb.error) { console.error(`[threats] feed fallback db error: ${fb.error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
       rows = (fb.data ?? []) as FeedRow[];
     }
 
@@ -113,7 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .order('last_seen', { ascending: false })
     .limit(100);
 
-  if (error) return res.status(500).json({ ok: false, error: error.message });
+  if (error) { console.error(`[threats] db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
 
   const threats = data ?? [];
 

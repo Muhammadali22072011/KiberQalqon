@@ -909,6 +909,20 @@ object ApkScanner {
             }
             val comboScore = PermissionCombos.totalScore(comboMatches)
 
+            // ENG-03: "deviceAdminWithCombo" uchun MUSTAQIL kombo balli — BIND_DEVICE_ADMIN'ning
+            // O'ZINI talab qiladigan kombo(lar)ni chiqarib tashlaymiz. Avval Ransomware-kombo
+            // (required = {BIND_DEVICE_ADMIN}) DeviceAdmin e'lonining O'ZIDAN kelib chiqib har doim
+            // mos kelar, shu sabab deviceAdminWithCombo aylanma mantiq bilan DOIM true bo'lib, har
+            // qanday DeviceAdmin-li ilova (Find My Device, Knox/MDM, remote-wipe'li bank) VERIFIED
+            // bo'lsa ham qattiq DANGER bo'lardi. Endi DeviceAdmin + MUSTAQIL zararli kombo (overlay/
+            // SMS/accessibility...) >= 30 bo'lsagina ishlaydi.
+            val comboScoreIndependentOfDeviceAdmin = comboMatches
+                .filter { m ->
+                    val req = m.combo.required
+                    !(req.size == 1 && req.contains("android.permission.BIND_DEVICE_ADMIN"))
+                }
+                .sumOf { it.combo.score }
+
             val dexFindings = try {
                 DexPatternAnalyzer.analyze(apkPath)
             } catch (e: Throwable) {
@@ -1095,7 +1109,8 @@ object ApkScanner {
                     hiddenElfOrDroppedSo = dropperFindings.hiddenElf.isNotEmpty() || droppedSo,
                     encryptedPayloadWithSignal = dropperFindings.encryptedPayloads.isNotEmpty() &&
                             (dropperFindings.soOutsideLib.isNotEmpty() || randomPkg),
-                    deviceAdminWithCombo = manifestFindings.declaresDeviceAdmin && comboScore >= 30,
+                    deviceAdminWithCombo = manifestFindings.declaresDeviceAdmin &&
+                            comboScoreIndependentOfDeviceAdmin >= 30,
                     obfuscatedSignature = signaturesFound.isNotEmpty(),
                     strongCombo = strongCombo,
                     evasionCount = evasionCount,
