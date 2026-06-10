@@ -312,10 +312,11 @@ object NotificationHelper {
         val context = LocaleHelper.apply(context)
         createChannels(context)
         val oem = OemAutostartGuide.detect()
-        // Tap → SplashActivity orqali autostart guide qayta ochiladi
-        val intent = Intent(context, SplashActivity::class.java).apply {
+        // Tap → ProtectionStatusActivity: u yerda "Avtomatik ishga tushirish (OEM)" qatori
+        // bor — foydalanuvchi autostart'ni qayta yoqadi. (Ilgari Splash marafoni orqali
+        // ochilardi; marafon olib tashlangach, ro'yxat ekraniga to'g'ridan-to'g'ri o'tamiz.)
+        val intent = Intent(context, ProtectionStatusActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("show_oem_guide", true)
         }
         val pi = PendingIntent.getActivity(
             context, 7002, intent,
@@ -371,6 +372,41 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(7001, builder.build())
     }
 
+    /**
+     * SD-02: SecurityGuard ilovani to'xtatishdan OLDIN sababни узбекча tushuntiradi. Avval
+     * jim killProcess bo'lardi — root/kastom-proshivkali legit foydalanuvchi (O'zbek bozorida ko'p)
+     * ilova "sababsiz yo'qolib" ketganini ko'rardi (sindi deb o'ylaydi). Bildirishnoma тизим
+     * jarayoniga binder orqali kill'dan oldin topshiriladi, shu sabab ko'rinadi.
+     *
+     * @param reason SecurityGuard.CheckResult.reason (tekshiruv nomi: signature/tamper/root/...).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showSecurityBlockNotification(context: Context, reason: String?) {
+        try {
+            val context = LocaleHelper.apply(context)
+            createChannels(context)
+            // Перепакетлаш/имзо мос эмас = қатъий бузилиш; қолганлари = муҳит (root/эмулятор).
+            val tamper = reason == "signature" || reason == "tamper"
+            val title = "KiberQalqon ishga tushmadi"
+            val text = if (tamper) {
+                "Ilova buzib ochilgan (qayta paketlangan) bo'lishi mumkin — xavfsizlik uchun to'xtatildi."
+            } else {
+                "Qurilmada root yoki o'zgartirilgan tizim aniqlandi — himoya bu muhitda ishlay olmaydi."
+            }
+            val builder = NotificationCompat.Builder(context, channelFor(context))
+                .setSmallIcon(R.drawable.ic_shield)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+            applyLegacyPrefs(context, builder)
+            NotificationManagerCompat.from(context).notify(7009, builder.build())
+        } catch (_: Throwable) {
+            // Bildirishnoma bermasa ham kill davom etadi — bu best-effort.
+        }
+    }
+
     @Suppress("NAME_SHADOWING")
     fun showInstalledSuspiciousNotification(
         context: Context,
@@ -398,5 +434,97 @@ object NotificationHelper {
             .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), pi)
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(pkg.hashCode() and 0x7FFFFFFF, builder.build())
+    }
+
+    /**
+     * Yangi (system bo'lmagan) Accessibility xizmati yoqilganda QURILMADA heads-up alert.
+     * Banker troyanlari aynan shu yo'l bilan ekranni o'qiydi va tugmalarni o'zi bosadi —
+     * shu sabab MAX prioritet + full-screen intent. Asosiy harakat: Accessibility
+     * sozlamalarini ochish (xizmatni darhol o'chirish uchun); qo'shimcha — "O'chirish".
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showAccessibilityThreatNotification(context: Context, pkg: String, appLabel: String) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val a11yIntent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val piOpen = PendingIntent.getActivity(
+            context, ("a11y_$pkg").hashCode(), a11yIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+            data = android.net.Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val piUninstall = PendingIntent.getActivity(
+            context, ("a11y_del_$pkg").hashCode(), uninstallIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle("⚠️ Ilova ekran ustidan nazoratni oldi")
+            .setContentText("$appLabel — Accessibility yoqildi. Banker troyanlari shunday qiladi.")
+            .setStyle(NotificationCompat.BigTextStyle().bigText(
+                "$appLabel ($pkg) Accessibility xizmatini yoqdi — endi u ekraningizni o'qiy oladi, " +
+                    "tugmalarni o'zi bosa oladi va bank ilovalari ustidan nazorat qila oladi.\n\n" +
+                    "Agar buni SIZ bilib yoqmagan bo'lsangiz — darhol o'chiring (banker bo'lishi mumkin).\n" +
+                    "Bosing: Accessibility sozlamalari → xizmatni o'chiring."
+            ))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(piOpen)
+            .setFullScreenIntent(piOpen, true)
+            .addAction(R.drawable.ic_shield, "Accessibility sozlamalari", piOpen)
+            .addAction(R.drawable.ic_trash, "O'chirish", piUninstall)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(("a11y_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
+    }
+
+    /**
+     * Yangi (system bo'lmagan) ilova bildirishnomalarga kirish huquqini olganda heads-up alert.
+     * Zamonaviy bankerlar OTP kodlarni RECEIVE_SMS'siz — bank/Telegram push'larini
+     * NotificationListener orqali o'qib o'g'irlaydi. Tap → bildirishnoma kirish sozlamalari.
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showNotificationAccessThreatNotification(context: Context, pkg: String, appLabel: String) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val settingsIntent = Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val piOpen = PendingIntent.getActivity(
+            context, ("notif_$pkg").hashCode(), settingsIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+            data = android.net.Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val piUninstall = PendingIntent.getActivity(
+            context, ("notif_del_$pkg").hashCode(), uninstallIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle("⚠️ Ilova bildirishnomalarni o'qiy oladi")
+            .setContentText("$appLabel — bildirishnomalarga kirish oldi. OTP kodlar xavf ostida.")
+            .setStyle(NotificationCompat.BigTextStyle().bigText(
+                "$appLabel ($pkg) bildirishnomalarni o'qish huquqini oldi — endi u bank va " +
+                    "Telegram push'laridagi bir martalik kodlarni (OTP) ko'ra oladi. Bankerlar " +
+                    "SMS ruxsatisiz aynan shunday o'g'irlaydi.\n\n" +
+                    "Agar buni SIZ bilib bermagan bo'lsangiz — darhol o'chiring.\n" +
+                    "Bosing: bildirishnoma kirish sozlamalari → ruxsatni olib tashlang."
+            ))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(piOpen)
+            .setFullScreenIntent(piOpen, true)
+            .addAction(R.drawable.ic_shield, "Sozlamalar", piOpen)
+            .addAction(R.drawable.ic_trash, "O'chirish", piUninstall)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(("notif_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
     }
 }

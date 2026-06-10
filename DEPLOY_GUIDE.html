@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiberQalqon — Деплой за 2 шага</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --card2:#1c2330; --line:#2a3441;
+    --txt:#e6edf3; --muted:#8b98a8; --red:#e5484d; --green:#3fb950;
+    --accent:#f0506e; --code:#0a0e14; --blue:#58a6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+  header{text-align:center;margin-bottom:28px}
+  header .logo{font-size:46px}
+  header h1{margin:6px 0 4px;font-size:26px;letter-spacing:.3px}
+  header p{margin:0;color:var(--muted)}
+  .ok{display:inline-block;margin-top:14px;background:rgba(63,185,80,.12);
+    border:1px solid rgba(63,185,80,.4);color:var(--green);
+    padding:8px 14px;border-radius:10px;font-size:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:22px 22px 18px;margin:18px 0;box-shadow:0 1px 0 rgba(255,255,255,.02)}
+  .step-h{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .num{flex:0 0 36px;height:36px;border-radius:50%;display:grid;place-items:center;
+    font-weight:700;background:var(--accent);color:#fff;font-size:17px}
+  .step-h h2{margin:0;font-size:19px}
+  .step-h .tag{margin-left:auto;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);padding:3px 9px;border-radius:20px}
+  .desc{color:var(--muted);font-size:14.5px;margin:4px 0 14px}
+  .desc b{color:var(--txt)}
+  ol.mini{margin:10px 0 14px;padding-left:20px;color:var(--muted);font-size:14px}
+  ol.mini li{margin:4px 0}
+  ol.mini b{color:var(--txt)}
+  .code{position:relative;background:var(--code);border:1px solid var(--line);
+    border-radius:12px;margin:12px 0;overflow:hidden}
+  .code .bar{display:flex;align-items:center;justify-content:space-between;
+    padding:7px 12px;background:var(--card2);border-bottom:1px solid var(--line);
+    font-size:12px;color:var(--muted)}
+  .code pre{margin:0;padding:14px 14px;overflow:auto;max-height:340px}
+  .code code{font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:12.7px;
+    color:#cbd5e1;white-space:pre}
+  .copy{cursor:pointer;border:1px solid var(--line);background:#222b38;color:var(--txt);
+    border-radius:8px;padding:4px 12px;font-size:12.5px;transition:.15s}
+  .copy:hover{background:#2c3645;border-color:#3a475a}
+  .copy.done{background:rgba(63,185,80,.18);border-color:rgba(63,185,80,.5);color:var(--green)}
+  a.btn{display:inline-block;text-decoration:none;background:#222b38;color:var(--blue);
+    border:1px solid var(--line);border-radius:9px;padding:9px 16px;font-size:14px;margin:2px 6px 2px 0}
+  a.btn:hover{border-color:var(--blue)}
+  .big{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+    border-radius:11px;padding:12px 20px;font-weight:600;font-size:15px;margin-top:6px}
+  .note{font-size:13px;color:var(--muted);background:var(--card2);
+    border-left:3px solid var(--accent);border-radius:8px;padding:10px 14px;margin:14px 0 2px}
+  .note.warn{border-left-color:var(--red)}
+  .note.good{border-left-color:var(--green)}
+  .chk{display:flex;align-items:flex-start;gap:10px;margin:8px 0;font-size:14px;cursor:pointer;user-select:none}
+  .chk input{margin-top:3px;width:17px;height:17px;accent-color:var(--green)}
+  .path{font-family:Consolas,monospace;font-size:12.5px;color:var(--green);word-break:break-all}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:36px;
+    border-top:1px solid var(--line);padding-top:18px}
+  kbd{background:#222b38;border:1px solid var(--line);border-bottom-width:2px;
+    border-radius:5px;padding:1px 6px;font-size:12px;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">🛡️</div>
+    <h1>KiberQalqon — деплой за 2 шага</h1>
+    <p>Все 52 бага исправлены и закоммичены · APK уже собран</p>
+    <div class="ok">✓ Терминал НЕ нужен — Supabase это сайт, Vercel запускается двойным кликом</div>
+  </header>
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="step-h">
+      <div class="num">1</div>
+      <h2>Supabase — выполнить 2 миграции</h2>
+      <span class="tag">~2 минуты · браузер</span>
+    </div>
+    <p class="desc">Открой панель Supabase → слева <b>SQL Editor</b> → <b>New query</b>.
+      Вставь SQL ниже, нажми <b>Run</b>. Потом так же второй блок. Оба идемпотентны — повторный запуск безопасен.</p>
+
+    <a class="btn" href="https://supabase.com/dashboard/project/_/sql/new" target="_blank">↗ Открыть Supabase SQL Editor</a>
+
+    <div class="code">
+      <div class="bar"><span>① 08_samples.sql — приватный бакет для образцов malware</span>
+        <button class="copy" onclick="cp(this)">Копировать</button></div>
+<pre><code>-- KiberQalqon — 08_samples.sql
+-- Xavfli/shubhali APK NAMUNALARINI serverda yig'ish (panelda yuklab olib o'rganish uchun).
+-- Idempotent: bir necha marta ishga tushirsa ham xavfsiz.
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'malware-samples',
+  'malware-samples',
+  false,
+  52428800,  -- 50 MB
+  array[
+    'application/vnd.android.package-archive',
+    'application/octet-stream',
+    'application/zip'
+  ]
+)
+on conflict (id) do update set
+  public             = false,
+  file_size_limit    = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="bar"><span>② 09_totp_replay.sql — защита 2FA-кода от повторного использования</span>
+        <button class="copy" onclick="cp(this)">Копировать</button></div>
+<pre><code>-- KiberQalqon — 09_totp_replay.sql  (TOTP replay himoyasi)
+-- 2FA kodi bir martagina ishlatilsin (o'g'irlangan kod qayta kira olmasin).
+-- Idempotent: bir necha marta ishga tushirsa ham xavfsiz.
+
+create table if not exists auth_totp (
+  id            text primary key,        -- bitta egasi: 'owner'
+  last_counter  bigint not null default 0,
+  used_at       timestamptz not null default now()
+);
+
+-- RLS: anon hech narsa ko'rmaydi, server service_role bilan ishlaydi.
+alter table auth_totp enable row level security;</code></pre>
+    </div>
+
+    <label class="chk"><input type="checkbox"> Запустил оба SQL (увидел «Success»)</label>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="step-h">
+      <div class="num">2</div>
+      <h2>Vercel — задеплоить облако</h2>
+      <span class="tag">~3 минуты · двойной клик</span>
+    </div>
+    <p class="desc">Терминал открывать не надо. Просто запусти готовый bat-файл двойным кликом —
+      он сам всё соберёт на серверах Vercel и покажет ссылку <b>Production: https://…</b></p>
+
+    <ol class="mini">
+      <li>Открой папку <b>ApkGuard\cloud</b> в проводнике.</li>
+      <li>Дважды кликни по файлу <b>deploy-prod.bat</b> — откроется чёрное окно.</li>
+      <li>Дождись строки <b>Production: https://…</b> Готово. Закрой окно (<kbd>Enter</kbd>).</li>
+    </ol>
+
+    <div class="code">
+      <div class="bar"><span>Путь к файлу (можно вставить в адресную строку проводника)</span>
+        <button class="copy" onclick="cp(this)">Копировать</button></div>
+<pre><code>C:\Users\User\OneDrive\Desktop\KiberQalqon\ApkGuard\cloud</code></pre>
+    </div>
+
+    <p class="note warn">⚠️ Аккаунт должен быть <b>muhammadali22072011</b> (НЕ akobirturgunov).
+      Если bat-файл попросит логин — в том же окне набери команду ниже и войди один раз, потом снова запусти bat.</p>
+
+    <div class="code">
+      <div class="bar"><span>Если нужен вход в Vercel (один раз)</span>
+        <button class="copy" onclick="cp(this)">Копировать</button></div>
+<pre><code>npx --yes vercel@latest login</code></pre>
+    </div>
+
+    <p class="note">Альтернатива через терминал (если удобнее):
+      открой PowerShell в <b>ApkGuard\cloud</b> и набери команду ниже.</p>
+    <div class="code">
+      <div class="bar"><span>Деплой одной командой</span>
+        <button class="copy" onclick="cp(this)">Копировать</button></div>
+<pre><code>npx --yes vercel@latest deploy --prod --yes</code></pre>
+    </div>
+
+    <label class="chk"><input type="checkbox"> Увидел «Production: https://…» — облако обновлено</label>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card">
+    <div class="step-h">
+      <div class="num">✓</div>
+      <h2>APK уже готов</h2>
+      <span class="tag">сделано</span>
+    </div>
+    <p class="desc">Собрал с этими фиксами. Просто скопируй на телефон и установи (debug ставится рядом с релизом).</p>
+    <div class="code">
+      <div class="bar"><span>kiberqalqon-1780470290870-debug.apk · 8.4 МБ</span>
+        <button class="copy" onclick="cp(this)">Копировать путь</button></div>
+<pre><code>C:\Users\User\OneDrive\Desktop\KiberQalqon\ApkGuard\app\build\outputs\apk\debug\kiberqalqon-1780470290870-debug.apk</code></pre>
+    </div>
+    <label class="chk"><input type="checkbox"> Установил APK на телефон</label>
+  </div>
+
+  <p class="note good">💡 <b>Про npm install:</b> я удалил <b>cloud/node_modules</b>, чтобы освободить место —
+    но для деплоя это НЕ нужно (Vercel ставит зависимости у себя). <b>npm install</b> понадобится,
+    только если захочешь запускать/собирать облако <b>локально</b>.</p>
+
+  <p class="note">📌 Код на ветке <b>fix/bug-hunt-52</b> (коммит <b>aa96443</b>). Когда проверишь — влей в <b>main</b>.</p>
+
+  <footer>
+    KiberQalqon · сгенерировано для Muhammadali · отметки сохраняются только пока открыта страница
+  </footer>
+</div>
+
+<script>
+  function cp(btn){
+    var code = btn.closest('.code').querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(function(){
+      var t = btn.textContent;
+      btn.textContent = '✓ Скопировано'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent = t; btn.classList.remove('done'); }, 1600);
+    }).catch(function(){
+      // fallback: выделить текст
+      var r = document.createRange(); r.selectNodeContents(btn.closest('.code').querySelector('code'));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Выделено — Ctrl+C';
+    });
+  }
+</script>
+</body>
+</html>

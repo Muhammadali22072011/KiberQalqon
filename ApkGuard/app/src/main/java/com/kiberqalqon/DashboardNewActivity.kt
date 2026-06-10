@@ -50,6 +50,11 @@ class DashboardNewActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
         }
 
+        // UX-01: "Karantin" plitkasi — karantin ekranini ochadi (tiklash/butunlay o'chirish).
+        binding.tileQuarantine.setOnClickListener {
+            startActivity(Intent(this, QuarantineActivity::class.java))
+        }
+
         binding.btnRefresh.setOnClickListener {
             loadStatistics()
         }
@@ -76,6 +81,10 @@ class DashboardNewActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // BG-01: ilova ochilganda real-time himoyani (idempotent) qaytaramiz. Ruxsat berilgach,
+        // aynan shu yerda xizmat yoqiladi va birinchi marta "Himoyangiz yoqildi" chiqadi
+        // (foreground-Activity'dan start HAR DOIM ruxsat etiladi — Android 12+ OEM-kill'dan keyin ham).
+        ProtectionActivator.activateIfReady(this)
         // Перерисовываем threat row'ы и список установленных приложений при каждом
         // возврате — пользователь мог в другом экране совершить новый scan,
         // установить/удалить приложение, и dashboard должен это отразить.
@@ -399,10 +408,14 @@ class DashboardNewActivity : AppCompatActivity() {
     private fun getStatistics(): Statistics {
         val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
 
+        // UX-06: "Karantin" plitkasi uchun HAQIQIY karantin sonini olamiz (avval total_safe —
+        // xavfsiz skanlar soni ko'rsatilardi, ya'ni karantin bo'sh bo'lsa ham "Karantin: 154").
+        val quarantineCount = try { Quarantine.list(this).size } catch (_: Throwable) { 0 }
         return Statistics(
             totalScanned = prefs.getInt("total_scanned", 0),
             totalBlocked = prefs.getInt("total_blocked", 0),
             totalSafe = prefs.getInt("total_safe", 0),
+            quarantineCount = quarantineCount,
             weekData = getWeekData(prefs)
         )
     }
@@ -424,8 +437,8 @@ class DashboardNewActivity : AppCompatActivity() {
         // "Yorug' minimal": raqamlar jonli sanaladi (count-up), darhol o'rnatilmaydi.
         AnimationHelper.countUp(binding.tvTotalScanned, stats.totalScanned, startDelay = 120)
         AnimationHelper.countUp(binding.tvTotalBlocked, stats.totalBlocked, startDelay = 220)
-        // Repurposed: was "safe count" — design §3.3 shows "Karantin" here, treat as quarantined files
-        AnimationHelper.countUp(binding.tvTotalSafe, stats.totalSafe, startDelay = 320)
+        // UX-06: "Karantin" plitkasi — endi haqiqiy karantin fayllar soni (Quarantine.list).
+        AnimationHelper.countUp(binding.tvTotalSafe, stats.quarantineCount, startDelay = 320)
 
         val protectionLevel = calculateProtectionLevel(stats)
         binding.speedometer.setProtectionLevel(protectionLevel, animate = true)
@@ -461,6 +474,7 @@ class DashboardNewActivity : AppCompatActivity() {
         val totalScanned: Int,
         val totalBlocked: Int,
         val totalSafe: Int,
+        val quarantineCount: Int,
         val weekData: List<Int>
     )
 }

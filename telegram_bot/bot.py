@@ -39,6 +39,8 @@ from typing import Optional
 try:
     from telegram import Update
     from telegram.constants import ChatAction
+    from telegram.error import BadRequest
+    from telegram.helpers import escape_markdown
     from telegram.ext import (
         ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters,
     )
@@ -55,6 +57,16 @@ SAMPLES_DIR.mkdir(exist_ok=True)
 # Лимит размера файла: бесплатные Telegram-боты получают до 20 MB через getFile.
 # Большие файлы можно принимать только через MTProto (TelegramAPI), что сложнее.
 MAX_APK_SIZE = 20 * 1024 * 1024
+
+# PY-01: SAMPLES_DIR cheksiz o'smasligi uchun QAT'IY kvota + rotatsiya. Aks holda har qabul
+# qilingan fayl abadiy saqlanib (rotatsiya/TTL yo'q edi), istalgan foydalanuvchi bir nechta katta
+# fayl bilan diskni to'ldirib (100MB bepul host) botni QAYTMASLIK bilan ishdan chiqarardi.
+SAMPLES_MAX_BYTES = 60 * 1024 * 1024   # jami ≤ 60MB
+SAMPLES_MAX_COUNT = 200                 # halqa-bufer: oxirgi 200 namuna
+
+# PY-03: per-user rate-limit — bir foydalanuvchi N soniyada bittadan ko'p fayl yubormasin (flud DoS).
+RATE_LIMIT_SEC = 20.0
+_last_seen: dict[int, float] = {}
 
 # apk_analyzer.py to'liq muvaffaqiyatli tahlilda doim shu bo'limni chiqaradi.
 # Bu satr yo'q bo'lsa — tahlil yarim qolgan, natija ishonchsiz (hech qachon "safe" deb hisoblamaymiz).
@@ -90,11 +102,46 @@ async def cmd_help(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_markdown(HELP_UZ)
 
 
+def _sample_files() -> list[Path]:
+    """SAMPLES_DIR'dagi yig'ilgan namuna fayllar (work_* papkalari emas)."""
+    return sorted(
+        (p for p in SAMPLES_DIR.glob("*") if p.is_file()),
+        key=lambda p: p.stat().st_mtime,
+    )
+
+
+def _enforce_sample_quota(incoming_bytes: int) -> None:
+    """PY-01: yangi faylni saqlashdan OLDIN halqa-bufer rotatsiyasi — eng eski namunalarni
+    o'chirib, jami hajm SAMPLES_MAX_BYTES va son SAMPLES_MAX_COUNT ichida turishini ta'minlaymiz."""
+    files = _sample_files()
+    total = sum(p.stat().st_size for p in files)
+    i = 0
+    while files and (total + incoming_bytes > SAMPLES_MAX_BYTES or len(files) - i >= SAMPLES_MAX_COUNT):
+        victim = files[i]
+        try:
+            total -= victim.stat().st_size
+            victim.unlink()
+        except Exception:
+            pass
+        i += 1
+
+
 async def on_apk(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     msg = update.message
     doc = msg.document
     if doc is None:
         return
+
+    # PY-03: per-user rate-limit — flud bilan botni band qilib qo'yishni oldini olamiz.
+    uid = update.effective_user.id if update.effective_user else 0
+    now = time.monotonic()
+    last = _last_seen.get(uid, 0.0)
+    if now - last < RATE_LIMIT_SEC:
+        await msg.reply_text(
+            f"⏳ Birozdan so'ng urinib ko'ring (har {int(RATE_LIMIT_SEC)} soniyada bitta fayl)."
+        )
+        return
+    _last_seen[uid] = now
 
     # Принимаем только .apk и application/vnd.android.package-archive.
     name = (doc.file_name or "").lower()
@@ -112,11 +159,17 @@ async def on_apk(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await msg.chat.send_action(ChatAction.TYPING)
     await msg.reply_text("⏳ Faylni qabul qildim, tekshirayapman...")
 
+    # PY-01: kvota — saqlashdan oldin eski namunalarni rotatsiya qilamiz.
+    try:
+        _enforce_sample_quota(doc.file_size or MAX_APK_SIZE)
+    except Exception:
+        log.exception("quota enforce failed")
+
     save_path = SAMPLES_DIR / f"{int(time.time())}_{_safe_filename(doc.file_name or 'sample.apk')}"
     try:
         tg_file = await context.bot.get_file(doc.file_id)
         await tg_file.download_to_drive(custom_path=str(save_path))
-    except Exception as e:
+    except Exception:
         log.exception("Failed to download")
         # Yarim yuklangan faylni darhol tozalaymiz, aks holda _run_analyzer corrupted ZIP'da yiqiladi
         try:
@@ -124,7 +177,8 @@ async def on_apk(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 save_path.unlink()
         except Exception:
             pass
-        await msg.reply_text(f"❌ Faylni yuklab bo'lmadi: {e}")
+        # PY (past): xom istisno matni (server yo'llari) chiqarilmaydi — umumiy xabar.
+        await msg.reply_text("❌ Faylni yuklab bo'lmadi — qayta urinib ko'ring.")
         return
 
     # Yuklab bo'lingach o'lchamni tekshirib ko'ramiz — agar 100 bayt dan kichik bo'lsa
@@ -139,7 +193,11 @@ async def on_apk(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     verdict = await asyncio.to_thread(_run_analyzer, save_path)
     text = _format_verdict(verdict, save_path)
-    await msg.reply_markdown(text)
+    # PY-03: Markdown parse xatosida vердикт (jumladan XAVFLI) YO'QOLMASIN — oddiy matnga tushamiz.
+    try:
+        await msg.reply_markdown(text)
+    except BadRequest:
+        await msg.reply_text(text.replace("*", "").replace("`", ""))
 
 
 def _safe_filename(name: str) -> str:
@@ -154,11 +212,9 @@ def _run_analyzer(apk_path: Path) -> dict:
     """
     workdir = SAMPLES_DIR / f"work_{apk_path.stem}"
     workdir.mkdir(exist_ok=True)
-    target_apk = workdir / "sample.apk"
-    try:
-        target_apk.write_bytes(apk_path.read_bytes())
-    except Exception as e:
-        return {"risk": "error", "reasons": [f"nusxa olishda xato: {e}"], "perms": []}
+    # PY-01: APK'ni IKKINCHI marta NUSXA QILMAYMIZ (avval target_apk = save_path nusxasi har
+    # tahlilда diskni ikkilantirardi). Analizator faylni to'g'ridan-to'g'ri save_path'dan oladi,
+    # workdir esa faqat extraction (apk_extracted) uchun.
 
     analyzer = PROJECT_ROOT / "apk_analyzer.py"
     if not analyzer.is_file():
@@ -167,10 +223,9 @@ def _run_analyzer(apk_path: Path) -> dict:
 
     try:
         # APK yo'lini VA chiqish papkasini analizatorga ANIQ argument qilib beramiz —
-        # u faylni cwd'dan emas, aniq berilgan yo'ldan oladi. (Avval cwd'ga tayanardi,
-        # lekin analizator faylni o'z papkasidan qidirardi → har doim "topilmadi" → soxta SAFE.)
+        # u faylni cwd'dan emas, aniq berilgan yo'ldan oladi.
         proc = subprocess.run(
-            [sys.executable, str(analyzer), str(target_apk), str(workdir)],
+            [sys.executable, str(analyzer), str(apk_path), str(workdir)],
             cwd=str(workdir),
             timeout=120,
             capture_output=True,
@@ -180,8 +235,10 @@ def _run_analyzer(apk_path: Path) -> dict:
         )
     except subprocess.TimeoutExpired:
         return {"risk": "error", "reasons": ["tahlil 2 daqiqadan oshib ketdi"], "perms": []}
-    except Exception as e:
-        return {"risk": "error", "reasons": [f"analizator ishlamadi: {e}"], "perms": []}
+    except Exception:
+        # PY (past): xom istisno matni chiqarilmaydi.
+        log.exception("analyzer subprocess failed")
+        return {"risk": "error", "reasons": ["analizator ishlamadi"], "perms": []}
     finally:
         # work_* (nusxa sample.apk + apk_extracted) — vaqtinchalik, doim tozalaymiz.
         # To'plangan asl namuna (save_path) saqlanadi.
@@ -204,7 +261,13 @@ def _parse_analyzer_output(text: str) -> dict:
     reasons: list[str] = []
     in_perms = False
     in_threats = False
+    dex_count = 0  # «--- DEX файлы (код приложения): N ---» — позитивное доказательство, что код реально извлечён
     for line in text.splitlines():
+        if "DEX" in line and "код приложения" in line:
+            digits = "".join(ch for ch in line.split(":")[-1] if ch.isdigit())
+            if digits:
+                dex_count = int(digits)
+            continue
         if "ОПАСНЫЕ" in line and "РАЗРЕШЕНИЯ" in line:
             in_perms, in_threats = True, False
             continue
@@ -233,6 +296,12 @@ def _parse_analyzer_output(text: str) -> dict:
         risk = "danger"
     elif score >= 1 or perms:
         risk = "suspicious"
+    elif dex_count == 0:
+        # Hech qanday DEX chiqmadi — analizator haqiqiy kodni ko'rmadi (GP-bit evaziya / buzuq ZIP).
+        # POZITIV dalilsiz "safe" YO'Q: hech bo'lmaganda "shubhali" (oltin qoida #1).
+        risk = "suspicious"
+        if not reasons:
+            reasons = ["[BO'SH] kod (DEX) topilmadi — tahlil ishonchsiz, ehtiyot bo'ling"]
     else:
         risk = "safe"
     return {"risk": risk, "reasons": reasons[:5], "perms": perms[:8]}
@@ -244,20 +313,28 @@ def _format_verdict(v: dict, path: Path) -> str:
         body = "\n".join(v.get("reasons", []) or ["noma'lum xato"])
         return f"⚠️ *Tekshirib bo'lmadi*\n\nSabab:\n{body}"
 
+    # PY-03: ZARARLI APK ichidagi entry-nomi (reasons'ga, masalan `[kategoriya] 'kw' в <yo'l>`)
+    # va fayl nomi MARKDOWN'da ekranlanadi. Avval ekranlanmasdi → maxsus belgili nom (` _ [ ])
+    # "can't parse entities" bilan vердиктни (jumladan XAVFLI) yetkazmasdan yiqitardi.
     emoji = {"safe": "🟢 *XAVFSIZ*", "suspicious": "🟠 *SHUBHALI*", "danger": "🔴 *XAVFLI*"}[risk]
-    parts = [emoji, f"`{path.name}`"]
+    parts = [emoji, f"`{escape_markdown(path.name)}`"]
     if v["perms"]:
         parts.append("\n*Talab qilingan ruxsatlar:*")
         for p in v["perms"]:
             short = p.rsplit(".", 1)[-1]
-            parts.append(f"• {short}")
+            parts.append(f"• {escape_markdown(short)}")
     if v["reasons"]:
         parts.append("\n*Xavf belgilari:*")
         for r in v["reasons"]:
-            parts.append(f"• {r}")
+            parts.append(f"• {escape_markdown(r)}")
     if risk == "danger":
         parts.append("\n❌ *Bu faylni telefonga o'rnatmang!*")
     return "\n".join(parts)
+
+
+async def _on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # PY-03: global error-handler — qayd etilmagan istisno botni jim qoldirmasin (logga yozamiz).
+    log.exception("Unhandled error", exc_info=context.error)
 
 
 def main() -> int:
@@ -269,6 +346,7 @@ def main() -> int:
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(MessageHandler(filters.Document.ALL, on_apk))
+    app.add_error_handler(_on_error)
     log.info("Bot started — waiting for APKs...")
     app.run_polling(close_loop=False)
     return 0

@@ -35,15 +35,18 @@ export function readGeo(req: VercelRequest): Geo {
 // mijozning IP'si bo'ladi; bo'lmasa x-real-ip. Lokal dev'da null. Egasi paneliga
 // ko'rsatish uchun saqlanadi (maxfiylik siyosatida oshkor qilingan).
 export function clientIp(req: VercelRequest): string | null {
-  const xff = req.headers['x-forwarded-for'];
-  const raw = Array.isArray(xff) ? xff[0] : xff;
-  if (typeof raw === 'string' && raw.trim()) {
-    const first = raw.split(',')[0].trim();
-    if (first) return first;
-  }
+  // CL-01: x-real-ip'ni AFZAL ko'ramiz — uni Vercel o'zi qo'yadi (haqiqiy ulanish IP'si),
+  // klient soxtalashtira olmaydi. x-forwarded-for'ning chap qiymati klient nazoratida —
+  // panelда soxta IP ko'rsatilmasligi uchun unга tayanmaymiz. XFF kerak bo'lsa OXIRGI hop.
   const real = req.headers['x-real-ip'];
   const r = Array.isArray(real) ? real[0] : real;
   if (typeof r === 'string' && r.trim()) return r.trim();
+  const xff = req.headers['x-forwarded-for'];
+  const raw = Array.isArray(xff) ? xff[0] : xff;
+  if (typeof raw === 'string' && raw.trim()) {
+    const parts = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
   return null;
 }
 

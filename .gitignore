@@ -35,6 +35,12 @@ release.keystore*
 /resources/
 /competitor_cyberhimoya/
 **/unpacked/
+# Karantin-papkalar: malware namunalari va dekompilyatsiya qilingan begona ilova kodlari.
+# Butun katalog bilan e'tiborga olinmaydi (faqat kengaytma bo'yicha emas) — bitta `git add -A`
+# raqobatchining dekompilyatsiya qilingan kodi (mualliflik huquqi + RE izi) yoki .xapk/переименованный
+# sample'ni jim qo'shib qo'ymasin.
+/_samples/
+/_competitor/
 
 # ============================================================
 #  BUNDLED TOOLING — large & regenerable
@@ -70,5 +76,14 @@ Thumbs.db
 #  LOGS & LARGE GENERATED REPORTS
 # ============================================================
 *.log
+build_log.txt
 scan_report_*.txt
 result_analiza.txt
+
+# ============================================================
+#  ROOT SCREENSHOTS (ишчи скриншотлар — репога керак эмас)
+# ============================================================
+/kq_screen*.png
+/s3.png
+/s4.png
+/s5.png

@@ -35,14 +35,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSess] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
 
-  const logout = useCallback(() => {
+  const logout = useCallback((reason?: 'expired') => {
+    // Sababни Login sahifasi o'qib "Sessiya muddati tugadi" deb ko'rsatadi (jim tashlanmasin).
+    if (reason) { try { sessionStorage.setItem('kq_logout_reason', reason); } catch { /* ignore */ } }
     clearSession();
     setSess(null);
   }, []);
 
-  // API 401 qaytarsa — avtomatik chiqish.
+  // API 401 qaytarsa — avtomatik chiqish (sessiya muddati tugagan deb belgilaymiz).
   useEffect(() => {
-    setUnauthHandler(() => setSess(null));
+    setUnauthHandler(() => { try { sessionStorage.setItem('kq_logout_reason', 'expired'); } catch { /* ignore */ } setSess(null); });
     return () => setUnauthHandler(null);
   }, []);
 
@@ -63,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!session?.exp) return;
     const delay = session.exp * 1000 - Date.now();
-    if (delay <= 0) { logout(); return; }
-    const id = window.setTimeout(logout, delay);
+    if (delay <= 0) { logout('expired'); return; }
+    const id = window.setTimeout(() => logout('expired'), delay);
     return () => window.clearTimeout(id);
   }, [session, logout]);
 

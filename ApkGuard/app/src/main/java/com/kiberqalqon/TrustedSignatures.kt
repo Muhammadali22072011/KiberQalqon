@@ -1,5 +1,9 @@
 package com.kiberqalqon
 
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+
 /**
  * Whitelist официальных приложений, которые часто триггерят false positive.
  *
@@ -11,24 +15,26 @@ package com.kiberqalqon
  *   пока подпись отличается от установленной. Но в APK-файле (offline scan) пакет — это просто
  *   строка. Без проверки cert-fingerprint whitelist по package превращается в backdoor.
  *
- * КАК ДОБАВИТЬ НОВУЮ ЗАПИСЬ:
- *   1) Установи официальное приложение (с Google Play или с сайта банка).
- *   2) Запусти scripts/extract_cert_fingerprint.py path/to/official.apk
- *   3) Скопируй package + sha256 в [ENTRIES] ниже.
+ * ТРИ ИСТОЧНИКА доверенных (package, cert) пар:
+ *   1) [ENTRIES] — статически зашитые (нужны РЕАЛЬНЫЕ fingerprints; пусто по умолчанию).
+ *   2) [dynamicSelf] — сам KiberQalqon (вычисляется в рантайме, [registerSelf]).
+ *   3) [dynamicVendors] — сертификаты доверенных вендоров, РЕАЛЬНО установленных на
+ *      устройстве ИЗ Google Play ([captureInstalledTrusted]). Без выдуманных хэшей.
  *
  * ВАЖНО: пустой fingerprint = "пока не верифицирован" = whitelist не сработает.
  * Никогда не оставляй "" или "TODO" в проде — лучше удалить запись.
  */
 object TrustedSignatures {
 
-    /** Пара (sha256 cert) -> читаемое имя для логов и UI. */
+    /** Пара (package, sha256 cert) -> читаемое имя для логов и UI. */
     private val ENTRIES: Map<Pair<String, String>, String> = mapOf(
-        // Сам KiberQalqon — fingerprint вычисляется в рантайме (см. selfFingerprint()).
+        // Сам KiberQalqon — fingerprint вычисляется в рантайме (см. registerSelf()).
         // Здесь только остальные.
 
         // ----- НИЖЕ FINGERPRINTS НУЖНО ЗАПОЛНИТЬ ВРУЧНУЮ -----
         // Скрипт: python scripts/extract_cert_fingerprint.py <apk>
-        // Пока пусто — whitelist по этим пакетам НЕ сработает (это безопасное поведение по умолчанию).
+        // Пока пусто — whitelist по этим пакетам опирается на dynamicVendors (рантайм-пин
+        // с Google Play). Это безопасное поведение по умолчанию (никаких выдуманных хэшей).
 
         // ("org.telegram.messenger" to "<sha256>")     to "Telegram",
         // ("org.telegram.messenger.web" to "<sha256>") to "Telegram (web)",
@@ -45,16 +51,54 @@ object TrustedSignatures {
      */
     private val dynamicSelf = mutableMapOf<Pair<String, String>, String>()
 
+    /**
+     * Сертификаты доверенных вендоров (AppReputation.TRUSTED_EXACT), реально установленных
+     * на устройстве из Google Play. Заполняется в фоне через [captureInstalledTrusted].
+     * ConcurrentHashMap — пишется из фонового потока, читается сканером.
+     */
+    private val dynamicVendors = java.util.concurrent.ConcurrentHashMap<Pair<String, String>, String>()
+
     fun registerSelf(packageName: String, sha256: String) {
         if (sha256.isNotBlank()) {
             dynamicSelf[packageName to sha256] = "KiberQalqon (self)"
         }
     }
 
+    /**
+     * Закрепляет (pin) сертификаты доверенных вендоров, РЕАЛЬНО установленных на устройстве
+     * из Google Play. Тогда offline-скан APK с такой парой (package, cert) сразу даёт SAFE —
+     * без device-проверки AppReputation. Никаких выдуманных fingerprint'ов: всё берётся из
+     * настоящего установленного приложения. Снижение риска: пиним ТОЛЬКО приложения, чей
+     * источник установки — Google Play (com.android.vending). Вызывать в фоне.
+     */
+    fun captureInstalledTrusted(context: Context) {
+        val pm = context.packageManager
+        for (pkg in AppReputation.exactTrustedPackages()) {
+            try {
+                if (!isFromTrustedStore(pm, pkg)) continue
+                val fp = CertUtil.installedFingerprintSha256(context, pkg) ?: continue
+                if (fp.isNotBlank()) dynamicVendors[pkg to fp] = pkg
+            } catch (_: Throwable) {
+                // не установлено / не видно (package visibility) — пропускаем, это безопасно.
+            }
+        }
+    }
+
+    private fun isFromTrustedStore(pm: PackageManager, pkg: String): Boolean = try {
+        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            pm.getInstallSourceInfo(pkg).installingPackageName
+        } else {
+            @Suppress("DEPRECATION") pm.getInstallerPackageName(pkg)
+        }
+        installer == "com.android.vending"   // Google Play Store
+    } catch (_: Throwable) {
+        false
+    }
+
     /** Вернёт имя доверенного приложения, если (package, fingerprint) в whitelist. */
     fun trustedName(packageName: String?, sha256: String?): String? {
         if (packageName.isNullOrBlank() || sha256.isNullOrBlank()) return null
         val key = packageName to sha256
-        return ENTRIES[key] ?: dynamicSelf[key]
+        return ENTRIES[key] ?: dynamicSelf[key] ?: dynamicVendors[key]
     }
 }

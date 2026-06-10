@@ -52,7 +52,7 @@ class ReportProblemActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.rp_empty), Toast.LENGTH_SHORT).show()
             return
         }
-        if (BuildConfig.DEV_TG_BOT_TOKEN.isBlank() || BuildConfig.DEV_TG_CHAT_ID.isBlank()) {
+        if (Secrets.tgBotToken().isBlank() || Secrets.tgChatId().isBlank()) {
             Toast.makeText(this, getString(R.string.rp_not_configured), Toast.LENGTH_LONG).show()
             return
         }

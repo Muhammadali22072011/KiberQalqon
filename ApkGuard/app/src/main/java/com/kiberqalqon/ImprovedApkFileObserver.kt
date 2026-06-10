@@ -99,6 +99,13 @@ class ImprovedApkFileObserver(
      * shuning uchun foydalanuvchi hech nima ko'rmasdi.
      */
     private fun onApkReady(file: File) {
+        // BG-02: foydalanuvchi fon himoyani o'chirgan bo'lsa — real-time observer ham JIM turishi
+        // kerak (avval observer tumblerni umuman tekshirmasdi: "o'chirilgan" deganда ham yangi APK
+        // popup ochib, telemetriya yuborardi).
+        try {
+            if (!Config.isBackgroundEnabled(context)) return
+        } catch (_: Throwable) { /* Config o'qib bo'lmasa — davom etamiz */ }
+
         try {
             TelemetryReporter.reportDownloadDetected(context, file.absolutePath, file.length())
         } catch (e: Throwable) {

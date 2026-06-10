@@ -60,6 +60,11 @@ export default function Layout() {
 
   useEffect(() => { setOpen(false); }, [loc.pathname]);
 
+  // Marshrut o'zgarganda kq_news_seen'ni qayta o'qiymiz: shu tabda /app/news ochilganda
+  // News.tsx mount-effekti seen vaqtini yozadi (bola effektlari ota'dan oldin ishlaydi),
+  // shuning uchun bu yerda o'qisak badge darhol tozalanadi (storage event kerak emas).
+  useEffect(() => { setSeenAt(Number(localStorage.getItem('kq_news_seen') || 0)); }, [loc.pathname]);
+
   // kq_news_seen o'zgarganini sezish: boshqa tab → 'storage'; shu tab (NewsCarousel /
   // News sahifasi setItem qiladi, 'storage' otmaydi) → focus/visibilitychange'da qayta o'qiymiz.
   useEffect(() => {

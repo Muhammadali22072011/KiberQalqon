@@ -30,3 +30,9 @@ dev.tg.chat.id=
 #                       kompilatsiya qilinmaydi — u faqat panelni ochish uchun.
 cloud.base.url=
 cloud.device.secret=
+
+# === Imzolangan remote-config (verdikt chegaralari) ===
+# Vercel ENV CONFIG_SIGNING_SECRET bilan AYNAN bir xil bo'lsin. Bu kalit APK ichiga
+# Shield shifrida kompilatsiya qilinadi (RemoteConfig imzoni tekshiradi). Bo'sh bo'lsa —
+# ilova baked (ichki) standart chegaralarda qoladi (xavfsiz, lekin markaziy tighten yo'q).
+config.signing.secret=

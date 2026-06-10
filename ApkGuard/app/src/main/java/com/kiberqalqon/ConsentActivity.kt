@@ -86,13 +86,14 @@ class ConsentActivity : AppCompatActivity() {
             cardConsent.visibility = View.VISIBLE
             btnClose.visibility = View.GONE
 
+            // UX-02: faqat ToS + Maxfiylik majburiy. "Jamoatchilik xavfsizligi uchun ma'lumot
+            // ulashish" — OPT-IN (mahsulot hamma joyda shunday deydi); avval u ham majburiy edi
+            // (qorong'i pattern: rozilik bermasdan antivirusdan foydalanib bo'lmasdi).
             val gate: () -> Unit = {
-                btnAccept.isEnabled =
-                    cbTerms.isChecked && cbPrivacy.isChecked && cbCommunity.isChecked
+                btnAccept.isEnabled = cbTerms.isChecked && cbPrivacy.isChecked
             }
             cbTerms.setOnCheckedChangeListener { _, _ -> gate() }
             cbPrivacy.setOnCheckedChangeListener { _, _ -> gate() }
-            cbCommunity.setOnCheckedChangeListener { _, _ -> gate() }
 
             btnAccept.setOnClickListener { onAccept(cbCommunity.isChecked) }
             btnDecline.setOnClickListener { onDecline() }
@@ -108,22 +109,10 @@ class ConsentActivity : AppCompatActivity() {
     private fun onAccept(communityConsent: Boolean) {
         Config.setUserConsent(this, true)
         Config.setCommunityShareConsent(this, communityConsent)
-        // Geo xaritasi jamoatchilik roziligi bilan darvozalangan. Rozilik berilgani uchun
-        // joylashuv ruxsatini AYNAN SHU YERDA so'raymiz — shunda qurilma xaritada to'g'ri
-        // nuqtada chiqadi va foydalanuvchi keyin Sozlamalarga qo'lda kirmaydi.
-        // Natija qanday bo'lishidan qat'i nazar keyingi ekranga o'tamiz.
-        if (communityConsent && !DeviceLocation.hasPermission(this)) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                REQ_LOCATION
-            )
-        } else {
-            proceedAfterConsent()
-        }
+        // UX-02: joylashuv ruxsati BU YERDA SO'RALMAYDI. "just-in-time permissions" o'zgartishi uni
+        // ProtectionStatus'dagi ixtiyoriy qatorga ko'chirgan edi — bu yerda yana so'rasak, geolokatsiya
+        // ikki marta so'raladi (consent + checklist), ya'ni olib tashlangan "marafon" qaytib keladi.
+        proceedAfterConsent()
     }
 
     override fun onRequestPermissionsResult(

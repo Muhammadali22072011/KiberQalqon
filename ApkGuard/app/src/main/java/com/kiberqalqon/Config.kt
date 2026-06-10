@@ -23,6 +23,7 @@ private const val KEY_ACCENT = "accent_variant"
 private const val KEY_USER_CONSENT = "user_consent_v1"
 private const val KEY_CONSENT_TS = "user_consent_ts"
 private const val KEY_PROTECTION_ACKED = "protection_acked_v1"
+private const val KEY_WELCOME_SHOWN = "welcome_shown_v1"
 // Version bump — esli izmenim ToS/Privacy, podnimaem versiyu chtoby zapustit' soglasie zanovo.
 // v1: minimal threat data (hash, package, verdict, device model)
 // v2: + APK file upload + crash logs (developer debugging telemetry, opt-in)
@@ -61,6 +62,16 @@ object Config {
 
     fun setProtectionAcked(context: Context, acked: Boolean) {
         prefs(context).edit { putBoolean(KEY_PROTECTION_ACKED, acked) }
+    }
+
+    // "Himoyangiz yoqildi" bildirishnomasi BIR MARTA — himoya HAQIQATAN faollashganda
+    // (ruxsat berilgach), birinchi ochilishda ruxsatdan OLDIN emas (yolg'on "himoyalangan"ni
+    // oldini olamiz). [ProtectionActivator] ishlatadi.
+    fun isWelcomeShown(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_WELCOME_SHOWN, false)
+
+    fun setWelcomeShown(context: Context, shown: Boolean) {
+        prefs(context).edit { putBoolean(KEY_WELCOME_SHOWN, shown) }
     }
 
     fun isUploadEnabled(context: Context): Boolean =

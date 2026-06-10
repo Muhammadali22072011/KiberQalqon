@@ -17,11 +17,16 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
+        // BG-01: MY_PACKAGE_REPLACED (ilova yangilangach) ham shu yerda — bu broadcast fon'dan
+        // foreground-service start cheklovidan ISTISNO, shuning uchun yangilanishdan keyin real-time
+        // himoyani ishonchli qaytaradi (App.onCreate fon'dan startForegroundService chaqirsa Android
+        // 12+ da rad etardi va himoya ilova qo'lда ochilmaguncha o'lik qolardi).
         if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_MY_PACKAGE_REPLACED &&
             intent.action != "android.intent.action.QUICKBOOT_POWERON" &&
             intent.action != "com.htc.intent.action.QUICKBOOT_POWERON") return
 
-        Log.d(TAG, "Boot completed")
+        Log.d(TAG, "Boot/package-replaced: ${intent.action}")
         val app = context.applicationContext
         try {
             TelemetryReporter.reportBootCompleted(app)
@@ -62,19 +67,15 @@ class BootReceiver : BroadcastReceiver() {
         } catch (e: Throwable) {
             Log.w(TAG, "a11y watcher failed", e)
         }
-        // Periodik GuardWorker (15 daqiqa) — yangi APK fayllarni qidiradi
         try {
-            val request = androidx.work.PeriodicWorkRequestBuilder<GuardWorker>(
-                15, java.util.concurrent.TimeUnit.MINUTES
-            ).build()
-            // #34: App.scheduleGuardWork bilan BIR XIL unique nom — aks holda KEEP dedup
-            // qila olmasdi va reboot'dan keyin IKKITA parallel 15 daq'lik GuardWorker
-            // zanjiri ishlab (ikki barobar skan/alert) batareyani behuda yer edi.
-            androidx.work.WorkManager.getInstance(app).enqueueUniquePeriodicWork(
-                "kiberqalqon_scan",
-                androidx.work.ExistingPeriodicWorkPolicy.KEEP,
-                request
-            )
+            NotificationAccessWatcher.schedule(app)
+        } catch (e: Throwable) {
+            Log.w(TAG, "notif-access watcher failed", e)
+        }
+        // Periodik full-sweep GuardWorker (15 daqiqa) — App.scheduleGuardWork bilan BIR XIL
+        // unique nom va flag (UPDATE policy → bitta zanjir, reboot'dan keyin ham to'liq skan).
+        try {
+            GuardWorker.schedulePeriodic(app)
         } catch (e: Throwable) {
             Log.w(TAG, "GuardWorker schedule failed", e)
         }

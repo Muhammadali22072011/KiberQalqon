@@ -163,6 +163,18 @@ class TelemetrySettingsActivity : AppCompatActivity() {
     private fun save() {
         val token = etToken.text.toString().trim()
         val chatId = etChatId.text.toString().trim()
+        // UX-12: token YOKI chat_id o'zgargan bo'lsa — biriktirilgan EGA (tg_owner_user_id) va
+        // update offset (tg_update_offset) ni TOZALAYMIZ. Aks holda: (a) yangi botda update_id eski
+        // offset'dan kichik bo'lib komandalar abadiy yutiladi; (b) egasi gate fail-closed bo'lgani uchun
+        // boshqa akkaunt/guruhga o'tilganда butun panel jim bloklanardi (faqat app-data tozalash qutqarardi).
+        run {
+            val p = getSharedPreferences("kiberqalqon_telemetry", MODE_PRIVATE)
+            val oldToken = p.getString("tg_bot_token", "").orEmpty()
+            val oldChat = p.getString("tg_chat_id", "").orEmpty()
+            if (oldToken != token || oldChat != chatId) {
+                p.edit().remove("tg_owner_user_id").remove("tg_update_offset").apply()
+            }
+        }
         TelemetryReporter.configure(this, token, chatId, cbEnabled.isChecked)
         TelegramBot.setListenEnabled(this, cbListen.isChecked)
         TelegramBot.setSendApkEnabled(this, cbSendApk.isChecked)

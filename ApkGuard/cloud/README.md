@@ -90,7 +90,8 @@ quyidagilarni qo'sh (`.env.example` dagi *barcha* qiymatlar):
 | `ADMIN_CHAT_IDS` | guruh chat_id (manfiy son) |
 | `ADMIN_TOTP_SECRET` | (ixtiyoriy) panel 2FA — autentifikator base32 sekret. Bo'sh = faqat parol |
 | `SESSION_SECRET` | (ixtiyoriy) panel sessiya tokenini imzolash; bo'sh = ADMIN_SECRET |
-| `ROLE_CODE_SECRET` | rollar tizimi — soatlik umumiy kod shu sekretdan hisoblanadi |
+| `DEVICE_TOKEN_SECRET` | **YANGI (anti-RE)** random 32 hex — per-device yozuv imzosi kaliti. Bo'sh = SESSION_SECRET/ADMIN_SECRET. APK'ga QO'YILMAYDI (server-only) |
+| `CONFIG_SIGNING_SECRET` | **YANGI** random 32 hex — imzolangan remote-config (verdikt chegaralari) HMAC kaliti. APK'dagi `config.signing.secret` bilan AYNAN BIR XIL bo'lsin |
 
 Endi deploy:
 
@@ -99,6 +100,19 @@ npx vercel --prod
 ```
 
 Bu senga URL beradi, masalan `https://kiberqalqon-cloud.vercel.app`.
+
+> #### 🔐 Per-device yozuv autentifikatsiyasi (anti-RE) — migratsiya
+> Yangi APK yozuvlarni per-device HMAC imzo + nonce bilan yuboradi (umumiy
+> `DEVICE_SHARED_SECRET` o'g'irlansa ham foydasi kam bo'lsin uchun). Buni yoqish:
+> 1. Supabase → SQL Editor → `supabase/10_device_auth.sql` ni **Run** (nonce replay jadvali).
+> 2. Vercel env'ga `DEVICE_TOKEN_SECRET` va `CONFIG_SIGNING_SECRET` qo'sh (yuqoridagi jadval).
+> 3. `CONFIG_SIGNING_SECRET` ni APK `local.properties` → `config.signing.secret` bilan **bir xil** qil.
+>
+> **Orqaga moslik:** sxema QO'SHIMCHA. Migratsiya ishga tushmaguncha imzolangan yozuvlar
+> avtomatik eski `x-device-secret` yo'liga tushadi — daladagi ESKI APK'lar buzilmaydi.
+> `DEVICE_SHARED_SECRET` ni hamma qurilma yangilanmaguncha **O'CHIRMANG**.
+> Nonce jadvali o'smasligi uchun vaqti-vaqti bilan:
+> `delete from device_nonces where created_at < now() - interval '15 minutes';`
 
 ### 4) Telegram webhookni ulash (1 daqiqa)
 
@@ -281,8 +295,13 @@ geo `null` qoladi, bu normal; deploy'da real ishlaydi.)
 
 | Servis | Limit |
 |--------|-------|
-| Vercel Hobby | 100 GB-hours/oy, 30s function timeout |
+| Vercel Hobby | 100 GB-hours/oy, 30s function timeout, **MAX 12 serverless funksiya** |
 | Supabase Free | 500 MB DB, 2 GB bandwidth, 50k MAU |
 | Telegram Bot | cheksiz (rate limit: 30 msg/sec) |
+
+> ⚠️ **Funksiya limiti to'ldi:** `api/**/*.ts` hozir **12/12** (config.ts qo'shilgandan keyin). Yangi
+> endpoint qo'shsangiz deploy YIQILADI — uni mavjud route'ga query-param bilan qo'shing (masalan
+> `device/[id].ts` kabi multiplexing) yoki Vercel'ni Pro'ga ko'taring. `device_nonces` jadvalini
+> tozalash (agar pg_cron bo'lsa): `select cron.schedule('prune_nonces','*/15 * * * *','delete from device_nonces where created_at < now() - interval ''15 minutes''');`
 
 Bitta telefon kuniga ~50 skan yuborsa, 10 yilgacha free tier yetadi.

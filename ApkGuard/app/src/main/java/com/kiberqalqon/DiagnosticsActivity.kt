@@ -100,6 +100,18 @@ class DiagnosticsActivity : AppCompatActivity() {
         }
         root.addView(btnTelemetry)
 
+        val btnHidden = Button(this).apply {
+            text = "🔍 Yashirin / o'chmaydigan tahdidlar"
+            setOnClickListener {
+                try {
+                    startActivity(android.content.Intent(this@DiagnosticsActivity, HiddenThreatsActivity::class.java))
+                } catch (e: Exception) {
+                    Toast.makeText(this@DiagnosticsActivity, "Xato: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+        root.addView(btnHidden)
+
         // 🧪 Test scanner — генерирует синтетические "вирусы" и прогоняет через
         // наш ApkScanner. ТОЛЬКО в debug: TestVirusGenerator встраивает реальные IOC
         // (elrxzx.com, ydbllnjd.com, frida-server…) как тестовые образцы. В release
@@ -247,7 +259,7 @@ class DiagnosticsActivity : AppCompatActivity() {
      * Telegram kanaliga sozlanmagan bo'lsa, oddiy "ulashish" oynasiga qaytamiz.
      */
     private fun showSendToDevDialog() {
-        if (BuildConfig.DEV_TG_BOT_TOKEN.isBlank() || BuildConfig.DEV_TG_CHAT_ID.isBlank()) {
+        if (Secrets.tgBotToken().isBlank() || Secrets.tgChatId().isBlank()) {
             Toast.makeText(this, "Telegram kanal sozlanmagan — boshqa usulda yuboring", Toast.LENGTH_LONG).show()
             shareDiagnostics()
             return

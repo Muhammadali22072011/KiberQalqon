@@ -36,6 +36,14 @@ class ScanResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Tahdid verdikti maxfiy ekran — skrinshot/ekran yozuvini bloklaymiz (FLAG_SECURE),
+        // shunda boshqa ilova yoki overlay tahlilchi natija/IOC'larni ko'chirib ololmaydi.
+        try {
+            window.setFlags(
+                android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                android.view.WindowManager.LayoutParams.FLAG_SECURE
+            )
+        } catch (_: Throwable) { /* FLAG_SECURE muhim emas — UI ishlashda davom etadi */ }
         ThemeHelper.applyAccent(this)
         binding = ActivityScanResultBinding.inflate(layoutInflater)
         setContentView(binding.root)

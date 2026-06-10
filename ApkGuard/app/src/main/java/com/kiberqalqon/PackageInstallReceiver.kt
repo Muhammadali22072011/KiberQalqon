@@ -51,11 +51,17 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 if (isOwn) return
                 Log.d(TAG, "Package installed: $pkg")
                 scope.launch { scanInstalledPackage(ctx, pkg) }
+                // Yangi ilova darhol accessibility / bildirishnoma kirish so'rashi mumkin —
+                // ikkalasini ham real vaqtda kuzatamiz.
+                AccessibilityWatcher.checkNow(ctx)
+                NotificationAccessWatcher.checkNow(ctx)
             }
             Intent.ACTION_PACKAGE_REPLACED -> {
                 if (isOwn) return
                 Log.d(TAG, "Package replaced: $pkg")
                 scope.launch { rescanReplacedPackage(ctx, pkg) }
+                AccessibilityWatcher.checkNow(ctx)
+                NotificationAccessWatcher.checkNow(ctx)
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED, Intent.ACTION_PACKAGE_REMOVED -> {
                 // REMOVED prikhodit s EXTRA_REPLACING=true vo vremya update — skipaem.

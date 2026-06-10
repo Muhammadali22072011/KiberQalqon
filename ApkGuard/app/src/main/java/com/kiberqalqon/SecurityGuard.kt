@@ -8,8 +8,6 @@ import android.util.Log
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.net.InetSocketAddress
-import java.net.Socket
 
 /**
  * SecurityGuard — комплексная защита APK от взлома и анализа.
@@ -39,8 +37,16 @@ object SecurityGuard {
      * иначе приложение, установленное ИЗ Play, само себя закроет. Текущее значение —
      * для sideload/прямой установки APK, подписанного этим release.keystore.
      */
-    private const val EXPECTED_RELEASE_SIGNATURE_SHA256 =
-        "1CB3F378189D6EF38985B3AE234D859E750029AB353246FA496349A8FF14D983"
+    // Shield ([Shield]) shifrida — `strings`/jadx DEX'da imzo-xeshini OCHIQ ko'rmasin
+    // (tekshiruvni topib patch qilishni qiyinlashtiradi). Plaintext faqat kommentda.
+    // Asl (autoritativ) gate — native nSigInvalid (libkqguard.so); bu Kotlin qiymati
+    // .so yo'q bo'lgandagi fallback. Ikkalasi AYNAN bir xil qiymatni ushlaydi.
+    private val EXPECTED_RELEASE_SIGNATURE_SHA256: String by lazy {
+        try {
+            // 1CB3F378189D6EF38985B3AE234D859E750029AB353246FA496349A8FF14D983
+            Shield.dec("355d7564bd6c21760a38236d372aa14d67daa9bb461873810286d53057c2dc0d628db9f3ed6a8fadd0d5e8c1a6d0e86a987561c55462d647bb19b776ec5258bd")
+        } catch (_: Throwable) { "" }
+    }
 
     /**
      * Разрешённые источники установки. Если APK поставили не из этих источников
@@ -77,6 +83,7 @@ object SecurityGuard {
             "signature" to { isSignatureInvalid(ctx) },
             "root"     to { isRooted() },
             "debug"    to { isBeingDebugged() },
+            "native"   to { NativeBridge.antiDebugTripped() },
             "frida"    to { isFridaPresent() },
             "xposed"   to { isXposedPresent() },
             "emulator" to { isEmulator() },
@@ -131,8 +138,9 @@ object SecurityGuard {
      */
     @Suppress("DEPRECATION")
     private fun isSignatureInvalid(ctx: Context): Boolean {
-        // Если эталонная подпись не задана — пропускаем (на этапе разработки).
-        if (EXPECTED_RELEASE_SIGNATURE_SHA256.isBlank()) return false
+        // Kotlin const bo'sh (dev) VA native gate ham yo'q bo'lsa — tekshirib bo'lmaydi, o'tkazamiz.
+        // Native (libkqguard.so) yuklangan bo'lsa const bo'sh bo'lsa ham u tekshiradi.
+        if (EXPECTED_RELEASE_SIGNATURE_SHA256.isBlank() && !NativeBridge.isLoaded()) return false
 
         val pm = ctx.packageManager
         val signatures = try {
@@ -151,8 +159,12 @@ object SecurityGuard {
         for (sig in signatures) {
             val md = java.security.MessageDigest.getInstance("SHA-256")
             val hash = md.digest(sig.toByteArray()).joinToString("") { "%02X".format(it) }
-            if (hash.equals(EXPECTED_RELEASE_SIGNATURE_SHA256, ignoreCase = true)) {
-                return false // ok, нашли совпадение
+            // Native gate (libkqguard.so) — DEX'dan qiyin patch qilinadi → .so yuklangan
+            // bo'lsa AVTORITATIV. .so yo'q bo'lsa Kotlin const (Shield) fallback'i hal qiladi.
+            val nativeOk = NativeBridge.isLoaded() && !NativeBridge.signatureInvalid(hash)
+            val kotlinOk = hash.equals(EXPECTED_RELEASE_SIGNATURE_SHA256, ignoreCase = true)
+            if (nativeOk || kotlinOk) {
+                return false // imzo to'g'ri
             }
         }
         Log.w(TAG, "Signature does not match expected fingerprint")
@@ -164,12 +176,18 @@ object SecurityGuard {
     // ============================================================
 
     private fun isRooted(): Boolean {
+        // SD-03/SD-04: checkBootProps() OLIB TASHLANDI. U razlochilangan bootloader
+        // (ro.boot.flash.locked=0), verifiedbootstate=orange (har qanday kastom-ROM uchun ШТАТНЫЙ
+        // holat), ro.debuggable=1, veritymode=logging kabi ZAIF belgilarni root deb sanardi va
+        // bularsiz ham root BO'LMAGAN legit qurilmalarni (O'zbek bozoridagi arzon/инженер proshivkalar)
+        // jim o'ldirardi. Bundan tashqari har bir tekshiruv main-thread'da getprop'ni ProcessBuilder
+        // bilan fork qilardi (cold-start ANR riski). Endi root faqat ISHONCHLI to'g'ridan-to'g'ri
+        // marker bilan aniqlanadi: su binar, root-app, cloaker, Magisk fayllari/tmpfs-mount.
         return checkSuBinary() ||
                 checkRootApps() ||
                 checkRootCloakers() ||
                 checkMagiskFiles() ||
-                checkMagiskAdvanced() ||
-                checkBootProps()
+                checkMagiskAdvanced()
     }
 
     /**
@@ -242,6 +260,9 @@ object SecurityGuard {
      * Эти проверки делаются через `getprop` system-команду; на современных API
      * можно через android.os.SystemProperties (hidden API, требует рефлексию).
      */
+    // SD-03: endi isRooted() kill-yo'lida ISHLATILMAYDI (zaif indikatorlar legit kastom-ROM'ларни
+    // false-root qilardi). Advisory sifatida saqlanadi (kelajakda diagnostika uchun).
+    @Suppress("unused")
     private fun checkBootProps(): Boolean {
         val redFlags = mapOf(
             "ro.boot.flash.locked" to "0",
@@ -366,14 +387,10 @@ object SecurityGuard {
      * Стратегия — multi-vector: каждая проверка независима, любая срабатывает → DANGER.
      */
     private fun isFridaPresent(): Boolean {
-        // Проверка №1 — стандартные + пара "тихих" портов, которые Frida-вариации
-        // иногда используют (RPC и file-transfer).
-        for (port in FRIDA_PORTS) {
-            if (isPortOpen(port)) {
-                Log.w(TAG, "Frida port open: $port")
-                return true
-            }
-        }
+        // SECGUARD-01: avval bu yerda 5 ta portga AKTIV TCP-connect (har biri 150ms timeout =
+        // sovuq startda ~750ms bloklash, main-thread'da) bor edi. Olib tashlandi — pastdagi
+        // №4 tekshiruvi (/proc/self/net/tcp) AYNAN shu Frida portlarini soketsiz, bloklamasdan
+        // aniqlaydi. Shunday qilib startup tezlashadi, Frida aniqlash saqlanadi.
 
         // Проверка №2 — frida-gadget / GumJS библиотека загружена в наш процесс.
         try {
@@ -448,17 +465,6 @@ object SecurityGuard {
             "626c5e339a",         // frida
             "7471583bd63964275f61" // pool-frida
         )
-    }
-
-    private fun isPortOpen(port: Int): Boolean {
-        return try {
-            Socket().use { s ->
-                s.connect(InetSocketAddress("127.0.0.1", port), 150)
-                true
-            }
-        } catch (_: Exception) {
-            false
-        }
     }
 
     private fun isXposedPresent(): Boolean {

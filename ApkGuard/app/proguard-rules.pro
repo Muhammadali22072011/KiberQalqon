@@ -86,11 +86,14 @@
 
 # --- Сторонние зависимости ---
 # OkHttp
+# anti-RE (medium);: `-keep class okhttp3.** { *; }` УДАЛЁН. Он сохранял весь OkHttp с читаемыми
+# именами → стандартный Frida-хук `Java.use("okhttp3.Request$Builder").header` снимал ВСЕ исходящие
+# заголовки (x-device-secret/HMAC к облаку), не трогая ни Shield, ни нативную либу — самый дешёвый
+# обход всей ветки hardening. OkHttp 4.x не требует keep-правил: consumer-rules лежат в jar
+# (META-INF/proguard); достаточно -dontwarn ниже.
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn org.conscrypt.**
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
 
 # AndroidX WorkManager
 -dontwarn androidx.work.**
@@ -105,3 +108,12 @@
 # --- Reflection: предупреждения, на которые можно забить ---
 -dontwarn java.lang.invoke.**
 -dontwarn javax.annotation.**
+
+# --- JNI / Native (libkqguard.so) ---
+# JNI_OnLoad ichida RegisterNatives FindClass("com/kiberqalqon/NativeBridge") bo'yicha
+# bog'lanadi — shuning uchun klass NOMI R8'dan keyin ham saqlanishi SHART, aks holda
+# native binding yiqiladi (UnsatisfiedLinkError → loaded=false → himoya kuchsizlanadi).
+-keep class com.kiberqalqon.NativeBridge { *; }
+-keepclasseswithmembernames,includedescriptorclasses class * {
+    native <methods>;
+}

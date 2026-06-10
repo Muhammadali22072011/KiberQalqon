@@ -64,8 +64,9 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
 }
 
 export default function Devices() {
-  const { data, loading, error } = usePoll(() => apiGet<{ devices: DeviceRow[] }>('/api/devices'), 15000);
+  const { data, loading, error } = usePoll(() => apiGet<{ devices: DeviceRow[]; total?: number }>('/api/devices'), 15000);
   const devices = data?.devices || [];
+  const total = data?.total ?? devices.length;
   const [sel, setSel] = useState<string | null>(null);
 
   return (
@@ -77,7 +78,7 @@ export default function Devices() {
 
       <div className={'grid' + (sel ? ' map-grid' : '')}>
         <Panel>
-          <PanelHead sub="Ro‘yxat" title={`${devices.length} ta qurilma`} />
+          <PanelHead sub="Ro‘yxat" title={total > devices.length ? `${devices.length} / ${total} ta qurilma` : `${total} ta qurilma`} />
           <div style={{ overflowX: 'auto' }}>
             <table>
               <thead>
@@ -95,7 +96,7 @@ export default function Devices() {
                 {loading && !devices.length ? (
                   <tr><td colSpan={7}><Spinner label="Yuklanmoqda…" /></td></tr>
                 ) : error && !devices.length ? (
-                  <tr><td colSpan={7}><Empty>Yuklab bo‘lmadi: {error}</Empty></td></tr>
+                  <tr><td colSpan={7}><Empty>Ma‘lumotni yuklab bo‘lmadi — qayta urinilmoqda…</Empty></td></tr>
                 ) : !devices.length ? (
                   <tr><td colSpan={7}><Empty>Hozircha qurilma yo‘q</Empty></td></tr>
                 ) : (

@@ -62,7 +62,12 @@ object DropperDetector {
                     if (name == "AndroidManifest.xml") continue
                     // Подписи и стандартные ресурсы — скипаем.
                     if (name.startsWith("META-INF/") && !name.endsWith(".dex") && !name.endsWith(".apk")) continue
-                    if (name.startsWith("res/") && !looksLikeRawWithPayload(name)) continue
+                    // ENG-05: avval res/raw/'dan boshqa BARCHA res/ (res/drawable, res/mipmap...) magic
+                    // tekshiruvidan OLDIN tashlanardi — payload-DEX/APK/ELF'ni res/drawable/icon.png ga
+                    // qo'yib hiddenApks/hiddenDex/hiddenElf (qattiq DANGER signallari)ni butunlay aylanib
+                    // o'tish mumkin edi. Endi HAR res/ entry magic-baytlari tekshiriladi (assets/ kabi).
+                    // Yuqori-entropy (shifrlangan) evristikasi esa isSuspectEncryptedPayload ichida
+                    // baribir faqat assets/ + res/raw/ bilan cheklangan — FP oshmaydi.
 
                     // .so вне lib/{abi}/ — очень подозрительно
                     if (name.endsWith(".so") && !isInValidLib(name)) {
@@ -200,15 +205,9 @@ object DropperDetector {
 
     private fun isPayloadLocation(name: String): Boolean {
         return name.startsWith("assets/") ||
-                name.startsWith("res/raw/") ||
+                name.startsWith("res/") ||   // ENG-05: barcha res/ (faqat res/raw/ emas)
                 name.startsWith("META-INF/") ||
                 !name.contains("/")  // root-level random file
-    }
-
-    private fun looksLikeRawWithPayload(name: String): Boolean {
-        // res/raw/* + не "обычные" типы (xml, json, mp3, png, jpg, txt и т.п. — для них magic
-        // быстро отсеется в любом случае). Лучше проверяем всё что в res/raw/.
-        return name.startsWith("res/raw/")
     }
 
     /**

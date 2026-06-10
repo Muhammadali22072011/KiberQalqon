@@ -78,6 +78,11 @@ add('qoraqalpogiston', 'nukus', 'nokis', 'xojayli', 'khojeyli', 'beruniy', 'chim
 
 const sq = (a: number): number => a * a;
 
+// Eng yaqin shahar/viloyat masofasi shu chegaradan oshsa — null qaytaramiz. ~1.5° (~165 km)
+// kvadrati. Maqsad: O'zbekistondan TASHQARIDAGI qurilma (rouming, VPN-IP) eng yaqin UZ
+// shahriga "yopishib" hudud statistikasini ifloslantirmasin — u "Aniqlanmagan"ga tushadi.
+const MAX_SNAP_SQ = 2.25;
+
 // Qurilmani viloyatga biriktirish. Avval shahar nomi, keyin eng yaqin markaz.
 export function regionOf(lat?: number | null, lng?: number | null, city?: string | null): string | null {
   if (city && city.trim()) {
@@ -92,7 +97,7 @@ export function regionOf(lat?: number | null, lng?: number | null, city?: string
     const d = sq(lat - r.lat) + sq((lng - r.lng) * cosLat);
     if (d < bestD) { bestD = d; best = r.key; }
   }
-  return best;
+  return bestD <= MAX_SNAP_SQ ? best : null;
 }
 
 // ── Shahar/tuman darajasi (GPS bo'lsa nomni KOORDINATADAN aniqlaymiz) ───────────
@@ -255,5 +260,5 @@ export function nearestCity(lat?: number | null, lng?: number | null): string | 
     const d = sq(lat - c.lat) + sq((lng - c.lng) * cosLat);
     if (d < bestD) { bestD = d; best = c.name; }
   }
-  return best;
+  return bestD <= MAX_SNAP_SQ ? best : null;
 }

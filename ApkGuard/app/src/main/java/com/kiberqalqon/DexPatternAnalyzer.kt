@@ -39,7 +39,6 @@ import java.util.zip.ZipFile
 object DexPatternAnalyzer {
 
     private const val TAG = "DexPatternAnalyzer"
-    private const val MAX_DEX_SIZE = 30L * 1024 * 1024  // 30 MB на 1 dex — выше уже подозрительно
     private const val SAMPLE_SIZE = 4 * 1024 * 1024     // первые 4 MB достаточно для большинства
 
     data class Findings(
@@ -149,7 +148,12 @@ object DexPatternAnalyzer {
                 dexCount = entries.size
 
                 for (entry in entries) {
-                    if (entry.size <= 0 || entry.size > MAX_DEX_SIZE) continue
+                    // ENG-02: katta DEX'ni butunlay TASHLAB YUBORMAYMIZ. Avval >30MB DEX continue bilan
+                    // o'tkazib yuborilardi — malware classes.dex'ni ~31MB'gacha "padding" qilib butun bir
+                    // tirни (anti-Frida/anti-Magisk/TracerPid/SMS/overlay/packer/C2) o'chirib qo'yardi
+                    // (dexFindings.score=0, evasionCount=0). Endi hajmidan qat'i nazar birinchi
+                    // SAMPLE_SIZE (4MB) baytni doimo o'qiymiz — paттернlar odatda boshida.
+                    if (entry.size <= 0L) continue
                     val readBytes = entry.size.coerceAtMost(SAMPLE_SIZE.toLong()).toInt()
                     val buf = ByteArray(readBytes)
                     var off = 0

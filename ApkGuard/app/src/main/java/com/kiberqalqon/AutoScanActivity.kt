@@ -542,11 +542,16 @@ class AutoScanActivity : AppCompatActivity() {
             }
         }
 
-        val installedPkg = installedPackageForApk(apkPath)
+        // UX-05: avval lokal `installedPkg` MAYDONNI (this.installedPkg) soyalab qo'yardi — tugma
+        // matni "Ilovani o'chirish" bo'lar, lekin onClick'dagi deleteApk() MAYDONNI o'qib (null edi)
+        // faqat faylni o'chirib, O'RNATILGAN (eng shubhali!) ilovani qoldirardi. Endi maydonni
+        // aniqlangan paket bilan to'ldiramiz, shunda deleteApk() haqiqatan uninstall qiladi.
+        val detectedPkg = installedPackageForApk(apkPath)
+        if (detectedPkg != null) installedPkg = detectedPkg
         binding.btnDelete.visibility = View.VISIBLE
         binding.btnDelete.isEnabled = true
         binding.btnDelete.text =
-            if (installedPkg != null) getString(R.string.uninstall_app)
+            if (detectedPkg != null) getString(R.string.uninstall_app)
             else getString(R.string.delete_apk)
         binding.btnDelete.setOnClickListener { deleteApk() }
         binding.tvDeleteHint.visibility = View.VISIBLE

@@ -77,6 +77,9 @@ object MaliciousPackages {
     /** Returns family code name if the package is in blacklist, else null. */
     fun maliciousFamily(packageName: String?): String? {
         if (packageName.isNullOrBlank()) return null
-        return ENTRIES[packageName.lowercase()]
+        val key = packageName.lowercase()
+        // 1) qo'lda kiritilgan baza (yuqori sifat, mahalliy namunalar)
+        // 2) bulut feed (ThreatDb.packageFamily) — fallback. Init/feed bo'lmasa null.
+        return ENTRIES[key] ?: ThreatDb.packageFamily(key)
     }
 }

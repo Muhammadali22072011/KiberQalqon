@@ -29,27 +29,25 @@ class App : android.app.Application() {
         // САМАЯ ПЕРВАЯ строка: ставим CrashHandler чтобы поймать ВСЁ что упадёт ниже.
         CrashHandler.install(this)
 
+        // Native himoya kutubxonasini (libkqguard.so) erta yuklab qo'yamiz, SecurityGuard'gacha.
+        // Yuklanmasa (test JVM / ABI mos emas / NDK'siz build) crash BO'LMAYDI — NativeBridge
+        // ichida ushlanadi, chaqiruvchilar Kotlin fallback'iga tushadi.
+        NativeBridge.init()
+
         // Salom dekompilyatorlarga (logcat + DEX string). Foydalanuvchi ko'rmaydi.
         EasterEgg.stamp()
 
         // Ilk ochilishda barcha himoya sozlamalarini yoqilgan holatda saqlaymiz.
         // Foydalanuvchi hech narsa qilmasdan, o'rnatish bilan darhol "to'liq himoya"
         // rejimida ishlay boshlaydi.
-        val firstRun = try {
+        // Standart sozlamalarni "запекаем" (fon, tovush, sensitivity va h.k.) — lekin "Himoyangiz
+        // yoqildi" bildirishnomasi BU YERDA CHIQARILMAYDI. Avval birinchi ochilishda ruxsatdan OLDIN
+        // chiqib, yolg'on "himoyalangan" ko'rsatardi. Endi welcome FAQAT himoya haqiqatan faollashganda
+        // (ruxsat berilgach) [ProtectionActivator] orqali bir marta ko'rsatiladi.
+        try {
             Config.ensureFirstRunDefaults(this)
         } catch (e: Exception) {
             Log.e("KiberQalqon", "ensureFirstRunDefaults failed", e)
-            false
-        }
-        if (firstRun) {
-            // Birinchi ochilishda "Himoyangiz yoqildi" deb tasdiqlash bildirishnomasi.
-            // POST_NOTIFICATIONS ruxsati hali so'ralmagan bo'lishi mumkin (API 33+) —
-            // unda bildirishnoma sukut ravishda yo'q bo'lib ketadi, crash bo'lmaydi.
-            try {
-                NotificationHelper.showWelcomeNotification(this)
-            } catch (e: Exception) {
-                Log.w("KiberQalqon", "welcome notification failed", e)
-            }
         }
 
         // Запуск приложения — событие в Telegram-телеметрию.
@@ -62,16 +60,20 @@ class App : android.app.Application() {
             val sp = getSharedPreferences("kiberqalqon_lifecycle", MODE_PRIVATE)
             val lastStart = sp.getLong("last_start", 0L)
             val now = System.currentTimeMillis()
-            val gapHrs = if (lastStart > 0) (now - lastStart) / 3_600_000L else 0L
-            if (lastStart > 0 && gapHrs >= 12) {
+            val gapMs = if (lastStart > 0) now - lastStart else 0L
+            val gapHrs = gapMs / 3_600_000L
+            // BG: tanaffusni "o'ldirildi" deb sanashdan oldin TELEFON O'CHIQ bo'lganini chiqarib
+            // tashlaymiz. elapsedRealtime() = ребутдан beri o'tgan vaqt (telefon o'chsa nolга tushadi).
+            // Agar gap > uptime bo'lsa, demak shu tanaffus ichida qurilma o'chgan/ребут bo'lgan —
+            // bu OEM-kill emas (kechasi o'chirib qo'yilgan telefon har erta "himoyani o'ldirdi" deb
+            // qo'rqitmasin). BootReceiver bunday holatda himoyani allaqachon ko'taradi.
+            val wasPoweredOff = gapMs > android.os.SystemClock.elapsedRealtime()
+            if (lastStart > 0 && gapHrs >= 12 && !wasPoweredOff) {
                 TelemetryReporter.reportServiceKilled(this, "process — gap ${gapHrs} h")
             }
-            // 6 soatdan ko'p tanaffus — OEM o'ldirib qo'ygan deb hisoblaymiz va
-            // foydalanuvchiga eslatma chiqaramiz. 12 soat — telemetriya uchun
-            // alohida darajadagi signal. Faqat OEM cheklovlari bo'lgan qurilmalarda
-            // ko'rsatamiz, aks holda standart Android Doze'ni xabar chiqarishga sabab
-            // qilmasligimiz kerak.
-            if (lastStart > 0 && gapHrs >= 6 &&
+            // 6 soatdan ko'p UZLUKSIZ tanaffus (telefon yoniq turib) — OEM o'ldirib qo'ygan deb
+            // hisoblaymiz va eslatma chiqaramiz. Faqat OEM cheklovlari bor qurilmalarda.
+            if (lastStart > 0 && gapHrs >= 6 && !wasPoweredOff &&
                 OemAutostartGuide.hasOemRestrictions()) {
                 try {
                     NotificationHelper.showKillDetectedNotification(this, gapHrs)
@@ -92,6 +94,8 @@ class App : android.app.Application() {
             val result = SecurityGuard.runAllChecks(this)
             if (!result.passed) {
                 Log.e("KiberQalqon", "Security check failed: ${result.reason}. Exiting.")
+                // SD-02: jim o'ldirishdan oldin foydalanuvchiga sababni узбекча tushuntiramiz.
+                try { NotificationHelper.showSecurityBlockNotification(this, result.reason) } catch (_: Throwable) {}
                 android.os.Process.killProcess(android.os.Process.myPid())
                 kotlin.system.exitProcess(10)
             }
@@ -106,6 +110,9 @@ class App : android.app.Application() {
         // skandan OLDIN tayyor bo'lishi shart (ProtectionService/receiver'lar pastroqda).
         try {
             ThreatDb.init(this)
+            // Bulutdan yangilanadigan qora ro'yxat (keshlangan) — assets ustiga qo'shamiz.
+            // Tarmoq YO'Q: faqat avval tekshirilgan keshni ThreatDb'ga merge qiladi.
+            CloudBlacklist.loadCached(this)
         } catch (e: Throwable) {
             Log.e("KiberQalqon", "ThreatDb init failed", e)
         }
@@ -128,20 +135,18 @@ class App : android.app.Application() {
             Log.e("KiberQalqon", "Error registering self fingerprint", e)
         }
 
-        // Doimiy himoya bildirishnomasi — status bar'da "KIBER QALQON faol".
-        // Foydalanuvchi har doim ilova ishlayotganini ko'radi, qo'shimcha sozlama
-        // kerak emas. Foreground service prioritet OS'ga "bu jarayonni o'ldirma"
-        // signalini ham beradi.
-        if (Config.isBackgroundEnabled(this)) {
-            try {
-                ProtectionService.start(this)
-            } catch (e: Exception) {
-                Log.e("KiberQalqon", "ProtectionService start failed", e)
-            }
-        }
+        // Doimiy himoya xizmati — FAQAT himoya haqiqatan ishlay olganda (fon yoqilgan + fayl ruxsati
+        // bor) boshlanadi va shundagina "KIBER QALQON faol · himoyalangan" bildirishnomasi chiqadi.
+        // Ruxsatdan oldin yolg'on "himoyalangan" KO'RSATILMAYDI (foydalanuvchi talabi). Ruxsat
+        // berilgach, Activity onResume (Splash/Dashboard/Main/Himoya holati) shu yerdan qayta yoqadi.
+        // (Birinchi ochilishda fon'dan startForegroundService Android 12+ da rad etilishi mumkin —
+        //  shuning uchun asosiy ishonchli yoqish nuqtasi — foreground Activity onResume.)
+        ProtectionActivator.activateIfReady(this)
 
-        // WorkManager.getInstance() трогает диск — выносим в IO, чтобы не блокировать UI thread.
-        appScope.launch {
+        // WorkManager.getInstance() диск, CloudBlacklist.refresh/RemoteConfig — сеть (OkHttp .execute),
+        // captureInstalledTrusted — PackageManager IO. Всё это блокирующее → Dispatchers.IO, а не
+        // Default (CPU-пул): не занимаем вычислительные потоки сетевым ожиданием.
+        appScope.launch(Dispatchers.IO) {
             try {
                 scheduleGuardWork()
             } catch (e: Exception) {
@@ -163,6 +168,27 @@ class App : android.app.Application() {
                 CloudTelemetry.registerDevice(this@App)
             } catch (e: Exception) {
                 Log.e("KiberQalqon", "Cloud register failed", e)
+            }
+            // Imzolangan masofaviy config (verdikt chegaralari) ni fonda yangilaymiz — skan
+            // chegaralari APK ichida ANIQ turmasin. Xato/oflayn/imzo noto'g'ri → baked standartlar.
+            try {
+                RemoteConfig.refresh(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "RemoteConfig refresh failed", e)
+            }
+            // Bulut qora ro'yxatini fonda yangilaymiz (yangi hash/paketlar ilovani
+            // yangilamasdan bloklanadi). Imzo majburiy; xato/oflayn → assets bazasi qoladi.
+            try {
+                CloudBlacklist.refresh(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "CloudBlacklist refresh failed", e)
+            }
+            // Qurilmadagi o'rnatilgan ishonchli ilovalarning (Play'dan) sertifikatini pin
+            // qilamiz — offline skanda false-positive'ni kamaytiradi (TrustedSignatures).
+            try {
+                TrustedSignatures.captureInstalledTrusted(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "TrustedSignatures capture failed", e)
             }
         }
 
@@ -200,6 +226,9 @@ class App : android.app.Application() {
             // Любая новая запись — алерт в Telegram, потому что accessibility — главный
             // вектор современных банковских троянов.
             try { AccessibilityWatcher.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "a11y", e) }
+            // Каждые 4 часа смотрим enabled_notification_listeners — кража OTP через доступ
+            // к уведомлениям (банкеры воруют коды без RECEIVE_SMS).
+            try { NotificationAccessWatcher.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "notifaccess", e) }
         }
 
         // Slushaem state SIM/airplane/screen — vse v odnom dinamicheskom receivere,
@@ -219,13 +248,14 @@ class App : android.app.Application() {
             Log.e("KiberQalqon", "Failed to register SystemStateReceiver", e)
         }
 
-        // User-present (telefon ochilgan) eventi orqali darhol skan ishga tushiramiz.
+        // User-present (telefon QULFDAN chiqarilgan) eventi orqali darhol skan ishga tushiramiz.
         // OEM (Xiaomi/Huawei) WorkManager 15-daq periodik skanni o'ldirsa ham, foydalanuvchi
         // telefonni har ochganida biz yangi APK'larni qidiramiz — fast feedback loop.
+        // BG-03/perf: ACTION_SCREEN_ON OLIB TASHLANDI (ekran bildirishnomadan yonsa ham yurardi);
+        // faqat USER_PRESENT + receiver ichida 10 daqiqalik trottling.
         try {
             val screenFilter = android.content.IntentFilter().apply {
                 addAction(android.content.Intent.ACTION_USER_PRESENT)
-                addAction(android.content.Intent.ACTION_SCREEN_ON)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(ScreenUnlockReceiver(), screenFilter, android.content.Context.RECEIVER_NOT_EXPORTED)
@@ -238,11 +268,7 @@ class App : android.app.Application() {
     }
 
     private fun scheduleGuardWork() {
-        val request = PeriodicWorkRequestBuilder<GuardWorker>(15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "kiberqalqon_scan",
-            ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+        // Yagona periodik full-sweep skaner (avvalgi GuardWorker + PeriodicCheckWorker birlashtirildi).
+        GuardWorker.schedulePeriodic(this)
     }
 }

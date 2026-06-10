@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  KiberQalqon — tarmoq xavfsizligi sozlamasi (anti-RE).
+
+  • Cleartext (HTTP) BUTUNLAY taqiqlangan — telemetriya va qurilma kaliti faqat HTTPS'da
+    ketadi (tarmoqda ochiq sniff qilinmasin).
+  • kiberqalqon-cloud.vercel.app uchun sertifikat-PINNING: reverser o'zining proxy-CA'si
+    (Burp/mitmproxy) bilan TLS'ni MITM qilib qurilma kalitini/endpointlarni JONLI ushlay
+    OLMAYDI — bu "movdarukni qanday ishlashini bilib olish" yo'lini yopadi.
+
+  Pinlar CA DARAJASIDA (Google Trust Services), leaf EMAS: Vercel *.vercel.app leaf
+  sertifikatini tez-tez almashtiradi, lekin WR1 (intermediate) va GTS Root R1 (anchor)
+  barqaror — shuning uchun leaf rotatsiyasi telemetriyani uzmaydi. Pinlar jonli zanjirdan
+  olingan (openssl bilan tekshirilgan).
+
+  expiration: agar Vercel kelajakda CA'ni umuman almashtirsa, shu sanadan keyin pinning
+  AVTOMATIK o'chadi (telemetriya butunlay o'lib qolmasligi uchun fail-safe). O'sha holatda
+  ilovani yangi pin bilan qayta chiqarish kerak.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">kiberqalqon-cloud.vercel.app</domain>
+        <pin-set expiration="2027-06-01">
+            <!-- Google Trust Services WR1 — *.vercel.app ni imzolovchi intermediate -->
+            <pin digest="SHA-256">yDu9og255NN5GEf+Bwa9rTrqFQ0EydZ0r1FCh9TdAW4=</pin>
+            <!-- GTS Root R1 — barqaror ildiz (anchor) -->
+            <pin digest="SHA-256">hxqRlPTu1bMS/0DITB1SSu0vd4u/8l8TjPgfaAp63Gc=</pin>
+            <!-- ZAXIRA: ISRG Root X1 (Let's Encrypt). Hozir zanjirda YO'Q, lekin Vercel CA'ni
+                 almashtirsa (masalan LE'ga) telemetriya uzilmasligi uchun muqobil pin.
+                 Android pinlarni "yoki" deb qaraydi — bittasi mos kelsa yetadi. -->
+            <pin digest="SHA-256">C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>

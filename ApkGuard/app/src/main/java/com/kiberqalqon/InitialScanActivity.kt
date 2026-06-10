@@ -126,7 +126,7 @@ class InitialScanActivity : AppCompatActivity() {
             )
             .setCancelable(false)
             .setPositiveButton("Ruxsat berish") { _, _ -> openManageStorage() }
-            .setNegativeButton("Keyinroq") { _, _ -> goToDashboard() }
+            .setNegativeButton("Keyinroq") { _, _ -> goToDashboard(markDone = false) }
             .setOnDismissListener { askingAccess = false }
             .show()
     }
@@ -526,9 +526,24 @@ class InitialScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToDashboard() {
-        Config.setInitialScanDone(this)
-        startActivity(Intent(this, DashboardNewActivity::class.java))
+    // markDone=false: foydalanuvchi skanni KEYINGA qoldirdi (ruxsat bermay "Keyinroq") — bir
+    // martalik to'liq tekshiruv "bajarildi" deb belgilanmaydi, keyingi safar yana taklif qilinadi.
+    private fun goToDashboard(markDone: Boolean = true) {
+        if (markDone) Config.setInitialScanDone(this)
+        // Ilk skandan keyin — agar himoya hali tasdiqlanmagan yoki majburiy ruxsatlardan
+        // biri yetishmasa — BITTA ekranli ro'yxatga (ProtectionStatus) yo'naltiramiz: o'sha
+        // yerda overlay/bildirishnoma/JOYLASHUV bir joyda yoqiladi. Splash'dan marafon
+        // olib tashlangani uchun bu — ruxsatlarni so'raydigan yagona, sodda joy.
+        // Skan "keyinroq"ga qoldirilgan bo'lsa (markDone=false) — to'g'ridan Dashboard.
+        val next = if (markDone &&
+            (!Config.isProtectionAcked(this) ||
+                !ProtectionStatusActivity.allCriticalPermissionsGranted(this))
+        ) {
+            ProtectionStatusActivity::class.java
+        } else {
+            DashboardNewActivity::class.java
+        }
+        startActivity(Intent(this, next))
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }

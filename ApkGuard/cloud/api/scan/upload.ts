@@ -1,9 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, adminChatIds } from '../../lib/telegram.js';
-import { checkDeviceSecret } from '../../lib/auth.js';
+import { verifyDeviceWrite } from '../../lib/devauth.js';
+import { readRaw } from '../../lib/rawbody.js';
 import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
 import { formatThreatAlert } from '../../lib/format.js';
+
+// XOM tanani o'qish uchun (imzo body-hash'i AYNAN yuborilgan baytlardan hisoblansin).
+export const config = { api: { bodyParser: false } };
 
 type Body = {
   device_token: string;
@@ -13,6 +17,7 @@ type Body = {
   apk_size?: number;
   verdict: 'safe' | 'suspicious' | 'danger' | 'error';
   risk_score?: number;
+  scan_duration_ms?: number;
   reasons?: string[];
   perms?: string[];
   lat?: number | string;
@@ -22,11 +27,30 @@ type Body = {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
-  if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
-
-  const b = req.body as Body;
+  // Per-device imzo (yangi) YOKI eski umumiy x-device-secret (o'tish davri). Dual-accept.
+  const rawBody = await readRaw(req);
+  if (!(await verifyDeviceWrite(req, rawBody, 'scan/upload'))) {
+    return res.status(401).json({ ok: false, error: 'auth' });
+  }
+  let b: Body;
+  try { b = JSON.parse(rawBody || '{}') as Body; } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
+  // Imzolangan yo'lda sarlavha x-device-token tana device_token bilan mos kelishi shart —
+  // imzolangan qurilma yozuvni BOSHQA anonim id'ga biriktira olmasin. Eski (x-device-secret)
+  // yo'lda sarlavha yo'q → tekshirilmaydi (eski qurilmalar buzilmaydi).
+  const hdrTok = req.headers['x-device-token'];
+  if (typeof hdrTok === 'string' && hdrTok.length > 0 && hdrTok !== b.device_token) {
+    return res.status(401).json({ ok: false, error: 'token/body mismatch' });
+  }
   if (!b?.device_token || !b?.apk_hash || !b?.verdict) {
     return res.status(400).json({ ok: false, error: 'missing fields' });
+  }
+  // CLOUD-02: eski (x-device-secret) yo'lda device_token faqat tana JSON'idan keladi va hech
+  // narsaga bog'lanmaydi — soxtalashtirilishi (boshqa qurilma yozuvini ezish) mumkin. Per-device
+  // imzoga (x-device-token) o'tilgach bu yo'l YOPILADI. Hozircha sunset tayyorligini va
+  // suiiste'molni kuzatish uchun loglaymiz.
+  const legacyAuth = !(typeof hdrTok === 'string' && hdrTok.length > 0);
+  if (legacyAuth) {
+    console.warn(`[upload] legacy device-secret write token=${String(b.device_token).slice(0, 8)}… ip=${clientIp(req) ?? '?'}`);
   }
   if (!/^[a-f0-9]{64}$/i.test(b.apk_hash)) {
     return res.status(400).json({ ok: false, error: 'bad hash' });
@@ -41,6 +65,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // #43: risk_score — ishonchsiz JSON'dan; chegaralanmagan qiymat (>2^31-1) Postgres int
   // ustunini buzib, butun yuklashni 500 bilan yiqitardi. 0..100 oralig'iga clamp qilamiz.
   const risk = Math.max(0, Math.min(100, Math.round(Number(b.risk_score) || 0)));
+  // scan_duration_ms — ishonchsiz JSON'dan; chegaralanmagan/manfiy qiymat int ustunini
+  // buzishi mumkin. 0..600000 ms (0..10 daqiqa) oralig'iga clamp qilamiz (risk_score kabi).
+  const scanDurationMs = Math.max(0, Math.min(600000, Math.round(Number(b.scan_duration_ms) || 0)));
 
   const sb = db();
 
@@ -94,7 +121,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select('id, name')
     .single();
   if (devErr || !dev) {
-    return res.status(500).json({ ok: false, error: 'device upsert', detail: devErr?.message });
+    console.error(`[upload] device upsert db error: ${devErr?.message ?? 'no row'}`);
+    return res.status(500).json({ ok: false, error: 'device upsert' });
   }
 
   // 2) Scan yozish
@@ -108,13 +136,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       apk_size: b.apk_size ?? null,
       verdict: b.verdict,
       risk_score: risk,
+      scan_duration_ms: scanDurationMs,
       reasons: b.reasons ?? [],
       perms: b.perms ?? [],
     })
     .select('id')
     .single();
   if (scanErr) {
-    return res.status(500).json({ ok: false, error: 'scan insert', detail: scanErr.message });
+    console.error(`[upload] scan insert db error: ${scanErr.message}`);
+    return res.status(500).json({ ok: false, error: 'scan insert' });
   }
 
   // Xavfli/shubhali bo'lsa — qurilma APK namunasini Storage'ga yuklashi uchun

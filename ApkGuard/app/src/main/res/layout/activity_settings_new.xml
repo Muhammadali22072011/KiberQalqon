@@ -637,6 +637,38 @@
                     <include
                         layout="@layout/inc_settings_chevron_row"
                         android:id="@+id/rowPrivacy" />
+
+                    <!-- UX-03: avval faqat sploshdagi yashirin long-press orqali ochiladigan
+                         flagman ekranlar (Yashirin tahdidlar, Telegram, Himoya holati). -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="20dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_chevron_row"
+                        android:id="@+id/rowHiddenThreats" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="20dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_chevron_row"
+                        android:id="@+id/rowTelegram" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="20dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        layout="@layout/inc_settings_chevron_row"
+                        android:id="@+id/rowProtectionStatus" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

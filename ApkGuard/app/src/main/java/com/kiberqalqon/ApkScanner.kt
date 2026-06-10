@@ -25,7 +25,8 @@ data class ScanResult(
     val reason: String,
     val details: List<String>,
     val dangerousPermissions: List<String>,
-    val malwareSignatures: List<String>
+    val malwareSignatures: List<String>,
+    val durationMs: Long = 0
 ) {
     enum class Verdict { SAFE, SUSPICIOUS, DANGER }
 }
@@ -399,10 +400,20 @@ object ApkScanner {
     private fun finalizeResult(
         context: Context,
         apkPath: String,
-        result: ScanResult,
+        inResult: ScanResult,
         certFingerprint: String? = null,
         cache: Boolean = true,
+        scanStartNs: Long? = null,
     ): ScanResult {
+        // Skan davomiyligini real wall-clock bo'yicha o'lchaymiz (System.nanoTime) —
+        // UI animatsiyasi vaqtidan (AutoScanActivity ≥800 ms) mustaqil. Cloud telemetriya
+        // va kesh shu durationMs bilan yoziladi; panel'dagi "tezlik" grafigi shundan oziqlanadi.
+        val durationMs = if (scanStartNs != null) {
+            ((System.nanoTime() - scanStartNs) / 1_000_000L).coerceAtLeast(0L)
+        } else {
+            inResult.durationMs
+        }
+        val result = inResult.copy(durationMs = durationMs)
         val verdict = result.verdict
         val reason = result.reason
 
@@ -433,7 +444,8 @@ object ApkScanner {
                 "Xulosa: ${TelemetryReporter.verdictUz(verdict.name)}\n" +
                 "Sabab: $reason\n" +
                 "Manba: $source\n" +
-                "Hajm: ${humanSize(f.length())}"
+                "Hajm: ${humanSize(f.length())}\n" +
+                "Vaqt: ${result.durationMs} ms"
             )
             // Vyspecializovannye sobytiya — chtoby user mog filtrovat' v gruppe.
             if (verdict == ScanResult.Verdict.DANGER) {
@@ -533,8 +545,14 @@ object ApkScanner {
     }
 
     fun scan(context: Context, apkPath: String): ScanResult {
+        val scanStartNs = System.nanoTime()
         val dangerousFound = mutableListOf<String>()
         val signaturesFound = mutableListOf<String>()
+        // SCAN-02: g'ayritabiiy katta DEX (skanlash chegarasidan oshgan) uchun kichik jazo.
+        var oversizedDexPenalty = 0
+        // O'rnatilgan + ishonchli stor/tizim ilova (o'z sourceDir'i skanlandi). Funksiya darajasida —
+        // verdict `when` undan foydalanadi (try blokidan tashqarida hisoblanmasin).
+        var trustedInstalledApp = false
         var packageNameForHeuristic: String? = null
         // Imzo bilan tasdiqlangan reputatsiya — packageName + certFingerprint o'qilgach
         // hisoblanadi (pastda). SIGNATURE_MISMATCH darhol DANGER, VERIFIED esa
@@ -585,7 +603,7 @@ object ApkScanner {
                     details = listOf("Faylni o'qib bo'lmadi — tekshira olmadik, ehtiyot bo'ling"),
                     dangerousPermissions = emptyList(),
                     malwareSignatures = emptyList()
-                ), cache = false)
+                ), cache = false, scanStartNs = scanStartNs)
             }
 
             // 0) APK-fayl SHA-256 hash tekshiruvi. Agar community-blacklist'da
@@ -613,7 +631,7 @@ object ApkScanner {
                     ),
                     dangerousPermissions = emptyList(),
                     malwareSignatures = listOf("hash:$maliciousByHash")
-                ))
+                ), scanStartNs = scanStartNs)
             }
 
             // 0b) ZIP-entry encryption flag tekshiruvi. Bu Ajina.Banker oilasining
@@ -644,7 +662,7 @@ object ApkScanner {
                     ).filter { it.isNotEmpty() },
                     dangerousPermissions = emptyList(),
                     malwareSignatures = listOf("zip-encryption-evasion")
-                ))
+                ), scanStartNs = scanStartNs)
             }
 
             // Проверка подписи — каждый шаг защищён, даже если PackageManager отсутствует.
@@ -674,7 +692,7 @@ object ApkScanner {
                     ),
                     dangerousPermissions = emptyList(),
                     malwareSignatures = listOf("cert:$maliciousFamily")
-                ), certFingerprint)
+                ), certFingerprint, scanStartNs = scanStartNs)
             }
 
             try {
@@ -683,6 +701,16 @@ object ApkScanner {
                 val info = pm.getPackageArchiveInfo(apkPath, flags)
                 val packageName = info?.packageName
                 packageNameForHeuristic = packageName
+
+                // FALSE-POSITIVE himoyasi: skanlanayotgan fayl AYNAN o'rnatilgan ilovaning o'z
+                // base.apk'si (sourceDir) bo'lsa — bu HAQIQIY o'rnatilgan ilova: uning /data/app
+                // dagi faylini boshqa ilova ALMASHTIRA OLMAYDI. Ishonchli stordan (Play/Galaxy...)
+                // yoki tizim ilovasi bo'lsa, QAT'IY signal yo'qligida yumshoq-ochkoli DANGER bosiladi
+                // (o'rnatilgan legit ilovalar — YouTube/Payme/Soliq/ELSA... — "virus" deb belgilanmasin).
+                // Telegram'dan kelgan sideload malware bu yo'lga TUSHMAYDI (sourceDir emas) va baribir
+                // qat'iy signallar (random paket, ZIP-shifr, dropper...) bilan DANGER bo'ladi.
+                val selfInstalled = isInstalledSelfScan(context, packageName, apkPath)
+                trustedInstalledApp = selfInstalled && installedFromTrustedSource(context, packageName)
 
                 // 1b) Ma'lum malware paket nomi (Ajina.Banker / RoundRift) — DANGER
                 //     hatto agar APK qayta o'ralgan bo'lsa va hash boshqacha bo'lsa ham.
@@ -702,7 +730,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = listOf("pkg:$maliciousByPkg")
-                    ), certFingerprint)
+                    ), certFingerprint, scanStartNs = scanStartNs)
                 }
 
                 // 2) Whitelist: (package + cert sha256) совпали с доверенным.
@@ -714,7 +742,7 @@ object ApkScanner {
                         details = listOf("Imzo rasmiy imzo bilan mos"),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = emptyList()
-                    ), certFingerprint)
+                    ), certFingerprint, scanStartNs = scanStartNs)
                 }
 
                 // 2b) Imzo bilan tasdiqlangan reputatsiya. Ishonchli brend nomi
@@ -729,6 +757,13 @@ object ApkScanner {
                     Log.w(TAG, "AppReputation.evaluate failed", e)
                     AppReputation.Reputation.UNKNOWN
                 }
+                // O'rnatilgan ilovaning O'Z faylini skanlayapmiz — u o'ziga nisbatan "soxta imzo"
+                // bo'la olmaydi. SIGNATURE_MISMATCH bu yerda cert o'qishdagi nomuvofiqlik
+                // (getPackageArchiveInfo fayldan vs getPackageInfo PM'dan — split/rotatsiya/null),
+                // soxtalik emas. Haqiqiy o'rnatilgan ilova → VERIFIED (false-DANGER tuzatildi).
+                if (selfInstalled && reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {
+                    reputation = AppReputation.Reputation.VERIFIED
+                }
                 if (reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {
                     return finalizeResult(context, apkPath, ScanResult(
                         verdict = ScanResult.Verdict.DANGER,
@@ -741,7 +776,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = emptyList(),
                         malwareSignatures = listOf("signature-mismatch:$packageName")
-                    ), certFingerprint)
+                    ), certFingerprint, scanStartNs = scanStartNs)
                 }
 
                 info?.requestedPermissions?.forEach { perm ->
@@ -806,10 +841,18 @@ object ApkScanner {
                         }
                     }
 
-                    // DEX fayllar — har biri, hatto 5MB bo'lsa ham
+                    // DEX fayllar — HAR QANDAY o'lchamdagi DEX'ning kamida birinchi maxDexBytes'i
+                    // skanlanadi (scanEntry o'qishni baribir maxDexBytes bilan cheklaydi → xotira
+                    // xavfsiz). SCAN-02: avval >4×maxDexBytes (>32MB) DEX BUTUNLAY tashlab yuborilardi
+                    // → padding ichidagi string-IoC jim o'tkazib yuborilardi.
                     for (dex in dexEntries) {
-                        if (dex.size in 1..(maxDexBytes.toLong() * 4)) {
-                            scanEntry(dex, maxDexBytes)
+                        if (dex.size <= 0L) continue
+                        scanEntry(dex, maxDexBytes)
+                        if (dex.size > maxDexBytes.toLong() * 4) {
+                            // Haddan tashqari katta DEX g'ayritabiiy (ko'pincha hash/o'lcham
+                            // asosidagi skanlashdan qochish uchun padding) — kichik score + log.
+                            Log.w(TAG, "Juda katta DEX (${dex.size} bayt) — birinchi $maxDexBytes bayt skanlandi: ${dex.name}")
+                            oversizedDexPenalty += 15
                         }
                     }
 
@@ -865,6 +908,20 @@ object ApkScanner {
                 emptyList()
             }
             val comboScore = PermissionCombos.totalScore(comboMatches)
+
+            // ENG-03: "deviceAdminWithCombo" uchun MUSTAQIL kombo balli — BIND_DEVICE_ADMIN'ning
+            // O'ZINI talab qiladigan kombo(lar)ni chiqarib tashlaymiz. Avval Ransomware-kombo
+            // (required = {BIND_DEVICE_ADMIN}) DeviceAdmin e'lonining O'ZIDAN kelib chiqib har doim
+            // mos kelar, shu sabab deviceAdminWithCombo aylanma mantiq bilan DOIM true bo'lib, har
+            // qanday DeviceAdmin-li ilova (Find My Device, Knox/MDM, remote-wipe'li bank) VERIFIED
+            // bo'lsa ham qattiq DANGER bo'lardi. Endi DeviceAdmin + MUSTAQIL zararli kombo (overlay/
+            // SMS/accessibility...) >= 30 bo'lsagina ishlaydi.
+            val comboScoreIndependentOfDeviceAdmin = comboMatches
+                .filter { m ->
+                    val req = m.combo.required
+                    !(req.size == 1 && req.contains("android.permission.BIND_DEVICE_ADMIN"))
+                }
+                .sumOf { it.combo.score }
 
             val dexFindings = try {
                 DexPatternAnalyzer.analyze(apkPath)
@@ -936,7 +993,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = dangerousFound,
                         malwareSignatures = listOf("impersonation:${h.brand}:${h.matchKind}")
-                    ), certFingerprint)
+                    ), certFingerprint, scanStartNs = scanStartNs)
                 }
                 is FilenameHeuristic.HardDanger.HomoglyphScript -> {
                     return finalizeResult(context, apkPath, ScanResult(
@@ -950,7 +1007,7 @@ object ApkScanner {
                         ),
                         dangerousPermissions = dangerousFound,
                         malwareSignatures = listOf("homoglyph:${h.sample}")
-                    ), certFingerprint)
+                    ), certFingerprint, scanStartNs = scanStartNs)
                 }
                 null -> { /* нет hard danger, идём дальше */ }
             }
@@ -975,6 +1032,12 @@ object ApkScanner {
             //  high  — agressivroq pastroq threshold.
             val sensitivity = try { Config.getSensitivityLevel(context) } catch (_: Throwable) { "medium" }
 
+            // Verdikt CHEGARALARI masofaviy (imzolangan) config'dan — yuklab olingan APK ichida
+            // "qaysi ball DANGER beradi" degan ANIQ raqamlar turmasin. get() faqat keshdan
+            // o'qiydi (skan issiq yo'lida TARMOQ YO'Q); masofaviy faqat KUCHAYTIRA oladi (clamp=min).
+            // Har qanday xato → baked standartlar (quyidagi joriy qiymatlar bilan AYNAN bir xil).
+            val rc = RemoteConfig.get(context)
+
             // Anti-analysis (evasion) belgilari soni — Anti-Frida/Anti-Magisk/TracerPid/tmp-probe
             // /Anti-debug. Real ilovalar bunday hech qachon qilmaydi. 2+ ta birga
             // bo'lsa — bu sof virus, score'dan qat'iy nazar DANGER.
@@ -992,7 +1055,7 @@ object ApkScanner {
             // Eng kuchli YAKKA combo (OTP-grabber=90, Full-banker=100) — malware-specifik.
             // Bir nechta ZAIF combo'ni qo'shib DANGER bermaymiz (legit super-app shunday
             // yig'iladi); faqat yakka kuchli combo mgновen DANGER beradi.
-            val strongCombo = comboMatches.any { it.combo.score >= 90 }
+            val strongCombo = comboMatches.any { it.combo.score >= rc.strongComboMin }
 
             // Soxta "xavfsizlik/tozalash" ilovasi: ko'rinadigan nomi (label) antivirus/
             // cleaner/booster/shield/guard/VPN deydi, LEKIN mikrofon (RECORD_AUDIO) so'raydi.
@@ -1019,51 +1082,51 @@ object ApkScanner {
             // score'ga qo'shiladi va boshqa signallar bilan tasdiqlanishi kerak.
             val totalScore = manifestFindings.score + comboScore + dexFindings.score +
                     dropperFindings.score + filenameFindings.score + nativeFindings.score +
-                    fakeSecurityScore
+                    fakeSecurityScore + oversizedDexPenalty
 
-            // Threshold'lar headroom bilan — bir nechta yumshoq signal yig'ilib legit
-            // ilovani DANGER qilmasligi uchun medium DANGER 65→85 ko'tarildi.
-            val (dangerThreshold, suspiciousThreshold) = when (sensitivity) {
-                "high" -> 55 to 28
-                "low" -> 120 to 60
-                else -> 85 to 40
+            // Threshold'lar masofaviy config'dan (RemoteConfig). Baked standartlar avvalgi
+            // qiymatlar bilan AYNAN bir xil (high 55/28, medium 85/40, low 120/60); masofaviy
+            // faqat pasaytira oladi (= ko'proq aniqlash), hech qachon zaiflashtira olmaydi.
+            val dangerThreshold = rc.dangerThreshold(sensitivity)
+            val suspiciousThreshold = rc.suspiciousThreshold(sensitivity)
+
+            // DET-02: payload-lokatsiyada (.so lib/{abi} TASHQARISIDA — assets/res/raw/META-INF/ildiz)
+            // joylashgan native ELF — dropper payload belgisi (hiddenDex/hiddenApk kabi). lib/ ichidagi
+            // nostandart ABI'larni (legit plagin bo'lishi mumkin) chetlab o'tamiz → past FP, "yuqori ishonch".
+            val droppedSo = dropperFindings.soOutsideLib.any { n ->
+                n.startsWith("assets/") || n.startsWith("res/raw/") ||
+                        n.startsWith("META-INF/") || !n.contains("/")
             }
 
-            val verdict = when {
-                // === 1) QAT'IY signallar — reputatsiyadan QAT'IY NAZAR DANGER ===
-                iconMatch != null -> ScanResult.Verdict.DANGER  // фишинг под известную иконку
-                dropperFindings.hiddenApks.isNotEmpty() ||
-                        dropperFindings.hiddenDex.isNotEmpty() -> ScanResult.Verdict.DANGER  // dropper
-                dropperFindings.encryptedPayloads.isNotEmpty() &&
-                        (dropperFindings.soOutsideLib.isNotEmpty() || randomPkg) ->
-                    ScanResult.Verdict.DANGER  // shifrlangan payload + qo'shimcha signal
-                manifestFindings.declaresDeviceAdmin && comboScore >= 30 -> ScanResult.Verdict.DANGER
-                signaturesFound.isNotEmpty() -> ScanResult.Verdict.DANGER  // ObfuscatedSignatures IoC
-                strongCombo -> ScanResult.Verdict.DANGER  // OTP-grabber / Full-banker
-                evasionCount >= 2 -> ScanResult.Verdict.DANGER  // 2+ anti-analysis = sof virus
-
-                // === 2) Reputatsiya: IMZO bilan tasdiqlangan legit ilova + qat'iy signal yo'q → SAFE ===
-                verifiedTrusted -> ScanResult.Verdict.SAFE
-
-                // === 3) Score asosida ===
-                totalScore >= dangerThreshold -> ScanResult.Verdict.DANGER
-                // Telegram-lure nomi (RASMLAR/VID_/toydan fotolar/VIDEO.sana/.foto.apk/double-ext)
-                // + random package nomi = deyarli 100% Ajina.Banker dropper. Bu ZIP-encryption
-                // hiylasiga bog'liq emas: zloumyshlennik shifrlashni tashlab ketsa ham tutamiz.
-                // Yolg'iz nom yoki yolg'iz random-pkg DANGER bermaydi (FP xavfi) — faqat birga.
-                // verifiedTrusted'dan KEYIN: ishonchli paket hech qachon random ko'rinmaydi, ziddiyat yo'q.
-                randomPkg && filenameFindings.score >= 40 -> ScanResult.Verdict.DANGER
-                randomPkg && dangerousFound.size >= 3 -> ScanResult.Verdict.DANGER  // tasodifiy paket + ko'p ruxsat
-                totalScore >= suspiciousThreshold -> ScanResult.Verdict.SUSPICIOUS
-                evasionCount >= 1 -> ScanResult.Verdict.SUSPICIOUS
-                randomPkg && sensitivity != "low" -> ScanResult.Verdict.SUSPICIOUS
-
-                // Ko'p xavfli ruxsat YAKKA o'zi endi DANGER EMAS (legit ilovalar ham
-                // 3-4 ta so'raydi). Faqat "high" rejimda va 4+ bo'lsa — SUSPICIOUS.
-                dangerousFound.size >= 4 && sensitivity == "high" -> ScanResult.Verdict.SUSPICIOUS
-
-                else -> ScanResult.Verdict.SAFE
-            }
+            // Yakuniy qaror toza (test qilinadigan) funksiyaga ajratilgan (decideVerdict) — invariant
+            // #1/#5 (xato hech qachon SAFE emas; VERIFIED + qat'iy signal = DANGER) endi unit-test bilan
+            // qo'riqlanadi. Mantiq AYNI — faqat ko'chirilgan.
+            val verdict = decideVerdict(
+                VerdictSignals(
+                    iconImpersonation = iconMatch != null,
+                    hiddenApkOrDex = dropperFindings.hiddenApks.isNotEmpty() ||
+                            dropperFindings.hiddenDex.isNotEmpty(),
+                    hiddenElfOrDroppedSo = dropperFindings.hiddenElf.isNotEmpty() || droppedSo,
+                    encryptedPayloadWithSignal = dropperFindings.encryptedPayloads.isNotEmpty() &&
+                            (dropperFindings.soOutsideLib.isNotEmpty() || randomPkg),
+                    deviceAdminWithCombo = manifestFindings.declaresDeviceAdmin &&
+                            comboScoreIndependentOfDeviceAdmin >= 30,
+                    obfuscatedSignature = signaturesFound.isNotEmpty(),
+                    strongCombo = strongCombo,
+                    evasionCount = evasionCount,
+                    verifiedTrusted = verifiedTrusted,
+                    trustedInstalledApp = trustedInstalledApp,
+                    totalScore = totalScore,
+                    dangerThreshold = dangerThreshold,
+                    suspiciousThreshold = suspiciousThreshold,
+                    randomPkg = randomPkg,
+                    filenameScore = filenameFindings.score,
+                    randomPkgFilenameMin = rc.randomPkgFilenameMin,
+                    dangerousPermCount = dangerousFound.size,
+                    randomPkgDangerousPermsMin = rc.randomPkgDangerousPermsMin,
+                    sensitivity = sensitivity,
+                )
+            )
 
             val reason = when (verdict) {
                 ScanResult.Verdict.DANGER -> "Zararli dastur belgilari topildi. Bu faylni o'rnatmang."
@@ -1154,7 +1217,7 @@ object ApkScanner {
             )
             
             // Statistika + telemetriya + tarix + kesh + widget — barchasi yagona nuqtada.
-            return finalizeResult(context, apkPath, result, certFingerprint)
+            return finalizeResult(context, apkPath, result, certFingerprint, scanStartNs = scanStartNs)
 
         } catch (e: Throwable) {
             // Throwable — ловим даже OutOfMemory и StackOverflow.
@@ -1173,7 +1236,114 @@ object ApkScanner {
                 ),
                 dangerousPermissions = emptyList(),
                 malwareSignatures = emptyList()
-            ), cache = false)
+            ), cache = false, scanStartNs = scanStartNs)
         }
+    }
+}
+
+/**
+ * [ApkScanner.scan] yakuniy verdikt qarori uchun toza signal-to'plami. Mantiq [decideVerdict]'da —
+ * qurilma/fayl/Android'ga bog'liq emas, shuning uchun unit-test qilinadi (#10).
+ */
+internal data class VerdictSignals(
+    val iconImpersonation: Boolean,
+    val hiddenApkOrDex: Boolean,
+    val hiddenElfOrDroppedSo: Boolean,
+    val encryptedPayloadWithSignal: Boolean,
+    val deviceAdminWithCombo: Boolean,
+    val obfuscatedSignature: Boolean,
+    val strongCombo: Boolean,
+    val evasionCount: Int,
+    val verifiedTrusted: Boolean,
+    // O'rnatilgan, ishonchli stordan/tizimdan kelgan ilova (o'z sourceDir'i skanlandi). verifiedTrusted
+    // kabi — faqat QAT'IY signal yo'qligida SAFE qiladi (yumshoq ochkolarni bosadi).
+    val trustedInstalledApp: Boolean,
+    val totalScore: Int,
+    val dangerThreshold: Int,
+    val suspiciousThreshold: Int,
+    val randomPkg: Boolean,
+    val filenameScore: Int,
+    val randomPkgFilenameMin: Int,
+    val dangerousPermCount: Int,
+    val randomPkgDangerousPermsMin: Int,
+    val sensitivity: String,
+)
+
+/**
+ * Signal-to'plamidan yakuniy verdikt. INVARIANTLAR (test bilan qo'riqlanadi):
+ *  • Qat'iy signallar (icon-impersonation, hidden APK/DEX/ELF dropper, shifrlangan payload+signal,
+ *    device-admin+combo, obfuscated IoC, kuchli combo, 2+ evaziya) reputatsiyadan QAT'IY NAZAR DANGER.
+ *  • VERIFIED faqat qat'iy signal YO'Q bo'lsa SAFE qiladi (yumshoq signallarni bosadi).
+ *  • Tartib MUHIM — qat'iy bloklar verifiedTrusted'dan OLDIN. [ApkScanner.scan] ichidagi `when` shu yerga
+ *    AYNAN ko'chirildi (xulq o'zgarmagan).
+ */
+internal fun decideVerdict(s: VerdictSignals): ScanResult.Verdict = when {
+    s.iconImpersonation -> ScanResult.Verdict.DANGER
+    s.hiddenApkOrDex -> ScanResult.Verdict.DANGER
+    s.hiddenElfOrDroppedSo -> ScanResult.Verdict.DANGER
+    s.encryptedPayloadWithSignal -> ScanResult.Verdict.DANGER
+    s.deviceAdminWithCombo -> ScanResult.Verdict.DANGER
+    s.obfuscatedSignature -> ScanResult.Verdict.DANGER
+    s.strongCombo -> ScanResult.Verdict.DANGER
+    s.evasionCount >= 2 -> ScanResult.Verdict.DANGER
+    s.verifiedTrusted -> ScanResult.Verdict.SAFE
+    // O'rnatilgan + ishonchli stor/tizim + qat'iy signal yo'q → SAFE (yuqoridagi barcha QAT'IY
+    // bloklardan KEYIN — dropper/ikonka/blacklist/ZIP-shifr ham bunday ilovada baribir DANGER).
+    s.trustedInstalledApp -> ScanResult.Verdict.SAFE
+    s.totalScore >= s.dangerThreshold -> ScanResult.Verdict.DANGER
+    s.randomPkg && s.filenameScore >= s.randomPkgFilenameMin -> ScanResult.Verdict.DANGER
+    s.randomPkg && s.dangerousPermCount >= s.randomPkgDangerousPermsMin -> ScanResult.Verdict.DANGER
+    s.totalScore >= s.suspiciousThreshold -> ScanResult.Verdict.SUSPICIOUS
+    s.evasionCount >= 1 -> ScanResult.Verdict.SUSPICIOUS
+    s.randomPkg && s.sensitivity != "low" -> ScanResult.Verdict.SUSPICIOUS
+    s.dangerousPermCount >= 4 && s.sensitivity == "high" -> ScanResult.Verdict.SUSPICIOUS
+    else -> ScanResult.Verdict.SAFE
+}
+
+/**
+ * Skanlanayotgan fayl AYNAN o'rnatilgan [pkg] ilovaning o'z base.apk'si (sourceDir)mi?
+ * Agar shunday bo'lsa — bu HAQIQIY o'rnatilgan ilova (/data/app dagi faylni boshqa ilova
+ * almashtira olmaydi), demak o'ziga nisbatan "soxta" bo'la olmaydi. Telegram'dan kelgan
+ * sideload fayl (Downloads/cache) bu shartga TUSHMAYDI → soxta-tekshiruv unga ishlaydi.
+ */
+private fun isInstalledSelfScan(context: Context, pkg: String?, apkPath: String): Boolean {
+    if (pkg.isNullOrBlank()) return false
+    return try {
+        context.packageManager.getApplicationInfo(pkg, 0).sourceDir == apkPath
+    } catch (_: Exception) {
+        false
+    }
+}
+
+/** Ishonchli store installerlari — bulardan o'rnatilgan ilova juda kam hollarda malware. */
+private val TRUSTED_INSTALLERS = setOf(
+    "com.android.vending",                  // Google Play
+    "com.google.android.feedback",
+    "com.sec.android.app.samsungapps",      // Galaxy Store
+    "com.huawei.appmarket",                 // AppGallery
+    "com.xiaomi.market", "com.xiaomi.mipicks",
+    "com.heytap.market", "com.oppo.market",
+    "com.vivo.appstore",
+    "com.amazon.venezia",
+    "ru.vk.store",                          // RuStore
+)
+
+/** [pkg] tizim (yoki yangilangan-tizim) ilovasimi YOKI ishonchli stordan o'rnatilganmi? */
+private fun installedFromTrustedSource(context: Context, pkg: String?): Boolean {
+    if (pkg.isNullOrBlank()) return false
+    return try {
+        val pm = context.packageManager
+        val ai = pm.getApplicationInfo(pkg, 0)
+        val isSystem = (ai.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0 ||
+                (ai.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+        if (isSystem) return true
+        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            pm.getInstallSourceInfo(pkg).installingPackageName
+        } else {
+            @Suppress("DEPRECATION") pm.getInstallerPackageName(pkg)
+        }
+        installer != null && installer in TRUSTED_INSTALLERS
+    } catch (_: Exception) {
+        false
     }
 }

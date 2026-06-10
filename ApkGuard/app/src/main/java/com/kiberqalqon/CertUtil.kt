@@ -116,6 +116,38 @@ object CertUtil {
         null
     }
 
+    /**
+     * ENG-04: o'rnatilgan paketning BARCHA yaroqli imzo SHA-256'lari — joriy imzo(lar) +
+     * KALIT ROTATSIYA TARIXI (signingCertificateHistory). Google Play App Signing kalitni
+     * rotatsiya qilganда (yoki ilova Play App Signing'ga o'tganда) yangi APK BOSHQA kalit bilan
+     * imzolanadi; faqat firstOrNull()'ni solishtirish legit yangilanishni "soxta imzo" (DANGER)
+     * deb belgilardi — айнан репода ташвиш bo'lgan O'zbek gov/bank ilovalarида. Tarixни ham
+     * qo'shsak, rotatsiya zanjiridagi har qanday imzo VERIFIED bo'ladi. Soxta ilova (zanjirда
+     * yo'q begona kalit) baribir MISMATCH → DANGER bo'lib qoladi.
+     */
+    fun installedSigningFingerprints(context: Context, pkg: String): Set<String> = try {
+        val pm = context.packageManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val info = pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES)
+            val si = info.signingInfo
+            val sigs = buildList {
+                si?.apkContentsSigners?.let { addAll(it.toList()) }
+                // hasMultipleSigners() bo'lsa tarix mavjud emas; aks holda rotatsiya zanjiri.
+                if (si != null && !si.hasMultipleSigners()) {
+                    si.signingCertificateHistory?.let { addAll(it.toList()) }
+                }
+            }
+            sigs.mapNotNull { it?.toByteArray()?.let { b -> sha256Hex(b) } }.toSet()
+        } else {
+            @Suppress("DEPRECATION")
+            val info = pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES)
+            @Suppress("DEPRECATION")
+            (info.signatures ?: emptyArray()).mapNotNull { it?.toByteArray()?.let { b -> sha256Hex(b) } }.toSet()
+        }
+    } catch (_: Exception) {
+        emptySet()
+    }
+
     private fun sha256Hex(bytes: ByteArray): String {
         val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
         return sha256HexBytes(digest)

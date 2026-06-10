@@ -3,6 +3,7 @@ package com.kiberqalqon
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Base64
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,8 @@ import java.io.File
 import java.security.MessageDigest
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * KiberQalqon Cloud telemetriyasi — markaziy monitoring paneli/xaritasi uchun.
@@ -54,6 +57,10 @@ object CloudTelemetry {
     private const val TAG = "CloudTelemetry"
     private const val PREFS = "kiberqalqon_cloud"
     private const val KEY_DEVICE_TOKEN = "device_token"
+    // Per-device imzo tokeni — register javobida server beradi, yozuvlarni HMAC bilan
+    // imzolash uchun. Bo'lmasa (hali register bo'lmagan / server kalitsiz) — faqat
+    // x-device-secret bilan ketamiz (eski yo'l, buzilmaydi).
+    private const val KEY_AUTH_TOKEN = "device_auth_token"
     private const val KEY_LAST_REGISTER_TS = "last_register_ts"
     private const val KEY_LAST_REGISTER_VER = "last_register_ver"
     // Oxirgi muvaffaqiyatli register'da yuborilgan nuqta ("lat,lng") — qurilma ko'chsa
@@ -141,8 +148,14 @@ object CloudTelemetry {
                 fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
             }
 
-            val ok = postJson("$base/api/device/register", secret, body)
-            if (ok) {
+            val resp = postJsonForResult(ctx, "$base/api/device/register", secret, "device/register", body)
+            if (resp != null) {
+                // Server bergan per-device imzo tokenini saqlaymiz — keyingi yozuvlar shu
+                // bilan HMAC imzolanadi. Bo'lmasa (server kalitsiz) eski yo'lda qolamiz.
+                try {
+                    val t = JSONObject(resp).optString("device_auth_token", "")
+                    if (t.isNotBlank()) sp.edit().putString(KEY_AUTH_TOKEN, t).apply()
+                } catch (_: Throwable) { /* token yo'q — muhim emas */ }
                 val ed = sp.edit()
                     .putLong(KEY_LAST_REGISTER_TS, now)
                     .putInt(KEY_LAST_REGISTER_VER, BuildConfig.VERSION_CODE)
@@ -195,13 +208,14 @@ object CloudTelemetry {
                     put("package_name", pkg ?: JSONObject.NULL)
                     put("app_label", label)
                     put("apk_size", src.length())
+                    put("scan_duration_ms", result.durationMs)
                     put("verdict", verdictKey(result.verdict))
                     put("risk_score", riskScore(result))
                     put("reasons", reasons)
                     put("perms", perms)
                 }
                 putGeo(ctx, body)
-                val resp = postJsonForResult("$base/api/scan/upload", secret, body)
+                val resp = postJsonForResult(ctx, "$base/api/scan/upload", secret, "scan/upload", body)
                 // Server xavfli/shubhali natija uchun imzolangan yuklash URL'i qaytarsa —
                 // APK namunasini (snapshot) to'g'ridan-to'g'ri Storage'ga yuklaymiz.
                 // Xavfsiz APK'lar uchun server URL bermaydi → bu yer ham hech narsa qilmaydi.
@@ -249,7 +263,7 @@ object CloudTelemetry {
     }
 
     private fun deviceSecret(): String? {
-        val s = BuildConfig.CLOUD_DEVICE_SECRET.trim()
+        val s = Secrets.cloudDeviceSecret().trim()
         return if (s.isBlank()) null else s
     }
 
@@ -336,37 +350,23 @@ object CloudTelemetry {
         return (base + bonus).coerceIn(0, cap)
     }
 
-    private fun postJson(url: String, secret: String, body: JSONObject): Boolean {
-        return try {
-            val req = Request.Builder()
-                .url(url)
-                .header("x-device-secret", secret)
-                .post(body.toString().toRequestBody(JSON))
-                .build()
-            client.newCall(req).execute().use { resp ->
-                if (!resp.isSuccessful) {
-                    Log.w(TAG, "POST $url -> ${resp.code}: ${resp.body?.string()?.take(180)}")
-                }
-                resp.isSuccessful
-            }
-        } catch (e: Throwable) {
-            Log.w(TAG, "postJson failed: $url", e)
-            false
-        }
-    }
-
     /**
-     * postJson kabi, lekin javob MATNINI qaytaradi (muvaffaqiyatli bo'lsa) — chunki
-     * /api/scan/upload xavfli natija uchun "sample_upload" URL'ini qaytarishi mumkin.
-     * Xato/muvaffaqiyatsiz bo'lsa null.
+     * Yozuv so'rovi — javob MATNINI qaytaradi (muvaffaqiyatli bo'lsa). /api/scan/upload
+     * "sample_upload" URL'ini, /api/device/register esa "device_auth_token" ni qaytaradi.
+     * Xato/muvaffaqiyatsiz → null.
+     *
+     * Sarlavhalar: HAR DOIM x-device-secret (o'tish davri eski yo'li), va per-device token
+     * keshlangan bo'lsa — QO'SHIMCHA HMAC imzo sarlavhalari (server dual-accept: imzoni
+     * afzal ko'radi). bodyStr — AYNAN POST qilinadigan satr (imzo body-hash'i shundan).
      */
-    private fun postJsonForResult(url: String, secret: String, body: JSONObject): String? {
+    private fun postJsonForResult(ctx: Context, url: String, secret: String, label: String, body: JSONObject): String? {
         return try {
-            val req = Request.Builder()
+            val bodyStr = body.toString()
+            val rb = Request.Builder()
                 .url(url)
                 .header("x-device-secret", secret)
-                .post(body.toString().toRequestBody(JSON))
-                .build()
+            addSignedHeaders(ctx, rb, label, bodyStr)
+            val req = rb.post(bodyStr.toRequestBody(JSON)).build()
             client.newCall(req).execute().use { resp ->
                 val text = resp.body?.string()
                 if (!resp.isSuccessful) {
@@ -378,6 +378,43 @@ object CloudTelemetry {
             Log.w(TAG, "postJsonForResult failed: $url", e)
             null
         }
+    }
+
+    /**
+     * Per-device imzo sarlavhalarini qo'shadi (token keshlangan bo'lsa). Imzo:
+     *   sig = base64url(HMAC-SHA256(authToken, "<label>\n<ts>\n<nonce>\n<sha256hex(bodyStr)>"))
+     * Server (devauth.ts) AYNAN shu kanonik satrni qayta hisoblab tekshiradi. Token yo'q
+     * bo'lsa hech narsa qo'shilmaydi (faqat x-device-secret bilan o'tadi). Har qanday xato → jim.
+     */
+    private fun addSignedHeaders(ctx: Context, rb: Request.Builder, label: String, bodyStr: String) {
+        try {
+            val authToken = authToken(ctx) ?: return
+            val deviceToken = deviceToken(ctx)
+            val ts = (System.currentTimeMillis() / 1000).toString()
+            val nonce = (UUID.randomUUID().toString() + UUID.randomUUID().toString()).replace("-", "")
+            val canonical = "$label\n$ts\n$nonce\n${sha256Hex(bodyStr)}"
+            val mac = Mac.getInstance("HmacSHA256")
+            mac.init(SecretKeySpec(authToken.toByteArray(Charsets.UTF_8), "HmacSHA256"))
+            val sig = Base64.encodeToString(
+                mac.doFinal(canonical.toByteArray(Charsets.UTF_8)),
+                Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+            )
+            rb.header("x-device-token", deviceToken)
+            rb.header("x-signature", sig)
+            rb.header("x-timestamp", ts)
+            rb.header("x-nonce", nonce)
+        } catch (_: Throwable) { /* imzosiz — x-device-secret bilan o'tadi */ }
+    }
+
+    private fun authToken(ctx: Context): String? {
+        val t = prefs(ctx).getString(KEY_AUTH_TOKEN, null)
+        return if (t.isNullOrBlank()) null else t
+    }
+
+    /** SHA-256 hex (lowercase) — satr uchun (imzo body-hash'i; server 'hex' bilan mos). */
+    private fun sha256Hex(s: String): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        return md.digest(s.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
     }
 
     /**

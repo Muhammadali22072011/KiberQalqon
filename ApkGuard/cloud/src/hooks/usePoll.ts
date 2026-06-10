@@ -27,8 +27,12 @@ export function usePoll<T>(fn: () => Promise<T>, intervalMs: number) {
     let alive = true;
     load();
     if (intervalMs > 0) {
-      const id = window.setInterval(() => { if (alive) load(); }, intervalMs);
-      return () => { alive = false; window.clearInterval(id); };
+      // Fon (ko'rinmas) tab'da so'rov yubormaymiz — projektor/uzoq ochiq panel kuniga
+      // minglab keraksiz Vercel/Supabase chaqiruvini tejaydi. Tab qaytib ko'rinsa darhol yangilaymiz.
+      const id = window.setInterval(() => { if (alive && !document.hidden) load(); }, intervalMs);
+      const onVis = () => { if (alive && !document.hidden) load(); };
+      document.addEventListener('visibilitychange', onVis);
+      return () => { alive = false; window.clearInterval(id); document.removeEventListener('visibilitychange', onVis); };
     }
     return () => { alive = false; };
   }, [load, intervalMs]);

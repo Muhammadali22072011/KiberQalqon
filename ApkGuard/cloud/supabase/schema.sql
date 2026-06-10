@@ -28,14 +28,21 @@ create table if not exists scans (
   apk_size      bigint,
   verdict       text not null check (verdict in ('safe','suspicious','danger','error')),
   risk_score    int default 0,
+  scan_duration_ms int default 0,                -- skan davomiyligi (ms); 0 = eski/noma'lum
   reasons       jsonb default '[]'::jsonb,       -- ["READ_SMS", "BIND_ACCESSIBILITY_SERVICE", ...]
   perms         jsonb default '[]'::jsonb,
   scanned_at    timestamptz not null default now()
 );
 
+-- Migratsiya: mavjud bazada scans jadvali bo'lsa, ustunni idempotent qo'shamiz
+-- (create table if not exists eski jadvalga yangi ustun QO'SHMAYDI). SQL Editor'da
+-- butun faylni qayta ishga tushirsangiz ham xavfsiz.
+alter table scans add column if not exists scan_duration_ms int default 0;
+
 create index if not exists idx_scans_device on scans(device_id, scanned_at desc);
 create index if not exists idx_scans_hash on scans(apk_hash);
 create index if not exists idx_scans_verdict on scans(verdict, scanned_at desc);
+create index if not exists idx_scans_duration on scans(scan_duration_ms) where scan_duration_ms > 0;
 
 -- ============================================================================
 -- 3) THREATS — topilgan vrias xeshlari (qora ro'yxat)
@@ -136,7 +143,14 @@ select
   count(*) filter (where verdict = 'danger')     as danger_count,
   count(*) filter (where verdict = 'suspicious') as suspicious_count,
   count(*) filter (where verdict = 'safe')       as safe_count,
-  count(distinct device_id)                      as active_devices
+  count(distinct device_id)                      as active_devices,
+  -- Tekshiruv tezligi (faqat o'lchangan skanlar; eski 0-davomiyli yozuvlar tashlanadi).
+  count(*) filter (where scan_duration_ms > 0)   as perf_count,
+  coalesce(round(avg(scan_duration_ms) filter (where scan_duration_ms > 0))::int, 0) as avg_duration_ms,
+  coalesce(round(percentile_cont(0.5) within group (order by scan_duration_ms)
+           filter (where scan_duration_ms > 0))::int, 0) as median_duration_ms,
+  coalesce(round(percentile_cont(0.95) within group (order by scan_duration_ms)
+           filter (where scan_duration_ms > 0))::int, 0) as p95_duration_ms
 from scans
 where scanned_at >= current_date;
 
