@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v4 dizayn — Onboarding + InitialScan ekranlari satrlari.
+  Matnlar manbasi: design_v4_extracted/screens1.jsx (ONB) va screens3.jsx (InitialScan).
+  Qayta ishlatilgan eski kalitlar: btn_skip, kq4_continue, initial_scan_eyebrow,
+  initial_scan_desc, initial_scan_delete_all, initial_scan_skip, is_go_main,
+  is_recommend_delete, is_header_safe, is_sub_no_threats, is_all_deleted,
+  is_dangerous_remaining_count, kq4_danger, kq4_suspicious.
+-->
+<resources>
+    <!-- ============ Onboarding (3 slayd, screens1.jsx ONB) ============ -->
+    <!-- eyebrow "1 · 3" — slayd raqami / jami -->
+    <string name="kq4_onb_step" translatable="false">%1$d · %2$d</string>
+    <string name="kq4_onb_title_1">Telefoningizni o\'zi tekshiradi</string>
+    <string name="kq4_onb_body_1">Anor Qalqon Telegram, WhatsApp va yuklab olingan fayllarni o\'zi kuzatib turadi. Siz hech narsa qilishingiz shart emas.</string>
+    <string name="kq4_onb_title_2">Xavfli dasturlarni topadi</string>
+    <string name="kq4_onb_body_2">Rasm yoki video deb yashiringan zararli fayllar aniqlanadi. Ular bank parolingiz va SMS kodlaringizni o\'g\'irlashga urinadi.</string>
+    <string name="kq4_onb_title_3">Sodda til, kuchli himoya</string>
+    <string name="kq4_onb_body_3">Hamma narsa o\'zbek tilida, oddiy so\'zlar bilan tushuntiriladi. Murakkab texnik atamalar yo\'q — faqat siz uchun muhim narsa.</string>
+    <!-- oxirgi slayd tugmasi -->
+    <string name="kq4_onb_enable">Himoyani yoqish</string>
+
+    <!-- ============ InitialScan (screens3.jsx InitialScan) ============ -->
+    <string name="kq4_is_title">Telefon tekshirilmoqda</string>
+    <!-- natija sarlavhasi: "{N} ta xavfli fayl topildi" -->
+    <string name="kq4_is_found_count">%1$d ta xavfli fayl topildi</string>
+    <!-- bo'sh ro'yxat kartasi: hammasi o'chirilgandan keyin -->
+    <string name="kq4_is_all_deleted">Barcha xavfli fayllar o\'chirildi</string>
+    <!-- bo'sh ro'yxat kartasi: boshidan hech narsa topilmagan -->
+    <string name="kq4_is_none_found">Hech qanday xavfli fayl topilmadi</string>
+
+    <!-- "Barcha fayllarga ruxsat" yo'q bo'lganda chiqadigan dialog matni.
+         Sarlavha/tugmalar uchun strings.xml dagi tayyor kalitlar qayta ishlatiladi:
+         permission_needed ("Ruxsat kerak"), grant ("Ruxsat berish"), btn_later ("Keyinroq"). -->
+    <string name="kq4_is_perm_msg">Telefon fayllarini (Yuklamalar, Telegram va boshqalar) tekshirish uchun \"Barcha fayllarga ruxsat\" yoqilishi shart. Busiz skaner fayllarni KO\'RA OLMAYDI va xavfni topa olmaydi.</string>
+
+    <!-- Skan natijasi ovozli e'loni (TTS) -->
+    <string name="kq4_is_tts_danger">Ogohlantirish! %1$d ta xavfli fayl aniqlandi.</string>
+    <string name="kq4_is_tts_susp">Diqqat! %1$d ta shubhali fayl topildi.</string>
+</resources>

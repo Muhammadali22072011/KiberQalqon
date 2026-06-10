@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экранов «Настройки» и «О проекте» (русский). -->
+<resources>
+
+    <!-- ── Настройки ── -->
+    <string name="kq4_set_eyebrow">Настройки</string>
+    <string name="kq4_set_title">Управление</string>
+    <string name="kq4_set_profile_version">ВЕРСИЯ %1$s · НАВОИ</string>
+    <string name="kq4_set_active">Активен</string>
+
+    <string name="kq4_set_sec_protection">Защита</string>
+    <string name="kq4_set_row_autoscan_title">Автоматическая проверка</string>
+    <string name="kq4_set_row_autoscan_sub">Проверяет папки каждые 15 минут</string>
+    <string name="kq4_set_row_autodelete_title">Удалять опасный файл автоматически</string>
+    <string name="kq4_set_row_autodelete_sub">Найденный вредоносный файл удаляется за 5 секунд</string>
+    <string name="kq4_set_row_phishing_title">Защита от поддельных SMS</string>
+    <string name="kq4_set_row_phishing_sub">Скрывает подозрительные сообщения, запрашивающие код</string>
+    <string name="kq4_set_row_background_title">Работа в фоне</string>
+    <string name="kq4_set_row_background_sub">Защита снова включается даже после перезагрузки телефона</string>
+
+    <string name="kq4_set_sec_appearance">Внешний вид</string>
+    <string name="kq4_set_theme_title">Тема</string>
+    <string name="kq4_set_theme_sub">Дневная или ночная</string>
+    <string name="kq4_set_accent_title">Основной цвет</string>
+    <string name="kq4_set_accent_sub">Выберите национальный стиль цвета</string>
+
+    <string name="kq4_set_sec_language">Язык</string>
+
+    <string name="kq4_set_sec_about">О приложении</string>
+    <string name="kq4_set_row_report">Сообщить о проблеме</string>
+
+    <string name="kq4_set_sec_extra">Дополнительно</string>
+    <string name="kq4_set_row_hidden">Сканер скрытых угроз</string>
+    <string name="kq4_set_row_telegram">Уведомления Telegram</string>
+    <string name="kq4_set_row_protection">Состояние защиты и разрешения</string>
+    <string name="kq4_set_row_admin">Панель управления</string>
+
+    <string name="kq4_set_footer">ANOR QALQON v%1$s · BUILD %2$d\n© 2026 · Muhammadali · Навои</string>
+
+    <!-- ── О проекте ── -->
+    <string name="kq4_about_eyebrow">О проекте</string>
+    <string name="kq4_about_desc">Anor Qalqon — современное защитное приложение, созданное для Узбекистана. Оберегает ваш телефон от вредоносных APK-файлов и обманных атак. Всё объясняется простым и понятным языком.</string>
+    <string name="kq4_about_sec_features">Возможности</string>
+    <string name="kq4_about_f1_title">Автоматическая проверка</string>
+    <string name="kq4_about_f1_sub">Проверяет новые файлы каждые 15 минут</string>
+    <string name="kq4_about_f2_title">Сам удаляет угрозы</string>
+    <string name="kq4_about_f2_sub">Находит вредоносный файл и сразу уничтожает его</string>
+    <string name="kq4_about_f3_title">Защита от поддельных SMS</string>
+    <string name="kq4_about_f3_sub">Скрывает обманные сообщения, запрашивающие банковский код</string>
+    <string name="kq4_about_f4_title">Два языка</string>
+    <string name="kq4_about_f4_sub">Узбекский и русский</string>
+    <string name="kq4_about_sec_author">Автор</string>
+    <string name="kq4_about_author_sub">Навои · Узбекистан</string>
+    <string name="kq4_about_footer">© 2026 · ANOR QALQON · v%1$s</string>
+</resources>

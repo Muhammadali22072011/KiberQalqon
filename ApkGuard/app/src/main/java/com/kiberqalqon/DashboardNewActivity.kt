@@ -2,11 +2,14 @@ package com.kiberqalqon
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import com.kiberqalqon.databinding.ActivityDashboardNewBinding
 import kotlinx.coroutines.*
 
@@ -26,51 +29,55 @@ class DashboardNewActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         AnimationHelper.fadeIn(binding.root, duration = 400)
-        AnimationHelper.glowPulse(binding.imgLiveDot, duration = 1200)
-
-        // Hero meter ortida yumshoq, tinch pulsatsiya qiluvchi "scan-ring" (akssent rangida).
-        binding.imgScanGlow.setImageResource(R.drawable.kq_scan_ring)
-        AnimationHelper.glowPulse(binding.imgScanGlow, duration = 2200)
-
         binding.dashboardContent.post {
             AnimationHelper.cascadeChildren(binding.dashboardContent, delayBetween = 70)
         }
 
         setupUI()
-        loadStatistics()
+        // loadStatistics() bu yerda chaqirilmaydi — onResume() har doim onCreate'dan keyin
+        // keladi va statistikani o'zi yuklaydi (ikki marta yuklashning hojati yo'q).
     }
 
     private fun setupUI() {
-        binding.btnSettings.setOnClickListener {
-            // Ekran o'tishi endi tema (KqWindowAnimations) orqali — yagona, yengil uslub.
-            startActivity(Intent(this, SettingsActivity::class.java))
+        // ── v4 TopBar (inc_kq4_topbar) ──────────────────────────────────────
+        // UZ / RU — tap bilan til almashtiriladi va Activity yangi locale'da qayta tug'iladi.
+        binding.kq4Topbar.kq4LangCode.text =
+            if (Config.getLanguage(this) == "ru") "RU" else "UZ"
+        binding.kq4Topbar.kq4BtnLang.setOnClickListener {
+            val cur = Config.getLanguage(this)
+            val next = if (cur == "ru") "uz" else "ru"
+            Config.setLanguage(this, next)
+            recreate()
         }
 
+        // Qo'ng'iroqcha → Karantin (dizayn TopBar: bell → quarantine).
+        binding.kq4Topbar.kq4BtnBell.setOnClickListener {
+            startActivity(Intent(this, QuarantineActivity::class.java))
+        }
+
+        // ── HERO CTA ────────────────────────────────────────────────────────
         binding.btnQuickScan.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
-        }
-
-        // UX-01: "Karantin" plitkasi — karantin ekranini ochadi (tiklash/butunlay o'chirish).
-        binding.tileQuarantine.setOnClickListener {
-            startActivity(Intent(this, QuarantineActivity::class.java))
         }
 
         binding.btnRefresh.setOnClickListener {
             loadStatistics()
         }
 
-        binding.cardApkList.setOnClickListener {
+        // ── 3 raqam kartasi ────────────────────────────────────────────────
+        binding.tileScanned.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
         }
+        binding.tileDeleted.setOnClickListener {
+            startActivity(Intent(this, QuarantineActivity::class.java))
+        }
+        binding.tileProtection.setOnClickListener {
+            startActivity(Intent(this, ProtectionStatusActivity::class.java))
+        }
 
-        // UZ / RU toggle — раньше пилюля не имела click handler, теперь
-        // тапом переключаем язык и пересоздаём Activity на новой локали.
-        binding.tvLangCode.text = if (Config.getLanguage(this) == "ru") "RU" else "UZ"
-        binding.btnLangToggle.setOnClickListener {
-            val cur = Config.getLanguage(this)
-            val next = if (cur == "ru") "uz" else "ru"
-            Config.setLanguage(this, next)
-            recreate()
+        // "Hammasi" → to'liq skaner ro'yxati.
+        binding.cardApkList.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
         }
 
         // Единая нижняя нав. — активна вкладка HOME.
@@ -90,14 +97,62 @@ class DashboardNewActivity : AppCompatActivity() {
         // установить/удалить приложение, и dashboard должен это отразить.
         populateThreatRows()
         populateInstalledApps()
+        updateProtectionStatusBar()
+        updateGuardDots()
+        // Hero (halqa, %, sarlavha, rang) va hisoblagichlar ham qaytishda yangilanishi shart —
+        // aks holda topbar yashil "Himoya yoqilgan", hero esa eski sariq holatda qoladi
+        // (masalan, ProtectionStatusActivity'da himoya yoqilgandan keyin). Yengil ish:
+        // SharedPreferences + Quarantine.list Dispatchers.IO'da; countUp teng qiymatda
+        // miltillamaydi, ring.setValue animatsiyalanadi.
+        loadStatistics()
+    }
+
+    /** TopBar: real himoya holati — matn (yoqilgan/o'chiq) + nuqta rangi (safe/warn). */
+    private fun updateProtectionStatusBar() {
+        val on = Config.isBackgroundEnabled(this)
+        binding.kq4Topbar.kq4TopSub.setText(
+            if (on) R.string.kq4_protection_on else R.string.kq4_protection_off
+        )
+        binding.kq4Topbar.kq4TopDot.backgroundTintList = ColorStateList.valueOf(
+            getColor(if (on) R.color.kq_safe else R.color.kq_warn)
+        )
+    }
+
+    /**
+     * "Himoya qatlamlari" 2×2 nuqtalari — modul REAL yoqilgan bo'lsa yashil, aks holda sariq:
+     *  - Fayllar nazorati = fon real-time monitoring (Config.isBackgroundEnabled)
+     *  - Bank himoyasi    = APK skaner har doim ishlaydi → doim yashil
+     *  - SMS himoyasi     = phishing-bildirishnoma filtri (flag + notification-access ruxsati)
+     *  - Internet himoyasi= DNS-sinkhole VPN (opt-in; ruxsat berilgan bo'lsa prepare()==null)
+     */
+    private fun updateGuardDots() {
+        setGuardDot(binding.kq4GuardFilesDot, Config.isBackgroundEnabled(this))
+        setGuardDot(binding.kq4GuardBankDot, true)
+
+        val smsOn = Config.isPhishingBlockerEnabled(this) &&
+            try {
+                NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
+            } catch (_: Throwable) { false }
+        setGuardDot(binding.kq4GuardSmsDot, smsOn)
+
+        val netOn = try {
+            VpnFilterService.prepareIntent(this) == null
+        } catch (_: Throwable) { false }
+        setGuardDot(binding.kq4GuardNetDot, netOn)
+    }
+
+    private fun setGuardDot(dot: View, enabled: Boolean) {
+        dot.backgroundTintList = ColorStateList.valueOf(
+            getColor(if (enabled) R.color.kq_safe else R.color.kq_warn)
+        )
     }
 
     /**
      * `appList` ichiga barcha user-app'larni (system'sis) ro'yxat sifatida joylaydi.
-     * Har bir satr: real ikonka + ilova nomi + paket nomi + verdict-rang nuqta.
+     * Har bir satr: real ikonka + ilova nomi + paket · manba + verdict-tag.
      * Verdict `kiberqalqon_rescan` SharedPreferences'dan o'qiladi
      * (InstalledAppsRescanWorker har 24 soatda yangilaydi).
-     * Skan qilinmagan ilova uchun nuqta kulrang.
+     * Skan qilinmagan ilova uchun tag — kulrang "Tekshirilmagan".
      *
      * PackageManager.loadIcon/loadLabel sekin bo'lishi mumkin (telefonda 30-60 ilova bilan),
      * shuning uchun ro'yxat va metadata IO threadda yig'iladi, UI'ga main thread'da kiritamiz.
@@ -163,14 +218,25 @@ class DashboardNewActivity : AppCompatActivity() {
         val source: InstallSource,
     )
 
-    private enum class InstallSource(val labelText: String, val isTrusted: Boolean) {
-        PLAY_MARKET("Play Market", true),
-        GALAXY_STORE("Galaxy Store", true),
-        HUAWEI_GALLERY("AppGallery", true),
-        AMAZON("Amazon", true),
-        SIDELOAD("Sideload", false),
-        PRE_INSTALLED("Tizim", true),
-        UNKNOWN("Noma'lum", false),
+    private enum class InstallSource {
+        PLAY_MARKET,
+        GALAXY_STORE,
+        HUAWEI_GALLERY,
+        AMAZON,
+        SIDELOAD,
+        PRE_INSTALLED,
+        UNKNOWN,
+    }
+
+    /** Manba yorlig'i — lokalizatsiya qilinadigan resurs (Tizim/Noma'lum tarjima bo'ladi). */
+    private fun sourceLabelRes(source: InstallSource): Int = when (source) {
+        InstallSource.PLAY_MARKET -> R.string.kq4_dash_src_play
+        InstallSource.GALAXY_STORE -> R.string.kq4_dash_src_galaxy
+        InstallSource.HUAWEI_GALLERY -> R.string.kq4_dash_src_huawei
+        InstallSource.AMAZON -> R.string.kq4_dash_src_amazon
+        InstallSource.SIDELOAD -> R.string.kq4_dash_src_sideload
+        InstallSource.PRE_INSTALLED -> R.string.kq4_dash_src_system
+        InstallSource.UNKNOWN -> R.string.kq4_dash_src_unknown
     }
 
     /**
@@ -208,7 +274,16 @@ class DashboardNewActivity : AppCompatActivity() {
 
     /** Берём 3 последние DANGER/SUSPICIOUS записи из ScanHistory и кладём в hero list. */
     private fun populateThreatRows() {
-        val recent = ScanHistory.all(this)
+        val history = ScanHistory.all(this)
+
+        // HERO: "So'nggi tekshiruv: …" — real oxirgi skan vaqti (yangi yozuv ro'yxat boshida).
+        val lastTs = history.firstOrNull()?.timestamp ?: 0L
+        binding.kq4DashLastScan.text = getString(
+            R.string.kq4_dash_last_scan,
+            if (lastTs > 0) humanAgo(lastTs) else getString(R.string.kq4_dash_never)
+        )
+
+        val recent = history
             .filter { it.verdict != ScanResult.Verdict.SAFE }
             .take(3)
 
@@ -218,26 +293,32 @@ class DashboardNewActivity : AppCompatActivity() {
             binding.threatRow3.root,
         )
 
+        // Ko'rinadigan satrlar orasidagina hairline-ajratgich (design .li border-bottom).
+        binding.kq4ThreatDiv1.visibility = if (recent.size >= 2) View.VISIBLE else View.GONE
+        binding.kq4ThreatDiv2.visibility = if (recent.size >= 3) View.VISIBLE else View.GONE
+
         if (recent.isEmpty()) {
             // История пуста — показываем 1 строку-заглушку "ничего не найдено", остальные прячем.
             bindThreatRow(
                 rows[0],
-                filename = "Hozircha xavf topilmadi",
-                sub = "Yangi APK aniqlanganda bu yerda paydo bo'ladi",
+                filename = getString(R.string.kq4_dash_empty_title),
+                sub = getString(R.string.kq4_dash_empty_sub),
                 verdict = ScanResult.Verdict.SAFE,
             )
-            rows[0].visibility = android.view.View.VISIBLE
-            rows[1].visibility = android.view.View.GONE
-            rows[2].visibility = android.view.View.GONE
+            rows[0].visibility = View.VISIBLE
+            rows[0].setOnClickListener(null)
+            rows[0].isClickable = false
+            rows[1].visibility = View.GONE
+            rows[2].visibility = View.GONE
             return
         }
 
         for ((i, row) in rows.withIndex()) {
             val entry = recent.getOrNull(i)
             if (entry == null) {
-                row.visibility = android.view.View.GONE
+                row.visibility = View.GONE
             } else {
-                row.visibility = android.view.View.VISIBLE
+                row.visibility = View.VISIBLE
                 bindThreatRow(
                     row,
                     filename = entry.apkName,
@@ -260,57 +341,82 @@ class DashboardNewActivity : AppCompatActivity() {
         }
     }
 
+    /** Dizayn .li sub: "{manba} orqali · {vaqt}". */
     private fun buildThreatSub(entry: ScanHistory.Entry): String {
-        val source = entry.source?.takeIf { it.isNotBlank() } ?: "skan"
-        val ago = humanAgo(entry.timestamp)
-        return "${source.replaceFirstChar { it.uppercase() }} · $ago"
+        val source = (entry.source?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.kq4_dash_source_scan))
+            .replaceFirstChar { it.uppercase() }
+        return getString(R.string.kq4_dash_via_time, source, humanAgo(entry.timestamp))
     }
 
     private fun humanAgo(ts: Long): String {
-        if (ts <= 0) return "yaqinda"
+        if (ts <= 0) return getString(R.string.kq4_dash_ago_recent)
         val delta = (System.currentTimeMillis() - ts) / 1000
         return when {
-            delta < 60 -> "hozirgina"
-            delta < 3600 -> "${delta / 60} daq oldin"
-            delta < 86400 -> "${delta / 3600} soat oldin"
-            else -> "${delta / 86400} kun oldin"
+            delta < 60 -> getString(R.string.kq4_dash_ago_now)
+            delta < 3600 -> getString(R.string.kq4_dash_ago_min, delta / 60)
+            delta < 86400 -> getString(R.string.kq4_dash_ago_hour, delta / 3600)
+            else -> getString(R.string.kq4_dash_ago_day, delta / 86400)
         }
     }
 
+    /**
+     * v4 .li satrini verdict bo'yicha bo'yaydi:
+     *  DANGER     → av danger + ic4_file (qizil) + tag "Xavfli"
+     *  SUSPICIOUS → av warn + ic4_file (sariq) + tag "Shubhali"
+     *  SAFE       → faqat bo'sh-holat uchun: av safe + ic4_check_circle, tag yashirin.
+     * Verdict mantiqi o'zgarmaydi — bu faqat ko'rinish.
+     */
     private fun bindThreatRow(
-        root: android.view.View,
+        root: View,
         filename: String,
         sub: String,
         verdict: ScanResult.Verdict = ScanResult.Verdict.DANGER,
     ) {
         root.findViewById<TextView>(R.id.tvThreatName).text = filename
         root.findViewById<TextView>(R.id.tvThreatSub).text = sub
+
+        val av = root.findViewById<View>(R.id.avThreat)
+        val icon = root.findViewById<ImageView>(R.id.ivThreatIcon)
+        val tag = root.findViewById<View>(R.id.tagThreat)
+        val tagDot = root.findViewById<View>(R.id.tagThreatDot)
         val sev = root.findViewById<TextView>(R.id.tvThreatSev)
+
         when (verdict) {
             ScanResult.Verdict.DANGER -> {
-                sev.text = getString(R.string.kq_sev_crit)
-                sev.setBackgroundResource(R.drawable.kq_sev_crit)
+                av.setBackgroundResource(R.drawable.kq4_av_danger)
+                icon.setImageResource(R.drawable.ic4_file)
+                icon.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_danger))
+                tag.visibility = View.VISIBLE
+                tag.setBackgroundResource(R.drawable.kq4_tag_danger)
+                tagDot.backgroundTintList = ColorStateList.valueOf(getColor(R.color.kq_danger_ink))
+                sev.text = getString(R.string.kq4_danger)
                 sev.setTextColor(getColor(R.color.kq_danger_ink))
             }
             ScanResult.Verdict.SUSPICIOUS -> {
-                sev.text = getString(R.string.kq_sev_high)
-                sev.setBackgroundResource(R.drawable.kq_sev_high)
+                av.setBackgroundResource(R.drawable.kq4_av_warn)
+                icon.setImageResource(R.drawable.ic4_file)
+                icon.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_warn))
+                tag.visibility = View.VISIBLE
+                tag.setBackgroundResource(R.drawable.kq4_tag_warn)
+                tagDot.backgroundTintList = ColorStateList.valueOf(getColor(R.color.kq_warn_ink))
+                sev.text = getString(R.string.kq4_suspicious)
                 sev.setTextColor(getColor(R.color.kq_warn_ink))
             }
             ScanResult.Verdict.SAFE -> {
-                sev.text = getString(R.string.kq_sev_safe)
-                sev.setBackgroundResource(R.drawable.kq_sev_safe)
-                sev.setTextColor(getColor(R.color.kq_safe_ink))
+                av.setBackgroundResource(R.drawable.kq4_av_safe)
+                icon.setImageResource(R.drawable.ic4_check_circle)
+                icon.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_safe))
+                tag.visibility = View.GONE
             }
         }
     }
 
     /**
      * inc_dashboard_app_row layout satrini o'rnatilgan ilova ma'lumotlari bilan to'ldiradi.
-     * Verdict bo'yicha o'ng tomondagi nuqta rangini sozlaydi.
-     * Install source (Play Market/Sideload/...) — paket nomi tagidagi badge.
+     * Sub: "paket · manba"; o'ngda verdict-tag (safe/warn/danger, skan qilinmagan — soft).
      */
-    private fun bindAppRow(root: android.view.View, data: AppRowData) {
+    private fun bindAppRow(root: View, data: AppRowData) {
         val iconView = root.findViewById<ImageView>(R.id.ivAppIcon)
         if (data.icon != null) {
             iconView.setImageDrawable(data.icon)
@@ -319,34 +425,24 @@ class DashboardNewActivity : AppCompatActivity() {
         }
 
         root.findViewById<TextView>(R.id.tvAppName).text = data.label
-        root.findViewById<TextView>(R.id.tvAppPkg).text = data.pkgName
+        root.findViewById<TextView>(R.id.tvAppPkg).text = getString(
+            R.string.kq4_dash_pkg_src, data.pkgName, getString(sourceLabelRes(data.source))
+        )
 
-        // Install source badge: yashil=ishonchli do'kon, sariq=sideload, kulrang=noma'lum
-        val sourceBadge = root.findViewById<TextView>(R.id.tvAppSource)
-        if (sourceBadge != null) {
-            val isVirus = data.verdict == "DANGER"
-            sourceBadge.text = when {
-                isVirus -> "⚠️ VIRUS"
-                else -> data.source.labelText
-            }
-            val sourceColor = when {
-                isVirus -> getColor(R.color.kq_danger)
-                data.source.isTrusted -> getColor(R.color.kq_safe_ink)
-                data.source == InstallSource.SIDELOAD -> getColor(R.color.kq_warn_ink)
-                else -> getColor(R.color.kq_ink_3)
-            }
-            sourceBadge.setTextColor(sourceColor)
+        // Verdict-tag: yashil=safe, sariq=shubhali, qizil=xavfli, kulrang=skan qilinmagan.
+        val tag = root.findViewById<View>(R.id.tagApp)
+        val tagDot = root.findViewById<View>(R.id.tagAppDot)
+        val tagText = root.findViewById<TextView>(R.id.tvAppTag)
+        val (bgRes, inkColor, textRes) = when (data.verdict) {
+            "DANGER" -> Triple(R.drawable.kq4_tag_danger, R.color.kq_danger_ink, R.string.kq4_danger)
+            "SUSPICIOUS" -> Triple(R.drawable.kq4_tag_warn, R.color.kq_warn_ink, R.string.kq4_suspicious)
+            "SAFE" -> Triple(R.drawable.kq4_tag_safe, R.color.kq_safe_ink, R.string.kq4_safe)
+            else -> Triple(R.drawable.kq4_tag_soft, R.color.kq_ink_2, R.string.kq4_dash_not_scanned)
         }
-
-        // Verdict-nuqta: yashil=safe, sariq=shubhali, qizil=xavfli, kulrang=skan qilinmagan.
-        val dot = root.findViewById<android.view.View>(R.id.vAppStatusDot)
-        val dotColor = when (data.verdict) {
-            "DANGER" -> getColor(R.color.kq_danger)
-            "SUSPICIOUS" -> getColor(R.color.kq_warn)
-            "SAFE" -> getColor(R.color.kq_safe)
-            else -> getColor(R.color.kq_ink_3)
-        }
-        dot?.backgroundTintList = android.content.res.ColorStateList.valueOf(dotColor)
+        tag.setBackgroundResource(bgRes)
+        tagDot.backgroundTintList = ColorStateList.valueOf(getColor(inkColor))
+        tagText.setText(textRes)
+        tagText.setTextColor(getColor(inkColor))
 
         // Ilovaga bosilsa — uning ruxsatlarini batafsil ko'rsatamiz.
         root.setOnClickListener { openAppDetails(data) }
@@ -408,8 +504,7 @@ class DashboardNewActivity : AppCompatActivity() {
     private fun getStatistics(): Statistics {
         val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
 
-        // UX-06: "Karantin" plitkasi uchun HAQIQIY karantin sonini olamiz (avval total_safe —
-        // xavfsiz skanlar soni ko'rsatilardi, ya'ni karantin bo'sh bo'lsa ham "Karantin: 154").
+        // UX-06: karantin soni HAQIQIY karantindan (Quarantine.list), statistika emas.
         val quarantineCount = try { Quarantine.list(this).size } catch (_: Throwable) { 0 }
         return Statistics(
             totalScanned = prefs.getInt("total_scanned", 0),
@@ -434,14 +529,32 @@ class DashboardNewActivity : AppCompatActivity() {
     }
 
     private fun updateUI(stats: Statistics) {
-        // "Yorug' minimal": raqamlar jonli sanaladi (count-up), darhol o'rnatilmaydi.
+        // Raqamlar jonli sanaladi (count-up), darhol o'rnatilmaydi.
         AnimationHelper.countUp(binding.tvTotalScanned, stats.totalScanned, startDelay = 120)
-        AnimationHelper.countUp(binding.tvTotalBlocked, stats.totalBlocked, startDelay = 220)
-        // UX-06: "Karantin" plitkasi — endi haqiqiy karantin fayllar soni (Quarantine.list).
-        AnimationHelper.countUp(binding.tvTotalSafe, stats.quarantineCount, startDelay = 320)
+        // Dizayn (screens1.jsx): plitka №2 "O'chirildi" → go quarantine, ya'ni REAL
+        // o'chirilgan/karantindagi fayllar soni (Quarantine.list), blok hisoblagichi emas.
+        // Aks holda plitkadagi raqam Karantin ekranidagi raqam bilan mos kelmaydi.
+        AnimationHelper.countUp(binding.tvTotalBlocked, stats.quarantineCount, startDelay = 220)
 
         val protectionLevel = calculateProtectionLevel(stats)
-        binding.speedometer.setProtectionLevel(protectionLevel, animate = true)
+        binding.tvProtectionPct.text = getString(R.string.kq4_dash_pct, protectionLevel)
+
+        // HERO holati — porog'lar eski SpeedometerView.statusColor() bilan 1:1:
+        // >=80 yashil "himoyalangan", 50..79 sariq "to'liq emas", <50 qizil "xavf ostida".
+        val (titleRes, colorRes, iconRes) = when {
+            protectionLevel >= 80 ->
+                Triple(R.string.kq4_dash_hero_safe, R.color.kq_safe, R.drawable.ic4_shield_check)
+            protectionLevel >= 50 ->
+                Triple(R.string.kq4_dash_hero_warn, R.color.kq_warn, R.drawable.ic4_shield_alert)
+            else ->
+                Triple(R.string.kq4_dash_hero_danger, R.color.kq_danger, R.drawable.ic4_shield_alert)
+        }
+        val statusColor = getColor(colorRes)
+        binding.kq4DashHeroTitle.setText(titleRes)
+        binding.kq4DashHeroIcon.setImageResource(iconRes)
+        binding.kq4DashHeroIcon.imageTintList = ColorStateList.valueOf(statusColor)
+        binding.kq4DashRing.ringColor = statusColor
+        binding.kq4DashRing.setValue(protectionLevel.toFloat())
     }
 
     private fun calculateProtectionLevel(stats: Statistics): Int {

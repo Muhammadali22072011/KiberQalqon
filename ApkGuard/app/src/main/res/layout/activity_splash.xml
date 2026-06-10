@@ -1,148 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  KiberQalqon splash. Mirrors Splash in screens-onboarding.jsx:
-    1. turquoise to darker-turquoise gradient (kq_primary_light to kq_primary_2_light)
-    2. tiled 8-point Uzbek star pattern on top (white at ~18 percent)
-    3. centered halo with 2 pulsing rings plus the shield mark
-    4. "KiberQalqon" wordmark (mixed case)
-    5. mono eyebrow "TELEFON HIMOYASI · V {versionName}"
-    6. tagline "Zararli APK fayllardan himoyalanish"
-    7. three pulsing load dots near the bottom
-  IDs kept stable so SplashActivity.kt keeps working unchanged:
-    ivLogo, tvAppName, tvSubtitle, tvVersion
+  ANOR QALQON splash — v4 «Milliy Kiber Himoya» dizayni (screens1.jsx → Splash):
+    · to'liq ekran anor-gradient fon (@drawable/kq4_splashlanguage_bg — kq4_splash_bg'dagi
+      noqonuniy angle=255 [45 ga karrali emas → inflate'da XmlPullParserException] tufayli
+      guruhning o'z drawable'i bilan almashtirildi, angle=270)
+    · 3 ta dekorativ 8 qirrali yulduz (oq tint, alpha ~0.12)
+    · markazda LogoDisc: oq doira 116dp + haqiqiy anor-qalqon logotipi (~96dp)
+    · LogoDisc atrofida 2 ta pulsar halqa (scale+alpha, ikkinchisi +800ms)
+    · "ANOR QALQON" 34sp ExtraBold, ls -0.03 · mono "MILLIY KIBER HIMOYA" 12sp ls 0.22
+    · pastda 3 ta oq load-nuqta (stagger)
+  Barqaror ID'lar saqlangan (SplashActivity ularga bog'liq):
+    splashRoot, starsBox, contentColumn, heroBox, pulseRing1/2, logoDisc, ivLogo,
+    tvAppName, tvSubtitle, loadDots, loadDot1-3, tvVersion (yashirin, long-press diag).
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/splashRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/kq_splash_gradient">
+    android:background="@drawable/kq4_splashlanguage_bg"
+    android:clipChildren="false">
 
-    <!-- subtle tiled star pattern on top of the gradient. Uses a single vector
-         drawable with a 4x7 grid of stars baked in (BitmapDrawable + vector src
-         crashes on API 28). Stretched to fill: aspect-ratio drift is acceptable
-         for a low-alpha ornament. -->
-    <ImageView
+    <!-- dekorativ yulduzlar (dizayn: STAR_TILE, oq, alpha .12) -->
+    <FrameLayout
+        android:id="@+id/starsBox"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@null"
-        android:scaleType="fitXY"
-        android:src="@drawable/kq_star_tile_white" />
+        android:layout_height="match_parent">
 
-    <!-- vertical column: shield · wordmark · eyebrow -->
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="-16dp"
+            android:layout_marginTop="72dp"
+            android:alpha="0.12"
+            android:contentDescription="@null"
+            android:src="@drawable/kq4_star"
+            app:tint="#FFFFFF" />
+
+        <ImageView
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="150dp"
+            android:layout_marginEnd="26dp"
+            android:alpha="0.12"
+            android:contentDescription="@null"
+            android:src="@drawable/kq4_star"
+            app:tint="#FFFFFF" />
+
+        <ImageView
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="36dp"
+            android:layout_marginBottom="150dp"
+            android:alpha="0.12"
+            android:contentDescription="@null"
+            android:src="@drawable/kq4_star"
+            app:tint="#FFFFFF" />
+    </FrameLayout>
+
+    <!-- markaziy kolonna: LogoDisc + wordmark + mono tagline -->
     <LinearLayout
+        android:id="@+id/contentColumn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingHorizontal="32dp">
 
-        <!-- 160dp hero: 2 pulsing rings + halo + shield -->
+        <!-- 170dp hero: 2 pulsar halqa + LogoDisc (dizayn: width/height 170) -->
         <FrameLayout
             android:id="@+id/heroBox"
-            android:layout_width="160dp"
-            android:layout_height="160dp">
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:clipChildren="false">
 
             <View
                 android:id="@+id/pulseRing1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="170dp"
+                android:layout_height="170dp"
                 android:layout_gravity="center"
                 android:background="@drawable/kq_pulse_ring" />
 
             <View
                 android:id="@+id/pulseRing2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="170dp"
+                android:layout_height="170dp"
                 android:layout_gravity="center"
                 android:background="@drawable/kq_pulse_ring" />
 
-            <View
-                android:layout_width="110dp"
-                android:layout_height="110dp"
+            <!-- LogoDisc 116dp: oq doira + anor-qalqon PNG (116×0.84 ≈ 96dp) -->
+            <FrameLayout
+                android:id="@+id/logoDisc"
+                android:layout_width="116dp"
+                android:layout_height="116dp"
                 android:layout_gravity="center"
-                android:background="@drawable/kq_shield_halo" />
+                android:background="@drawable/kq4_circle_white">
 
-            <ImageView
-                android:id="@+id/ivLogo"
-                android:layout_width="68dp"
-                android:layout_height="68dp"
-                android:layout_gravity="center"
-                android:alpha="0"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/kq_shield_mark_white" />
+                <ImageView
+                    android:id="@+id/ivLogo"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/kq_logo_anor" />
+            </FrameLayout>
         </FrameLayout>
 
-        <!-- wordmark — "KiberQalqon" (mixed case per design, 38sp / 800) -->
+        <!-- wordmark: 800 34px, ls -.03em (dizayn marginTop 32) -->
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="38dp"
+            android:layout_marginTop="32dp"
             android:alpha="0"
-            android:letterSpacing="-0.02"
-            android:text="@string/dash_brand"
+            android:fontFamily="@font/onest_extrabold"
+            android:letterSpacing="-0.03"
+            android:text="@string/splash_logo_title"
             android:textColor="#FFFFFF"
-            android:textSize="38sp"
-            android:textStyle="bold" />
+            android:textSize="34sp" />
 
-        <!-- mono eyebrow — "TELEFON HIMOYASI · V {versionName}". -->
+        <!-- mono tagline: 12px, ls .22em, oq 90% (long-press → diagnostika) -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:alpha="0.85"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.24"
-            android:text="TELEFON HIMOYASI · V 7.5"
-            android:textAllCaps="true"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:textStyle="normal" />
+            android:layout_marginTop="12dp"
+            android:alpha="0"
+            android:fontFamily="@font/ssmono_semibold"
+            android:letterSpacing="0.22"
+            android:text="@string/kq4_milliy"
+            android:textColor="#E6FFFFFF"
+            android:textSize="12sp" />
     </LinearLayout>
 
-    <!-- tagline near the bottom -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="70dp"
-        android:alpha="0.75"
-        android:text="@string/splash_subtitle2"
-        android:textColor="#FFFFFF"
-        android:textSize="12sp" />
-
-    <!-- three load dots, staggered animation -->
+    <!-- 3 ta load-nuqta (dizayn: bottom 54, 9px, gap 8) -->
     <LinearLayout
         android:id="@+id/loadDots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="38dp"
+        android:layout_marginBottom="54dp"
         android:orientation="horizontal">
 
         <View
             android:id="@+id/loadDot1"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/kq_load_dot" />
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/kq4_dot" />
 
         <View
             android:id="@+id/loadDot2"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/kq_load_dot" />
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/kq4_dot" />
 
         <View
             android:id="@+id/loadDot3"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
-            android:background="@drawable/kq_load_dot" />
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:background="@drawable/kq4_dot" />
     </LinearLayout>
 
-    <!-- Hidden but kept so SplashActivity's long-press diagnostics hook still works. -->
+    <!-- Yashirin, lekin saqlangan — long-press diagnostika kirishi shu yerga bog'liq. -->
     <TextView
         android:id="@+id/tvVersion"
         android:layout_width="wrap_content"
@@ -150,7 +177,6 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="14dp"
         android:alpha="0"
-        android:text="VERSION 7.5"
         android:textColor="#FFFFFF"
         android:textSize="10sp" />
 </FrameLayout>

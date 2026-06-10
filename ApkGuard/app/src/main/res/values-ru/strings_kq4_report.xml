@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экрана Report («Сообщить о проблеме»). -->
+<resources>
+    <string name="kq4_report_title">Сообщить о проблеме</string>
+    <string name="kq4_report_sub">Опишите ошибку или проблему здесь — она попадёт напрямую разработчику.</string>
+    <string name="kq4_report_privacy_title">Ваша конфиденциальность защищена</string>
+    <string name="kq4_report_privacy_body">Личные данные (имя, номер, другие приложения) не отправляются.</string>
+    <string name="kq4_report_thanks">Спасибо!</string>
+    <string name="kq4_report_sent_sub">Ваше сообщение отправлено разработчику. Скоро мы всё исправим.</string>
+    <string name="kq4_report_close">Закрыть</string>
+</resources>

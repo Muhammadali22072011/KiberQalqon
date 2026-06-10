@@ -31,9 +31,9 @@ object ThemeHelper {
      */
     fun applyAccent(activity: Activity) {
         val themeRes = when (Config.getAccent(activity)) {
-            "anor", "pomegranate" -> R.style.Theme_KiberQalqon_Anor
+            "feruz", "turkuaz" -> R.style.Theme_KiberQalqon_Feruz
             "zafaron", "saffron" -> R.style.Theme_KiberQalqon_Zafaron
-            else -> R.style.Theme_KiberQalqon_Feruz   // default = turkuaz (Yorug' minimal)
+            else -> R.style.Theme_KiberQalqon_Anor   // default = anor (brand)
         }
         activity.setTheme(themeRes)
     }

@@ -194,7 +194,7 @@ object CommunityReportClient {
             if (token.isBlank() || chatId.isBlank()) return
 
             val text = buildString {
-                append("💥 KiberQalqon ilova yiqildi")
+                append("💥 Anor Qalqon ilova yiqildi")
                 if (BuildConfig.DEBUG) append("  [DEBUG]")
                 append("\n")
                 append("Ilova: ${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})\n")

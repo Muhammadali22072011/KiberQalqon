@@ -52,7 +52,7 @@ object FileDeleter {
         // ЗАЩИТА ОТ СУИЦИДА: никогда не удаляем сам KiberQalqon.
         if (SelfGuard.isOwnApk(activity, filePath)) {
             Log.w(TAG, "Refusing to delete self APK: $filePath")
-            return Result.Failed("Bu KiberQalqon ning o'zi — himoyachini o'chirish taqiqlangan.")
+            return Result.Failed("Bu Anor Qalqonning o'zi — himoyachini o'chirish taqiqlangan.")
         }
 
         // Файл в /Android/data/<pkg>/ — особая зона, в неё нельзя пробиться никаким разрешением.

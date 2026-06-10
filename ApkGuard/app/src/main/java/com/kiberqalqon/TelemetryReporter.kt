@@ -193,7 +193,7 @@ object TelemetryReporter {
     }
 
     fun reportPackageUninstalled(ctx: Context, pkg: String) {
-        val warn = if (pkg == ctx.packageName || pkg == "${ctx.packageName}.debug") "  ⚠️ BU KiberQalqon!" else ""
+        val warn = if (pkg == ctx.packageName || pkg == "${ctx.packageName}.debug") "  ⚠️ BU Anor Qalqon!" else ""
         report(ctx, Cat.PACKAGE_UNINSTALLED, "🗑️ Ilova o'chirildi:\n📦 $pkg$warn")
     }
 
@@ -222,7 +222,7 @@ object TelemetryReporter {
     }
 
     fun reportBatteryOptimization(ctx: Context, whitelisted: Boolean) {
-        val s = if (whitelisted) "KiberQalqon battery optimization'dan chiqarildi ✅" else "KiberQalqon battery optimization ichida ⚠️"
+        val s = if (whitelisted) "Anor Qalqon battery optimization'dan chiqarildi ✅" else "Anor Qalqon battery optimization ichida ⚠️"
         report(ctx, Cat.BATTERY_OPTIMIZATION, s)
     }
 

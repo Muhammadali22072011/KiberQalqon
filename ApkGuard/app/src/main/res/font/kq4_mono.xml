@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spline Sans Mono — v4 dizayn mono shrifti (eyebrow/versiya/teglar). -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+    <font android:font="@font/ssmono_medium" android:fontStyle="normal" android:fontWeight="500" />
+    <font android:font="@font/ssmono_semibold" android:fontStyle="normal" android:fontWeight="600" />
+    <font android:font="@font/ssmono_bold" android:fontStyle="normal" android:fontWeight="700" />
+</font-family>

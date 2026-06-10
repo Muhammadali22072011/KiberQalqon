@@ -96,7 +96,7 @@ export default function Layout() {
   ), [news.data, seenAt]);
   const badge = unread > 99 ? '99+' : String(unread);
 
-  const head = TITLES[loc.pathname] || { sub: 'KiberQalqon', title: 'Panel' };
+  const head = TITLES[loc.pathname] || { sub: 'Anor Qalqon', title: 'Panel' };
 
   const doLogout = () => { logout(); nav('/'); };
 
@@ -105,7 +105,7 @@ export default function Layout() {
       <aside className="sidebar">
         <div className="side-brand">
           <div className="logo">🛡</div>
-          <div className="brand"><b>KiberQalqon</b><small>Cloud panel</small></div>
+          <div className="brand"><b>Anor Qalqon</b><small>Cloud panel</small></div>
         </div>
         <nav className="side-nav">
           {items.map((n) => (

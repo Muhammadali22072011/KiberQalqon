@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 Stats ekrani (ScanHistoryActivity) — «Statistika» vkladkasi satrlari. -->
+<resources>
+    <!-- Stat-kartalar -->
+    <string name="kq4_stats_scanned_files">Tekshirilgan fayl</string>
+    <string name="kq4_stats_found_removed">Topildi va o\'chirildi</string>
+
+    <!-- Grafik kartasi -->
+    <string name="kq4_stats_daily_checks">Kunlik tekshiruvlar</string>
+    <string name="kq4_stats_week">Hafta</string>
+
+    <!-- Hafta kunlari (Du..Ya) -->
+    <string name="kq4_stats_day_mon">Du</string>
+    <string name="kq4_stats_day_tue">Se</string>
+    <string name="kq4_stats_day_wed">Cho</string>
+    <string name="kq4_stats_day_thu">Pa</string>
+    <string name="kq4_stats_day_fri">Ju</string>
+    <string name="kq4_stats_day_sat">Sh</string>
+    <string name="kq4_stats_day_sun">Ya</string>
+
+    <!-- Kategoriyalar -->
+    <string name="kq4_stats_threat_types">Qanday xavflar topildi</string>
+    <string name="kq4_stats_cat_bank">Bank o\'g\'irlash</string>
+    <string name="kq4_stats_cat_dropper">Yashirin yuklash</string>
+    <string name="kq4_stats_cat_sms">Soxta SMS</string>
+    <string name="kq4_stats_cat_other">Boshqa</string>
+    <string name="kq4_stats_count_fmt" translatable="false">%1$d / %2$d</string>
+
+    <!-- Topilgan fayllar ro'yxati -->
+    <string name="kq4_stats_found_files">Topilgan fayllar</string>
+    <string name="kq4_stats_src_telegram" translatable="false">Telegram</string>
+    <string name="kq4_stats_src_whatsapp" translatable="false">WhatsApp</string>
+    <string name="kq4_stats_src_download">Yuklanmalar</string>
+    <string name="kq4_stats_src_share">Ulashish</string>
+    <string name="kq4_stats_src_scan">Skaner</string>
+</resources>

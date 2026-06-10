@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Til tanlash ekrani (birinchi ochilishda) / Экран выбора языка (первый запуск).
+  Til tanlash ekrani — v4 «Milliy Kiber Himoya» dizayni (screens1.jsx → Language).
   Matn ataylab ikki tilda — foydalanuvchi hali tilni tanlamagan.
-  IDs: btnUzbek, btnRussian (LanguageSelectActivity.kt).
+  Markaz: LogoDisc 104dp + "ANOR QALQON" 30sp + mono tagline.
+  Past: sarlavha + 2 ta tanlov kartasi (UZ/RU) + "Davom etish" (h58).
+  IDs: btnUzbek, btnRussian (karta), ivCheckUz, ivCheckRu, btnContinue
+  (LanguageSelectActivity.kt tanlov holatini shu id'lar orqali chizadi).
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,93 +17,162 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingHorizontal="28dp"
-        android:paddingVertical="48dp">
+        android:paddingHorizontal="22dp"
+        android:paddingBottom="28dp">
 
-        <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/kq_shield_mark" />
+        <!-- flex:1 markaz blok: LogoDisc + brend lockup -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="280dp"
+            android:orientation="vertical"
+            android:paddingVertical="24dp">
 
+            <!-- LogoDisc 104dp (oq doira + anor-qalqon PNG ~88dp) -->
+            <FrameLayout
+                android:layout_width="104dp"
+                android:layout_height="104dp"
+                android:background="@drawable/kq4_circle_white"
+                android:elevation="6dp">
+
+                <ImageView
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/kq_logo_anor" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="@font/onest_extrabold"
+                android:letterSpacing="-0.03"
+                android:text="@string/splash_logo_title"
+                android:textColor="@color/kq_ink"
+                android:textSize="30sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/ssmono_semibold"
+                android:letterSpacing="0.18"
+                android:text="@string/kq4_milliy"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="11.5sp" />
+        </LinearLayout>
+
+        <!-- "Tilni tanlang · Выберите язык" (600 14px, ink-3, markazda) -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:letterSpacing="0.08"
-            android:text="KIBER QALQON"
-            android:textColor="@color/kq_ink"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/onest_semibold"
+            android:gravity="center"
+            android:text="@string/kq4_lang_title"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="14sp" />
 
-        <!-- background points at ?attr/kqPrimary (a plain color), NOT @color/kq_primary:
-             the latter is a <selector> ColorStateList, and using one as android:background
-             crashes on API < 29 (ColorStateListDrawable was added in API 29). -->
-        <View
-            android:layout_width="44dp"
-            android:layout_height="3dp"
-            android:layout_marginTop="20dp"
-            android:background="?attr/kqPrimary" />
-
-        <!-- Bilingual heading -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Tilni tanlang"
-            android:textColor="@color/kq_ink"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Выберите язык"
-            android:textColor="@color/kq_ink_2"
-            android:textSize="16sp" />
-
-        <!-- Uzbek -->
-        <com.google.android.material.button.MaterialButton
+        <!-- UZ kartasi (boshlang'ich holat: tanlangan) -->
+        <LinearLayout
             android:id="@+id/btnUzbek"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="32dp"
-            android:text="🇺🇿   O'zbekcha"
-            android:textAllCaps="false"
-            android:textColor="@color/kq_on_primary"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/kq_primary"
-            app:cornerRadius="18dp" />
-
-        <!-- Russian -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRussian"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="14dp"
-            android:text="🇷🇺   Русский"
-            android:textAllCaps="false"
-            android:textColor="@color/kq_ink"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            app:cornerRadius="18dp"
-            app:strokeColor="@color/kq_hairline_strong"
-            app:strokeWidth="1dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:alpha="0.7"
-            android:gravity="center"
-            android:text="Keyinroq Sozlamalardan o'zgartirishingiz mumkin\nМожно изменить позже в Настройках"
-            android:textColor="@color/kq_ink_3"
-            android:textSize="12sp" />
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/kq4_card_selected"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/kq4_av_neutral"
+                android:fontFamily="@font/ssmono_bold"
+                android:gravity="center"
+                android:text="@string/kq4_lang_uz"
+                android:textColor="@color/kq_ink_2"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/onest_semibold"
+                android:text="@string/kq4_lang_uzbek"
+                android:textColor="@color/kq_ink"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/ivCheckUz"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_check_circle"
+                app:tint="@color/kq_primary" />
+        </LinearLayout>
+
+        <!-- RU kartasi -->
+        <LinearLayout
+            android:id="@+id/btnRussian"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/kq4_card"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/kq4_av_neutral"
+                android:fontFamily="@font/ssmono_bold"
+                android:gravity="center"
+                android:text="@string/kq4_lang_ru_code"
+                android:textColor="@color/kq_ink_2"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/onest_semibold"
+                android:text="@string/kq4_lang_russian"
+                android:textColor="@color/kq_ink"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/ivCheckRu"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/kq4_lang_ring" />
+        </LinearLayout>
+
+        <!-- "Davom etish" — btn primary block lg (h58) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnContinue"
+            style="@style/KQ4.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:minHeight="58dp"
+            android:text="@string/kq4_continue"
+            android:textSize="17sp"
+            app:cornerRadius="29dp" />
     </LinearLayout>
 </ScrollView>

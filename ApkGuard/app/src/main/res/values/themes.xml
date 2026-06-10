@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-      Base theme. Activities apply one of the three Accent overlays below at
-      runtime via ThemeHelper.applyAccent(...) so `kq_primary` (a state list
-      pointing at `?attr/kqPrimary`) resolves to whichever colour the user
-      picked in Settings.
+      Base theme — v4 «Milliy Kiber Himoya» (design_v4_extracted/page.html).
+      Activities apply one of the three Accent overlays below at runtime via
+      ThemeHelper.applyAccent(...) so `kq_primary` (a state list pointing at
+      `?attr/kqPrimary`) resolves to whichever colour the user picked in
+      Settings. Light/dark surfaces come from values/ vs values-night/ colors.
 
-      Default = Anor (matches the design screenshots Le Muhammadali shipped on
-      2026-05-22). ThemeHelper reads the stored pref and picks Anor/Feruz/Zafaron.
+      Default = Anor #C52A3E — THE brand.
     -->
     <style name="Theme.KiberQalqon" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/kq_feruz</item>
-        <item name="colorPrimaryDark">@color/kq_feruz_2</item>
-        <item name="colorAccent">@color/kq_feruz</item>
+        <item name="colorPrimary">@color/kq_anor</item>
+        <item name="colorPrimaryDark">@color/kq_anor_2</item>
+        <item name="colorAccent">@color/kq_anor</item>
         <item name="colorControlNormal">@color/kq_ink_3</item>
-        <item name="colorControlActivated">@color/kq_feruz</item>
-        <item name="colorControlHighlight">@color/kq_feruz_soft</item>
+        <item name="colorControlActivated">@color/kq_anor</item>
+        <item name="colorControlHighlight">@color/kq_anor_soft</item>
 
-        <!-- Yorug' minimal: oqish-krem fon, quyuq-ko'k matn, yorug' status/nav panel. -->
+        <!-- v4 surfaces: iliq krem fon (light) / iliq qora (dark, values-night). -->
         <item name="android:statusBarColor">@color/kq_bg</item>
         <item name="android:navigationBarColor">@color/kq_bg</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightStatusBar">@bool/kq_light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/kq_light_system_bars</item>
         <item name="android:windowBackground">@color/kq_bg</item>
         <item name="android:colorBackground">@color/kq_bg</item>
 
@@ -29,19 +29,22 @@
         <item name="android:textColorSecondary">@color/kq_ink_2</item>
         <item name="android:textColorHint">@color/kq_ink_3</item>
 
-        <!-- Butun ilova bo'ylab yengil, animatsiyali ekran o'tishlari (bitta joydan
-             barcha Activity'larga qo'llanadi; Anor/Feruz/Zafaron ham meros oladi). -->
+        <!-- v4 brend shrifti — Onest hamma joyda (res/font/kq4_display.xml). -->
+        <item name="android:fontFamily">@font/kq4_display</item>
+        <item name="fontFamily">@font/kq4_display</item>
+        <item name="android:textViewStyle">@style/KQ4.TextView</item>
+
+        <!-- Butun ilova bo'ylab yengil, animatsiyali ekran o'tishlari. -->
         <item name="android:windowAnimationStyle">@style/KqWindowAnimations</item>
 
-        <!-- Default accent = Feruz (turkuaz). .Anor / .Zafaron child themes override these. -->
-        <item name="kqPrimary">@color/kq_feruz</item>
-        <item name="kqPrimary2">@color/kq_feruz_2</item>
-        <item name="kqPrimarySoft">@color/kq_feruz_soft</item>
+        <!-- Default accent = Anor (brand). .Feruz / .Zafaron child themes override these. -->
+        <item name="kqPrimary">@color/kq_anor</item>
+        <item name="kqPrimary2">@color/kq_anor_2</item>
+        <item name="kqPrimarySoft">@color/kq_anor_soft</item>
+        <item name="kqPrimaryInk">@color/kq_anor_ink</item>
     </style>
 
-    <!-- Ekrandan ekranga o'tish animatsiyalari. Oldinga: yangi ekran o'ngdan yengil
-         suriladi + paydo bo'ladi; eski ekran chapga parallaks bilan chekinadi.
-         Orqaga: aksincha. task* — ilova tashqaridan ochil/yopilganda. -->
+    <!-- Ekrandan ekranga o'tish animatsiyalari. -->
     <style name="KqWindowAnimations">
         <item name="android:activityOpenEnterAnimation">@anim/kq_activity_open_enter</item>
         <item name="android:activityOpenExitAnimation">@anim/kq_activity_open_exit</item>
@@ -53,36 +56,47 @@
         <item name="android:taskCloseExitAnimation">@anim/kq_activity_close_exit</item>
     </style>
 
-    <!-- Accent overlays — applied via Activity.setTheme() in attachBaseContext.
+    <!-- Default TextView — Onest shrift hamma matnga meros bo'lsin. -->
+    <style name="KQ4.TextView" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">@font/kq4_display</item>
+    </style>
+
+    <!-- Accent overlays — applied via Activity.setTheme() in onCreate.
          colorPrimary/colorAccent set too so MaterialSwitch / MaterialButton /
          MaterialCheckBox honor the accent without per-widget tinting. -->
     <style name="Theme.KiberQalqon.Anor" parent="Theme.KiberQalqon">
         <item name="kqPrimary">@color/kq_anor</item>
         <item name="kqPrimary2">@color/kq_anor_2</item>
         <item name="kqPrimarySoft">@color/kq_anor_soft</item>
+        <item name="kqPrimaryInk">@color/kq_anor_ink</item>
         <item name="colorPrimary">@color/kq_anor</item>
         <item name="colorPrimaryVariant">@color/kq_anor_2</item>
         <item name="colorAccent">@color/kq_anor</item>
         <item name="colorControlActivated">@color/kq_anor</item>
+        <item name="colorControlHighlight">@color/kq_anor_soft</item>
     </style>
 
     <style name="Theme.KiberQalqon.Feruz" parent="Theme.KiberQalqon">
         <item name="kqPrimary">@color/kq_feruz</item>
         <item name="kqPrimary2">@color/kq_feruz_2</item>
         <item name="kqPrimarySoft">@color/kq_feruz_soft</item>
+        <item name="kqPrimaryInk">@color/kq_feruz_ink</item>
         <item name="colorPrimary">@color/kq_feruz</item>
         <item name="colorPrimaryVariant">@color/kq_feruz_2</item>
         <item name="colorAccent">@color/kq_feruz</item>
         <item name="colorControlActivated">@color/kq_feruz</item>
+        <item name="colorControlHighlight">@color/kq_feruz_soft</item>
     </style>
 
     <style name="Theme.KiberQalqon.Zafaron" parent="Theme.KiberQalqon">
         <item name="kqPrimary">@color/kq_zafaron</item>
         <item name="kqPrimary2">@color/kq_zafaron_2</item>
         <item name="kqPrimarySoft">@color/kq_zafaron_soft</item>
+        <item name="kqPrimaryInk">@color/kq_zafaron_ink</item>
         <item name="colorPrimary">@color/kq_zafaron</item>
         <item name="colorPrimaryVariant">@color/kq_zafaron_2</item>
         <item name="colorAccent">@color/kq_zafaron</item>
         <item name="colorControlActivated">@color/kq_zafaron</item>
+        <item name="colorControlHighlight">@color/kq_zafaron_soft</item>
     </style>
 </resources>

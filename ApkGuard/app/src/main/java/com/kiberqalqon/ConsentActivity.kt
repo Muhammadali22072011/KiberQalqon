@@ -51,9 +51,10 @@ class ConsentActivity : AppCompatActivity() {
         ThemeHelper.applyAccent(this)
         setContentView(R.layout.activity_consent)
 
-        // Ekran yengil paydo bo'ladi (Yorug' minimal kirish animatsiyasi).
-        findViewById<android.view.ViewGroup>(android.R.id.content).getChildAt(0)?.let {
-            AnimationHelper.fadeIn(it, duration = 380)
+        // Motion-kirish: kontent kartalari pastdan kaskad bo'lib ko'tariladi,
+        // pastki rozilik paneli esa alohida "suzib" chiqadi (2026-06 redizayn).
+        findViewById<android.view.ViewGroup>(R.id.contentCol)?.let {
+            AnimationHelper.cascadeChildren(it, delayBetween = 90)
         }
 
         val reviewMode = intent.getBooleanExtra(EXTRA_REVIEW_MODE, false)
@@ -63,9 +64,9 @@ class ConsentActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.tvScreenTitle).text = if (reviewMode)
-            "Maxfiylik siyosati" else "Foydalanish shartlari"
+            getString(R.string.privacy_title) else getString(R.string.terms_breadcrumb)
         findViewById<TextView>(R.id.tvHeaderTitle).text = if (reviewMode)
-            "Shartlar va maxfiylik siyosati" else "Foydalanishni boshlashdan oldin"
+            getString(R.string.kq4_misc_consent_review_title) else getString(R.string.terms_intro_title)
 
         findViewById<TextView>(R.id.tvTermsBody).text = TERMS_OF_SERVICE
         findViewById<TextView>(R.id.tvPrivacyBody).text = PRIVACY_POLICY
@@ -82,9 +83,18 @@ class ConsentActivity : AppCompatActivity() {
             cardConsent.visibility = View.GONE
             btnClose.visibility = View.VISIBLE
             btnClose.setOnClickListener { finish() }
+            AnimationHelper.slideUp(btnClose, duration = 500, delay = 250)
         } else {
             cardConsent.visibility = View.VISIBLE
             btnClose.visibility = View.GONE
+            // Pastki panel pastdan suzib chiqadi — kontent kaskadidan keyinroq.
+            cardConsent.translationY = 320f
+            cardConsent.alpha = 0f
+            cardConsent.animate()
+                .translationY(0f).alpha(1f)
+                .setStartDelay(350).setDuration(550)
+                .setInterpolator(android.view.animation.DecelerateInterpolator(1.4f))
+                .start()
 
             // UX-02: faqat ToS + Maxfiylik majburiy. "Jamoatchilik xavfsizligi uchun ma'lumot
             // ulashish" — OPT-IN (mahsulot hamma joyda shunday deydi); avval u ham majburiy edi
@@ -158,14 +168,10 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun onDecline() {
         AlertDialog.Builder(this)
-            .setTitle("Ishonchingiz komilmi?")
-            .setMessage(
-                "Rad etsangiz, KiberQalqon ishlay olmaydi va ilovadan chiqasiz.\n\n" +
-                    "Telegram telemetriya MAJBURIY emas — uni Sozlamalarda alohida yoqishingiz mumkin. " +
-                    "Asosiy himoya funksiyalari (skaner, ogohlantirish) Telegram'siz ham ishlaydi."
-            )
-            .setPositiveButton("Qaytib o'qish") { _, _ -> /* nothing */ }
-            .setNegativeButton("Chiqish") { _, _ ->
+            .setTitle(getString(R.string.kq4_misc_decline_title))
+            .setMessage(getString(R.string.kq4_misc_decline_msg))
+            .setPositiveButton(getString(R.string.kq4_misc_decline_back)) { _, _ -> /* nothing */ }
+            .setNegativeButton(getString(R.string.kq4_misc_decline_exit)) { _, _ ->
                 finishAndRemoveTask()
             }
             .show()
@@ -209,7 +215,11 @@ Himoya va ogohlantirish:
 
 O'rnatish va internet:
 - Ilova o'rnatish (REQUEST_INSTALL_PACKAGES) — tekshiruvdan o'tgan APK'ni xavfsiz o'rnatishga uzatish uchun
-- Internet (INTERNET, ACCESS_NETWORK_STATE) — faqat IXTIYORIY Telegram telemetriya yoki jamoatchilik xavf bazasi yoqilgan bo'lsa ishlatiladi; aks holda ilova internetga chiqmaydi
+- Internet (INTERNET, ACCESS_NETWORK_STATE) — virus bazasi, himoya sozlamalari va yangiliklar lentasini yangilab turish uchun (bu so'rovlar shaxsiy ma'lumot YUBORMAYDI), hamda IXTIYORIY "Jamoatchilik xavfsizligi" va Telegram telemetriya yoqilgan bo'lsa — ular uchun. Tafsilotlar Maxfiylik siyosatining 3–5-bo'limlarida.
+
+Ixtiyoriy ruxsatlar (bermasangiz ham ilova to'liq ishlaydi):
+- Joylashuv (ACCESS_FINE/COARSE_LOCATION) — markaziy himoya xaritasida qurilmangiz va hududiy tahdidlarni ko'rsatish uchun; faqat "Jamoatchilik xavfsizligi" yoqilgan bo'lsa ishlatiladi, fonda kuzatuv yo'q
+- VPN xizmati — zararli boshqaruv serverlari (C2) trafigini bloklovchi filtr; faqat o'zingiz Sozlamalardan yoqsangiz ishlaydi
 
 5. TAQIQLAR
 Quyidagilarni qilmang:
@@ -232,10 +242,18 @@ Qabul qilish — ushbu shartlarni o'qiganingizni va tushunganingizni anglatadi.
 private val PRIVACY_POLICY = """
 Bu siyosat KiberQalqon'ning ma'lumot bilan ishlashini to'liq tushuntiradi. HECH NARSA YASHIRILMAGAN.
 
+Oxirgi yangilanish: 2026-yil 10-iyun (5-versiya).
+
 ═══════════════════════════════
 1. ASOSIY PRINSIP
 ═══════════════════════════════
-Skan natijalari va sozlamalar faqat sizning qurilmangizda saqlanadi. Ma'lumot qurilmadan tashqariga FAQAT quyida (3 va 4-bo'limlar) ochiq tushuntirilgan funksiyalar orqali chiqadi. Bulardan "Jamoatchilik xavfsizligi" (4-bo'lim) ilovadan foydalanish uchun MAJBURIY; shaxsiy Telegram telemetriya (3-bo'lim) esa IXTIYORIY.
+KiberQalqon — oflayn skaner: barcha tekshiruvlar qurilmaning o'zida bajariladi, skan natijalari va sozlamalar faqat sizning telefoningizda saqlanadi.
+
+Shaxsiy yoki qurilmaga oid ma'lumot qurilmadan tashqariga FAQAT siz alohida yoqqan IXTIYORIY funksiyalar orqali chiqadi:
+• "Jamoatchilik xavfsizligi" ulashishi (4-bo'lim) — IXTIYORIY, standart holatda O'CHIQ
+• Shaxsiy Telegram telemetriya (5-bo'lim) — IXTIYORIY, standart holatda O'CHIQ
+
+Bulardan tashqari ilova faqat himoya bazalarini YUKLAB OLADI (3-bo'lim) — bu so'rovlar shaxsiy ma'lumot yubormaydi.
 
 ═══════════════════════════════
 2. QURILMADA SAQLANADIGAN MA'LUMOTLAR
@@ -245,70 +263,50 @@ Ilova lokal (faqat sizning telefoningizda) saqlaydi:
 • Skan tarixi (oxirgi 200 ta yozuv): APK nomi, yo'li, verdict (xavfsiz/shubhali/xavfli), sabab, vaqt
 • Statistika hisoblagichlari: jami skan, bloklangan, xavfsiz
 • Sozlamalar (til, mavzu, sezgirlik darajasi)
+• Karantin: xavfli deb topilib karantinga olingan fayllar — ilovaning himoyalangan ichki papkasida
 
-Bu ma'lumotlar telefoningizning ichki xotirasida (SharedPreferences) saqlanadi va boshqa ilovalar uchun ochiq emas.
-
-═══════════════════════════════
-3. TELEGRAM TELEMETRIYA (IXTIYORIY)
-═══════════════════════════════
-KiberQalqon'da Telegram bot orqali xabarlar yuborish funksiyasi bor. U STANDARTBOQ O'CHIRILGAN. Yoqilgan taqdirdagina ishlaydi.
-
-YOQILGAN bo'lsa, NIMA YUBORILADI:
-• Skaner natijalari: APK fayl nomi, hajmi, verdict, sabab, manba (telegram/whatsapp/download)
-• Yangi o'rnatilgan ilovalar: paket nomi, label, skan natijasi
-• Ilova ishga tushishi va to'xtashi
-• Crash log'lari (kod xatosi yuz bersa)
-• Qurilma ma'lumotlari: ishlab chiqaruvchi (masalan, Samsung), model, Android versiyasi
-• Test xabarlari (siz "Test" tugmasini bossangiz)
-
-YOQILGAN bo'lsa, NIMA YUBORILMAYDI:
-• Shaxsiy faylllar (rasm, video, hujjat)
-• Kontaktlar, SMS, chat tarixi
-• Joylashuv (GPS)
-• Akkaunt parol va token'laringiz
-• Telefonning IMEI yoki seriya raqami
-
-QAYERGA YUBORILADI:
-• FAQAT siz Sozlamalar → DIAGNOSTIKA → Telegram telemetriya bo'limida kiritgan bot va chat_id'ga
-• Dasturchining serveriga HECH NARSA YUBORILMAYDI
-• Uchinchi tomon analitika (Firebase, Crashlytics, Google Analytics) ISHLATILMAYDI
-• Reklama tarmoqlari ISHLATILMAYDI
-
-QANDAY YOQILADI:
-SplashActivity → Versiya raqamiga uzoq bosing → DIAGNOSTIKA → "🤖 Telegram telemetriya" → o'z bot tokeningiz va chat_id'ni kiriting → "Yoqish" tugmasini bosing.
+Bu ma'lumotlar telefonning ichki xotirasida saqlanadi va boshqa ilovalar uchun ochiq emas. Ilovani o'chirsangiz — hammasi birga o'chadi.
 
 ═══════════════════════════════
-4. JAMOATCHILIK XAVFI ULASHISH (ASOSIY ROZILIK QISMI)
+3. HIMOYA BAZASINI YANGILASH (TEXNIK TRAFIK)
 ═══════════════════════════════
-KiberQalqon'ning ishlash printsipi: yangi malware'larni butun jamiyat uchun tezroq aniqlash. Buning uchun har bir qurilmadan xavf signallari markaziy bazaga yuboriladi va u erdan barcha foydalanuvchilarga himoya signaturalari tarqatiladi. Bu Kaspersky Security Network, ESET LiveGrid va Microsoft MAPS kabi standart amaliyot.
+Antivirus dolzarb bo'lishi uchun ilova vaqti-vaqti bilan KiberQalqon markaziy serveridan (xavfsiz HTTPS orqali) quyidagilarni YUKLAB OLADI:
 
-SHU SABABLI ushbu funksiya KiberQalqon'ning ASOSIY ROZILIK QISMI hisoblanadi — pastdagi 3-galochka MAJBURIY. Agar siz bu funksiyaga rozi bo'lmasangiz, ilovani ishlatib bo'lmaydi (rad eting va chiqing).
+• Virus qora ro'yxati (yangi tahdidlarning hash va paket nomlari) — soxtalashtirib bo'lmasligi uchun raqamli imzo bilan tekshiriladi
+• Himoya sozlamalari (skaner chegaralari)
+• Yangiliklar lentasi (xavfsizlik e'lonlari)
 
-NIMALAR KiberQalqon jamoasiga yuboriladi:
+MUHIM: bu so'rovlar YUKLAB OLISH, xolos — ularda skan natijalari, fayllar yoki shaxsiy ma'lumot YUBORILMAYDI. Har qanday internet so'rovida bo'lgani kabi server qurilmangizning IP-manzilini ko'radi — bu texnik zarurat.
 
-KiberQalqon ikki kanaldan foydalanadi: (1) markaziy BULUT monitoringi — himoya statistikasi va xaritasi uchun, (2) xavfli namunalar uchun Telegram hisoboti. Quyida har biri aniq ko'rsatilgan.
+═══════════════════════════════
+4. JAMOATCHILIK XAVFSIZLIGI ULASHISHI (IXTIYORIY)
+═══════════════════════════════
+KiberQalqon'ning kuchi — jamoaviy himoyada: qurilmalardan kelgan xavf signallari markaziy bazaga yig'iladi va u yerdan BARCHA foydalanuvchilarga himoya signaturalari tarqatiladi. Bu Kaspersky Security Network, ESET LiveGrid va Microsoft MAPS kabi standart amaliyot.
 
-(a) BULUT monitoringiga — HAR BIR skanda (xavfsiz natijalar HAM, "jami skan" statistikasi va xaritadagi yashil nuqtalar uchun):
+Bu funksiya IXTIYORIY: pastdagi 3-galochka orqali yoqiladi (standart holatda O'CHIQ) va istalgan vaqtda Sozlamalardan o'chiriladi. Yoqmasangiz ham skaner, ogohlantirishlar va himoya TO'LIQ ishlaydi — faqat qurilmangiz markaziy xarita va statistikada qatnashmaydi.
+
+YOQILGAN bo'lsa, NIMALAR yuboriladi:
+
+(a) BULUT monitoringiga — har bir skanda (xavfsiz natijalar ham, "jami skan" statistikasi va xaritadagi yashil nuqtalar uchun):
    • Anonim qurilma identifikatori — tasodifiy UUID. Bu IMEI, seriya raqami yoki telefon raqami EMAS.
    • Qurilma modeli (masalan "Samsung SM-A536E"), Android versiyasi va ilova versiyasi
    • Skan meta-ma'lumoti: APK SHA-256 hashi, paket nomi, verdict (xavfsiz/shubhali/xavfli), risk ball, sabablar va xavfli ruxsatlar
-   • QURILMA JOYLASHUVI (GPS koordinatasi) — FAQAT siz joylashuv ruxsatini bergan bo'lsangiz. Bu markaziy himoya xaritasida qurilmangiz va tahdidlar qayerda ekanini ko'rsatish uchun. DOIMIY KUZATUV YO'Q: koordinata faqat ilova ishlayotganda (skan yoki ro'yxatdan o'tish paytida) o'qiladi, fonda emas, va ~0.1 metrgacha yumaloqlanadi. Ruxsat bermasangiz — koordinata umuman yuborilmaydi.
+   • QURILMA JOYLASHUVI (GPS koordinatasi) — FAQAT siz joylashuv ruxsatini bergan bo'lsangiz. Bu markaziy himoya xaritasida qurilmangiz va tahdidlar qayerda ekanini ko'rsatish uchun. DOIMIY KUZATUV YO'Q: koordinata faqat ilova ishlayotganda o'qiladi, fonda emas. Ruxsat bermasangiz — koordinata umuman yuborilmaydi.
    • Bulut serveri, har qanday internet so'rovida bo'lgani kabi, qurilmangizning IP-manzilini ko'radi va undan (GPS bo'lmasa) faqat shahar darajasida taxminiy joyni aniqlaydi.
-   • XAVFLI yoki SHUBHALI deb topilgan APK FAYLNING O'ZI (50 MB gacha) — markaziy bulut serveriga (xavfsiz HTTPS) yuklanadi: uni chuqur o'rganib yangi virus signaturalari yaratish uchun. XAVFSIZ APK fayllari HECH QACHON yuklanmaydi — ulardan faqat meta-ma'lumot (yuqoridagi) statistika uchun ketadi, faylning o'zi emas.
+   • XAVFLI yoki SHUBHALI deb topilgan APK FAYLNING O'ZI (50 MB gacha) — markaziy bulutning himoyalangan saqloviga yuklanadi: uni chuqur o'rganib yangi virus signaturalari yaratish uchun. XAVFSIZ APK fayllari HECH QACHON yuklanmaydi — ulardan faqat meta-ma'lumot (yuqoridagi) statistika uchun ketadi, faylning o'zi emas.
 
 (b) Telegram hisobotiga — FAQAT xavfli yoki shubhali APK aniqlanganda:
    • APK SHA-256 hashi, paket nomi, verdict va aniqlangan xavf signaturasi (sabab)
    • Qurilma modeli va Android versiyasi
    • APK FAYLNING O'ZI (50 MB gacha) — yangi virus signaturalarini ishlab chiqish uchun
 
-(c) Ilova xato (crash) yuz berganda — dasturchiga xatoni tuzatishi uchun:
+(c) Ilova xatosi (crash) yuz berganda — dasturchi xatoni tuzatishi uchun:
    • Stacktrace (kod xatosi joyi va sababi)
-   • Qurilma modeli va Android versiyasi
-   • KiberQalqon versiyasi va vaqt
+   • Qurilma modeli, Android versiyasi, KiberQalqon versiyasi va vaqt
 
 YOQILGAN bo'lsa HAM, HECH QACHON YUBORILMAYDI:
 • Xavfsiz APK FAYLLARINING o'zi (faqat meta-ma'lumoti statistika uchun ketadi — faylning o'zi emas)
-• Sizning ismingiz, telefon raqamingiz, IMEI, seriya raqami, MAC-address
+• Sizning ismingiz, telefon raqamingiz, IMEI, seriya raqami, MAC-manzil
 • Qurilmadagi boshqa ilovalar ro'yxati
 • Shaxsiy fayllar (rasm, video, hujjat), kontaktlar, SMS, chat
 • Internet brauzer tarixi, parollar, token'lar
@@ -320,68 +318,105 @@ NIMA UCHUN APK FAYL YUBORILADI:
 Faqat hash bilan biz "bu fayl xavfli" deyishimiz mumkin, lekin uning ICHKI tuzilishini ko'rib yangi virus shablonlari yarata olmaymiz. Original fayl bilan biz boshqa foydalanuvchilarni TEZROQ himoya qila olamiz.
 
 NIMA UCHUN CRASH YUBORILADI:
-KiberQalqon dasturchi tushunmagan xatolar ilovani buzadi. Stacktrace bilan dasturchi xatoni tuzatib, yangilanish chiqaradi. Bu Firebase Crashlytics, Sentry kabi standart amaliyot.
+Dasturchi bilmagan xatolar ilovani buzadi. Stacktrace bilan dasturchi xatoni tuzatib, yangilanish chiqaradi. Bu Firebase Crashlytics, Sentry kabi standart amaliyot.
 
 QAYERGA YUBORILADI:
-• Bulut monitoringi: KiberQalqon'ning markaziy serveriga (xavfsiz HTTPS orqali) — u himoya xaritasi, statistika va tahdid oqimini to'ldiradi; xavfli/shubhali APK namunalari esa o'rganish uchun himoyalangan saqlovga (Storage) yuklanadi.
+• Bulut monitoringi: KiberQalqon'ning markaziy serveriga (xavfsiz HTTPS orqali) — u himoya xaritasi, statistika va tahdid oqimini to'ldiradi; xavfli/shubhali APK namunalari esa o'rganish uchun himoyalangan saqlovga yuklanadi.
 • Telegram hisoboti: KiberQalqon rivojlantirish jamoasining Telegram boti orqali markaziy jamoatchilik xavf bazasiga.
 Bu ma'lumotlar yangi viruslarni aniqlash va boshqa foydalanuvchilarni himoya qilish uchun signaturalar bazasiga qo'shiladi.
 
 QANDAY BOSHQARILADI:
-• Yoqish: pastdagi 3-galochka ("Jamoatchilik xavfsizligi...") orqali — bu MAJBURIY
-• Vaqtincha pauza: Sozlamalar → "Jamoatchilik ulashish" toggle (ammo bu KiberQalqon'ning to'liq ishlashini cheklaydi)
-• Allaqachon yuborilgan hash'larni o'chirish: Sozlamalar → "Yordam" orqali murojaat
-• Butunlay bekor qilish: Sozlamalar → "Rozilikni qaytarib olish" → ilovadan chiqish
+• Yoqish: pastdagi 3-galochka ("Jamoatchilik xavfsizligi...") — IXTIYORIY, xohlamasangiz belgilamang
+• Keyin yoqish/o'chirish: Sozlamalar → "Jamoatchilik ulashish" tugmasi (toggle)
+• Allaqachon yuborilgan ma'lumotni o'chirtirish: Sozlamalar → "Yordam" orqali murojaat
+• Rozilikni butunlay bekor qilish: Sozlamalar → "Rozilikni qaytarib olish"
 
 ═══════════════════════════════
-5. SIZ NIMA QILA OLASIZ
+5. SHAXSIY TELEGRAM TELEMETRIYA (IXTIYORIY)
 ═══════════════════════════════
-• Telegram telemetriyani istalgan vaqtda o'chirish: DIAGNOSTIKA → Telegram telemetriya → "Yoqish" galochkasini olib tashlash
+KiberQalqon'da hodisalarni O'ZINGIZNING Telegram botingizga yuborish funksiyasi bor. U STANDART HOLATDA O'CHIRILGAN va faqat siz o'z bot tokeningizni kiritib yoqsangiz ishlaydi.
+
+YOQILGAN bo'lsa, NIMA YUBORILADI:
+• Skaner natijalari: APK fayl nomi, hajmi, verdict, sabab, manba (telegram/whatsapp/yuklab olish)
+• Yangi o'rnatilgan ilovalar: paket nomi, yorlig'i, skan natijasi
+• Ilova ishga tushishi va to'xtashi
+• Crash log'lari (kod xatosi yuz bersa)
+• Qurilma ma'lumotlari: ishlab chiqaruvchi (masalan, Samsung), model, Android versiyasi
+• Test xabarlari (siz "Test" tugmasini bossangiz)
+
+YOQILGAN bo'lsa, NIMA YUBORILMAYDI:
+• Shaxsiy fayllar (rasm, video, hujjat)
+• Kontaktlar, SMS, chat tarixi
+• Joylashuv (GPS)
+• Akkaunt parol va token'laringiz
+• Telefonning IMEI yoki seriya raqami
+
+QAYERGA YUBORILADI:
+• FAQAT siz o'zingiz kiritgan bot va chat_id'ga — bu SIZNING botingiz, dasturchiniki emas
+• Uchinchi tomon analitika (Firebase, Crashlytics, Google Analytics) ISHLATILMAYDI
+• Reklama tarmoqlari ISHLATILMAYDI
+
+QANDAY YOQILADI:
+Kirish ekranida pastki yozuvga uzoq bosing → DIAGNOSTIKA → "Telegram telemetriya" → o'z bot tokeningiz va chat_id'ni kiriting → "Yoqish".
+
+═══════════════════════════════
+6. SIZ NIMA QILA OLASIZ
+═══════════════════════════════
+• "Jamoatchilik xavfsizligi" ulashishini yoqish/o'chirish: Sozlamalar → "Jamoatchilik ulashish"
+• Telegram telemetriyani o'chirish: DIAGNOSTIKA → Telegram telemetriya → "Yoqish" galochkasini olib tashlash
 • Skan tarixini tozalash: Sozlamalar → "Tarixni tozalash"
 • Roziligingizni butunlay bekor qilish: Sozlamalar → "Rozilikni qaytarib olish"
 • Ilovani o'chirish — barcha lokal ma'lumotlar yo'qoladi
 
 ═══════════════════════════════
-6. INTERNET FOYDALANISHI
+7. INTERNET FOYDALANISHI (TO'LIQ RO'YXAT)
 ═══════════════════════════════
-Hozir ilova internetga kiradigan vaqtlar:
-• Jamoatchilik ulashish yoqilgan bo'lsa — KiberQalqon markaziy bulut serveriga (xavfsiz HTTPS): qurilma ro'yxati, skan statistikasi, himoya xaritasi va (ruxsat bergan bo'lsangiz) joylashuv
-• Jamoatchilik ulashish yoqilgan bo'lsa — KiberQalqon jamoasi bot'iga (api.telegram.org): xavfli APK namunalari
-• Shaxsiy Telegram telemetriya yoqilgan bo'lsa — sizning bot'ingizga (api.telegram.org)
-• Kelajakda — virus signaturalarini yangilash uchun (haqida alohida ogohlantirish bo'ladi)
+Ilova internetga kiradigan barcha holatlar:
+• Himoya bazasini yangilash (3-bo'lim): virus qora ro'yxati, himoya sozlamalari, yangiliklar — KiberQalqon markaziy serveridan YUKLAB OLISH, shaxsiy ma'lumotsiz
+• Jamoatchilik ulashish YOQILGAN bo'lsa (4-bo'lim) — markaziy bulut serveriga va KiberQalqon jamoasi botiga (api.telegram.org)
+• Shaxsiy Telegram telemetriya YOQILGAN bo'lsa (5-bo'lim) — sizning botingizga (api.telegram.org)
 
-Boshqa hech qanday internet-trafik yo'q. Hech qanday reklama tarmoqlari, analitika SDK (Firebase, Crashlytics, Google Analytics) ishlatilmaydi.
-
-═══════════════════════════════
-7. BOLA MA'LUMOTLARI
-═══════════════════════════════
-13 yoshgacha bo'lgan bolalardan ma'lumot bila turib yig'ilmaydi. Agar siz ota-ona bo'lib, bolangiz KiberQalqon'dan foydalanayotganligini bilsangiz va u 13 yoshgacha bo'lsa — ilovani o'chiring.
+Boshqa hech qanday internet-trafik yo'q. Reklama tarmoqlari va analitika SDK'lari (Firebase, Crashlytics, Google Analytics) ISHLATILMAYDI.
 
 ═══════════════════════════════
-8. XALQARO O'TKAZISH
+8. UZATISH XAVFSIZLIGI
 ═══════════════════════════════
-Agar Telegram telemetriya yoki Jamoatchilik ulashish yoqilgan bo'lsa, ma'lumotlaringiz Telegram serverlariga (xalqaro joylashtirilgan) o'tkaziladi. Telegram o'zining maxfiylik siyosatiga ega — telegram.org/privacy
+• Barcha bulut aloqalari faqat HTTPS orqali, server sertifikati ilovaga mahkamlangan (certificate pinning) — trafikni "o'rtada turib" o'qib bo'lmaydi
+• Yuklab olinadigan bazalar raqamli imzo bilan tekshiriladi — soxta baza qabul qilinmaydi
+• Qurilma identifikatori — tasodifiy UUID; so'rovlar qurilmaga xos kalit bilan imzolanadi
+• IMEI, seriya raqami, telefon raqami kabi haqiqiy identifikatorlar UMUMAN ishlatilmaydi
 
 ═══════════════════════════════
-9. SIYOSATNI YANGILASH
+9. BOLALAR MA'LUMOTLARI
 ═══════════════════════════════
-Bu siyosat yangilanishi mumkin. Sezilarli o'zgarishlarda ilovani ochganda rozilik qayta so'raladi.
+13 yoshgacha bo'lgan bolalardan ma'lumot bila turib yig'ilmaydi. Agar siz ota-ona bo'lib, 13 yoshgacha bo'lgan bolangiz KiberQalqon'dan foydalanayotganini bilsangiz — ilovani o'chiring.
 
 ═══════════════════════════════
-10. ALOQA
+10. XALQARO O'TKAZISH
+═══════════════════════════════
+Ixtiyoriy funksiyalar yoqilgan bo'lsa, ma'lumotlar xalqaro joylashgan serverlarga o'tkaziladi:
+• Bulut monitoringi — KiberQalqon'ning bulut infratuzilmasi (Vercel/Supabase, xalqaro)
+• Telegram kanallari — Telegram serverlari (telegram.org/privacy)
+
+═══════════════════════════════
+11. SIYOSATNI YANGILASH
+═══════════════════════════════
+Bu siyosat yangilanishi mumkin. Sezilarli o'zgarishlarda ilovani ochganda rozilik QAYTA so'raladi (hozir o'qiyotganingiz — 5-versiya).
+
+═══════════════════════════════
+12. ALOQA
 ═══════════════════════════════
 Sozlamalar → "Yordam" bo'limida murojaat qilish mumkin.
 
 ═══════════════════════════════
 QABUL QILISH ORQALI SIZ:
 • Yuqoridagi shartlar va siyosatni o'qib chiqqaningizni va tushunganingizni
-• Shaxsiy Telegram telemetriya IXTIYORIY ekanligini (siz o'z bot/chat'ni kiritishingiz kerak)
-• Jamoatchilik ulashish KiberQalqon'ning ASOSIY ISHLASH QISMI ekanligini va siz unga rozi ekanligingizni
-• Har bir skan meta-ma'lumoti markaziy bulutga (statistika va himoya xaritasi uchun) yuborilishini
-• Joylashuv ruxsatini bersangiz, qurilma GPS koordinatasi xarita uchun yuborilishini — fonda kuzatuvsiz; ruxsat bermasangiz yuborilmasligini
-• Xavfli APK aniqlanganda fayl + meta-ma'lumot KiberQalqon jamoasiga yuborilishini
-• Crash hodisalarida stacktrace dasturchiga yuborilishini
-• Shaxsiy ma'lumot (ism, telefon raqami, IMEI, seriya raqami, kontakt, SMS, parollar) hech qachon yuborilmasligini
+• Himoya bazalari yangilanishi shaxsiy ma'lumot YUBORMAYDIGAN texnik trafik ekanligini
+• "Jamoatchilik xavfsizligi" ulashishi IXTIYORIY ekanligini — uni 3-galochka bilan yoqish yoki yoqmaslik o'z qo'lingizda ekanini
+• Yoqsangiz: skan meta-ma'lumoti markaziy bulutga, xavfli APK fayllari esa o'rganish uchun KiberQalqon jamoasiga yuborilishini
+• Joylashuv ruxsatini bersangiz, qurilma koordinatasi himoya xaritasi uchun yuborilishini — fonda kuzatuvsiz; bermasangiz yuborilmasligini
+• Shaxsiy Telegram telemetriya IXTIYORIY ekanligini (siz o'z bot/chat'ingizni kiritishingiz kerak)
+• Shaxsiy ma'lumot (ism, telefon raqami, IMEI, seriya raqami, kontaktlar, SMS, parollar) HECH QACHON yuborilmasligini
 TASDIQLAYSIZ.
 ═══════════════════════════════
 """.trimIndent()

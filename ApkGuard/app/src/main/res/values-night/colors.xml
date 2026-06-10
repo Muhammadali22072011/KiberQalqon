@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Legacy "cyber dark" palette overrides for dark mode (kept until migrated). -->
-    <color name="primary">#00B4D8</color>
-    <color name="primary_dark">#0077B6</color>
-    <color name="primary_glow">#48CAE4</color>
-    <color name="primary_neon">#00F5FF</color>
-    <color name="accent">#00E676</color>
-    <color name="accent_neon">#39FF14</color>
+    <!-- Legacy palette overrides for dark mode — retinted 2026-06-10 to the v4
+         «Milliy Kiber Himoya» design (design_v4_extracted/page.html,
+         [data-theme=dark]) so unmigrated screens match the redesign. -->
+    <color name="primary">#EF5D72</color>
+    <color name="primary_dark">#C52A3E</color>
+    <color name="primary_glow">#F4889A</color>
+    <color name="primary_neon">#F3A9B5</color>
+    <color name="accent">#34C374</color>
+    <color name="accent_neon">#8FE3AC</color>
 
-    <color name="background">#020510</color>
-    <color name="background_dark">#000000</color>
-    <color name="surface">#070F1F</color>
-    <color name="surface_elevated">#0C1A2F</color>
-    <color name="card_background">#0C1A2F</color>
-    <color name="card_border">#1E3A5F</color>
+    <color name="background">#15110D</color>
+    <color name="background_dark">#0E0B08</color>
+    <color name="surface">#201A14</color>
+    <color name="surface_elevated">#2A231B</color>
+    <color name="card_background">#201A14</color>
+    <color name="card_border">#312A20</color>
 
-    <color name="safe">#00E676</color>
-    <color name="safe_glow">#39FF14</color>
-    <color name="suspicious">#FFB300</color>
-    <color name="suspicious_glow">#FFD600</color>
-    <color name="danger">#FF1744</color>
-    <color name="danger_glow">#FF5252</color>
-    <color name="warning">#FFB300</color>
+    <color name="safe">#34C374</color>
+    <color name="safe_glow">#8FE3AC</color>
+    <color name="suspicious">#EFB24F</color>
+    <color name="suspicious_glow">#F3CD86</color>
+    <color name="danger">#F0655A</color>
+    <color name="danger_glow">#F4A99F</color>
+    <color name="warning">#EFB24F</color>
 
-    <color name="safe_bg">#1A00E676</color>
-    <color name="warning_bg">#1AFFB300</color>
-    <color name="danger_bg">#1AFF1744</color>
+    <color name="safe_bg">#16331F</color>
+    <color name="warning_bg">#3A2C12</color>
+    <color name="danger_bg">#3A1C18</color>
 
     <color name="uz_blue">#0099B5</color>
     <color name="uz_green">#1EB53A</color>
@@ -35,68 +37,72 @@
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="text_primary">#E8F4F8</color>
-    <color name="text_secondary">#8BA3B8</color>
-    <color name="text_hint">#5A7290</color>
-    <color name="text_cyan">#48CAE4</color>
+    <color name="text_primary">#F6EFE6</color>
+    <color name="text_secondary">#C2B6A8</color>
+    <color name="text_hint">#897D70</color>
+    <color name="text_cyan">#F3A9B5</color>
 
-    <color name="dark_background">#020510</color>
-    <color name="dark_surface">#070F1F</color>
-    <color name="dark_card">#0C1A2F</color>
-    <color name="dark_text_primary">#E8F4F8</color>
-    <color name="dark_text_secondary">#8BA3B8</color>
+    <color name="dark_background">#15110D</color>
+    <color name="dark_surface">#201A14</color>
+    <color name="dark_card">#2A231B</color>
+    <color name="dark_text_primary">#F6EFE6</color>
+    <color name="dark_text_secondary">#C2B6A8</color>
 
-    <color name="chip_background">#1A00B4D8</color>
-    <color name="divider">#1E3A5F</color>
-    <color name="grid_line">#0F2A47</color>
-    <color name="ic_launcher_background">#0A1428</color>
+    <color name="chip_background">#1AEF5D72</color>
+    <color name="divider">#312A20</color>
+    <color name="grid_line">#2A231B</color>
+    <color name="ic_launcher_background">#FBE9EE</color>
 
     <!-- ────────────────────────────────────────────────────────────
-         KIBERQALQON · Cyber Security (DARK)
-         Source of truth: design_handoff_kiberqalqon_redesign/README.md §2.1
+         ANOR QALQON · v4 «Milliy Kiber Himoya» (DARK / Tungi)
+         Source of truth: design_v4_extracted/page.html — [data-theme=dark].
          ──────────────────────────────────────────────────────────── -->
 
-    <color name="kq_bg">#0F1820</color>
-    <color name="kq_bg_elev">#192634</color>
-    <color name="kq_bg_sunken">#0A111A</color>
+    <color name="kq_bg">#15110D</color>
+    <color name="kq_bg_elev">#201A14</color>          <!-- design token surface -->
+    <color name="kq_surface_2">#2A231B</color>        <!-- design token surface-2 -->
+    <color name="kq_bg_sunken">#0E0B08</color>        <!-- design token bg-2 -->
 
-    <color name="kq_ink">#F2F6F7</color>
-    <color name="kq_ink_2">#B5C2C9</color>
-    <color name="kq_ink_3">#7B8990</color>
-    <color name="kq_hairline">#26333F</color>
-    <color name="kq_hairline_strong">#3D4C5D</color>
+    <color name="kq_ink">#F6EFE6</color>
+    <color name="kq_ink_2">#C2B6A8</color>
+    <color name="kq_ink_3">#897D70</color>
+    <color name="kq_hairline">#312A20</color>
+    <color name="kq_hairline_strong">#463D2F</color>
 
-    <!-- `kq_primary*` resolved via theme attrs (see values/attrs.xml). -->
-    <color name="kq_on_primary">#0B0707</color>
+    <color name="kq_on_primary">#FFFFFF</color>
 
-    <!-- Base accent colors (DARK) — brighter so they're legible on deep navy bg. -->
-    <color name="kq_anor">#E25A4A</color>
-    <color name="kq_anor_2">#E89488</color>
-    <color name="kq_anor_soft">#3A1F1B</color>
-    <color name="kq_feruz">#5BCBD3</color>
-    <color name="kq_feruz_2">#A7E1E0</color>
-    <color name="kq_feruz_soft">#163240</color>
-    <color name="kq_zafaron">#E8B860</color>
-    <color name="kq_zafaron_2">#F0CC8A</color>
-    <color name="kq_zafaron_soft">#3A2F18</color>
+    <!-- Base accent colors (DARK) — design [data-theme=dark][data-accent=*] -->
+    <color name="kq_anor">#EF5D72</color>
+    <color name="kq_anor_2">#F4889A</color>
+    <color name="kq_anor_soft">#381820</color>
+    <color name="kq_anor_ink">#F3A9B5</color>
+    <color name="kq_feruz">#45CDC0</color>
+    <color name="kq_feruz_2">#74DED2</color>
+    <color name="kq_feruz_soft">#13322E</color>
+    <color name="kq_feruz_ink">#8FE5DB</color>
+    <color name="kq_zafaron">#E7B454</color>
+    <color name="kq_zafaron_2">#F0CD86</color>
+    <color name="kq_zafaron_soft">#382A13</color>
+    <color name="kq_zafaron_ink">#F1D292</color>
 
-    <!-- splash gradient stays turquoise (the screen never dark-shifts) -->
-    <color name="kq_primary_light">#2D9CB8</color>
-    <color name="kq_primary_2_light">#1F7B92</color>
+    <!-- splash gradient = anor brand (the screen never theme-shifts) -->
+    <color name="kq_primary_light">#C52A3E</color>
+    <color name="kq_primary_2_light">#9E1F30</color>
 
-    <color name="kq_accent">#E0A040</color>
-    <color name="kq_accent_soft">#3A2F18</color>
-    <color name="kq_accent_ink">#F0CC8A</color>
+    <color name="kq_accent">#E7B454</color>
+    <color name="kq_accent_soft">#382A13</color>
+    <color name="kq_accent_ink">#F1D292</color>
 
-    <color name="kq_safe">#5BCB8A</color>
-    <color name="kq_safe_bg">#1F3328</color>
-    <color name="kq_safe_ink">#A8E0B8</color>
-    <color name="kq_warn">#E8B860</color>
-    <color name="kq_warn_bg">#332A18</color>
-    <color name="kq_warn_ink">#F0CC8A</color>
-    <color name="kq_danger">#E25A4A</color>
-    <color name="kq_danger_bg">#36201C</color>
-    <color name="kq_danger_ink">#F0A89A</color>
+    <color name="kq_safe">#34C374</color>
+    <color name="kq_safe_bg">#16331F</color>
+    <color name="kq_safe_ink">#8FE3AC</color>
+    <color name="kq_warn">#EFB24F</color>
+    <color name="kq_warn_bg">#3A2C12</color>
+    <color name="kq_warn_ink">#F3CD86</color>
+    <color name="kq_danger">#F0655A</color>
+    <color name="kq_danger_bg">#3A1C18</color>
+    <color name="kq_danger_ink">#F4A99F</color>
 
-    <color name="kq_pattern">#24E25A4A</color>
+    <!-- ornament — brighter on dark (design token ornament 0.08) -->
+    <color name="kq_pattern">#14EF5D72</color>
 </resources>

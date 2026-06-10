@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ────────────────────────────────────────────────────────────
-         LEGACY "cyber dark" palette — kept so older screens still
-         compile while the kq_* tokens are migrated screen-by-screen.
-         New surfaces must use kq_* below, not these.
+         LEGACY palette — kept so older screens still compile. Retinted
+         2026-06-10 to the v4 «Milliy Kiber Himoya» design (source of truth:
+         design_v4_extracted/page.html tokens) so legacy/programmatic screens
+         match the redesign. New surfaces must use kq_* below, not these.
          ──────────────────────────────────────────────────────────── -->
-    <color name="primary">#00B4D8</color>
-    <color name="primary_dark">#0077B6</color>
-    <color name="primary_glow">#48CAE4</color>
-    <color name="primary_neon">#00F5FF</color>
-    <color name="accent">#00E676</color>
-    <color name="accent_neon">#39FF14</color>
+    <color name="primary">#C52A3E</color>
+    <color name="primary_dark">#9E1F30</color>
+    <color name="primary_glow">#EF5D72</color>
+    <color name="primary_neon">#F4889A</color>
+    <color name="accent">#1A9E54</color>
+    <color name="accent_neon">#34C374</color>
 
-    <color name="background">#050B18</color>
-    <color name="background_dark">#020510</color>
-    <color name="surface">#0A1628</color>
-    <color name="surface_elevated">#0F1F37</color>
-    <color name="card_background">#0F1F37</color>
-    <color name="card_border">#1E3A5F</color>
+    <color name="background">#F6F3EE</color>
+    <color name="background_dark">#EFE9E0</color>
+    <color name="surface">#FFFDFA</color>
+    <color name="surface_elevated">#F4EFE7</color>
+    <color name="card_background">#FFFDFA</color>
+    <color name="card_border">#E9E2D6</color>
 
-    <color name="safe">#00E676</color>
-    <color name="safe_glow">#39FF14</color>
-    <color name="suspicious">#FFB300</color>
-    <color name="suspicious_glow">#FFD600</color>
-    <color name="danger">#FF1744</color>
-    <color name="danger_glow">#FF5252</color>
-    <color name="warning">#FFB300</color>
+    <color name="safe">#1A9E54</color>
+    <color name="safe_glow">#34C374</color>
+    <color name="suspicious">#DF8A18</color>
+    <color name="suspicious_glow">#EFB24F</color>
+    <color name="danger">#E0432F</color>
+    <color name="danger_glow">#F0655A</color>
+    <color name="warning">#DF8A18</color>
 
-    <color name="safe_bg">#1A00E676</color>
-    <color name="warning_bg">#1AFFB300</color>
-    <color name="danger_bg">#1AFF1744</color>
+    <color name="safe_bg">#E1F4E7</color>
+    <color name="warning_bg">#FBECD2</color>
+    <color name="danger_bg">#FBE0DB</color>
 
     <color name="uz_blue">#0099B5</color>
     <color name="uz_green">#1EB53A</color>
@@ -38,84 +39,88 @@
     <color name="gold_medal">#FFD700</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="text_primary">#E8F4F8</color>
-    <color name="text_secondary">#8BA3B8</color>
-    <color name="text_hint">#5A7290</color>
-    <color name="text_cyan">#48CAE4</color>
+    <color name="text_primary">#20160F</color>
+    <color name="text_secondary">#685C52</color>
+    <color name="text_hint">#9A8D82</color>
+    <color name="text_cyan">#7C1623</color>
 
-    <color name="dark_background">#050B18</color>
-    <color name="dark_surface">#0A1628</color>
-    <color name="dark_card">#0F1F37</color>
-    <color name="dark_text_primary">#E8F4F8</color>
-    <color name="dark_text_secondary">#8BA3B8</color>
+    <color name="dark_background">#15110D</color>
+    <color name="dark_surface">#201A14</color>
+    <color name="dark_card">#2A231B</color>
+    <color name="dark_text_primary">#F6EFE6</color>
+    <color name="dark_text_secondary">#C2B6A8</color>
 
-    <color name="chip_background">#1A00B4D8</color>
-    <color name="divider">#1E3A5F</color>
-    <color name="grid_line">#0F2A47</color>
+    <color name="chip_background">#1AC52A3E</color>
+    <color name="divider">#E9E2D6</color>
+    <color name="grid_line">#EFE9E0</color>
 
-    <!-- Launcher adaptive icon backdrop = dark navy (matches new KiberQalqon
-         K-monogram cyber-shield logo). Launcher mask reveals this color in
-         corners and around the scaled-down foreground. -->
-    <color name="ic_launcher_background">#0A1428</color>
+    <!-- Launcher adaptive icon backdrop = anor-cream (Anor-Qalqon logo: anor
+         shield over cream). -->
+    <color name="ic_launcher_background">#FBE9EE</color>
     <color name="black">#000000</color>
 
     <!-- ────────────────────────────────────────────────────────────
-         KIBERQALQON · Milliy + Friendly (LIGHT)
-         Source of truth: design_handoff_kiberqalqon_redesign/README.md §2.1
-         oklch values were converted to hex; only edit if the README changes.
+         ANOR QALQON · v4 «Milliy Kiber Himoya» (LIGHT / Kunduzgi)
+         Source of truth: design_v4_extracted/page.html — [data-theme=light]
+         + [data-accent=*]. Dark overrides live in values-night/colors.xml.
          ──────────────────────────────────────────────────────────── -->
 
     <!-- Surface -->
-    <color name="kq_bg">#FBF8F3</color>
-    <color name="kq_bg_elev">#FFFFFF</color>
-    <color name="kq_bg_sunken">#F2EFE8</color>
+    <color name="kq_bg">#F6F3EE</color>
+    <color name="kq_bg_elev">#FFFDFA</color>         <!-- design token surface -->
+    <color name="kq_surface_2">#F4EFE7</color>       <!-- design token surface-2 -->
+    <color name="kq_bg_sunken">#EFE9E0</color>       <!-- design token bg-2 -->
 
     <!-- Ink -->
-    <color name="kq_ink">#1B2530</color>
-    <color name="kq_ink_2">#5A6772</color>
-    <color name="kq_ink_3">#8A969E</color>
-    <color name="kq_hairline">#E1E4E6</color>
-    <color name="kq_hairline_strong">#C9CFD3</color>
+    <color name="kq_ink">#20160F</color>
+    <color name="kq_ink_2">#685C52</color>
+    <color name="kq_ink_3">#9A8D82</color>
+    <color name="kq_hairline">#E9E2D6</color>
+    <color name="kq_hairline_strong">#D9CFBF</color> <!-- design token hairline-2 -->
 
     <!-- Primary — theme-resolved. `kq_primary` itself is a state list at
          `res/color/kq_primary.xml` referencing `?attr/kqPrimary`. Three theme
-         overlays (Theme.KiberQalqon.Anor / Feruz / Zafaron) bind that attr to one
-         of the three base colors below, so the user's accent pick in Settings
+         overlays (Theme.KiberQalqon.Anor / Feruz / Zafaron) bind that attr to
+         one of the three accents below, so the user's pick in Settings
          re-tints everything. -->
     <color name="kq_on_primary">#FFFFFF</color>
 
     <!-- Base accent colors (LIGHT). Don't reference these in layouts directly —
-         use `@color/kq_primary` so the theme can swap them. -->
-    <color name="kq_anor">#C13A28</color>
-    <color name="kq_anor_2">#8A2820</color>
-    <color name="kq_anor_soft">#F8DDD9</color>
-    <color name="kq_feruz">#2D9CB8</color>
-    <color name="kq_feruz_2">#1F7B92</color>
-    <color name="kq_feruz_soft">#DCEEF1</color>
-    <color name="kq_zafaron">#CC9442</color>
-    <color name="kq_zafaron_2">#7E5B22</color>
-    <color name="kq_zafaron_soft">#F4E8D2</color>
+         use `@color/kq_primary` / `@color/kq_primary_soft` / `@color/kq_primary_ink`
+         so the theme can swap them. Anor = THE brand. -->
+    <color name="kq_anor">#C52A3E</color>
+    <color name="kq_anor_2">#9E1F30</color>
+    <color name="kq_anor_soft">#F8E0E3</color>
+    <color name="kq_anor_ink">#7C1623</color>
+    <color name="kq_feruz">#1F9489</color>
+    <color name="kq_feruz_2">#15716A</color>
+    <color name="kq_feruz_soft">#DDF0EC</color>
+    <color name="kq_feruz_ink">#0C544C</color>
+    <color name="kq_zafaron">#C5871F</color>
+    <color name="kq_zafaron_2">#9C6912</color>
+    <color name="kq_zafaron_soft">#F7EAD0</color>
+    <color name="kq_zafaron_ink">#7A520C</color>
 
-    <!-- Splash gradient stays turquoise per design §3.1 (splash never theme-shifts). -->
-    <color name="kq_primary_light">#2D9CB8</color>
-    <color name="kq_primary_2_light">#1F7B92</color>
+    <!-- Splash gradient = anor brand (splash never theme-shifts). -->
+    <color name="kq_primary_light">#C52A3E</color>
+    <color name="kq_primary_2_light">#9E1F30</color>
 
-    <!-- Accent — Suzani saffron -->
-    <color name="kq_accent">#CC9442</color>
-    <color name="kq_accent_soft">#F4E8D2</color>
-    <color name="kq_accent_ink">#7E5B22</color>
+    <!-- Accent — Suzani saffron (legacy alias of zafaron) -->
+    <color name="kq_accent">#C5871F</color>
+    <color name="kq_accent_soft">#F7EAD0</color>
+    <color name="kq_accent_ink">#7A520C</color>
 
     <!-- Status -->
-    <color name="kq_safe">#4FAE6E</color>
-    <color name="kq_safe_bg">#E5F3E8</color>
-    <color name="kq_safe_ink">#236138</color>
-    <color name="kq_warn">#E8A03C</color>
-    <color name="kq_warn_bg">#FBEFD8</color>
-    <color name="kq_warn_ink">#7A5318</color>
-    <color name="kq_danger">#D74536</color>
-    <color name="kq_danger_bg">#F7DCD7</color>
-    <color name="kq_danger_ink">#7A2218</color>
+    <color name="kq_safe">#1A9E54</color>
+    <color name="kq_safe_bg">#E1F4E7</color>
+    <color name="kq_safe_ink">#0C6135</color>
+    <color name="kq_warn">#DF8A18</color>
+    <color name="kq_warn_bg">#FBECD2</color>
+    <color name="kq_warn_ink">#84500C</color>
+    <color name="kq_danger">#E0432F</color>
+    <color name="kq_danger_bg">#FBE0DB</color>
+    <color name="kq_danger_ink">#911C10</color>
 
-    <!-- 8-point star tile overlay (kq_primary @ ~10% alpha) -->
-    <color name="kq_pattern">#1AC13A28</color>
+    <!-- 8-point star tile / ornament (anor @ ~5% alpha over light) -->
+    <color name="kq_pattern">#0DC52A3E</color>
 </resources>

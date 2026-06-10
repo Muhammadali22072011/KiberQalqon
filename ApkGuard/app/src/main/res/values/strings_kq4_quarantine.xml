@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Karantin (QuarantineActivity) + Himoya holati / Ruxsatlar (ProtectionStatusActivity) satrlari. -->
+<resources>
+
+    <!-- ───────── Karantin ───────── -->
+    <string name="kq4_quar_eyebrow">Karantin</string>
+    <string name="kq4_quar_title">O\'chirilgan fayllar</string>
+    <string name="kq4_quar_sub">Bu fayllar xavfli edi va telefoningizdan o\'chirildi. Ular endi zarar yetkaza olmaydi.</string>
+    <string name="kq4_quar_empty_title">Karantin bo\'sh</string>
+    <string name="kq4_quar_empty_sub">Hamma narsa tozalandi.</string>
+    <string name="kq4_quar_meta" translatable="false">%1$s · %2$s</string>
+    <string name="kq4_quar_restore">Tiklash</string>
+    <string name="kq4_quar_delete">O\'chirish</string>
+    <string name="kq4_quar_clear_all">Karantinni butunlay tozalash</string>
+    <string name="kq4_quar_cancel">Bekor</string>
+
+    <string name="kq4_quar_restore_msg">«%1$s» asl joyiga qaytarilsinmi? (Bu fayl xavfli deb belgilangan edi.)</string>
+    <string name="kq4_quar_restored">Tiklandi: %1$s</string>
+    <string name="kq4_quar_restore_fail">Tiklab bo\'lmadi: %1$s</string>
+    <string name="kq4_quar_purge_title">Butunlay o\'chirish</string>
+    <string name="kq4_quar_purge_msg">«%1$s» butunlay o\'chirilsinmi? Bu amalni ortga qaytarib bo\'lmaydi.</string>
+    <string name="kq4_quar_clear_all_msg">Karantindagi barcha fayllar butunlay o\'chirilsinmi? Bu amalni ortga qaytarib bo\'lmaydi.</string>
+
+    <string name="kq4_quar_today">Bugun, %1$s</string>
+    <string name="kq4_quar_yesterday">Kecha, %1$s</string>
+    <string name="kq4_quar_days_ago">%1$d kun oldin</string>
+    <string name="kq4_quar_src_telegram" translatable="false">Telegram</string>
+    <string name="kq4_quar_src_whatsapp" translatable="false">WhatsApp</string>
+    <string name="kq4_quar_src_downloads">Yuklanmalar</string>
+    <string name="kq4_quar_src_storage">Xotira</string>
+
+    <!-- ───────── Himoya holati / Ruxsatlar ───────── -->
+    <string name="kq4_prot_eyebrow">Himoya holati</string>
+    <string name="kq4_prot_title">Ruxsatlar</string>
+    <string name="kq4_prot_count">%1$d / %2$d ruxsat berilgan</string>
+    <string name="kq4_prot_all_on">Himoya to\'liq yoqilgan</string>
+    <string name="kq4_prot_enable_one">Bitta ruxsatni yoqing — himoya kuchayadi</string>
+
+    <string name="kq4_prot_row_files_t">Fayllarga kirish</string>
+    <string name="kq4_prot_row_files_s">APK fayllarni tekshirish uchun shart</string>
+    <string name="kq4_prot_row_battery_t">Batareya cheklovisiz ishlash</string>
+    <string name="kq4_prot_row_battery_s">Yopilgandan keyin ham fonda kuzatadi. Samsungda yoqilmagan ko\'rinishi mumkin — majburiy emas.</string>
+    <string name="kq4_prot_row_overlay_t">Oynalar ustida ko\'rsatish</string>
+    <string name="kq4_prot_row_overlay_s">Xavf topilganda ogohlantirish oynasi darhol ochiladi. Ba\'zi telefonlarda yoqib bo\'lmaydi — majburiy emas.</string>
+    <string name="kq4_prot_row_notif_s">Xavf haqida ogohlantirish yuborish uchun shart</string>
+    <string name="kq4_prot_row_loc_t">Joylashuv</string>
+    <string name="kq4_prot_row_loc_s">Hududingizdagi tahdidlar xaritasi uchun. Ixtiyoriy — bermasangiz ham ilova to\'liq ishlaydi.</string>
+    <string name="kq4_prot_row_autostart_t">Avtomatik ishga tushirish (%1$s)</string>
+    <string name="kq4_prot_row_autostart_s">Telefon ilovani o\'chirib qo\'ymasligi uchun «Autostart»ni yoqing</string>
+    <string name="kq4_prot_row_bg_t">Fonda ishlash</string>
+    <string name="kq4_prot_row_bg_s">Doimiy kuzatuv yoqilgan bo\'lsin</string>
+
+    <string name="kq4_prot_continue_locked">Avval ruxsatlarni yoqing</string>
+    <string name="kq4_prot_continue_toast">Davom etish uchun barcha majburiy ruxsatlarni yoqing.</string>
+    <string name="kq4_prot_autostart_open">Sozlamani ochish</string>
+    <string name="kq4_prot_autostart_close">Yopish</string>
+    <string name="kq4_prot_autostart_fail">Avtomatik ochib bo\'lmadi. Sozlamalar → Ilovalar → Anor Qalqon orqali qo\'lda yoqing.</string>
+
+</resources>

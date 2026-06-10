@@ -1,12 +1,13 @@
 package com.kiberqalqon
 
 import android.Manifest
-import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +15,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +29,7 @@ import android.view.WindowManager
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
 import com.kiberqalqon.databinding.ActivityAutoScanBinding
 import java.io.File
@@ -34,6 +37,10 @@ import java.io.File
 /**
  * Полноэкранное окно автоматического сканирования APK
  * Показывается автоматически при обнаружении нового APK файла
+ *
+ * v4 «Milliy Kiber Himoya» рескин (design_v4_extracted/screens3.jsx → AutoScan):
+ * фаза скана — тёмный экран с KqRingView + 4 шага; фаза результата —
+ * красное свечение, 96dp круг, карточка «Bu fayl nima qiladi», countdown.
  */
 class AutoScanActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAutoScanBinding
@@ -53,6 +60,12 @@ class AutoScanActivity : AppCompatActivity() {
 
     /** True после того как scan завершился и результат показан — для разрешения back. */
     private var resultShown = false
+
+    /** Skan jarayoni halqasini boshqaradigan animator (0..90%, natijada 100%). */
+    private var progressAnimator: ValueAnimator? = null
+
+    /** Oxirgi skan natijasi — «Batafsil» tugmasi ScanResultActivity'ga uzatadi. */
+    private var lastResult: ScanResult? = null
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -176,8 +189,10 @@ class AutoScanActivity : AppCompatActivity() {
         // Avvalgi skan korutinalari va kechiktirilgan kolbeklar — bekor.
         handler.removeCallbacksAndMessages(null)
         scope.coroutineContext.cancelChildren()
+        progressAnimator?.cancel()
 
         resultShown = false
+        lastResult = null
         apkPath = incomingPath
         apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
         installedPkg = intent.getStringExtra("installed_pkg")?.takeIf { it.isNotBlank() }
@@ -199,6 +214,13 @@ class AutoScanActivity : AppCompatActivity() {
          */
         private const val DEDUP_WINDOW_MS = 20_000L
 
+        // v4 oq rang darajalari (qorong'i natija ekrani). const emas — .toInt()
+        // compile-time konstanta hisoblanmaydi.
+        private val WHITE = 0xFFFFFFFF.toInt()
+        private val WHITE_82 = 0xD1FFFFFF.toInt()
+        private val WHITE_70 = 0xB3FFFFFF.toInt()
+        private val WHITE_60 = 0x99FFFFFF.toInt()
+
         @Volatile private var lastLaunchedPath: String? = null
         @Volatile private var lastLaunchedAt: Long = 0L
 
@@ -214,6 +236,12 @@ class AutoScanActivity : AppCompatActivity() {
     private fun setupUI() {
         binding.tvApkName.text = apkName
 
+        // v4 halqa konfiguratsiyasi — design: stroke 6, track rgba(255,255,255,.10), ring #EF5D72.
+        binding.ringScan.strokeWidthDp = 6f
+        binding.ringScan.trackColor = 0x1AFFFFFF
+        binding.ringScan.ringColor = 0xFFEF5D72.toInt()
+        setScanProgress(0)
+
         // X-кнопка ВСЕГДА видима и ВСЕГДА работает — раньше её скрывали и юзер
         // оказывался запертым в окне. Никаких "обязательного сканирования" — если
         // юзер хочет выйти, выходит мгновенно.
@@ -225,7 +253,7 @@ class AutoScanActivity : AppCompatActivity() {
         // Анимация появления окна
         AnimationHelper.slideUp(binding.root, duration = 500)
     }
-    
+
     // Кнопка Назад работает ВСЕГДА. Юзера нельзя запирать в окне.
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
@@ -234,6 +262,7 @@ class AutoScanActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
+        progressAnimator?.cancel()
         scope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
         try { VoiceVerdict.shutdown() } catch (_: Throwable) {}
         super.onDestroy()
@@ -257,11 +286,13 @@ class AutoScanActivity : AppCompatActivity() {
     private var waitingForStoragePermission = false
 
     private fun startScanning() {
+        // Avvalgi natija qizil fon qoldirgan bo'lishi mumkin (onNewIntent) — qayta tiklash.
+        binding.root.setBackgroundResource(R.drawable.kq4_scan_bg)
         binding.layoutScanning.visibility = View.VISIBLE
         binding.layoutResult.visibility = View.GONE
         AnimationHelper.fadeIn(binding.layoutScanning, duration = 300)
-        binding.progressBar.let { AnimationHelper.pulse(it, duration = 1000, repeat = true) }
-        animateProgress()
+        AnimationHelper.pulse(binding.scanPulse, duration = 1000, repeat = true)
+        startProgressAnimation()
 
         // РЕАЛЬНОЕ сканирование в IO-потоке без фейкового postDelayed(2000).
         // Раньше юзер ждал ровно 2 секунды даже на пустом файле — теперь по факту.
@@ -282,36 +313,87 @@ class AutoScanActivity : AppCompatActivity() {
             // Минимум 800мс анимации — иначе пользователь не успеет понять что произошло.
             val elapsed = SystemClock.elapsedRealtime() - scanStartedAt
             if (elapsed < 800) delay(800 - elapsed)
+            finishScanProgress()
             if (!isFinishing && !isDestroyed) presentResult(result)
         }
     }
 
-    private fun animateProgress() {
-        val animator = ObjectAnimator.ofInt(binding.progressBar, "progress", 0, 100)
-        animator.duration = 1200
-        animator.start()
+    /**
+     * Skan davomida halqa 0→90% «yurib turadi» (real skan tugashini bildirmaydi),
+     * natija kelganda finishScanProgress() 100% ga yetkazadi. Shu tarzda progress
+     * real skan davomiyligiga bog'lanadi: tez skan — tez 100%, uzun skan — halqa kutadi.
+     */
+    private fun startProgressAnimation() {
+        progressAnimator?.cancel()
+        setScanProgress(0)
+        progressAnimator = ValueAnimator.ofInt(0, 90).apply {
+            duration = 2600
+            interpolator = DecelerateInterpolator(1.4f)
+            addUpdateListener { a ->
+                if (!isFinishing && !isDestroyed) setScanProgress(a.animatedValue as Int)
+            }
+            start()
+        }
+    }
+
+    private fun finishScanProgress() {
+        progressAnimator?.cancel()
+        progressAnimator = null
+        try { setScanProgress(100) } catch (_: Throwable) {}
+    }
+
+    /** % matni + halqa + 4 qadam holatini bitta joydan yangilaydi. */
+    private fun setScanProgress(p: Int) {
+        binding.tvProgress.text = getString(R.string.kq4_as_percent, p)
+        binding.ringScan.setValue(p.toFloat(), animate = false)
+        // design (screens3.jsx): done = floor(p/25) + (p%25 > 12 ? 1 : 0)
+        val done = if (p >= 100) 4 else ((p / 25) + if (p % 25 > 12) 1 else 0).coerceIn(0, 4)
+        applySteps(done)
+    }
+
+    private fun applySteps(done: Int) {
+        val rows = arrayOf(binding.stepRow1, binding.stepRow2, binding.stepRow3, binding.stepRow4)
+        val circles = arrayOf(binding.stepCircle1, binding.stepCircle2, binding.stepCircle3, binding.stepCircle4)
+        val checks = arrayOf(binding.stepCheck1, binding.stepCheck2, binding.stepCheck3, binding.stepCheck4)
+        val dots = arrayOf(binding.stepDot1, binding.stepDot2, binding.stepDot3, binding.stepDot4)
+        for (i in 0..3) {
+            val isDone = i < done
+            rows[i].alpha = if (isDone) 1f else 0.4f
+            circles[i].setBackgroundResource(
+                if (isDone) R.drawable.kq4_autoscan_step_done else R.drawable.kq4_autoscan_step_todo
+            )
+            checks[i].visibility = if (isDone) View.VISIBLE else View.GONE
+            dots[i].visibility = if (isDone) View.GONE else View.VISIBLE
+        }
     }
 
     private fun presentResult(result: ScanResult?) {
         try {
+            lastResult = result
             try { binding.layoutScanning.visibility = View.GONE } catch (_: Throwable) {}
             try { binding.layoutResult.visibility = View.VISIBLE } catch (_: Throwable) {}
             try { AnimationHelper.bounce(binding.cardResult, duration = 600) } catch (_: Throwable) {}
 
-            // Phase B background swap per redesign §3.5 — the cyber-dark scanning
-            // gradient yields to a deep-red danger gradient on DANGER verdicts.
+            // Fon almashinuvi — design §AutoScan result: DANGER qizil nur, SAFE odatiy fon,
+            // qolganlari qorong'i skan foni.
             when (result?.verdict) {
                 ScanResult.Verdict.DANGER -> {
-                    try { binding.root.setBackgroundResource(R.drawable.kq_autoscan_danger_bg) } catch (_: Throwable) {}
+                    try { binding.root.setBackgroundResource(R.drawable.kq4_autoscan_result_bg) } catch (_: Throwable) {}
                     safeShow { showDangerousResult(result) }
                 }
-                ScanResult.Verdict.SUSPICIOUS -> safeShow { showSuspiciousResult(result) }
+                ScanResult.Verdict.SUSPICIOUS -> {
+                    try { binding.root.setBackgroundResource(R.drawable.kq4_scan_bg) } catch (_: Throwable) {}
+                    safeShow { showSuspiciousResult(result) }
+                }
                 ScanResult.Verdict.SAFE -> safeShow { showSafeResult() }
                 // result == null — skan ISTISNO bilan tugadi (fayl o'qilmadi / parse xatosi).
                 // ANTIVIRUS ASOSIY QOIDASI: o'qib bo'lmagan fayl HECH QACHON "xavfsiz" emas.
                 // Avval `else -> showSafeResult()` edi — bu soxta-XAVFSIZ buggi: skan crash
                 // bo'lsa virus "✓ Fayl xavfsiz" deb ko'rsatilardi (Tekshirildi: 0). Endi → shubhali.
-                null -> safeShow { showUnscannableResult() }
+                null -> {
+                    try { binding.root.setBackgroundResource(R.drawable.kq4_scan_bg) } catch (_: Throwable) {}
+                    safeShow { showUnscannableResult() }
+                }
             }
             // Ovoz bilan verdict — yangi APK aniqlanganda foydalanuvchi telefonga
             // qaramasa ham eshitadi. Sozlamada o'chirilgan bo'lsa, VoiceVerdict sukut saqlaydi.
@@ -344,6 +426,55 @@ class AutoScanActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Qorong'i natija «хром»и: oq sarlavha/matn, qizil danger tugma + ghost «Batafsil»,
+     * qorong'i X tugmasi. SAFE keyin onNewIntent bilan qayta kirilganda ham
+     * hammasi qayta to'g'ri bo'yaladi.
+     */
+    private fun applyDarkChrome() {
+        binding.tvResultTitle.setTextColor(WHITE)
+        binding.tvResultMessage.setTextColor(WHITE_82)
+        binding.btnDelete.backgroundTintList = ColorStateList.valueOf(getColor(R.color.kq_danger))
+        binding.btnDelete.setTextColor(WHITE)
+        binding.btnDelete.iconTint = ColorStateList.valueOf(WHITE)
+        binding.btnDelete.icon = AppCompatResources.getDrawable(this, R.drawable.ic4_trash)
+        binding.btnDelete.text = getString(R.string.kq_delete_now)
+        binding.btnDetails.setBackgroundResource(R.drawable.kq4_autoscan_btn_ghost)
+        binding.btnDetails.setTextColor(WHITE)
+        binding.btnDetails.text = getString(R.string.kq_details)
+        binding.btnClose.setBackgroundResource(R.drawable.kq4_autoscan_iconbtn)
+        binding.btnClose.imageTintList = ColorStateList.valueOf(WHITE_70)
+        binding.tvDeleteHint.setTextColor(WHITE_60)
+        binding.resultShield.imageTintList = ColorStateList.valueOf(WHITE)
+    }
+
+    /** SAFE natija «хром»и — odatiy (yorug'/tema) fon, primary tugma, ink matnlar. */
+    private fun applySafeChrome() {
+        binding.root.setBackgroundResource(R.color.kq_bg)
+        binding.tvResultTitle.setTextColor(getColor(R.color.kq_ink))
+        binding.tvResultMessage.setTextColor(getColor(R.color.kq_ink_2))
+        binding.btnDelete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.kq_primary)
+        binding.btnDelete.setTextColor(getColor(R.color.kq_on_primary))
+        binding.btnDelete.icon = null
+        binding.btnDetails.setBackgroundResource(R.drawable.kq4_btn_soft)
+        binding.btnDetails.setTextColor(getColor(R.color.kq_ink))
+        binding.btnDetails.text = getString(R.string.kq4_as_close)
+        binding.btnDetails.setOnClickListener { finish() }
+        binding.btnClose.setBackgroundResource(R.drawable.kq4_icon_btn)
+        binding.btnClose.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_ink))
+    }
+
+    /** «Batafsil» — to'liq natija ekrani (ScanResultActivity) real natija bilan. */
+    private fun openDetails() {
+        val res = lastResult ?: return
+        val path = apkPath ?: return
+        try {
+            startActivity(ScanResultActivity.intent(this, path, res, installedPkg))
+        } catch (e: Throwable) {
+            android.util.Log.e("AutoScanActivity", "openDetails failed", e)
+        }
+    }
+
     /** Отправляет текстовое предупреждение друзьям через любое приложение (Telegram, WhatsApp, SMS). */
     private fun shareScanResult(verdict: ScanResult.Verdict) {
         try {
@@ -365,53 +496,95 @@ class AutoScanActivity : AppCompatActivity() {
     }
 
     /**
-     * Populates the FAYL header (filename + sev chip) and the mono meta block
-     * (paket / sha1 / oila / manba) with real data extracted from the scanned APK.
-     * Called from showDangerousResult/showSuspiciousResult.
+     * Oq-shaffof kartani real ma'lumot bilan to'ldiradi: fayl nomi, «manba · hajm»
+     * qatori va «Bu fayl nima qiladi» ro'yxati (real ruxsatlar/signaturalardan,
+     * data.jsx DOES uslubida inson tilida).
      */
     private fun populateInfoCard(result: ScanResult) {
-        val path = apkPath ?: return
-        val file = File(path)
-        binding.tvAsScanFileName.text = file.name.ifBlank { apkName ?: "?" }
+        val file = apkPath?.let { File(it) }
+        binding.tvAsScanFileName.text =
+            file?.name?.takeIf { it.isNotBlank() } ?: (apkName ?: "?")
 
-        val pkg = try {
-            packageManager.getPackageArchiveInfo(path, 0)?.packageName ?: "?"
-        } catch (_: Throwable) { "?" }
-        val sha1 = sha1Short(file)
-        val family = result.malwareSignatures.firstOrNull() ?: inferFamilyFromReason(result.reason)
-        val source = sourceLabel()
-
-        binding.tvAsScanMeta.text = buildString {
-            append("paket: $pkg\n")
-            append("sha1: $sha1\n")
-            append("oila: ${family ?: "—"}\n")
-            append("manba: $source")
+        val sizeText = file?.takeIf { it.exists() }?.let {
+            android.text.format.Formatter.formatShortFileSize(this, it.length())
         }
+        val src = sourceLabel().takeIf { it != "—" }
+        binding.tvAsScanSource.text =
+            listOfNotNull(src, sizeText).joinToString(" · ").ifBlank { "—" }
+
+        val rows = arrayOf(binding.doesRow1, binding.doesRow2, binding.doesRow3, binding.doesRow4)
+        val icons = arrayOf(binding.doesIcon1, binding.doesIcon2, binding.doesIcon3, binding.doesIcon4)
+        val texts = arrayOf(binding.doesText1, binding.doesText2, binding.doesText3, binding.doesText4)
+        val entries = doesEntries(result)
+        for (i in 0..3) {
+            if (i < entries.size) {
+                rows[i].visibility = View.VISIBLE
+                icons[i].setImageResource(entries[i].first)
+                texts[i].text = entries[i].second
+            } else {
+                rows[i].visibility = View.GONE
+            }
+        }
+        val hasRows = entries.isNotEmpty()
+        binding.tvDoesLabel.visibility = if (hasRows) View.VISIBLE else View.GONE
+        binding.viewDoesDivider.visibility = if (hasRows) View.VISIBLE else View.GONE
     }
 
-    private fun sha1Short(file: File): String = try {
-        if (!file.exists() || !file.canRead()) "—" else {
-            val md = java.security.MessageDigest.getInstance("SHA-1")
-            file.inputStream().use { ins ->
-                val buf = ByteArray(64 * 1024)
-                while (true) {
-                    val n = ins.read(buf); if (n <= 0) break
-                    md.update(buf, 0, n)
-                }
-            }
-            val hex = md.digest().joinToString("") { "%02x".format(it) }
-            hex.take(6) + "…" + hex.takeLast(5)
-        }
-    } catch (_: Throwable) { "—" }
+    /**
+     * Real skan belgilari (ruxsatlar + reason + signaturalar) → inson tilidagi
+     * «nima qiladi» qatorlari (maks 4). Hech narsa mos kelmasa — skanerning
+     * o'z izohlarini (details) ko'rsatamiz, ya'ni har doim real ma'lumot.
+     */
+    private fun doesEntries(result: ScanResult): List<Pair<Int, CharSequence>> {
+        val perms = result.dangerousPermissions.joinToString(" ").uppercase()
+        val hay = (result.reason + " " +
+                result.malwareSignatures.joinToString(" ") + " " +
+                result.details.joinToString(" ")).lowercase()
 
-    private fun inferFamilyFromReason(reason: String): String? {
-        val r = reason.lowercase()
+        val picked = mutableListOf<Pair<Int, Int>>()
+        fun add(icon: Int, res: Int) {
+            if (picked.none { it.second == res }) picked.add(icon to res)
+        }
+        if ("SMS" in perms || "NOTIFICATION_LISTENER" in perms || "sms" in hay)
+            add(R.drawable.ic4_message, R.string.kq4_as_does_sms)
+        if ("SYSTEM_ALERT_WINDOW" in perms || "overlay" in hay || "bank" in hay || "ajina" in hay || "phish" in hay)
+            add(R.drawable.ic4_card, R.string.kq4_as_does_bankpass)
+        if ("ACCESSIBILITY" in perms || "accessibility" in hay)
+            add(R.drawable.ic4_eye, R.string.kq4_as_does_screen)
+        if ("INSTALL_PACKAGES" in perms || "dropper" in hay)
+            add(R.drawable.ic4_download, R.string.kq4_as_does_download)
+        if ("DEVICE_ADMIN" in perms || "yashir" in hay || "hidden" in hay)
+            add(R.drawable.ic4_lock, R.string.kq4_as_does_hide)
+        if ("c2" in hay || "masofa" in hay || "remote" in hay)
+            add(R.drawable.ic4_globe, R.string.kq4_as_does_remote)
+        if ("CONTACTS" in perms)
+            add(R.drawable.ic4_user, R.string.kq4_as_does_contacts)
+        if ("CALL" in perms)
+            add(R.drawable.ic4_phone, R.string.kq4_as_does_calls)
+
+        val mapped: List<Pair<Int, CharSequence>> =
+            picked.take(4).map { it.first to (getString(it.second) as CharSequence) }
+        if (mapped.isNotEmpty()) return mapped
+        return result.details.take(3).map { R.drawable.ic4_alert to (it as CharSequence) }
+    }
+
+    /**
+     * Tahdid tavsifi — data.jsx THREATS.short shablonlaridan real turga qarab
+     * tanlanadi (bank o'g'risi / dropper / SMS o'g'risi / umumiy).
+     */
+    private fun threatShortText(result: ScanResult): String {
+        val hay = (result.reason + " " +
+                result.malwareSignatures.joinToString(" ") + " " +
+                result.details.joinToString(" ")).lowercase()
+        val perms = result.dangerousPermissions.joinToString(" ").uppercase()
         return when {
-            "ajina" in r -> "Ajina.Banker"
-            "roundrift" in r -> "RoundRift"
-            "sms" in r && "steal" in r -> "SMS Stealer"
-            "phish" in r || "overlay" in r -> "Phish overlay"
-            else -> null
+            "ajina" in hay || "bank" in hay || "overlay" in hay || "phish" in hay ->
+                getString(R.string.kq4_as_short_bank)
+            "dropper" in hay || "INSTALL_PACKAGES" in perms ->
+                getString(R.string.kq4_as_short_dropper)
+            "sms" in hay || "SMS" in perms ->
+                getString(R.string.kq4_as_short_sms)
+            else -> getString(R.string.kq4_as_short_generic)
         }
     }
 
@@ -426,31 +599,24 @@ class AutoScanActivity : AppCompatActivity() {
     }
 
     private fun showDangerousResult(result: ScanResult) {
-        // Badge → красный, dangerDetails показываем, populate реальными данными
-        binding.resultBadge.setBackgroundResource(R.drawable.kq_danger_badge)
-        binding.resultShield.setImageResource(R.drawable.ic_alert_triangle)
+        applyDarkChrome()
+        binding.resultBadge.setBackgroundResource(R.drawable.kq4_circle_danger)
+        binding.resultShield.setImageResource(R.drawable.ic4_alert)
+        binding.haloOuter.visibility = View.VISIBLE
+        binding.haloInner.visibility = View.VISIBLE
         binding.dangerDetails.visibility = View.VISIBLE
-        binding.tvAutoDelete.visibility = View.VISIBLE
         populateInfoCard(result)
 
-        binding.tvResultTitle.text = getString(R.string.auto_scan_dangerous_title)
-        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
-
-        val details = result.details.joinToString("\n• ", "• ")
-        val context = sourceHint()
-        binding.tvResultMessage.text = buildString {
-            append(getString(R.string.autoscan_danger_body))
-            append("\n\n")
-            append(details)
-            if (context != null) {
-                append("\n\n")
-                append(context)
-            }
-        }
+        binding.tvResultTitle.text = getString(R.string.kq4_as_danger_title)
+        // Tafsilotlar (result.details) endi kartada + «Batafsil» ekranida — bu yerda
+        // dizayndagi qisqa, jargonsiz tushuntirish.
+        binding.tvResultMessage.text = threatShortText(result)
 
         binding.btnDelete.visibility = View.VISIBLE
         // O'rnatilgan ilova bo'lsa — tugma "Ilovani o'chirish" (uninstall), fayl emas.
         if (installedPkg != null) binding.btnDelete.text = getString(R.string.uninstall_app)
+        binding.btnDetails.visibility = View.VISIBLE
+        binding.btnDetails.setOnClickListener { openDetails() }
         binding.tvDeleteHint.visibility = View.VISIBLE
         // Превращаем "подсказку" в кликабельный share — юзер одним тапом
         // отправляет друзьям предупреждение "этот APK — вирус, не ставьте".
@@ -461,22 +627,19 @@ class AutoScanActivity : AppCompatActivity() {
         AnimationHelper.shake(binding.cardResult, duration = 500)
 
         // Avtomatik o'chirish rejimi — Sozlamalardan keladi:
-        //  "delete" → 2.5 sekunddan keyin avtomatik deleteApk() chaqiramiz
+        //  "delete" → real obratniy otschot (soat qatori) tugagach deleteApk()
         //             (foydalanuvchi btnClose orqali to'xtata oladi).
         //  "ask"    → eski xulq-atvor: btnDelete pulsatsiya, kutamiz.
         //  "warn"   → faqat ogohlantirish, pulsatsiya yo'q (kam agressiv).
         val deleteMode = try { Config.getAutoDeleteMode(this) } catch (_: Throwable) { "ask" }
         when (deleteMode) {
-            "delete" -> {
-                binding.tvDeleteHint.text = getString(R.string.autoscan_auto_deleting)
-                handler.postDelayed({
-                    if (!isFinishing && !isDestroyed) deleteApk()
-                }, 2500)
-            }
+            "delete" -> startAutoDeleteCountdown()
             "warn" -> {
                 // Tugma ko'rinadi lekin pulsatsiyasiz.
+                binding.rowAutoDelete.visibility = View.GONE
             }
             else -> {
+                binding.rowAutoDelete.visibility = View.GONE
                 AnimationHelper.pulse(binding.btnDelete, duration = 1000, repeat = true)
             }
         }
@@ -484,16 +647,42 @@ class AutoScanActivity : AppCompatActivity() {
         sendNotification("🔴 Virus topildi!", "$apkName fayli xavfli — o'chirish tavsiya etiladi", true)
     }
 
+    /**
+     * Real avto-o'chirish hisoblagichi (design: «N soniyadan keyin avtomatik
+     * o'chiriladi» → «O'chirilmoqda…»). handler onDestroy/onNewIntent'da tozalanadi,
+     * shuning uchun yopilgan oynada otmaydi.
+     */
+    private fun startAutoDeleteCountdown(seconds: Int = 3) {
+        binding.rowAutoDelete.visibility = View.VISIBLE
+        binding.tvAutoDelete.text = getString(R.string.kq4_as_autodelete_in, seconds)
+        var left = seconds
+        val tick = object : Runnable {
+            override fun run() {
+                if (isFinishing || isDestroyed) return
+                left--
+                if (left <= 0) {
+                    binding.tvAutoDelete.text = getString(R.string.kq4_as_deleting)
+                    deleteApk()
+                } else {
+                    binding.tvAutoDelete.text = getString(R.string.kq4_as_autodelete_in, left)
+                    handler.postDelayed(this, 1000)
+                }
+            }
+        }
+        handler.postDelayed(tick, 1000)
+    }
+
     private fun showSuspiciousResult(result: ScanResult) {
-        // Badge → амбер, dangerDetails показываем, но без countdown.
-        binding.resultBadge.setBackgroundResource(R.drawable.kq_warn_badge)
-        binding.resultShield.setImageResource(R.drawable.ic_warning_alert)
+        applyDarkChrome()
+        binding.resultBadge.setBackgroundResource(R.drawable.kq4_autoscan_circle_warn)
+        binding.resultShield.setImageResource(R.drawable.ic4_alert)
+        binding.haloOuter.visibility = View.GONE
+        binding.haloInner.visibility = View.GONE
         binding.dangerDetails.visibility = View.VISIBLE
-        binding.tvAutoDelete.visibility = View.GONE
+        binding.rowAutoDelete.visibility = View.GONE
         populateInfoCard(result)
 
         binding.tvResultTitle.text = getString(R.string.autoscan_suspicious_title)
-        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
 
         val details = result.details.joinToString("\n• ", "• ")
         val context = sourceHint()
@@ -511,6 +700,8 @@ class AutoScanActivity : AppCompatActivity() {
 
         binding.btnDelete.visibility = View.VISIBLE
         if (installedPkg != null) binding.btnDelete.text = getString(R.string.uninstall_app)
+        binding.btnDetails.visibility = View.VISIBLE
+        binding.btnDetails.setOnClickListener { openDetails() }
         binding.tvDeleteHint.visibility = View.VISIBLE
         binding.tvDeleteHint.text = getString(R.string.share_result)
         binding.tvDeleteHint.setOnClickListener { shareScanResult(ScanResult.Verdict.SUSPICIOUS) }
@@ -525,13 +716,17 @@ class AutoScanActivity : AppCompatActivity() {
      * tavsiya etiladi. Avval bunday holatda showSafeResult() chaqirilardi (soxta-XAVFSIZ).
      */
     private fun showUnscannableResult() {
-        binding.resultBadge.setBackgroundResource(R.drawable.kq_warn_badge)
-        binding.resultShield.setImageResource(R.drawable.ic_warning_alert)
+        applyDarkChrome()
+        binding.resultBadge.setBackgroundResource(R.drawable.kq4_autoscan_circle_warn)
+        binding.resultShield.setImageResource(R.drawable.ic4_alert)
+        binding.haloOuter.visibility = View.GONE
+        binding.haloInner.visibility = View.GONE
         binding.dangerDetails.visibility = View.GONE
-        binding.tvAutoDelete.visibility = View.GONE
+        binding.rowAutoDelete.visibility = View.GONE
+        // Skan natijasi yo'q — «Batafsil» ekraniga uzatadigan ma'lumot ham yo'q.
+        binding.btnDetails.visibility = View.GONE
 
         binding.tvResultTitle.text = getString(R.string.autoscan_unscannable_title)
-        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
 
         val context = sourceHint()
         binding.tvResultMessage.text = buildString {
@@ -575,25 +770,30 @@ class AutoScanActivity : AppCompatActivity() {
     private fun presentHandledResult() {
         try { binding.layoutScanning.visibility = View.GONE } catch (_: Throwable) {}
         try { binding.layoutResult.visibility = View.VISIBLE } catch (_: Throwable) {}
-        try { binding.root.setBackgroundResource(R.drawable.kq_autoscan_danger_bg) } catch (_: Throwable) {}
+        try { binding.root.setBackgroundResource(R.drawable.kq4_autoscan_result_bg) } catch (_: Throwable) {}
         try { AnimationHelper.bounce(binding.cardResult, duration = 600) } catch (_: Throwable) {}
 
-        binding.resultBadge.setBackgroundResource(R.drawable.kq_danger_badge)
-        binding.resultShield.setImageResource(R.drawable.ic_alert_triangle)
+        applyDarkChrome()
+        binding.resultBadge.setBackgroundResource(R.drawable.kq4_circle_danger)
+        binding.resultShield.setImageResource(R.drawable.ic4_alert)
+        binding.haloOuter.visibility = View.VISIBLE
+        binding.haloInner.visibility = View.VISIBLE
         binding.dangerDetails.visibility = View.GONE
-        binding.tvAutoDelete.visibility = View.GONE
+        binding.rowAutoDelete.visibility = View.GONE
+        binding.btnDetails.visibility = View.GONE
 
-        binding.tvResultTitle.text = "🛡️ Virus topildi va o'chirildi"
-        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
+        binding.tvResultTitle.text = getString(R.string.kq4_as_handled_title)
 
         val reason = intent.getStringExtra("reason")?.takeIf { it.isNotBlank() }
         val ctxHint = sourceHint()
         binding.tvResultMessage.text = buildString {
-            append("$apkName fayli xavfli deb topildi va avtomatik o'chirildi (karantin).")
+            append(getString(R.string.kq4_as_handled_body, apkName ?: "?"))
             if (reason != null) {
-                append("\n\nSabab: ${reason.take(300)}")
+                append("\n\n")
+                append(getString(R.string.kq4_as_handled_reason, reason.take(300)))
             }
-            append("\n\nAgar bu xato bo'lsa, 7 kun ichida tiklash mumkin.")
+            append("\n\n")
+            append(getString(R.string.kq4_as_handled_restore))
             if (ctxHint != null) {
                 append("\n\n")
                 append(ctxHint)
@@ -603,6 +803,7 @@ class AutoScanActivity : AppCompatActivity() {
         // O'chirish tugmasi KERAK EMAS — fayl allaqachon yo'q. "Tushunarli" → oynani yopish.
         binding.btnDelete.visibility = View.VISIBLE
         binding.btnDelete.isEnabled = true
+        binding.btnDelete.icon = null
         binding.btnDelete.text = getString(R.string.btn_ok)
         binding.btnDelete.setOnClickListener { finish() }
 
@@ -620,14 +821,19 @@ class AutoScanActivity : AppCompatActivity() {
     }
 
     private fun showSafeResult() {
-        // Badge → зелёный, dangerDetails (info card + perm chips + countdown) скрываем.
-        binding.resultBadge.setBackgroundResource(R.drawable.kq_safe_badge)
-        binding.resultShield.setImageResource(R.drawable.ic_check_simple)
+        // Yashil natija — design: odatiy fon, kq4_circle_safe_soft doira,
+        // ic4_check_circle (kq_safe), Primary tugma. Yashil HECH QACHON kq_primary'da emas.
+        applySafeChrome()
+        binding.resultBadge.setBackgroundResource(R.drawable.kq4_circle_safe_soft)
+        binding.resultShield.setImageResource(R.drawable.ic4_check_circle)
+        binding.resultShield.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_safe))
+        binding.haloOuter.visibility = View.GONE
+        binding.haloInner.visibility = View.GONE
         binding.dangerDetails.visibility = View.GONE
-        binding.tvAutoDelete.visibility = View.GONE
+        binding.rowAutoDelete.visibility = View.GONE
+        binding.btnDetails.visibility = View.VISIBLE
 
-        binding.tvResultTitle.text = getString(R.string.status_safe)
-        binding.tvResultTitle.setTextColor(getColor(android.R.color.white))
+        binding.tvResultTitle.text = getString(R.string.kq4_as_safe_title)
 
         // Проверяем — установлен ли уже этот APK на устройстве. PackageInstaller на
         // "переустановке поверх того же signature" часто молча отказывает (особенно
@@ -885,6 +1091,7 @@ class AutoScanActivity : AppCompatActivity() {
     private fun onFileSuccessfullyDeleted() {
         binding.tvResultMessage.text = getString(R.string.delete_success)
         binding.btnDelete.visibility = View.GONE
+        binding.rowAutoDelete.visibility = View.GONE
         binding.tvDeleteHint.text = getString(R.string.autoscan_delete_hint_done)
 
         // "Bloklandi" hisoblagichi skan paytida (ApkScanner.scan, DANGER) bir marta oshadi;
@@ -917,9 +1124,9 @@ class AutoScanActivity : AppCompatActivity() {
                 android.util.Log.e("AutoScanActivity", "NotificationManager is null")
                 return
             }
-            
+
             val channelId = "kiberqalqon_scan"
-            
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 try {
                     val channel = NotificationChannel(
@@ -932,7 +1139,7 @@ class AutoScanActivity : AppCompatActivity() {
                     android.util.Log.e("AutoScanActivity", "Channel creation error", e)
                 }
             }
-            
+
             // Статистика — bildirishnoma uchun ko'rinish qiymatlari (kanonik kalitlardan).
             try {
                 val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
@@ -940,7 +1147,7 @@ class AutoScanActivity : AppCompatActivity() {
                 val blocked = prefs.getInt("total_blocked", 0)
 
                 val statsText = "Tekshirildi: $scanned | Bloklandi: $blocked"
-                
+
                 val notification = NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_shield)
                     .setContentTitle(title)
@@ -950,7 +1157,7 @@ class AutoScanActivity : AppCompatActivity() {
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
                     .build()
-                
+
                 // ID на базе hash от apk_path — уникален для каждого файла, нет коллизий
                 // с другими уведомлениями приложения. Внутри одного файла перезаписывается старое.
                 val notifId = (apkPath ?: apkName ?: title).hashCode() and 0x7FFFFFFF

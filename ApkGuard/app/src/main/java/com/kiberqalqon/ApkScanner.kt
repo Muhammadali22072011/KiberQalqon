@@ -571,7 +571,7 @@ object ApkScanner {
         if (isSelf) {
             return ScanResult(
                 verdict = ScanResult.Verdict.SAFE,
-                reason = "Bu KiberQalqon ning o'zi — o'tkazib yuboriladi",
+                reason = "Bu Anor Qalqonning o'zi — o'tkazib yuboriladi",
                 details = listOf("Himoyachi o'zini o'zi skanerlamaydi va o'chirmaydi."),
                 dangerousPermissions = emptyList(),
                 malwareSignatures = emptyList()

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — umumiy (shared) satrlar. Ekranga xos satrlar strings_kq4_<ekran>.xml ichida. -->
+<resources>
+    <string name="kq4_brand">Anor Qalqon</string>
+    <string name="kq4_milliy">MILLIY KIBER HIMOYA</string>
+    <string name="kq4_protection_on">Himoya yoqilgan</string>
+    <string name="kq4_protection_off">Himoya o\'chiq</string>
+    <string name="kq4_lang_uz" translatable="false">UZ</string>
+    <string name="kq4_notifications">Bildirishnomalar</string>
+    <string name="kq4_continue">Davom etish</string>
+    <string name="kq4_back">Orqaga</string>
+    <string name="kq4_all">Hammasi</string>
+    <string name="kq4_safe">Xavfsiz</string>
+    <string name="kq4_danger">Xavfli</string>
+    <string name="kq4_suspicious">Shubhali</string>
+    <string name="kq4_live">Jonli</string>
+    <string name="kq4_on">Yoniq</string>
+    <string name="kq4_enable">Yoqish</string>
+    <string name="kq4_deleted">O\'chirildi</string>
+</resources>

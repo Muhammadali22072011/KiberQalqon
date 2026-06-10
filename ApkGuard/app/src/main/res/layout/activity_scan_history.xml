@@ -1,170 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Statistics — §3.8 of the redesign. Replaces the legacy history list with the
-  data-rich statistics screen: totals, 7-day chart, family bars, samples list,
-  C2 network map, refresh CTA.
+  v4 «Milliy Kiber Himoya» — Stats / «Statistika» vkladkasi (screens2.jsx → Stats).
 
-  Stable IDs preserved for ScanHistoryActivity.kt binding:
-    toolbar, recycler (kept gone), empty (kept gone), btnClear.
+  Tartib: eyebrow STATISTIKA + h-title «So'nggi 7 kun» → 2 stat-karta (34sp raqam)
+  → grafik kartasi (7 ustun, 104dp maydon, badge 18dp) → «Qanday xavflar topildi»
+  (kategoriya progresslari 9dp/r5) → «Topilgan fayllar» (.li qatorlar,
+  item_scan_history.xml dan inflate) → ghost «Hisobotni yangilash» + «Tarixni
+  tozalash» → pastki navigatsiya.
 
-  All numeric/text data is bound LIVE in ScanHistoryActivity from
-  ScanHistory + kiberqalqon_stats. Only the world-map graphic below is a
-  decorative illustration; its danger markers are toggled by real threat count.
+  Hamma raqam/balandlik/ro'yxat JONLI bog'lanadi (ScanHistoryActivity):
+  kiberqalqon_stats prefs (total_scanned / total_blocked / day_0..6+epochday,
+  staleness bilan) va ScanHistory.all(). Ustun balandliklari LayoutParams orqali
+  kodda qo'yiladi (dizayn: 12% minimal + 78% proporsional).
 -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/kq_bg">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:navigationIconTint="@color/kq_ink" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingTop="?attr/actionBarSize"
         android:paddingBottom="92dp"
         android:scrollbars="none">
 
+        <!-- .screen-pad: 14 / 18 / 30 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="12dp">
+            android:paddingHorizontal="18dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="30dp">
 
-            <!-- ▌ Header -->
+            <!-- ▌ eyebrow + h-title -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/hist_section_stats"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:text="@string/hist_section_stats" />
 
             <TextView
+                style="@style/KQ4.HTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/hist_period_last_7_days"
-                android:textColor="@color/kq_ink"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="8dp"
+                android:text="@string/hist_period_last_7_days" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/hist_subtitle_protection"
-                android:textColor="@color/kq_ink_2"
-                android:textSize="13sp" />
-
-            <!-- ▌ Big totals row -->
+            <!-- ▌ 2 stat-karta (grid 1fr 1fr, gap 10) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="16dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/KQ4.Card"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/kq_stat_tile"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.08"
-                        android:text="@string/hist_label_total"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_ink_3"
-                        android:textSize="11sp" />
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/tvStatsTotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:letterSpacing="-0.02"
-                        android:text="0"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="32sp"
-                        android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/tvStatsTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/onest_extrabold"
+                            android:letterSpacing="-0.03"
+                            android:text="0"
+                            android:textColor="@color/kq_ink"
+                            android:textSize="34sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-2dp"
-                        android:text="@string/hist_unit_checked_apks"
-                        android:textColor="@color/kq_ink_2"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/onest_medium"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="@string/kq4_stats_scanned_files"
+                            android:textColor="@color/kq_ink_3"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/KQ4.Card"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/kq_stat_tile"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_weight="1">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.08"
-                        android:text="@string/hist_label_blocked"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_danger"
-                        android:textSize="11sp" />
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/tvStatsBlocked"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:letterSpacing="-0.02"
-                        android:text="0"
-                        android:textColor="@color/kq_danger"
-                        android:textSize="32sp"
-                        android:textStyle="bold" />
+                        <TextView
+                            android:id="@+id/tvStatsBlocked"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/onest_extrabold"
+                            android:letterSpacing="-0.03"
+                            android:text="0"
+                            android:textColor="@color/kq_danger"
+                            android:textSize="34sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-2dp"
-                        android:text="@string/hist_unit_malware_families"
-                        android:textColor="@color/kq_ink_2"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/onest_medium"
+                            android:lineSpacingMultiplier="1.3"
+                            android:text="@string/kq4_stats_found_removed"
+                            android:textColor="@color/kq_ink_3"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- ▌ "Faollik · Tekshiruvlar / kun" — 7-day bar chart -->
+            <!-- ▌ Grafik kartasi -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_marginTop="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -172,712 +140,628 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- between: sec-title 15 + tag outline -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <LinearLayout
+                        <TextView
+                            style="@style/KQ4.SecTitle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:letterSpacing="0.12"
-                                android:text="@string/hist_section_activity"
-                                android:textAllCaps="true"
-                                android:textColor="@color/kq_primary"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/hist_subtitle_checks_per_day"
-                                android:textColor="@color/kq_ink"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
+                            android:text="@string/kq4_stats_daily_checks"
+                            android:textSize="15sp" />
 
                         <TextView
+                            style="@style/KQ4.Tag"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/kq_btn_ghost"
-                            android:fontFamily="monospace"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="@string/hist_dropdown_week"
-                            android:textColor="@color/kq_ink"
-                            android:textSize="11sp" />
+                            android:layout_height="30dp"
+                            android:background="@drawable/kq4_tag_outline"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="@string/kq4_stats_week"
+                            android:textColor="@color/kq_ink_2" />
                     </LinearLayout>
 
-                    <!-- Bars container — heights and badges populated live from
-                         Statistics.weekData + ScanHistory in ScanHistoryActivity. -->
+                    <!-- 7 ustun: maydon 104dp, gap 8; balandliklar kodda -->
                     <LinearLayout
-                        android:id="@+id/chartBars"
                         android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:layout_marginTop="14dp"
-                        android:gravity="bottom"
-                        android:orientation="horizontal"
-                        android:weightSum="7">
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
 
                         <!-- Du -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/barBadge1"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-
-                            <View
-                                android:id="@+id/bar1"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge1"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_mon"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
                         </LinearLayout>
 
                         <!-- Se -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/barBadge2"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-
-                            <View
-                                android:id="@+id/bar2"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge2"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_tue"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
                         </LinearLayout>
 
                         <!-- Cho -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/barBadge3"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-
-                            <View
-                                android:id="@+id/bar3"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge3"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar3"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_wed"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
                         </LinearLayout>
 
                         <!-- Pa -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/barBadge4"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-
-                            <View
-                                android:id="@+id/bar4"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge4"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar4"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_thu"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
                         </LinearLayout>
 
                         <!-- Ju -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/barBadge5"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-
-                            <View
-                                android:id="@+id/bar5"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge5"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar5"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_fri"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
                         </LinearLayout>
 
                         <!-- Sh -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/barBadge6"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-
-                            <View
-                                android:id="@+id/bar6"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge6"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar6"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_sat"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
                         </LinearLayout>
 
                         <!-- Ya -->
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="3dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_horizontal"
+                            android:gravity="center_horizontal"
                             android:orientation="vertical">
 
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="104dp">
+
+                                <TextView
+                                    android:id="@+id/barBadge7"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="top|center_horizontal"
+                                    android:background="@drawable/kq4_circle_danger"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:visibility="gone" />
+
+                                <View
+                                    android:id="@+id/bar7"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@drawable/kq4_stats_bar" />
+                            </FrameLayout>
+
                             <TextView
-                                android:id="@+id/barBadge7"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="@drawable/kq_count_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="@string/kq4_stats_day_sun"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ▌ Qanday xavflar topildi -->
+            <TextView
+                style="@style/KQ4.SecTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="12dp"
+                android:text="@string/kq4_stats_threat_types"
+                android:textSize="16sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Bank o'g'irlash (danger) -->
+                    <LinearLayout
+                        android:id="@+id/rowCat1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="7dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq4_stats_cat_bank"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:id="@+id/tvCatCount1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="0 / 0"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="9dp"
+                            android:background="@drawable/kq4_stats_track">
 
                             <View
-                                android:id="@+id/bar7"
-                                android:layout_width="match_parent"
-                                android:layout_height="4dp"
-                                android:background="@drawable/kq_bar_primary" />
-                        </LinearLayout>
+                                android:id="@+id/vCatFill1"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/kq4_stats_fill_danger" />
+                        </FrameLayout>
                     </LinearLayout>
 
-                    <!-- Day labels -->
+                    <!-- Yashirin yuklash (danger) -->
                     <LinearLayout
+                        android:id="@+id/rowCat2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:orientation="horizontal"
-                        android:weightSum="7">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Du"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Se"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Cho"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Pa"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Ju"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Sh"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="monospace"
-                            android:gravity="center"
-                            android:text="Ya"
-                            android:textColor="@color/kq_ink_3"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ▌ "Aniqlangan tahdidlar" oilalar -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.12"
-                        android:text="OILALAR"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/hist_subtitle_detected_threats"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <include
-                        layout="@layout/inc_family_bar"
-                        android:id="@+id/famAjina" />
-                    <include
-                        layout="@layout/inc_family_bar"
-                        android:id="@+id/famRoundRift" />
-                    <include
-                        layout="@layout/inc_family_bar"
-                        android:id="@+id/famSmsStealer" />
-                    <include
-                        layout="@layout/inc_family_bar"
-                        android:id="@+id/famPhish" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ▌ 5 namuna -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.12"
-                        android:text="5 NAMUNA"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/hist_subtitle_threat_comparison"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <!-- Реальная дата самой свежей угрозы — ставится в bindSampleRows(). -->
-                    <TextView
-                        android:id="@+id/tvSamplesSub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/hist_found_threats"
-                        android:textColor="@color/kq_ink_2"
-                        android:textSize="12sp" />
-
-                    <include
-                        layout="@layout/inc_sample_row"
-                        android:id="@+id/sample1" />
-                    <include
-                        layout="@layout/inc_sample_row"
-                        android:id="@+id/sample2" />
-                    <include
-                        layout="@layout/inc_sample_row"
-                        android:id="@+id/sample3" />
-                    <include
-                        layout="@layout/inc_sample_row"
-                        android:id="@+id/sample4" />
-                    <include
-                        layout="@layout/inc_sample_row"
-                        android:id="@+id/sample5" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ▌ Tarmoq xaritasi -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.12"
-                        android:text="TARMOQ XARITASI"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/hist_subtitle_c2_addresses"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <!-- Map area -->
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="140dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/kq_map_bg">
-
-                        <View
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/kq_marker_primary" />
-
-                        <!-- Маркеры угроз — видимость переключается в bindC2Rows()
-                             по реальному числу угроз (0 → скрыты). -->
-                        <View
-                            android:id="@+id/c2MapDot1"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="start|top"
-                            android:layout_marginStart="40dp"
-                            android:layout_marginTop="36dp"
-                            android:background="@drawable/kq_marker_danger"
-                            android:visibility="gone" />
-
-                        <View
-                            android:id="@+id/c2MapDot2"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="end|bottom"
-                            android:layout_marginEnd="50dp"
-                            android:layout_marginBottom="22dp"
-                            android:background="@drawable/kq_marker_danger"
-                            android:visibility="gone" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="20dp"
-                            android:fontFamily="monospace"
-                            android:letterSpacing="0.12"
-                            android:text="@string/hist_label_city_navoiy"
-                            android:textAllCaps="true"
-                            android:textColor="@color/kq_primary"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-                    </FrameLayout>
-
-                    <!-- C2 rows — заполняются ScanHistoryActivity.bindC2Rows() из ScanHistory.
-                         Bo'sh holatda: row1 показывает "Tahdid yo'q", row2 спрятан. -->
-                    <LinearLayout
-                        android:id="@+id/c2Row1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:id="@+id/c2Marker1"
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
-                            android:background="@drawable/kq_marker_danger" />
+                        android:layout_marginTop="14dp"
+                        android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:layout_marginBottom="7dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/c2Domain1"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:text="—"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq4_stats_cat_dropper"
                                 android:textColor="@color/kq_ink"
-                                android:textSize="11.5sp"
-                                android:textStyle="bold" />
+                                android:textSize="13.5sp" />
 
                             <TextView
-                                android:id="@+id/c2Label1"
+                                android:id="@+id/tvCatCount2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:text="—"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="0 / 0"
                                 android:textColor="@color/kq_ink_3"
-                                android:textSize="10sp" />
+                                android:textSize="12sp" />
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/c2Chip1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/kq_sev_crit"
-                            android:fontFamily="monospace"
-                            android:letterSpacing="0.08"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="BLOK"
-                            android:textColor="@color/kq_danger_ink"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="9dp"
+                            android:background="@drawable/kq4_stats_track">
+
+                            <View
+                                android:id="@+id/vCatFill2"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/kq4_stats_fill_danger" />
+                        </FrameLayout>
                     </LinearLayout>
 
+                    <!-- Soxta SMS (warn) -->
                     <LinearLayout
-                        android:id="@+id/c2Row2"
+                        android:id="@+id/rowCat3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
-                            android:background="@drawable/kq_marker_danger" />
+                        android:layout_marginTop="14dp"
+                        android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:layout_marginBottom="7dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/c2Domain2"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:text="—"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq4_stats_cat_sms"
                                 android:textColor="@color/kq_ink"
-                                android:textSize="11.5sp"
-                                android:textStyle="bold" />
+                                android:textSize="13.5sp" />
 
                             <TextView
-                                android:id="@+id/c2Label2"
+                                android:id="@+id/tvCatCount3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:text="—"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="0 / 0"
                                 android:textColor="@color/kq_ink_3"
-                                android:textSize="10sp" />
+                                android:textSize="12sp" />
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/c2Chip2"
-                            android:layout_width="wrap_content"
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="9dp"
+                            android:background="@drawable/kq4_stats_track">
+
+                            <View
+                                android:id="@+id/vCatFill3"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/kq4_stats_fill_warn" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <!-- Boshqa (warn) — 0 bo'lsa kodda yashiriladi -->
+                    <LinearLayout
+                        android:id="@+id/rowCat4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/kq_sev_crit"
-                            android:fontFamily="monospace"
-                            android:letterSpacing="0.08"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="BLOK"
-                            android:textColor="@color/kq_danger_ink"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
+                            android:layout_marginBottom="7dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq4_stats_cat_other"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:id="@+id/tvCatCount4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:text="0 / 0"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="9dp"
+                            android:background="@drawable/kq4_stats_track">
+
+                            <View
+                                android:id="@+id/vCatFill4"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/kq4_stats_fill_warn" />
+                        </FrameLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ▌ Bottom CTA (ghost refresh) — reuses the existing btnClear ID
-                 so ScanHistoryActivity's "clear stats" path keeps working. -->
+            <!-- ▌ Topilgan fayllar -->
+            <TextView
+                style="@style/KQ4.SecTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/kq4_stats_found_files"
+                android:textSize="16sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Bo'sh holat -->
+                    <TextView
+                        android:id="@+id/tvThreatsEmpty"
+                        style="@style/KQ4.RowSub"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="28dp"
+                        android:text="@string/hist_no_threats_yet" />
+
+                    <!-- .li qatorlar — item_scan_history.xml dan inflate qilinadi -->
+                    <LinearLayout
+                        android:id="@+id/listThreats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ▌ btn ghost block -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnClear"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:id="@+id/btnRefresh"
+                style="@style/KQ4.Button.Ghost"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="18dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="@string/hist_button_refresh_report"
-                android:textAllCaps="false"
-                android:textColor="@color/kq_ink"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:cornerRadius="999dp"
-                app:icon="@drawable/ic_radar_scan"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp"
-                app:iconSize="18dp"
-                app:iconTint="@color/kq_ink"
-                app:strokeColor="@color/kq_hairline_strong"
-                app:strokeWidth="1dp" />
+                app:icon="@drawable/ic4_refresh"
+                app:iconSize="19dp" />
 
-            <!-- Compat — recycler kept gone so the binding doesn't NPE. The new
-                 design renders all rows inline; per-user-history is on hold
-                 until SampleAdapter is updated to honor the new row template. -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
-            <LinearLayout
-                android:id="@+id/empty"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
+            <!-- Tarixni tozalash — eski funksiya saqlanadi (dialog + clear) -->
+            <TextView
+                android:id="@+id/btnClear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="@font/onest_semibold"
+                android:padding="12dp"
+                android:text="@string/history_clear"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="13sp" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Единая нижняя нав — KqBottomNav.attach(this, STATS) в onCreate. -->
+    <!-- Pastki navigatsiya — KqBottomNav.attach(this, STATS) onCreate'da -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -885,4 +769,4 @@
 
         <include layout="@layout/view_kq_bottom_nav" />
     </FrameLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

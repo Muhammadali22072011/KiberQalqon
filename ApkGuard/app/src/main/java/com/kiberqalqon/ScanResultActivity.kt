@@ -4,8 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -15,12 +18,15 @@ import kotlinx.coroutines.*
 import java.io.File
 
 /**
- * Virus / xavf topilganda ko'rsatiladigan natija oynasi.
+ * Virus / xavf topilganda ko'rsatiladigan natija oynasi — v4 «Milliy Kiber Himoya»
+ * dizayni (screens3.jsx → ScanResult).
  *
- * Avval bu oyna BITTA virusning (Ajina.Banker) qotirilgan demo ma'lumotini
- * ko'rsatardi — qaysi APK skan qilinganidan qat'i nazar. Endi u haqiqiy
- * ilovaning ruxsatlarini APK'dan o'qib, odam tiliga tushunarli qilib chiqaradi:
- * "Xavfli ruxsatlar" (daraja yorlig'i bilan) + "Boshqa ruxsatlar".
+ * Tuzilishi: rangli banner (verdict + manba + fayl nomi) → "Bu fayl nima?" →
+ * "Bu fayl nima qiladi?" (haqiqiy xavfli topilmalar inson tilida) →
+ * "Qayerdan keldi?" (manba ogohlantirishi) → "So'ralgan ruxsatlar" havolasi
+ * (PermissionsDetailActivity) → harakatlar (o'chirish / do'stlarni ogohlantirish).
+ *
+ * Ruxsatlar haqiqiy APK'dan o'qiladi (readApkMeta) — dizayndagi THREATS faqat namuna.
  */
 class ScanResultActivity : AppCompatActivity() {
 
@@ -29,6 +35,8 @@ class ScanResultActivity : AppCompatActivity() {
     private var installedPackage: String? = null
     private var scanResult: ScanResult? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    private enum class SourceKind { TELEGRAM, WHATSAPP, WEB, FOLDER, INSTALLED }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -60,13 +68,14 @@ class ScanResultActivity : AppCompatActivity() {
         )
         scanResult = res
 
-        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.btnBack.setOnClickListener { finish() }
 
         // Ovozli verdict — Config.isSoundEnabled'da o'chirilgan bo'lsa, jim turadi.
         VoiceVerdict.init(this)
         VoiceVerdict.speak(this, res.verdict)
 
         bindVerdict(res)
+        bindSource(res)
         bindActions(res)
         loadPermissions(res)
 
@@ -74,8 +83,8 @@ class ScanResultActivity : AppCompatActivity() {
     }
 
     /**
-     * Verdict ochilish mikro-animatsiyasi ("Yorug' minimal"): ikonka yengil "pop"
-     * (overshoot) bilan paydo bo'ladi; XAVF bo'lsa qo'shimcha ogohlantiruvchi tebranish.
+     * Verdict ochilish mikro-animatsiyasi: fayl-ikonka yengil "pop" (overshoot) bilan
+     * paydo bo'ladi; XAVF bo'lsa qo'shimcha ogohlantiruvchi tebranish.
      */
     private fun revealVerdict(verdict: ScanResult.Verdict) {
         AnimationHelper.bounce(binding.imgVerdictIcon, duration = 600)
@@ -93,25 +102,33 @@ class ScanResultActivity : AppCompatActivity() {
         VoiceVerdict.shutdown()
     }
 
-    /** Banner — rang, ikonka, verdict yorlig'i va qisqacha xulosa. */
+    /** Banner — fon rangi, verdict-tag, fayl nomi/hajmi, "o'zini ... ko'rsatadi". */
     private fun bindVerdict(res: ScanResult) {
+        val dotColor: Int
         when (res.verdict) {
             ScanResult.Verdict.SAFE -> {
-                binding.cardResult.setBackgroundResource(R.drawable.kq_banner_safe)
-                binding.tvVerdict.text = getString(R.string.kq_sev_safe)
-                binding.imgVerdictIcon.setImageResource(R.drawable.ic_shield_check)
+                binding.cardResult.setBackgroundResource(R.drawable.kq4_scanres_banner_safe)
+                binding.tvVerdict.text = getString(R.string.kq4_safe)
+                dotColor = Color.parseColor("#AEF3C9")
+                binding.imgWhatIcon.imageTintList =
+                    ColorStateList.valueOf(getColor(R.color.kq_safe))
             }
             ScanResult.Verdict.SUSPICIOUS -> {
-                binding.cardResult.setBackgroundResource(R.drawable.kq_banner_warn)
-                binding.tvVerdict.text = getString(R.string.kq_sev_high)
-                binding.imgVerdictIcon.setImageResource(R.drawable.ic_alert_triangle)
+                binding.cardResult.setBackgroundResource(R.drawable.kq4_scanres_banner_warn)
+                binding.tvVerdict.text = getString(R.string.kq4_suspicious)
+                dotColor = Color.parseColor("#FFE3B3")
+                binding.imgWhatIcon.imageTintList =
+                    ColorStateList.valueOf(getColor(R.color.kq_warn))
             }
             ScanResult.Verdict.DANGER -> {
-                binding.cardResult.setBackgroundResource(R.drawable.kq_banner_danger)
-                binding.tvVerdict.text = getString(R.string.kq_sev_crit)
-                binding.imgVerdictIcon.setImageResource(R.drawable.ic_virus)
+                binding.cardResult.setBackgroundResource(R.drawable.kq4_scanresultpermissions_banner_danger)
+                binding.tvVerdict.text = getString(R.string.kq4_danger)
+                dotColor = Color.parseColor("#FFB3AA")
+                binding.imgWhatIcon.imageTintList =
+                    ColorStateList.valueOf(getColor(R.color.kq_danger))
             }
         }
+        binding.dotVerdict.backgroundTintList = ColorStateList.valueOf(dotColor)
 
         binding.tvReason.text =
             if (res.reason.isNotBlank()) res.reason else defaultReason(res.verdict)
@@ -120,6 +137,15 @@ class ScanResultActivity : AppCompatActivity() {
         // tvFileName boshlang'ich qiymat — keyin APK'dan ilova nomi o'qilsa, ustiga yoziladi.
         binding.tvFileName.text = file.name.ifBlank { getString(R.string.scan_result_title) }
         binding.tvFileSize.text = if (file.exists()) "${file.length() / 1024} KB" else ""
+
+        // "O'zini «...» qilib ko'rsatadi" — fayl nomi niqobidan; SAFE'da ko'rsatilmaydi.
+        val like = if (res.verdict == ScanResult.Verdict.SAFE) null else looksLikeLabel(file.name)
+        if (like != null) {
+            binding.tvLooksLike.visibility = View.VISIBLE
+            binding.tvLooksLike.text = getString(R.string.kq4_scanres_lookslike, like)
+        } else {
+            binding.tvLooksLike.visibility = View.GONE
+        }
     }
 
     private fun defaultReason(v: ScanResult.Verdict): String = when (v) {
@@ -127,6 +153,80 @@ class ScanResultActivity : AppCompatActivity() {
         ScanResult.Verdict.SUSPICIOUS -> getString(R.string.suspicious_reason)
         ScanResult.Verdict.SAFE -> getString(R.string.safe_reason)
     }
+
+    // ─────────────────────── Manba ("Qayerdan keldi?") ───────────────────────
+
+    private fun detectSource(): SourceKind {
+        if (!installedPackage.isNullOrBlank() || apkPath.contains("/data/app")) {
+            return SourceKind.INSTALLED
+        }
+        val p = apkPath.lowercase()
+        return when {
+            p.contains("telegram") -> SourceKind.TELEGRAM
+            p.contains("whatsapp") -> SourceKind.WHATSAPP
+            p.contains("download") -> SourceKind.WEB
+            else -> SourceKind.FOLDER
+        }
+    }
+
+    /** Fayl nomi kimga o'xshatib yasalgan — sodda niqob-aniqlash (faqat ko'rsatish uchun). */
+    private fun looksLikeLabel(name: String): String? {
+        val n = name.lowercase()
+        return when {
+            n.contains("taklifnoma") -> getString(R.string.kq4_scanres_like_invite)
+            Regex("rasm|foto|photo|img|surat").containsMatchIn(n) ->
+                getString(R.string.kq4_scanres_like_photos)
+            Regex("video|vid[_.]|\\.mp4|\\.mov").containsMatchIn(n) ->
+                getString(R.string.kq4_scanres_like_video)
+            Regex("\\.pdf|\\.docx?|hujjat|shartnoma").containsMatchIn(n) ->
+                getString(R.string.kq4_scanres_like_doc)
+            else -> null
+        }
+    }
+
+    private fun bindSource(res: ScanResult) {
+        val kind = detectSource()
+
+        binding.tvSource.text = getString(
+            when (kind) {
+                SourceKind.TELEGRAM -> R.string.kq4_scanres_src_telegram
+                SourceKind.WHATSAPP -> R.string.kq4_scanres_src_whatsapp
+                SourceKind.WEB -> R.string.kq4_scanres_src_web
+                SourceKind.FOLDER -> R.string.kq4_scanres_src_folder
+                SourceKind.INSTALLED -> R.string.kq4_scanres_src_installed
+            }
+        )
+
+        binding.imgSourceIcon.setImageResource(
+            when (kind) {
+                SourceKind.TELEGRAM, SourceKind.WHATSAPP -> R.drawable.ic4_message
+                SourceKind.WEB -> R.drawable.ic4_globe
+                SourceKind.INSTALLED -> R.drawable.ic4_phone
+                SourceKind.FOLDER -> R.drawable.ic4_folder
+            }
+        )
+
+        if (res.verdict == ScanResult.Verdict.SAFE) {
+            // SAFE — yumshoq neytral karta, ogohlantirish o'rniga maslahat.
+            binding.cardSource.setBackgroundResource(R.drawable.kq4_card_sunken)
+            val ink2 = ColorStateList.valueOf(getColor(R.color.kq_ink_2))
+            binding.imgSourceIcon.imageTintList = ink2
+            binding.tvSourceWarn.setTextColor(getColor(R.color.kq_ink_2))
+            binding.tvSourceWarn.text = getString(R.string.kq4_scanres_src_safe_note)
+        } else {
+            binding.tvSourceWarn.text = getString(
+                when (kind) {
+                    SourceKind.TELEGRAM -> R.string.kq4_scanres_warn_telegram
+                    SourceKind.WHATSAPP -> R.string.kq4_scanres_warn_whatsapp
+                    SourceKind.WEB -> R.string.kq4_scanres_warn_web
+                    SourceKind.FOLDER -> R.string.kq4_scanres_warn_folder
+                    SourceKind.INSTALLED -> R.string.kq4_scanres_warn_installed
+                }
+            )
+        }
+    }
+
+    // ─────────────────────── Harakatlar ───────────────────────
 
     private fun bindActions(res: ScanResult) {
         val pkg = installedPackage
@@ -145,15 +245,19 @@ class ScanResultActivity : AppCompatActivity() {
                     .show()
             }
             if (res.verdict == ScanResult.Verdict.SAFE) {
-                binding.btnDelete.alpha = 0.5f
-                binding.btnDelete.isEnabled = false
+                // SAFE fayl — o'chirish tugmasi o'rniga oddiy "Yopish".
+                binding.btnDelete.visibility = View.GONE
             }
         }
 
         // Do'stlarga ogohlantirish — faqat xavf bo'lganda mantiqiy.
         binding.btnRecheck.setOnClickListener { shareWarning(res) }
+        binding.btnShareTop.setOnClickListener { shareWarning(res) }
         if (res.verdict == ScanResult.Verdict.SAFE) {
             binding.btnRecheck.visibility = View.GONE
+            binding.btnShareTop.visibility = View.GONE
+            binding.btnClose.visibility = View.VISIBLE
+            binding.btnClose.setOnClickListener { finish() }
         }
     }
 
@@ -183,7 +287,6 @@ class ScanResultActivity : AppCompatActivity() {
 
     // ─────────────────────── Ruxsat tahlili ───────────────────────
 
-    private data class PermRow(val raw: String, val label: String, val severity: PermissionCatalog.Severity)
     private data class ApkMeta(val perms: List<String>, val pkg: String?, val label: String?)
 
     private fun loadPermissions(res: ScanResult) {
@@ -199,26 +302,8 @@ class ScanResultActivity : AppCompatActivity() {
             }
 
             val all = meta.perms.distinct()
-            binding.tvPermCount.text = getString(R.string.perm_count, all.size)
-
-            val dangerous = all
-                .filter { PermissionCatalog.severity(it) != PermissionCatalog.Severity.NORMAL }
-                .map { PermRow(it, PermissionCatalog.label(this@ScanResultActivity, it), PermissionCatalog.severity(it)) }
-                .sortedWith(
-                    compareBy(
-                        { if (it.severity == PermissionCatalog.Severity.CRITICAL) 0 else 1 },
-                        { it.label }
-                    )
-                )
-
-            val others = all
-                .filter { PermissionCatalog.severity(it) == PermissionCatalog.Severity.NORMAL }
-                .map { PermissionCatalog.shortName(it) }
-                .distinct()
-                .sorted()
-
-            renderDangerous(dangerous)
-            renderOthers(others)
+            renderDoes(all, res)
+            renderPermsCard(all, res)
         }
     }
 
@@ -267,46 +352,131 @@ class ScanResultActivity : AppCompatActivity() {
         return ApkMeta(res.dangerousPermissions, pkg, null)
     }
 
-    private fun renderDangerous(rows: List<PermRow>) {
-        val container = binding.permDangerContainer
-        container.removeAllViews()
-        if (rows.isEmpty()) {
-            binding.tvPermNone.visibility = View.VISIBLE
-            return
+    // ─────────────────────── "Bu fayl nima qiladi?" ───────────────────────
+
+    private data class DoesRow(val iconRes: Int, val textRes: Int)
+
+    /** Haqiqiy topilmalardan (siglar + ruxsatlar) inson tilidagi ro'yxat. */
+    private fun buildDoesRows(allPerms: List<String>, res: ScanResult): List<DoesRow> {
+        val s = allPerms.map { it.substringAfterLast('.').uppercase() }.toSet()
+        val rows = mutableListOf<DoesRow>()
+        if (res.malwareSignatures.isNotEmpty()) {
+            rows += DoesRow(R.drawable.ic4_alert, R.string.kq4_scanres_does_sig)
         }
-        binding.tvPermNone.visibility = View.GONE
-        val inflater = layoutInflater
-        for ((index, row) in rows.withIndex()) {
-            val view = inflater.inflate(R.layout.inc_kq_perm_row, container, false)
-            view.findViewById<TextView>(R.id.tvPermLabel).text = row.label
-            view.findViewById<TextView>(R.id.tvPermRaw).text = PermissionCatalog.shortName(row.raw)
-            val dot = view.findViewById<View>(R.id.vPermDot)
-            val sev = view.findViewById<TextView>(R.id.tvPermSev)
-            if (row.severity == PermissionCatalog.Severity.CRITICAL) {
-                dot.backgroundTintList = ColorStateList.valueOf(getColor(R.color.kq_danger))
-                sev.setBackgroundResource(R.drawable.kq_sev_crit)
-                sev.setTextColor(getColor(R.color.kq_danger_ink))
-                sev.text = getString(R.string.perm_sev_critical)
-            } else {
-                dot.backgroundTintList = ColorStateList.valueOf(getColor(R.color.kq_warn))
-                sev.setBackgroundResource(R.drawable.kq_sev_high)
-                sev.setTextColor(getColor(R.color.kq_warn_ink))
-                sev.text = getString(R.string.perm_sev_warning)
+        if ("SYSTEM_ALERT_WINDOW" in s) {
+            rows += DoesRow(R.drawable.ic4_card, R.string.kq4_scanres_does_overlay)
+        }
+        if ("READ_SMS" in s || "RECEIVE_SMS" in s) {
+            rows += DoesRow(R.drawable.ic4_message, R.string.kq4_scanres_does_sms_read)
+        }
+        if ("SEND_SMS" in s) {
+            rows += DoesRow(R.drawable.ic4_message, R.string.kq4_scanres_does_sms_send)
+        }
+        if ("BIND_ACCESSIBILITY_SERVICE" in s) {
+            rows += DoesRow(R.drawable.ic4_eye, R.string.kq4_scanres_does_screen)
+        }
+        if ("REQUEST_INSTALL_PACKAGES" in s) {
+            rows += DoesRow(R.drawable.ic4_download, R.string.kq4_scanres_does_download)
+        }
+        if ("BIND_DEVICE_ADMIN" in s) {
+            rows += DoesRow(R.drawable.ic4_lock, R.string.kq4_scanres_does_admin)
+        }
+        if ("READ_CONTACTS" in s) {
+            rows += DoesRow(R.drawable.ic4_user, R.string.kq4_scanres_does_contacts)
+        }
+        if ("READ_CALL_LOG" in s || "CALL_PHONE" in s ||
+            "PROCESS_OUTGOING_CALLS" in s || "ANSWER_PHONE_CALLS" in s
+        ) {
+            rows += DoesRow(R.drawable.ic4_phone, R.string.kq4_scanres_does_calls)
+        }
+        if ("ACCESS_FINE_LOCATION" in s || "ACCESS_BACKGROUND_LOCATION" in s) {
+            rows += DoesRow(R.drawable.ic4_globe, R.string.kq4_scanres_does_location)
+        }
+        if ("RECORD_AUDIO" in s) {
+            rows += DoesRow(R.drawable.ic4_eye, R.string.kq4_scanres_does_mic)
+        }
+        if ("CAMERA" in s) {
+            rows += DoesRow(R.drawable.ic4_eye, R.string.kq4_scanres_does_camera)
+        }
+        if ("MANAGE_EXTERNAL_STORAGE" in s) {
+            rows += DoesRow(R.drawable.ic4_folder, R.string.kq4_scanres_does_files)
+        }
+        return rows.take(6)
+    }
+
+    private fun renderDoes(allPerms: List<String>, res: ScanResult) {
+        val container = binding.doesContainer
+        container.removeAllViews()
+
+        val rows: List<DoesRow>
+        val avBg: Int
+        val tint: Int
+        if (res.verdict == ScanResult.Verdict.SAFE) {
+            rows = listOf(DoesRow(R.drawable.ic4_check_circle, R.string.kq4_scanres_does_safe))
+            avBg = R.drawable.kq4_av_safe
+            tint = getColor(R.color.kq_safe)
+        } else {
+            rows = buildDoesRows(allPerms, res).ifEmpty {
+                listOf(DoesRow(R.drawable.ic4_alert, R.string.kq4_scanres_does_generic))
             }
+            if (res.verdict == ScanResult.Verdict.SUSPICIOUS) {
+                avBg = R.drawable.kq4_av_warn
+                tint = getColor(R.color.kq_warn)
+            } else {
+                avBg = R.drawable.kq4_av_danger
+                tint = getColor(R.color.kq_danger)
+            }
+        }
+
+        val inflater = layoutInflater
+        rows.forEachIndexed { index, row ->
+            val view = inflater.inflate(R.layout.inc_kq_perm_row, container, false)
+            view.findViewById<FrameLayout>(R.id.permAv).setBackgroundResource(avBg)
+            val icon = view.findViewById<ImageView>(R.id.permIcon)
+            icon.setImageResource(row.iconRes)
+            icon.imageTintList = ColorStateList.valueOf(tint)
+            view.findViewById<TextView>(R.id.tvPermLabel).text = getString(row.textRes)
+            view.findViewById<TextView>(R.id.tvPermSub).visibility = View.GONE
+            view.findViewById<View>(R.id.permDivider).visibility =
+                if (index == rows.lastIndex) View.GONE else View.VISIBLE
             container.addView(view)
-            // Xavfli ruxsatlar ketma-ket, yengil suriladi (stagger reveal).
+            // Satrlar ketma-ket, yengil suriladi (stagger reveal).
             AnimationHelper.fadeIn(view, duration = 320, delay = index * 60L)
         }
     }
 
-    private fun renderOthers(others: List<String>) {
-        if (others.isEmpty()) {
-            binding.cardOthers.visibility = View.GONE
+    /** "So'ralgan ruxsatlar" havola-kartasi → PermissionsDetailActivity. */
+    private fun renderPermsCard(allPerms: List<String>, res: ScanResult) {
+        if (allPerms.isEmpty()) {
+            binding.cardPerms.visibility = View.GONE
             return
         }
-        binding.cardOthers.visibility = View.VISIBLE
-        binding.tvPermOthersTitle.text = getString(R.string.perm_section_others, others.size)
-        binding.tvPermOthers.text = others.joinToString("\n") { "·  $it" }
+        binding.cardPerms.visibility = View.VISIBLE
+
+        val critCount = allPerms.count {
+            PermissionsDetailActivity.classify(it) == PermissionsDetailActivity.Sev.CRIT
+        }
+        binding.tvPermCount.text = if (critCount > 0) {
+            getString(R.string.kq4_scanres_perm_count_danger, allPerms.size, critCount)
+        } else {
+            getString(R.string.perm_count, allPerms.size)
+        }
+
+        if (res.verdict == ScanResult.Verdict.SAFE) {
+            binding.avPerms.setBackgroundResource(R.drawable.kq4_av_neutral)
+            binding.imgPermsIcon.imageTintList =
+                ColorStateList.valueOf(getColor(R.color.kq_ink_2))
+        }
+
+        binding.cardPerms.setOnClickListener {
+            startActivity(
+                PermissionsDetailActivity.intent(
+                    this,
+                    binding.tvFileName.text?.toString() ?: File(apkPath).name,
+                    ArrayList(allPerms)
+                )
+            )
+        }
     }
 
     private fun deleteApk() {
@@ -315,7 +485,10 @@ class ScanResultActivity : AppCompatActivity() {
             if (deleted) {
                 Toast.makeText(this, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
-                finish()
+                // Dizayn: ekranda qolamiz — "Fayl o'chirildi. Telefoningiz xavfsiz." kartasi.
+                binding.btnDelete.visibility = View.GONE
+                binding.cardDeleted.visibility = View.VISIBLE
+                AnimationHelper.fadeIn(binding.cardDeleted, duration = 320)
             } else {
                 Toast.makeText(this, getString(R.string.not_deleted), Toast.LENGTH_SHORT).show()
             }

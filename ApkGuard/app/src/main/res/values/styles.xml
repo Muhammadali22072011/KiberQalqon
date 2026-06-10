@@ -1,25 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   KiberQalqon — dizayn-tizimi style'lari.
-  Manba: design_handoff_kiberqalqon_redesign/ANDROID_RESOURCES.md
-
-  SHRIFT: hozircha tizim shriftlari ishlatilgan (xavfsiz — `res/font/` va Google
-  fonts-provider certs hali yo'q, shuning uchun build buzilmaydi). Handoff'dagi
-  brend shriftlarga o'tish uchun:
-    1) res/font/ ga downloadable-font XML'lar qo'shing (space_grotesk_bold, ...);
-    2) values/font_certs.xml ga com_google_android_gms_fonts_certs massivini qo'shing;
-    3) quyidagi android:fontFamily qiymatlarini @font/... ga almashtiring.
-  Tizim shrifti -> brend shrifti mosligi:
-    sans-serif (bold)   -> @font/space_grotesk_bold   (sarlavhalar)
-    sans-serif          -> @font/manrope_regular      (matn)
-    monospace           -> @font/jetbrains_mono       (eyebrow / caption)
+  v4 manba: design_v4_extracted/page.html (token CSS) + screens*.jsx.
+  Shriftlar: Onest (@font/kq4_display) va Spline Sans Mono (@font/kq4_mono) —
+  res/font/ ichida statik og'irliklar bilan bundle qilingan.
 -->
 <resources>
 
-    <!-- ============================ Typography ============================ -->
+    <!-- ====================== v4 Typography (KQ4.*) ====================== -->
+    <!-- design .h-title: 700 28px, ls -.025em -->
+    <style name="KQ4.HTitle" parent="">
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/kq_ink</item>
+        <item name="android:letterSpacing">-0.025</item>
+        <item name="android:lineSpacingMultiplier">1.08</item>
+    </style>
+
+    <!-- design .h-sub: 400 15px/1.5 -->
+    <style name="KQ4.HSub" parent="">
+        <item name="android:fontFamily">@font/onest_regular</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/kq_ink_2</item>
+        <item name="android:lineSpacingMultiplier">1.5</item>
+    </style>
+
+    <!-- design .sec-title: 700 19px, ls -.02em -->
+    <style name="KQ4.SecTitle" parent="">
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:textColor">@color/kq_ink</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <!-- design .eyebrow: 700 12px, uppercase, primary -->
+    <style name="KQ4.Eyebrow" parent="">
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/kq_primary</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- design .li .ttl: 600 15.5px -->
+    <style name="KQ4.RowTitle" parent="">
+        <item name="android:fontFamily">@font/onest_semibold</item>
+        <item name="android:textSize">15.5sp</item>
+        <item name="android:textColor">@color/kq_ink</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <!-- design .li .sub: 400 13px -->
+    <style name="KQ4.RowSub" parent="">
+        <item name="android:fontFamily">@font/onest_regular</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/kq_ink_3</item>
+        <item name="android:lineSpacingMultiplier">1.35</item>
+    </style>
+
+    <!-- design .tag matni: 700 12.5px -->
+    <style name="KQ4.Tag" parent="">
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <!-- design .mono yorliqlar (versiya, MILLIY KIBER HIMOYA, …) -->
+    <style name="KQ4.Mono" parent="">
+        <item name="android:fontFamily">@font/kq4_mono</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/kq_ink_3</item>
+        <item name="android:letterSpacing">0.12</item>
+    </style>
+
+    <!-- ========================= v4 Buttons ========================= -->
+    <!-- design .btn: pill, h 54, 700 16px. MaterialButton bilan. -->
+    <style name="KQ4.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:minHeight">54dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="cornerRadius">27dp</item>
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">9dp</item>
+    </style>
+
+    <style name="KQ4.Button.Primary" parent="KQ4.Button">
+        <item name="backgroundTint">@color/kq_primary</item>
+        <item name="android:textColor">@color/kq_on_primary</item>
+        <item name="iconTint">@color/kq_on_primary</item>
+    </style>
+
+    <style name="KQ4.Button.Safe" parent="KQ4.Button">
+        <item name="backgroundTint">@color/kq_safe</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="iconTint">@color/white</item>
+    </style>
+
+    <style name="KQ4.Button.Danger" parent="KQ4.Button">
+        <item name="backgroundTint">@color/kq_danger</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="iconTint">@color/white</item>
+    </style>
+
+    <style name="KQ4.Button.Ghost" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">54dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="cornerRadius">27dp</item>
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">9dp</item>
+        <item name="strokeWidth">1.5dp</item>
+        <item name="strokeColor">@color/kq_hairline_strong</item>
+        <item name="android:textColor">@color/kq_ink</item>
+        <item name="iconTint">@color/kq_ink</item>
+        <item name="rippleColor">@color/kq_surface_2</item>
+    </style>
+
+    <style name="KQ4.Button.Soft" parent="KQ4.Button">
+        <item name="backgroundTint">@color/kq_surface_2</item>
+        <item name="android:textColor">@color/kq_ink</item>
+        <item name="iconTint">@color/kq_ink</item>
+    </style>
+
+    <!-- =========================== v4 Card =========================== -->
+    <!-- design .card: surface, r-lg 24, hairline stroke, yumshoq soya -->
+    <style name="KQ4.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">24dp</item>
+        <item name="cardBackgroundColor">@color/kq_bg_elev</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/kq_hairline</item>
+        <item name="cardElevation">2dp</item>
+    </style>
+
+    <style name="KQ4.Card.Flat" parent="KQ4.Card">
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <!-- ================================================================
+         LEGACY KQ.* style'lar — eski ekranlar uchun saqlangan, v4
+         shrift/ranglarga retint qilingan (eski ekranlar ham mos ko'rinsin).
+         ================================================================ -->
     <style name="KQ.Display.Large" parent="">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/onest_extrabold</item>
         <item name="android:textSize">38sp</item>
         <item name="android:textColor">@color/kq_ink</item>
         <item name="android:letterSpacing">-0.02</item>
@@ -27,8 +157,7 @@
     </style>
 
     <style name="KQ.H1" parent="">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/onest_bold</item>
         <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/kq_ink</item>
         <item name="android:letterSpacing">-0.018</item>
@@ -36,47 +165,38 @@
     </style>
 
     <style name="KQ.H2" parent="">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/onest_bold</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/kq_ink</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
     <style name="KQ.Eyebrow" parent="">
-        <item name="android:fontFamily">monospace</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">@font/onest_bold</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/kq_primary</item>
-        <item name="android:letterSpacing">0.12</item>
+        <item name="android:letterSpacing">0.02</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="KQ.Body" parent="">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/onest_regular</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/kq_ink_2</item>
         <item name="android:lineSpacingMultiplier">1.5</item>
     </style>
 
     <style name="KQ.Mono.Caption" parent="">
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/kq4_mono</item>
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/kq_ink_3</item>
         <item name="android:letterSpacing">0.04</item>
     </style>
 
-    <!-- ============================== Buttons ============================== -->
-    <style name="KQ.Button" parent="Widget.MaterialComponents.Button">
+    <style name="KQ.Button" parent="KQ4.Button">
         <item name="android:minHeight">52dp</item>
         <item name="cornerRadius">26dp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:letterSpacing">0.01</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="iconGravity">textStart</item>
-        <item name="iconPadding">8dp</item>
     </style>
 
     <style name="KQ.Button.Primary" parent="KQ.Button">
@@ -96,13 +216,8 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <!-- =============================== Card =============================== -->
-    <style name="KQ.Card" parent="Widget.MaterialComponents.CardView">
+    <style name="KQ.Card" parent="KQ4.Card">
         <item name="cardCornerRadius">22dp</item>
-        <item name="cardBackgroundColor">@color/kq_bg_elev</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="strokeColor">@color/kq_hairline</item>
-        <item name="cardElevation">2dp</item>
     </style>
 
 </resources>

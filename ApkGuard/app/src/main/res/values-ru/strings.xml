@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KIBER QALQON</string>
-    <string name="widget_description">KiberQalqon показывает статус защиты и последнюю проверку. Один тап — быстрый скан.</string>
+    <string name="app_name">ANOR QALQON</string>
+    <string name="widget_description">Anor Qalqon показывает статус защиты и последнюю проверку. Один тап — быстрый скан.</string>
 
     <!-- Permissions dialogs -->
     <string name="perm_storage_title">Доступ к файлам</string>
-    <string name="perm_storage_msg">Чтобы KiberQalqon мог проверять все ваши файлы, нужно разрешение.\n\nНажмите OK, чтобы предоставить разрешение.</string>
+    <string name="perm_storage_msg">Чтобы Anor Qalqon мог проверять все ваши файлы, нужно разрешение.\n\nНажмите OK, чтобы предоставить разрешение.</string>
     <string name="perm_overlay_title">Поверх других окон</string>
     <string name="perm_overlay_msg">Нужно разрешение, чтобы сразу предупредить при обнаружении вируса.\n\nНажмите OK.</string>
     <string name="perm_required_title">Требуется разрешение</string>
-    <string name="perm_required_msg">Без доступа к файлам KiberQalqon не сможет защитить ваше устройство.</string>
+    <string name="perm_required_msg">Без доступа к файлам Anor Qalqon не сможет защитить ваше устройство.</string>
     <string name="btn_retry">Повторить</string>
     <string name="btn_exit">Выход</string>
 
@@ -35,8 +35,8 @@
     <!-- Share scan result -->
     <string name="share_result">ПРЕДУПРЕЖДЕНИЕ ДЛЯ ДРУЗЕЙ</string>
     <string name="share_subject">⚠️ Внимание: обнаружен вредоносный APK</string>
-    <string name="share_text_danger">⚠️ ВНИМАНИЕ! KiberQalqon обнаружил вредоносный файл:\n\n📦 %1$s\n\n❌ Этот файл содержит вирус — НЕ устанавливайте его!\n\n🛡️ Проверьте через KiberQalqon: t.me/kiberqalqon_alerts_bot</string>
-    <string name="share_text_suspicious">⚠️ KiberQalqon обнаружил подозрительный файл:\n\n📦 %1$s\n\nПеред установкой тщательно проверьте.\n\nt.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_danger">⚠️ ВНИМАНИЕ! Anor Qalqon обнаружил вредоносный файл:\n\n📦 %1$s\n\n❌ Этот файл содержит вирус — НЕ устанавливайте его!\n\n🛡️ Проверьте через Anor Qalqon: t.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_suspicious">⚠️ Anor Qalqon обнаружил подозрительный файл:\n\n📦 %1$s\n\nПеред установкой тщательно проверьте.\n\nt.me/kiberqalqon_alerts_bot</string>
     <string name="share_via">Отправить</string>
 
     <!-- AutoScanActivity install/back -->
@@ -49,7 +49,7 @@
     <string name="autoscan_scanning">Проверяем…</string>
     <string name="autoscan_delete_cancelled">Удаление отменено. Файл всё ещё на устройстве.</string>
     <string name="autoscan_no_path">Путь к файлу не указан.</string>
-    <string name="autoscan_self_refused">Это сам KiberQalqon — удалять защитника запрещено.</string>
+    <string name="autoscan_self_refused">Это сам Anor Qalqon — удалять защитника запрещено.</string>
 
     <!-- FileDeleter results -->
     <string name="filedel_no_permission">Не удалось удалить файл — нет разрешения. Удалите вручную.</string>
@@ -88,6 +88,9 @@
 
     <!-- Dashboard - redesign §3.3 -->
     <string name="status_protected">Защищено</string>
+    <string name="status_partial">Защита неполная</string>
+    <string name="status_at_risk">Защита недостаточна</string>
+    <string name="kq_hero_sub">Всего проверено: %1$d · заблокировано: %2$d</string>
     <string name="last_scan_subtitle">Последняя проверка 12 минут назад</string>
     <string name="kq_scan_now">Проверить сейчас</string>
     <string name="kq_threats_today">Найдено сегодня</string>
@@ -127,14 +130,14 @@
     <string name="ctx_from_telegram">Этот APK пришёл через Telegram. Видео никогда не отправляются как APK — будьте осторожны.</string>
     <string name="ctx_from_whatsapp">Этот APK пришёл через WhatsApp. Настоящие приложения устанавливаются только из Play Store.</string>
     <string name="ctx_from_download">Этот APK был загружен. Перед установкой убедитесь в надёжности источника.</string>
-    <string name="ctx_from_share">Вы отправили этот APK в KiberQalqon на проверку.</string>
+    <string name="ctx_from_share">Вы отправили этот APK в Anor Qalqon на проверку.</string>
 
     <!-- Onboarding -->
     <string name="onb_eyebrow_1">01 · НАЧАЛО</string>
     <string name="onb_eyebrow_2">02 · ОБНАРУЖЕНИЕ</string>
     <string name="onb_eyebrow_3">03 · КОНТРОЛЬ</string>
     <string name="onboarding_title_1">Автоматическая защита — 24/7</string>
-    <string name="onboarding_desc_1">KiberQalqon каждые 15 минут проверяет Telegram, Загрузки и другие папки. Если найден вредоносный APK — он блокируется сразу.</string>
+    <string name="onboarding_desc_1">Anor Qalqon каждые 15 минут проверяет Telegram, Загрузки и другие папки. Если найден вредоносный APK — он блокируется сразу.</string>
     <string name="onboarding_title_2">Распознаём 5 семейств угроз</string>
     <string name="onboarding_desc_2">Новые поколения банковских троянов Центральной Азии — Ajina.Banker, RoundRift и другие — не доберутся до вашего телефона.</string>
     <string name="onboarding_title_3">Простой язык, мощная защита</string>
@@ -355,7 +358,7 @@
     <string name="scanning_text">Проверка…</string>
 
     <!-- Dashboard new redesign extras -->
-    <string name="dash_brand">KiberQalqon</string>
+    <string name="dash_brand">Anor Qalqon</string>
     <string name="dash_protection_on">ЗАЩИТА · АКТИВНА</string>
     <string name="dash_your_phone">ВАШ ТЕЛЕФОН</string>
     <string name="dash_recent_threats">ПОСЛЕДНИЕ УГРОЗЫ</string>
@@ -369,7 +372,7 @@
     <string name="settings_eyebrow">НАСТРОЙКИ</string>
     <string name="settings_header_title">Управление</string>
     <string name="settings_header_subtitle">Настройте уровень защиты</string>
-    <string name="settings_pro_title">KiberQalqon Pro</string>
+    <string name="settings_pro_title">Anor Qalqon Pro</string>
     <string name="settings_pro_version">ВЕРСИЯ 7.8 · НАВОИ</string>
     <string name="settings_pro_active">✓ АКТИВНО</string>
     <string name="settings_section_protection">ЗАЩИТА</string>
@@ -381,32 +384,32 @@
     <string name="settings_accent_label">Основной цвет бренда</string>
     <string name="settings_section_language">ЯЗЫК</string>
     <string name="settings_section_about">О ПРИЛОЖЕНИИ</string>
-    <string name="settings_footer">KIBERQALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
+    <string name="settings_footer">ANOR QALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
 
-    <string name="about_intro">KIBER QALQON — современное приложение киберзащиты, разработанное для Узбекистана. Защищает ваш телефон от вредоносных APK файлов, вирусов и фишинговых атак.</string>
+    <string name="about_intro">ANOR QALQON — современное приложение киберзащиты, разработанное для Узбекистана. Защищает ваш телефон от вредоносных APK файлов, вирусов и фишинговых атак.</string>
     <string name="about_section_features">ВОЗМОЖНОСТИ</string>
     <string name="about_features_body">🛡 Автоматическая фоновая защита\n  • Проверка каждые 15 минут\n  • Удаление опасных файлов\n\n🔍 Ручная проверка\n  • Список всех APK файлов\n  • Подробные результаты анализа\n\n📡 Загрузка на сервер\n  • Отправка опасных файлов на анализ\n\n🚫 Защита от фишинговых уведомлений\n  • Блокировка подозрительных\n  • Безопасность банка и платежей\n\n🌐 Два языка\n  • O\'zbekcha (основной)\n  • Русский</string>
     <string name="about_tech_body">• Kotlin — современный язык программирования\n• Material Design 3 — красивый дизайн\n• Android Jetpack — надёжные компоненты\n• WorkManager — фоновая работа\n• ProGuard — защита кода\n• OkHttp — безопасная сеть</string>
     <string name="about_section_tech">ТЕХНОЛОГИИ</string>
     <string name="about_section_author">АВТОР</string>
-    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/KiberQalqon\nEmail: support@KiberQalqon.uz</string>
+    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/Anor Qalqon\nEmail: support@Anor Qalqon.uz</string>
     <string name="about_section_license">ЛИЦЕНЗИЯ</string>
-    <string name="about_license_body">Проект с открытым исходным кодом для образовательных целей.\n\n© 2026 KIBER QALQON. Все права защищены.</string>
+    <string name="about_license_body">Проект с открытым исходным кодом для образовательных целей.\n\n© 2026 ANOR QALQON. Все права защищены.</string>
     <string name="about_section_project">О ПРОЕКТЕ</string>
     <string name="about_version">ВЕРСИЯ 7.6</string>
 
     <string name="terms_breadcrumb">Условия использования</string>
     <string name="terms_intro_title">Прежде чем начать использовать</string>
-    <string name="terms_last_update">ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ · 2026 · 05 · 29</string>
+    <string name="terms_last_update">ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ · 2026 · 06 · 10</string>
     <string name="terms_section_terms">УСЛОВИЯ ИСПОЛЬЗОВАНИЯ</string>
     <string name="terms_section_privacy">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</string>
-    <string name="terms_terms_body">Используя приложение KIBER QALQON, вы соглашаетесь с настоящими условиями. Если вы не согласны — не используйте приложение.</string>
-    <string name="terms_privacy_body">KIBER QALQON серьёзно относится к вашей конфиденциальности. Эта политика объясняет, какие данные собираются и как используются.</string>
+    <string name="terms_terms_body">Используя приложение ANOR QALQON, вы соглашаетесь с настоящими условиями. Если вы не согласны — не используйте приложение.</string>
+    <string name="terms_privacy_body">ANOR QALQON серьёзно относится к вашей конфиденциальности. Эта политика объясняет, какие данные собираются и как используются.</string>
     <string name="terms_changes_body">Мы оставляем за собой право изменять эти условия в любое время. Изменения будут объявлены в приложении.</string>
 
     <string name="consent_terms_chk">Я прочитал условия использования *</string>
     <string name="consent_privacy_chk">Я согласен с политикой конфиденциальности *</string>
-    <string name="consent_community_chk">Делиться данными для общественной безопасности *</string>
+    <string name="consent_community_chk">Делиться данными для общественной безопасности (необязательно)</string>
     <string name="consent_reject">Отказаться</string>
     <string name="consent_accept">Принимаю</string>
 
@@ -434,7 +437,7 @@
     <string name="auto_scan_label_detected">ОБНАРУЖЕНО</string>
     <string name="auto_scan_dangerous_perms">ОПАСНЫЕ РАЗРЕШЕНИЯ</string>
 
-    <string name="splash_logo_title">KIBER QALQON</string>
+    <string name="splash_logo_title">ANOR QALQON</string>
 
     <string name="apk_list_eyebrow">APK файлы</string>
 
@@ -548,7 +551,7 @@
 
     <!-- ═══ Localization pass 2026-05-28: AutoScanActivity hardcoded UI ═══ -->
     <string name="autoscan_unknown_file">Неизвестный файл</string>
-    <string name="autoscan_need_write_perm">Для удаления файла нужно разрешение \"Хранилище\".\n\nНастройки → Приложения → KiberQalqon → Разрешения → Хранилище</string>
+    <string name="autoscan_need_write_perm">Для удаления файла нужно разрешение \"Хранилище\".\n\nНастройки → Приложения → Anor Qalqon → Разрешения → Хранилище</string>
     <string name="autoscan_open_settings_btn">ОТКРЫТЬ НАСТРОЙКИ</string>
     <string name="autoscan_permission_granted_deleting">Разрешение получено — удаляем…</string>
     <string name="autoscan_cannot_show_result">Не удалось показать результат: %1$s</string>
@@ -575,7 +578,7 @@
     <string name="is_sub_no_threats">Опасных APK файлов не найдено.</string>
     <string name="is_sub_threats_found">Найдено %1$d вредоносных или подозрительных APK.</string>
     <string name="is_summary_no_threat">Угроз не обнаружено</string>
-    <string name="is_summary_no_threat_sub">Теперь KiberQalqon автоматически проверяет новые APK файлы в фоне.</string>
+    <string name="is_summary_no_threat_sub">Теперь Anor Qalqon автоматически проверяет новые APK файлы в фоне.</string>
     <string name="is_go_main">Перейти на главный экран</string>
     <string name="is_dangerous_found_count">Найдено %1$d опасных APK</string>
     <string name="is_recommend_delete">Рекомендуется удалить следующие файлы.</string>
@@ -606,9 +609,11 @@
     <string name="set_row_background_sub">WorkManager · каждые 15 минут</string>
     <string name="set_row_upload_title">Загрузка в облако</string>
     <string name="set_row_upload_sub">Отправлять опасные APK на сервер для анализа</string>
+    <string name="set_owner_mode_on">Режим владельца включён — скрытые разделы открыты</string>
+    <string name="set_owner_mode_off">Режим владельца выключен — скрытые разделы спрятаны</string>
     <string name="set_help_center">Центр помощи</string>
-    <string name="set_about_dialog_title">KiberQalqon</string>
-    <string name="set_about_dialog_message">KiberQalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nНациональная защита от банковских троянов Центральной Азии. Распознаёт Ajina.Banker, RoundRift и другие вредоносные семейства.</string>
+    <string name="set_about_dialog_title">Anor Qalqon</string>
+    <string name="set_about_dialog_message">Anor Qalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nНациональная защита от банковских троянов Центральной Азии. Распознаёт Ajina.Banker, RoundRift и другие вредоносные семейства.</string>
     <string name="set_help_dialog_message">Вопрос или проблема? Свяжитесь с нами:\n\n• Telegram: @kiberqalqon_uz\n• Email: support@kiberqalqon.uz\n• Web: https://kiberqalqon.uz</string>
     <string name="set_help_send_problem">Отправить проблему</string>
     <!-- Экран отправки проблемы -->
@@ -633,7 +638,7 @@
     <string name="set_community_label">Общественная безопасность (только hash + пакет)</string>
     <string name="set_revoke_consent">Отозвать согласие</string>
     <string name="set_revoke_confirm_title">Отозвать согласие?</string>
-    <string name="set_revoke_confirm_message">Это отключит телеметрию Telegram, и при следующем запуске KiberQalqon снова запросит у вас согласие.\n\nПродолжить?</string>
+    <string name="set_revoke_confirm_message">Это отключит телеметрию Telegram, и при следующем запуске Anor Qalqon снова запросит у вас согласие.\n\nПродолжить?</string>
     <string name="set_yes_revoke">Да, отозвать</string>
     <string name="set_consent_revoked">Согласие отозвано.</string>
     <string name="set_no">Нет</string>
@@ -642,21 +647,21 @@
     <string name="splash_subtitle">ЗАЩИТА ТЕЛЕФОНА · V %1$s</string>
     <string name="splash_version">ВЕРСИЯ %1$s</string>
     <string name="splash_oem_extra_setting_title">Доп. настройка %1$s</string>
-    <string name="splash_oem_guide_message">Ваш телефон автоматически завершает фоновые приложения. Чтобы KIBER QALQON работал 24/7, нужна одна разовая дополнительная настройка.</string>
+    <string name="splash_oem_guide_message">Ваш телефон автоматически завершает фоновые приложения. Чтобы ANOR QALQON работал 24/7, нужна одна разовая дополнительная настройка.</string>
     <string name="splash_open_setting">Открыть настройку</string>
     <string name="splash_later">Позже</string>
     <string name="splash_dont_show">Инструкция</string>
     <string name="splash_battery_title">Разрешение для постоянной защиты</string>
-    <string name="splash_battery_message">Xiaomi, Huawei, Samsung и другие завершают фоновые приложения ради \'экономии батареи\'. Разрешите KIBER QALQON работать 24/7.\n\nБез разрешения: скан будет запускаться раз в день, а не каждые 2-3 часа.</string>
+    <string name="splash_battery_message">Xiaomi, Huawei, Samsung и другие завершают фоновые приложения ради \'экономии батареи\'. Разрешите ANOR QALQON работать 24/7.\n\nБез разрешения: скан будет запускаться раз в день, а не каждые 2-3 часа.</string>
     <string name="splash_location_title">Разрешение на геолокацию</string>
     <string name="splash_location_message">Чтобы ваше устройство отображалось на карте защиты в точном месте, разрешите доступ к геолокации.\n\nБез разрешения: устройство будет показано на карте лишь в приблизительном городе.</string>
     <string name="splash_storage_title">Разрешение на доступ к файлам</string>
-    <string name="splash_storage_message">KIBER QALQON нужен доступ ко всем файлам, чтобы находить и проверять APK файлы.\n\nНажмите OK и предоставьте разрешение.</string>
+    <string name="splash_storage_message">ANOR QALQON нужен доступ ко всем файлам, чтобы находить и проверять APK файлы.\n\nНажмите OK и предоставьте разрешение.</string>
     <string name="splash_overlay_title">Разрешение показывать поверх других окон</string>
-    <string name="splash_overlay_message">KIBER QALQON должен показывать предупреждения поверх других приложений при обнаружении вирусов.\n\nНажмите OK и предоставьте разрешение.</string>
+    <string name="splash_overlay_message">ANOR QALQON должен показывать предупреждения поверх других приложений при обнаружении вирусов.\n\nНажмите OK и предоставьте разрешение.</string>
     <string name="splash_oem_overlay_title">%1$s: доп. настройка</string>
     <string name="splash_oem_overlay_message">Стандартного \'Display over other apps\' недостаточно. На вашем телефоне есть отдельные настройки.</string>
-    <string name="splash_storage_denied_message">Без доступа к файлам KIBER QALQON не сможет защитить ваше устройство.</string>
+    <string name="splash_storage_denied_message">Без доступа к файлам ANOR QALQON не сможет защитить ваше устройство.</string>
     <string name="splash_retry">Повторить</string>
     <string name="splash_subtitle2">Защита от вредоносных APK файлов</string>
     <string name="hist_found_threats">Обнаруженные угрозы</string>
@@ -672,18 +677,18 @@
     <string name="widget_scan_btn">Скан</string>
     <string name="notif_dangerous_apk_title">🛡️ Обнаружен опасный APK</string>
     <string name="notif_tap_to_check">%1$s — нажмите для проверки</string>
-    <string name="notif_new_apk_big">Обнаружен новый APK файл:\n%1$s\n\nНажмите на уведомление — KiberQalqon покажет полный результат проверки и кнопку удаления, если файл опасен.</string>
+    <string name="notif_new_apk_big">Обнаружен новый APK файл:\n%1$s\n\nНажмите на уведомление — Anor Qalqon покажет полный результат проверки и кнопку удаления, если файл опасен.</string>
     <string name="notif_installed_danger_title">🔴 Установлено опасное приложение: %1$s</string>
     <string name="notif_verdict_danger">Обнаружен опасный APK</string>
     <string name="notif_verdict_suspicious">Обнаружен подозрительный APK</string>
     <string name="notif_verdict_found">APK обнаружен</string>
     <string name="notif_kill_title">⚠️ Защита была отключена</string>
-    <string name="notif_kill_text">KIBER QALQON не работал %1$d ч</string>
-    <string name="notif_kill_big">Ваше устройство %1$s завершило процесс KIBER QALQON %2$d ч назад. Для постоянной защиты нужна доп. настройка.\n\nНажмите, чтобы открыть %3$s.</string>
+    <string name="notif_kill_text">ANOR QALQON не работал %1$d ч</string>
+    <string name="notif_kill_big">Ваше устройство %1$s завершило процесс ANOR QALQON %2$d ч назад. Для постоянной защиты нужна доп. настройка.\n\nНажмите, чтобы открыть %3$s.</string>
     <string name="notif_kill_center_miui">MIUI Security Center</string>
     <string name="notif_kill_center_default">настройки системы</string>
     <string name="notif_welcome_title">✓ Защита включена</string>
-    <string name="notif_welcome_text">KIBER QALQON теперь защищает ваш телефон 24/7</string>
+    <string name="notif_welcome_text">ANOR QALQON теперь защищает ваш телефон 24/7</string>
     <string name="notif_welcome_big">Все стандартные настройки включены автоматически:\n• Фоновое сканирование каждые 15 минут\n• Новые APK проверяются сразу\n• Звуковые и вибро-оповещения\n• Автообновление базы\n\nНичего не меняя, ваш телефон защищён.</string>
     <string name="notif_installed_suspicious_title">🟠 Подозрительное приложение: %1$s</string>
 </resources>

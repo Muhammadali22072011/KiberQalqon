@@ -51,7 +51,7 @@ class VpnFilterService : VpnService() {
     private fun startVpn() {
         try {
             val pfd = Builder()
-                .setSession("KiberQalqon C2 filter")
+                .setSession("Anor Qalqon C2 filter")
                 .addAddress(VIRT_ADDR, 32)
                 .addDnsServer(VIRT_DNS)
                 .addRoute(VIRT_DNS, 32)          // FAQAT virtual DNS serverga trafik ushlanadi

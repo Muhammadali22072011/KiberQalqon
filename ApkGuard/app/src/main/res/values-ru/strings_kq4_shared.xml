@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kq4_brand">Anor Qalqon</string>
+    <string name="kq4_milliy">НАЦИОНАЛЬНАЯ КИБЕРЗАЩИТА</string>
+    <string name="kq4_protection_on">Защита включена</string>
+    <string name="kq4_protection_off">Защита выключена</string>
+    <string name="kq4_notifications">Уведомления</string>
+    <string name="kq4_continue">Продолжить</string>
+    <string name="kq4_back">Назад</string>
+    <string name="kq4_all">Все</string>
+    <string name="kq4_safe">Безопасно</string>
+    <string name="kq4_danger">Опасно</string>
+    <string name="kq4_suspicious">Подозрительно</string>
+    <string name="kq4_live">Live</string>
+    <string name="kq4_on">Вкл</string>
+    <string name="kq4_enable">Включить</string>
+    <string name="kq4_deleted">Удалено</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Banner ichidagi fayl-ikonka kvadrati: oq 16% fon, oq 22% stroke, r18. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#29FFFFFF" />
+    <stroke android:width="1dp" android:color="#38FFFFFF" />
+    <corners android:radius="18dp" />
+</shape>

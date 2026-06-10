@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  O'rnatilgan ilova satri (dashboard ro'yxati).
-  44dp real ilova ikonkasi (tint'siz) + nom/paket + 10dp verdict-nuqta.
+  v4 dizayn .li satri — "Qurilma ilovalari" kartasi ichidagi o'rnatilgan ilova:
+  real ilova ikonkasi 48dp + nom (KQ4.RowTitle) + paket · manba (KQ4.RowSub)
+  + o'ngda verdict-tag (safe/warn/danger/soft "Tekshirilmagan").
+  Tag rang/matni DashboardNewActivity.bindAppRow() da qo'yiladi.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -11,63 +13,67 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="14dp"
-    android:paddingVertical="10dp">
+    android:paddingHorizontal="15dp"
+    android:paddingVertical="14dp">
 
     <ImageView
         android:id="@+id/ivAppIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:contentDescription="@null"
         android:src="@drawable/ic_shield" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="13dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvAppName"
+            style="@style/KQ4.RowTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="App nomi"
-            android:textColor="@color/kq_ink"
-            android:textSize="14.5sp"
-            android:textStyle="bold" />
+            android:text="@string/app_name" />
 
         <TextView
             android:id="@+id/tvAppPkg"
+            style="@style/KQ4.RowSub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:fontFamily="monospace"
-            android:singleLine="true"
-            android:text="com.example.app"
-            android:textColor="@color/kq_ink_3"
-            android:textSize="11sp" />
-
-        <TextView
-            android:id="@+id/tvAppSource"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="1dp"
-            android:text="Play Market"
-            android:textColor="@color/kq_safe_ink"
-            android:textSize="10sp"
-            android:textStyle="bold" />
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:text="@string/kq4_dash_not_scanned" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/vAppStatusDot"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/kq_safe_dot" />
+    <LinearLayout
+        android:id="@+id/tagApp"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/kq4_tag_soft"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <View
+            android:id="@+id/tagAppDot"
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:background="@drawable/kq4_dot"
+            android:backgroundTint="@color/kq_ink_2" />
+
+        <TextView
+            android:id="@+id/tvAppTag"
+            style="@style/KQ4.Tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:text="@string/kq4_dash_not_scanned"
+            android:textColor="@color/kq_ink_2" />
+    </LinearLayout>
 </LinearLayout>

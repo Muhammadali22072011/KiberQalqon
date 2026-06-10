@@ -51,7 +51,7 @@ class App : android.app.Application() {
         }
 
         // Запуск приложения — событие в Telegram-телеметрию.
-        TelemetryReporter.report(this, "APP_START", "KiberQalqon ishga tushdi")
+        TelemetryReporter.report(this, "APP_START", "Anor Qalqon ishga tushdi")
 
         // Esli s proshlogo start prosli >12 chasov — eto pohozhe na to chto OS
         // (ili polzovatel') prishibla process / vyklyuchila WorkManager. Pust' v

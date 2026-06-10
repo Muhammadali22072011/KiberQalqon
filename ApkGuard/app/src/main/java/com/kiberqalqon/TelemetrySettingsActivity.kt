@@ -1,8 +1,8 @@
 package com.kiberqalqon
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -10,6 +10,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.CompoundButtonCompat
 
 /**
  * Экран настройки Telegram-телеметрии:
@@ -34,91 +38,80 @@ class TelemetrySettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeHelper.applyAccent(this)
 
         val prefs = getSharedPreferences("kiberqalqon_telemetry", Context.MODE_PRIVATE)
 
+        // v4 «Milliy Kiber Himoya» reskin — fon kq_bg, eyebrow + h-title sarlavha,
+        // kq4_input maydonlar, pill tugmalar. Logika o'zgarmagan.
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(24), dp(20), dp(24))
+            setBackgroundColor(c(R.color.kq_bg))
+            setPadding(dp(18), dp(14), dp(18), dp(18))
         }
 
         root.addView(TextView(this).apply {
-            text = "🤖 Telegram telemetriya"
-            textSize = 22f
-            gravity = Gravity.CENTER
-            setPadding(0, 0, 0, dp(8))
+            text = getString(R.string.kq4_misc_tg_eyebrow)
+            isAllCaps = true
+            textSize = 12f
+            typeface = font(R.font.onest_bold)
+            letterSpacing = 0.02f
+            setTextColor(c(R.color.kq_primary))
+        })
+        root.addView(TextView(this).apply {
+            text = getString(R.string.kq4_misc_tg_title)
+            textSize = 24f
+            typeface = font(R.font.onest_bold)
+            letterSpacing = -0.02f
+            setTextColor(c(R.color.kq_ink))
+            setPadding(0, dp(6), 0, dp(8))
         })
 
         root.addView(TextView(this).apply {
-            text = "Barcha hodisalar (skaner, o'rnatish, xato, crash) sizning Telegram " +
-                   "guruhingizga yuboriladi."
-            textSize = 13f
+            text = getString(R.string.kq4_misc_tg_intro)
+            textSize = 14f
+            typeface = font(R.font.onest_regular)
+            setTextColor(c(R.color.kq_ink_2))
+            setLineSpacing(0f, 1.4f)
             setPadding(0, 0, 0, dp(16))
         })
 
         // --- BOT TOKEN ---
-        root.addView(TextView(this).apply {
-            text = "Bot tokeni (@BotFather dan):"
-            textSize = 14f
-            setPadding(0, dp(8), 0, dp(4))
-        })
-        etToken = EditText(this).apply {
-            hint = "7234567890:AAGxx..."
+        root.addView(label(getString(R.string.kq4_misc_tg_label_token)))
+        etToken = input(getString(R.string.kq4_misc_tg_hint_token_ex)).apply {
             setText(prefs.getString("tg_bot_token", "") ?: "")
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or
-                        android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         }
         root.addView(etToken)
 
         // --- CHAT ID ---
-        root.addView(TextView(this).apply {
-            text = "Guruh Chat ID (minus bilan, masalan -1001234567890):"
-            textSize = 14f
-            setPadding(0, dp(12), 0, dp(4))
-        })
-        etChatId = EditText(this).apply {
-            hint = "-1001234567890"
+        root.addView(label(getString(R.string.kq4_misc_tg_label_chat)))
+        etChatId = input(getString(R.string.kq4_misc_tg_hint_chat_ex)).apply {
             setText(prefs.getString("tg_chat_id", "") ?: "")
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or
-                        android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         }
         root.addView(etChatId)
 
         // --- ENABLED ---
-        cbEnabled = CheckBox(this).apply {
-            text = "Telemetriyani yoqish (xabarlar yuborish)"
+        cbEnabled = check(getString(R.string.kq4_misc_tg_check_enable)).apply {
             isChecked = prefs.getBoolean("tg_enabled", false)
-            setPadding(0, dp(16), 0, dp(4))
+            setPadding(paddingLeft, dp(16), paddingRight, dp(4))
         }
         root.addView(cbEnabled)
 
         // --- LISTEN COMMANDS ---
-        cbListen = CheckBox(this).apply {
-            text = "🎧 Telegram'dan komandalar qabul qilish"
+        cbListen = check(getString(R.string.kq4_misc_tg_check_listen)).apply {
             isChecked = prefs.getBoolean("tg_listen_commands", false)
-            setPadding(0, dp(4), 0, dp(4))
         }
         root.addView(cbListen)
 
-        root.addView(TextView(this).apply {
-            text = "    (guruhda /start yozing — boshqaruv paneli chiqadi)"
-            textSize = 11f
-            setPadding(0, 0, 0, dp(4))
-        })
+        root.addView(hint(getString(R.string.kq4_misc_tg_hint_listen)))
 
         // --- SEND APK FILE ---
-        cbSendApk = CheckBox(this).apply {
-            text = "📤 Skanerdan keyin APK faylni guruhga yuborish"
+        cbSendApk = check(getString(R.string.kq4_misc_tg_check_send_apk)).apply {
             isChecked = prefs.getBoolean("tg_send_apk", false)
-            setPadding(0, dp(4), 0, dp(4))
         }
         root.addView(cbSendApk)
 
-        root.addView(TextView(this).apply {
-            text = "    (faqat xavfli/shubhali APK'lar yuboriladi, 50MB gacha)"
-            textSize = 11f
-            setPadding(0, 0, 0, dp(8))
-        })
+        root.addView(hint(getString(R.string.kq4_misc_tg_hint_send_apk)))
 
         // --- БУФЕР ---
         val spacer = TextView(this)
@@ -127,37 +120,17 @@ class TelemetrySettingsActivity : AppCompatActivity() {
         ))
 
         // --- BUTTONS ---
-        val btnSave = Button(this).apply {
-            text = "💾 Saqlash"
-            setOnClickListener { save() }
-        }
-        root.addView(btnSave)
+        root.addView(v4Btn(getString(R.string.kq4_misc_tg_btn_save), primary = true) { save() })
+        root.addView(v4Btn(getString(R.string.kq4_misc_tg_btn_test)) { sendTest() })
+        root.addView(v4Btn(getString(R.string.kq4_misc_tg_btn_panel)) { sendPanel() })
+        root.addView(v4Btn(getString(R.string.kq4_misc_tg_btn_autodetect)) { autoDetectChatId() })
+        root.addView(v4Btn(getString(R.string.kq4_misc_tg_btn_guide)) { showGuide() })
 
-        val btnTest = Button(this).apply {
-            text = "🧪 Test xabar"
-            setOnClickListener { sendTest() }
-        }
-        root.addView(btnTest)
-
-        val btnPanel = Button(this).apply {
-            text = "🎛 Boshqaruv panelini yuborish"
-            setOnClickListener { sendPanel() }
-        }
-        root.addView(btnPanel)
-
-        val btnAutoChat = Button(this).apply {
-            text = "🤖 Chat ID'ni avto-aniqlash"
-            setOnClickListener { autoDetectChatId() }
-        }
-        root.addView(btnAutoChat)
-
-        val btnGuide = Button(this).apply {
-            text = "❓ Qanday sozlash?"
-            setOnClickListener { showGuide() }
-        }
-        root.addView(btnGuide)
-
-        setContentView(root)
+        setContentView(android.widget.ScrollView(this).apply {
+            isFillViewport = true
+            setBackgroundColor(c(R.color.kq_bg))
+            addView(root)
+        })
     }
 
     private fun save() {
@@ -184,24 +157,24 @@ class TelemetrySettingsActivity : AppCompatActivity() {
         } else {
             TelegramCommandPoller.stop(this)
         }
-        Toast.makeText(this, "Saqlandi", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_saved), Toast.LENGTH_SHORT).show()
     }
 
     private fun sendPanel() {
         save()
         if (!TelemetryReporter.isConfigured(this)) {
-            Toast.makeText(this, "Avval token va chat_id kiriting", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_need_config), Toast.LENGTH_LONG).show()
             return
         }
         Thread {
             try {
                 CommandRouter.sendPanel(applicationContext)
                 runOnUiThread {
-                    Toast.makeText(this, "Panel guruhga yuborildi", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_panel_sent), Toast.LENGTH_LONG).show()
                 }
             } catch (e: Throwable) {
                 runOnUiThread {
-                    Toast.makeText(this, "Xato: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.toast_error_generic, e.message), Toast.LENGTH_LONG).show()
                 }
             }
         }.start()
@@ -214,10 +187,10 @@ class TelemetrySettingsActivity : AppCompatActivity() {
     private fun autoDetectChatId() {
         val token = etToken.text.toString().trim()
         if (token.isEmpty()) {
-            Toast.makeText(this, "Avval bot tokenni kiriting", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_need_token), Toast.LENGTH_LONG).show()
             return
         }
-        Toast.makeText(this, "Qidirilmoqda... guruhga /start yozing", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_searching), Toast.LENGTH_LONG).show()
 
         Thread {
             try {
@@ -231,7 +204,7 @@ class TelemetrySettingsActivity : AppCompatActivity() {
                 val json = org.json.JSONObject(raw)
                 if (!json.optBoolean("ok", false)) {
                     runOnUiThread {
-                        Toast.makeText(this, "Bot tokeni xato yoki bloklangan", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_bad_token), Toast.LENGTH_LONG).show()
                     }
                     return@Thread
                 }
@@ -258,18 +231,22 @@ class TelemetrySettingsActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (foundChat != null) {
                         etChatId.setText(foundChat)
-                        Toast.makeText(this, "Topildi: $foundTitle ($foundChat)", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this,
+                            getString(R.string.kq4_misc_tg_toast_found, foundTitle ?: "", foundChat),
+                            Toast.LENGTH_LONG
+                        ).show()
                     } else {
                         Toast.makeText(
                             this,
-                            "Hech narsa topilmadi. Guruhga /start yozib qayta urinib ko'ring.",
+                            getString(R.string.kq4_misc_tg_toast_not_found),
                             Toast.LENGTH_LONG
                         ).show()
                     }
                 }
             } catch (e: Throwable) {
                 runOnUiThread {
-                    Toast.makeText(this, "Xato: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.toast_error_generic, e.message), Toast.LENGTH_LONG).show()
                 }
             }
         }.start()
@@ -278,32 +255,99 @@ class TelemetrySettingsActivity : AppCompatActivity() {
     private fun sendTest() {
         save()
         if (!TelemetryReporter.isConfigured(this)) {
-            Toast.makeText(this, "Avval token va chat_id kiriting", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_need_config), Toast.LENGTH_LONG).show()
             return
         }
         TelemetryReporter.report(this, "TEST",
-            "Test xabar — KiberQalqon telemetriya ishlayapti!\n" +
+            "Test xabar — Anor Qalqon telemetriya ishlayapti!\n" +
             "Vaqt: ${java.text.SimpleDateFormat("HH:mm:ss").format(java.util.Date())}"
         )
-        Toast.makeText(this, "Test yuborildi — guruhda tekshiring", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_test_sent), Toast.LENGTH_LONG).show()
     }
 
     private fun showGuide() {
         androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Telegram bot yaratish")
-            .setMessage(
-                "1. Telegram → @BotFather toping\n" +
-                "2. /newbot bosib bot yarating, tokenni oling\n\n" +
-                "3. Yangi guruh yarating va botingizni qo'shing\n\n" +
-                "4. Guruhga biror xabar yozing\n\n" +
-                "5. Brauzerda oching:\n" +
-                "   api.telegram.org/bot<TOKEN>/getUpdates\n" +
-                "   chat ni id ni oling (minus bilan)\n\n" +
-                "6. Bu yerga token va chat_id ni kiriting va Test bosing!"
-            )
-            .setPositiveButton("OK", null)
+            .setTitle(R.string.kq4_misc_tg_guide_title)
+            .setMessage(R.string.kq4_misc_tg_guide_body)
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    // ───────────────────── v4 dizayn yordamchilari ─────────────────────
+
+    private fun c(id: Int): Int = ContextCompat.getColor(this, id)
+
+    private fun font(id: Int): android.graphics.Typeface? =
+        try { ResourcesCompat.getFont(this, id) } catch (_: Exception) { null }
+
+    /** Maydon ustidagi yorliq — Onest SemiBold 13.5sp ink-2. */
+    private fun label(text: String): TextView = TextView(this).apply {
+        this.text = text
+        textSize = 13.5f
+        typeface = font(R.font.onest_semibold)
+        setTextColor(c(R.color.kq_ink_2))
+        setPadding(dp(4), dp(12), 0, dp(6))
+    }
+
+    /** Kichik izoh — ink-3 12sp. */
+    private fun hint(text: String): TextView = TextView(this).apply {
+        this.text = text
+        textSize = 12f
+        typeface = font(R.font.onest_regular)
+        setTextColor(c(R.color.kq_ink_3))
+        setPadding(dp(8), 0, 0, dp(4))
+    }
+
+    /** v4 input — kq4_input fon (r24, hairline-2), mono shrift token/chat_id uchun. */
+    private fun input(hintText: String): EditText = EditText(this).apply {
+        hint = hintText
+        textSize = 14f
+        typeface = font(R.font.ssmono_medium)
+        setTextColor(c(R.color.kq_ink))
+        setHintTextColor(c(R.color.kq_ink_3))
+        background = AppCompatResources.getDrawable(context, R.drawable.kq4_input)
+        backgroundTintList = null
+        minHeight = dp(52)
+        minimumHeight = dp(52)
+        setPadding(dp(16), dp(12), dp(16), dp(12))
+        inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                    android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+    }
+
+    /** v4 checkbox — kq_primary buttonTint, Onest Regular ink. */
+    private fun check(text: String): CheckBox = CheckBox(this).apply {
+        this.text = text
+        textSize = 14f
+        typeface = font(R.font.onest_regular)
+        setTextColor(c(R.color.kq_ink))
+        CompoundButtonCompat.setButtonTintList(
+            this, ColorStateList.valueOf(c(R.color.kq_primary))
+        )
+        setPadding(paddingLeft, dp(4), paddingRight, dp(4))
+    }
+
+    /** v4 pill tugma: kq4_btn_primary / kq4_btn_soft fon, Onest Bold, h≥46dp. */
+    private fun v4Btn(label: String, primary: Boolean = false, onClick: () -> Unit): Button =
+        Button(this).apply {
+            text = label
+            isAllCaps = false
+            textSize = 14.5f
+            typeface = font(R.font.onest_bold)
+            background = AppCompatResources.getDrawable(
+                context,
+                if (primary) R.drawable.kq4_btn_primary else R.drawable.kq4_btn_soft
+            )
+            backgroundTintList = null
+            stateListAnimator = null
+            minHeight = dp(46)
+            minimumHeight = dp(46)
+            setTextColor(c(if (primary) R.color.kq_on_primary else R.color.kq_ink))
+            setPadding(dp(16), dp(10), dp(16), dp(10))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(8) }
+            setOnClickListener { onClick() }
+        }
 }

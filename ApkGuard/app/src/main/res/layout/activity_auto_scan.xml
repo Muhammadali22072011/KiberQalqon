@@ -1,35 +1,694 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Auto-scan alert — §3.5 of the redesign.
+  AutoScan — v4 «Milliy Kiber Himoya» (design_v4_extracted/screens3.jsx → AutoScan).
 
-  Phase A (layoutScanning) is shown while scanning; Phase B (layoutResult)
-  swaps in once verdict is ready. Background is always the dark cyber gradient
-  even in light theme — this is a full-screen interrupt and should look like a
-  high-stakes terminal.
+  Faza A (layoutScanning): doim qorong'i fon (kq4_scan_bg), markazda 210dp
+  KqRingView + % + 4 qadam ro'yxati. Faza B (layoutResult): vertikal —
+  scroll kontent (halo + sarlavha + oq-shaffof karta + hisoblagich) va pastda
+  tugmalar qatori. Fon vердиктga qarab Kotlin'da almashtiriladi:
+  DANGER → kq4_autoscan_result_bg, SAFE → kq_bg, qolganlari → kq4_scan_bg.
 
-  Stable IDs preserved for AutoScanActivity.kt:
-    btnClose, tvApkName,
-    layoutScanning, scanPulse1, radarBeam, centerShield, tvScanStatus, progressBar, tvProgress,
-    layoutResult, cardResult, resultPulse, resultShield, tvResultTitle, tvResultMessage,
-    tvAutoDelete, btnDelete, btnCancel, tvDeleteHint.
+  AutoScanActivity.kt uchun barqaror id'lar:
+    btnClose, tvApkName, layoutScanning, scanPulse, ringScan, tvProgress,
+    stepRow1..4 / stepCircle1..4 / stepCheck1..4 / stepDot1..4,
+    layoutResult, cardResult, haloOuter, haloInner, resultBadge, resultShield,
+    tvResultTitle, tvResultMessage, dangerDetails, tvAsScanFileName,
+    tvAsScanSource, tvDoesLabel, viewDoesDivider,
+    doesRow1..4 / doesIcon1..4 / doesText1..4,
+    rowAutoDelete, tvAutoDelete, btnDelete, btnDetails, tvDeleteHint.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/kq_autoscan_bg">
+    android:background="@drawable/kq4_scan_bg">
 
-    <!-- Star-pattern overlay, always white-on-transparent. The drawable already
-         honors kq_primary tint, which on this dark bg reads as bright teal. -->
-    <ImageView
+    <!-- ╔════════ FAZA A — SKAN ════════╗ -->
+    <FrameLayout
+        android:id="@+id/layoutScanning"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.3"
-        android:contentDescription="@null"
-        android:scaleType="fitXY"
-        android:src="@drawable/kq_star_tile_white" />
+        android:visibility="visible">
 
-    <!-- Close X — top right -->
+        <!-- Dekorativ 8 qirrali yulduzlar (starBg, alpha .08, oq) -->
+        <ImageView
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="26dp"
+            android:layout_marginTop="84dp"
+            android:alpha="0.08"
+            android:contentDescription="@null"
+            android:src="@drawable/kq4_star"
+            app:tint="#FFFFFF" />
+
+        <ImageView
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="22dp"
+            android:layout_marginBottom="64dp"
+            android:alpha="0.08"
+            android:contentDescription="@null"
+            android:src="@drawable/kq4_star"
+            app:tint="#FFFFFF" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- 210dp halqa: pulse + ring + markazda % -->
+                <FrameLayout
+                    android:layout_width="210dp"
+                    android:layout_height="210dp">
+
+                    <View
+                        android:id="@+id/scanPulse"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/kq4_autoscan_pulse" />
+
+                    <com.kiberqalqon.KqRingView
+                        android:id="@+id/ringScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/onest_extrabold"
+                            android:letterSpacing="-0.02"
+                            android:text="0%"
+                            android:textColor="#FFFFFF"
+                            android:textSize="42sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/kq4_mono"
+                            android:letterSpacing="0.12"
+                            android:text="@string/kq4_as_checking"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tvScanStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:fontFamily="@font/onest_bold"
+                    android:gravity="center"
+                    android:letterSpacing="-0.01"
+                    android:text="@string/kq4_as_new_file"
+                    android:textColor="#FFFFFF"
+                    android:textSize="21sp" />
+
+                <TextView
+                    android:id="@+id/tvApkName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:ellipsize="middle"
+                    android:fontFamily="@font/kq4_mono"
+                    android:gravity="center"
+                    android:maxWidth="300dp"
+                    android:singleLine="true"
+                    android:text="example.apk"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12.5sp" />
+
+                <!-- 4 qadam ustuni (gap 11) -->
+                <LinearLayout
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="26dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/stepRow1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.4"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@+id/stepCircle1"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:background="@drawable/kq4_autoscan_step_todo">
+
+                            <ImageView
+                                android:id="@+id/stepCheck1"
+                                android:layout_width="13dp"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/kq4_autoscan_check"
+                                android:visibility="gone" />
+
+                            <View
+                                android:id="@+id/stepDot1"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/kq4_autoscan_step_dot" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/stepText1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/onest_medium"
+                            android:text="@string/kq4_as_step1"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/stepRow2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11dp"
+                        android:alpha="0.4"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@+id/stepCircle2"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:background="@drawable/kq4_autoscan_step_todo">
+
+                            <ImageView
+                                android:id="@+id/stepCheck2"
+                                android:layout_width="13dp"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/kq4_autoscan_check"
+                                android:visibility="gone" />
+
+                            <View
+                                android:id="@+id/stepDot2"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/kq4_autoscan_step_dot" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/stepText2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/onest_medium"
+                            android:text="@string/kq4_as_step2"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/stepRow3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11dp"
+                        android:alpha="0.4"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@+id/stepCircle3"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:background="@drawable/kq4_autoscan_step_todo">
+
+                            <ImageView
+                                android:id="@+id/stepCheck3"
+                                android:layout_width="13dp"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/kq4_autoscan_check"
+                                android:visibility="gone" />
+
+                            <View
+                                android:id="@+id/stepDot3"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/kq4_autoscan_step_dot" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/stepText3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/onest_medium"
+                            android:text="@string/kq4_as_step3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/stepRow4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11dp"
+                        android:alpha="0.4"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@+id/stepCircle4"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:background="@drawable/kq4_autoscan_step_todo">
+
+                            <ImageView
+                                android:id="@+id/stepCheck4"
+                                android:layout_width="13dp"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/kq4_autoscan_check"
+                                android:visibility="gone" />
+
+                            <View
+                                android:id="@+id/stepDot4"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/kq4_autoscan_step_dot" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/stepText4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/onest_medium"
+                            android:text="@string/kq4_as_step4"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- ╔════════ FAZA B — NATIJA ════════╗ -->
+    <LinearLayout
+        android:id="@+id/layoutResult"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/cardResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingStart="22dp"
+                android:paddingTop="44dp"
+                android:paddingEnd="22dp"
+                android:paddingBottom="16dp">
+
+                <!-- 96dp doira + 2 yarim shaffof ободок (halo) -->
+                <FrameLayout
+                    android:layout_width="140dp"
+                    android:layout_height="140dp">
+
+                    <View
+                        android:id="@+id/haloOuter"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/kq4_autoscan_halo_outer" />
+
+                    <View
+                        android:id="@+id/haloInner"
+                        android:layout_width="116dp"
+                        android:layout_height="116dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/kq4_autoscan_halo_inner" />
+
+                    <FrameLayout
+                        android:id="@+id/resultBadge"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/kq4_circle_danger">
+
+                        <ImageView
+                            android:id="@+id/resultShield"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_alert"
+                            app:tint="#FFFFFF" />
+                    </FrameLayout>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tvResultTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/onest_extrabold"
+                    android:gravity="center"
+                    android:letterSpacing="-0.02"
+                    android:text="@string/kq4_as_danger_title"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/tvResultMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/onest_regular"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.5"
+                    android:maxWidth="320dp"
+                    android:text="@string/kq4_as_short_generic"
+                    android:textColor="#D1FFFFFF"
+                    android:textSize="15sp" />
+
+                <!-- Oq-shaffof karta: fayl qatori + «bu fayl nima qiladi» -->
+                <LinearLayout
+                    android:id="@+id/dangerDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/kq4_card_white07"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/kq4_autoscan_filebox">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_file"
+                                app:tint="#FFFFFF" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="11dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvAsScanFileName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/onest_bold"
+                                android:singleLine="true"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14.5sp" />
+
+                            <TextView
+                                android:id="@+id/tvAsScanSource"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:fontFamily="@font/onest_regular"
+                                android:textColor="#99FFFFFF"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/viewDoesDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginBottom="14dp"
+                        android:background="#1AFFFFFF" />
+
+                    <TextView
+                        android:id="@+id/tvDoesLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/onest_semibold"
+                        android:letterSpacing="0.04"
+                        android:text="@string/kq4_as_does_label"
+                        android:textAllCaps="true"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp" />
+
+                    <LinearLayout
+                        android:id="@+id/doesRow1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/doesIcon1"
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_alert"
+                            app:tint="#FFB3AA" />
+
+                        <TextView
+                            android:id="@+id/doesText1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/onest_medium"
+                            android:lineSpacingMultiplier="1.3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/doesRow2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/doesIcon2"
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_alert"
+                            app:tint="#FFB3AA" />
+
+                        <TextView
+                            android:id="@+id/doesText2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/onest_medium"
+                            android:lineSpacingMultiplier="1.3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/doesRow3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/doesIcon3"
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_alert"
+                            app:tint="#FFB3AA" />
+
+                        <TextView
+                            android:id="@+id/doesText3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/onest_medium"
+                            android:lineSpacingMultiplier="1.3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/doesRow4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/doesIcon4"
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_alert"
+                            app:tint="#FFB3AA" />
+
+                        <TextView
+                            android:id="@+id/doesText4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/onest_medium"
+                            android:lineSpacingMultiplier="1.3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13.5sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Soat + avto-o'chirish hisoblagichi -->
+                <LinearLayout
+                    android:id="@+id/rowAutoDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic4_clock"
+                        app:tint="#99FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/tvAutoDelete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/kq4_mono"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="12.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Pastki tugmalar: danger lg + «Batafsil» pilyula -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="22dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="22dp"
+            android:paddingBottom="26dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDelete"
+                    style="@style/KQ4.Button.Danger"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="58dp"
+                    android:text="@string/kq_delete_now"
+                    android:textSize="17sp"
+                    app:icon="@drawable/ic4_trash"
+                    app:iconSize="20dp" />
+
+                <TextView
+                    android:id="@+id/btnDetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="58dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/kq4_autoscan_btn_ghost"
+                    android:fontFamily="@font/onest_bold"
+                    android:gravity="center"
+                    android:letterSpacing="-0.01"
+                    android:minWidth="96dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/kq_details"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Do'stlarni ogohlantirish (ulashish) havolasi -->
+            <TextView
+                android:id="@+id/tvDeleteHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/onest_medium"
+                android:gravity="center"
+                android:padding="4dp"
+                android:textColor="#99FFFFFF"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Yopish (X) — har doim ko'rinadi va ishlaydi -->
     <ImageButton
         android:id="@+id/btnClose"
         android:layout_width="44dp"
@@ -37,478 +696,10 @@
         android:layout_gravity="top|end"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@drawable/kq4_autoscan_iconbtn"
         android:contentDescription="@string/btn_close"
-        android:padding="10dp"
+        android:padding="11dp"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_close_x"
-        app:tint="#80FFFFFF" />
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="64dp"
-            android:paddingBottom="24dp">
-
-            <!-- ╔════════ PHASE A — SCANNING ════════╗ -->
-            <LinearLayout
-                android:id="@+id/layoutScanning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-                <!-- 220dp pulse-ring container with progress-style ring + glass disc -->
-                <FrameLayout
-                    android:layout_width="220dp"
-                    android:layout_height="220dp">
-
-                    <ImageView
-                        android:id="@+id/scanPulse1"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="0.4"
-                        android:background="@drawable/bg_scan_pulse_safe"
-                        android:contentDescription="@null" />
-
-                    <ImageView
-                        android:id="@+id/radarBeam"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_radar_scan"
-                        app:tint="#5EEAD4" />
-
-                    <FrameLayout
-                        android:layout_width="130dp"
-                        android:layout_height="130dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/kq_shield_halo">
-
-                        <TextView
-                            android:id="@+id/tvProgress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="0%"
-                            android:textColor="#FFFFFF"
-                            android:textSize="38sp"
-                            android:textStyle="bold" />
-
-                        <ImageView
-                            android:id="@+id/centerShield"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_gravity="center"
-                            android:alpha="0.25"
-                            android:contentDescription="@null"
-                            android:src="@drawable/kq_shield_mark_white" />
-                    </FrameLayout>
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvScanStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
-                    android:letterSpacing="-0.01"
-                    android:text="@string/kq_new_apk_scanning"
-                    android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvApkName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:ellipsize="middle"
-                    android:fontFamily="monospace"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:text="example.apk"
-                    android:textColor="#A8D5D9"
-                    android:textSize="13sp" />
-
-                <!-- Hidden progress bar so existing animator binding stays alive. -->
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="14dp"
-                    android:max="100"
-                    android:progress="0"
-                    android:progressBackgroundTint="#1AFFFFFF"
-                    android:progressTint="#5EEAD4" />
-
-                <!-- Terminal log card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
-                    android:background="@drawable/kq_terminal_card"
-                    android:orientation="vertical"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:text="# Telegram → Downloads/"
-                        android:textColor="#6A7A83"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="monospace"
-                        android:text="[+] FileObserver: CLOSE_WRITE"
-                        android:textColor="#82E0A6"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="monospace"
-                        android:text="[+] ZIP-evasion check… GP-flag=0x01"
-                        android:textColor="#82E0A6"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="monospace"
-                        android:text="[+] Manifest unpack… OK"
-                        android:textColor="#82E0A6"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="monospace"
-                        android:text="[+] DEX scan… ajina pattern"
-                        android:textColor="#F0BF6C"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="monospace"
-                        android:text="[!] SMS_READ + ACCESSIBILITY /* danger */"
-                        android:textColor="#F0BF6C"
-                        android:textSize="11.5sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- ╔════════ PHASE B — RESULT (XAVFLI) ════════╗ -->
-            <LinearLayout
-                android:id="@+id/layoutResult"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <FrameLayout
-                    android:id="@+id/cardResult"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <FrameLayout
-                            android:id="@+id/resultBadge"
-                            android:layout_width="96dp"
-                            android:layout_height="96dp"
-                            android:background="@drawable/kq_danger_badge">
-
-                            <ImageView
-                                android:id="@+id/resultPulse"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:alpha="0"
-                                android:contentDescription="@null" />
-
-                            <ImageView
-                                android:id="@+id/resultShield"
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:layout_gravity="center"
-                                android:contentDescription="@null"
-                                android:src="@drawable/ic_alert_triangle"
-                                app:tint="#FFFFFF" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:id="@+id/tvResultTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:letterSpacing="-0.02"
-                            android:text="@string/auto_scan_dangerous_title"
-                            android:textColor="#FFFFFF"
-                            android:textSize="30sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvResultMessage"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:gravity="center"
-                            android:lineSpacingMultiplier="1.4"
-                            android:text="@string/auto_scan_dangerous_body"
-                            android:textColor="#E0BFC2"
-                            android:textSize="14sp" />
-
-                        <!-- Danger-only details: info card + perm chips. Прячется при SAFE/SUSPICIOUS. -->
-                        <LinearLayout
-                            android:id="@+id/dangerDetails"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                        <!-- Info card (translucent white) -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="18dp"
-                            android:background="@drawable/kq_info_card_alpha"
-                            android:orientation="vertical"
-                            android:padding="14dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="monospace"
-                                        android:letterSpacing="0.16"
-                                        android:text="@string/auto_scan_label_file"
-                                        android:textAllCaps="true"
-                                        android:textColor="#FF9AA6"
-                                        android:textSize="10sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:id="@+id/tvAsScanFileName"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:text=""
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="14sp"
-                                        android:textStyle="bold" />
-                                </LinearLayout>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/kq_perm_chip"
-                                    android:fontFamily="monospace"
-                                    android:letterSpacing="0.08"
-                                    android:paddingHorizontal="10dp"
-                                    android:paddingVertical="4dp"
-                                    android:text="@string/kq_sev_crit"
-                                    android:textColor="#FFD4D9"
-                                    android:textSize="10sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginBottom="10dp"
-                                android:background="#14FFFFFF" />
-
-                            <TextView
-                                android:id="@+id/tvAsScanMeta"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:lineSpacingMultiplier="1.45"
-                                android:text=""
-                                android:textColor="#C5CFD2"
-                                android:textSize="11.5sp" />
-                        </LinearLayout>
-
-                        <!-- Perm chips -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:letterSpacing="0.12"
-                                android:text="@string/auto_scan_dangerous_perms"
-                                android:textAllCaps="true"
-                                android:textColor="#FF9AA6"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <!-- 2 rows × 2 chips so we don't need a flexbox dep -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="6dp"
-                                    android:background="@drawable/kq_perm_chip"
-                                    android:fontFamily="monospace"
-                                    android:paddingHorizontal="10dp"
-                                    android:paddingVertical="4dp"
-                                    android:text="SMS_READ"
-                                    android:textColor="#FFD4D9"
-                                    android:textSize="10.5sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/kq_perm_chip"
-                                    android:fontFamily="monospace"
-                                    android:paddingHorizontal="10dp"
-                                    android:paddingVertical="4dp"
-                                    android:text="ACCESSIBILITY"
-                                    android:textColor="#FFD4D9"
-                                    android:textSize="10.5sp" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="6dp"
-                                    android:background="@drawable/kq_perm_chip"
-                                    android:fontFamily="monospace"
-                                    android:paddingHorizontal="10dp"
-                                    android:paddingVertical="4dp"
-                                    android:text="OVERLAY"
-                                    android:textColor="#FFD4D9"
-                                    android:textSize="10.5sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/kq_perm_chip"
-                                    android:fontFamily="monospace"
-                                    android:paddingHorizontal="10dp"
-                                    android:paddingVertical="4dp"
-                                    android:text="ACC_NOTIF"
-                                    android:textColor="#FFD4D9"
-                                    android:textSize="10.5sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                        </LinearLayout> <!-- /dangerDetails -->
-                    </LinearLayout>
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvAutoDelete"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:fontFamily="monospace"
-                    android:gravity="center"
-                    android:text="@string/kq_auto_delete_5s"
-                    android:textColor="#80FFFFFF"
-                    android:textSize="11sp" />
-
-                <!-- Action row: filled danger + ghost details -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDelete"
-                        android:layout_width="0dp"
-                        android:layout_height="52dp"
-                        android:layout_weight="2"
-                        android:letterSpacing="0.01"
-                        android:text="@string/kq_delete_now"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="@color/kq_danger"
-                        app:cornerRadius="999dp"
-                        app:icon="@drawable/ic_trash"
-                        app:iconGravity="textStart"
-                        app:iconPadding="8dp"
-                        app:iconSize="18dp"
-                        app:iconTint="#FFFFFF" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCancel"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="0dp"
-                        android:layout_height="52dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:text="@string/kq_details"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:cornerRadius="999dp"
-                        app:strokeColor="#40FFFFFF"
-                        app:strokeWidth="1dp" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvDeleteHint"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center"
-                    android:text="@string/delete_hint"
-                    android:textColor="#80FFFFFF"
-                    android:textSize="11sp"
-                    android:visibility="gone" />
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        android:src="@drawable/ic4_x"
+        app:tint="#B3FFFFFF" />
 </FrameLayout>

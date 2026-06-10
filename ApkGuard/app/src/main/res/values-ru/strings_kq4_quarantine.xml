@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экранов Карантин и Состояние защиты (русский перевод). -->
+<resources>
+
+    <!-- ───────── Карантин ───────── -->
+    <string name="kq4_quar_eyebrow">Карантин</string>
+    <string name="kq4_quar_title">Удалённые файлы</string>
+    <string name="kq4_quar_sub">Эти файлы были опасны и удалены с вашего телефона. Они больше не могут навредить.</string>
+    <string name="kq4_quar_empty_title">Карантин пуст</string>
+    <string name="kq4_quar_empty_sub">Всё очищено.</string>
+    <string name="kq4_quar_restore">Восстановить</string>
+    <string name="kq4_quar_delete">Удалить</string>
+    <string name="kq4_quar_clear_all">Полностью очистить карантин</string>
+    <string name="kq4_quar_cancel">Отмена</string>
+
+    <string name="kq4_quar_restore_msg">Вернуть «%1$s» на прежнее место? (Этот файл был помечен как опасный.)</string>
+    <string name="kq4_quar_restored">Восстановлено: %1$s</string>
+    <string name="kq4_quar_restore_fail">Не удалось восстановить: %1$s</string>
+    <string name="kq4_quar_purge_title">Удалить навсегда</string>
+    <string name="kq4_quar_purge_msg">Удалить «%1$s» навсегда? Это действие нельзя отменить.</string>
+    <string name="kq4_quar_clear_all_msg">Удалить навсегда все файлы из карантина? Это действие нельзя отменить.</string>
+
+    <string name="kq4_quar_today">Сегодня, %1$s</string>
+    <string name="kq4_quar_yesterday">Вчера, %1$s</string>
+    <string name="kq4_quar_days_ago">%1$d дн. назад</string>
+    <string name="kq4_quar_src_downloads">Загрузки</string>
+    <string name="kq4_quar_src_storage">Память</string>
+
+    <!-- ───────── Состояние защиты / Разрешения ───────── -->
+    <string name="kq4_prot_eyebrow">Состояние защиты</string>
+    <string name="kq4_prot_title">Разрешения</string>
+    <string name="kq4_prot_count">%1$d / %2$d разрешений включено</string>
+    <string name="kq4_prot_all_on">Защита полностью включена</string>
+    <string name="kq4_prot_enable_one">Включите ещё одно разрешение — защита станет сильнее</string>
+
+    <string name="kq4_prot_row_files_t">Доступ к файлам</string>
+    <string name="kq4_prot_row_files_s">Нужен для проверки APK-файлов</string>
+    <string name="kq4_prot_row_battery_t">Работа без ограничений батареи</string>
+    <string name="kq4_prot_row_battery_s">Следит в фоне даже после закрытия. На Samsung может выглядеть выключенным — необязательно.</string>
+    <string name="kq4_prot_row_overlay_t">Поверх других окон</string>
+    <string name="kq4_prot_row_overlay_s">При угрозе сразу откроется окно предупреждения. На некоторых телефонах включить нельзя — необязательно.</string>
+    <string name="kq4_prot_row_notif_s">Нужно для предупреждений об угрозах</string>
+    <string name="kq4_prot_row_loc_t">Геолокация</string>
+    <string name="kq4_prot_row_loc_s">Для карты угроз вашего региона. Необязательно — приложение полностью работает и без неё.</string>
+    <string name="kq4_prot_row_autostart_t">Автозапуск (%1$s)</string>
+    <string name="kq4_prot_row_autostart_s">Включите «Autostart», чтобы телефон не выключал приложение</string>
+    <string name="kq4_prot_row_bg_t">Фоновая работа</string>
+    <string name="kq4_prot_row_bg_s">Постоянное наблюдение должно быть включено</string>
+
+    <string name="kq4_prot_continue_locked">Сначала включите разрешения</string>
+    <string name="kq4_prot_continue_toast">Чтобы продолжить, включите все обязательные разрешения.</string>
+    <string name="kq4_prot_autostart_open">Открыть настройку</string>
+    <string name="kq4_prot_autostart_close">Закрыть</string>
+    <string name="kq4_prot_autostart_fail">Не удалось открыть автоматически. Включите вручную: Настройки → Приложения → Anor Qalqon.</string>
+
+</resources>

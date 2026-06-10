@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- v4: light theme → dark status/nav bar icons. values-night flips this. -->
+    <bool name="kq_light_system_bars">true</bool>
+</resources>

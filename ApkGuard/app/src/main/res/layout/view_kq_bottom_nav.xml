@@ -51,7 +51,7 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_shield"
+                android:src="@drawable/ic4_shield"
                 app:tint="@color/kq_ink_3" />
         </LinearLayout>
 
@@ -92,7 +92,7 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_radar_scan"
+                android:src="@drawable/ic4_scan"
                 app:tint="@color/kq_ink_3" />
         </LinearLayout>
 
@@ -133,7 +133,7 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_history"
+                android:src="@drawable/ic4_chart"
                 app:tint="@color/kq_ink_3" />
         </LinearLayout>
 
@@ -174,7 +174,7 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_settings"
+                android:src="@drawable/ic4_gear"
                 app:tint="@color/kq_ink_3" />
         </LinearLayout>
 

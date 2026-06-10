@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,14 +16,14 @@ import com.kiberqalqon.databinding.ActivityOnboardingBinding
 import kotlin.math.abs
 
 /**
- * Onboarding (design from screens-onboarding.jsx — 3 slides).
+ * Onboarding — v4 «Milliy Kiber Himoya» dizayni (design_v4_extracted/screens1.jsx → ONB).
  *
- * Each slide carries an eyebrow ("01 · BOSHLASH"), a title, a body, and a
- * visual kind (METER / THREATS / ALERT) that picks which of the three
- * mocked-up visuals to show in the page layout.
+ * 3 slayd: har birida 176dp doira ichida slayd ikonkasi (ic4_scan / ic4_shield_alert /
+ * ic4_check_circle), eyebrow "1 · 3", sarlavha va matn. Pastdagi tugma oxirgi slaydgacha
+ * "Davom etish", oxirgisida "Himoyani yoqish" — bosilganda onboarding tugaydi.
  *
- * Footer button cycles "Davom etish" until the last slide, where it switches
- * to "Boshlash · Himoyani yoqish" and finishes onboarding.
+ * O'tishlar saqlangan: tugatish → InitialScanActivity (agar hali o'tkazilmagan bo'lsa),
+ * aks holda DashboardNewActivity. "O'tkazib yuborish" ham xuddi shu yo'l.
  */
 class OnboardingActivity : AppCompatActivity() {
 
@@ -39,9 +40,9 @@ class OnboardingActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val pages = listOf(
-            Page(R.string.onb_eyebrow_1, R.string.onboarding_title_1, R.string.onboarding_desc_1, Visual.METER),
-            Page(R.string.onb_eyebrow_2, R.string.onboarding_title_2, R.string.onboarding_desc_2, Visual.THREATS),
-            Page(R.string.onb_eyebrow_3, R.string.onboarding_title_3, R.string.onboarding_desc_3, Visual.ALERT),
+            Page(R.drawable.ic4_scan, R.string.kq4_onb_title_1, R.string.kq4_onb_body_1),
+            Page(R.drawable.ic4_shield_alert, R.string.kq4_onb_title_2, R.string.kq4_onb_body_2),
+            Page(R.drawable.ic4_check_circle, R.string.kq4_onb_title_3, R.string.kq4_onb_body_3),
         )
 
         binding.viewPager.adapter = PagerAdapter(pages)
@@ -65,7 +66,7 @@ class OnboardingActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 updateIndicator(position)
                 binding.btnNext.setText(
-                    if (position == pages.lastIndex) R.string.btn_start else R.string.btn_next
+                    if (position == pages.lastIndex) R.string.kq4_onb_enable else R.string.kq4_continue
                 )
             }
         })
@@ -100,7 +101,7 @@ class OnboardingActivity : AppCompatActivity() {
         for (i in 0 until count) {
             val dot = View(this).apply {
                 layoutParams = LinearLayout.LayoutParams(dp(8), dp(8)).apply {
-                    if (i > 0) marginStart = dp(6)
+                    if (i > 0) marginStart = dp(7)
                 }
                 setBackgroundResource(R.drawable.kq_pager_dot_off)
             }
@@ -109,14 +110,14 @@ class OnboardingActivity : AppCompatActivity() {
         updateIndicator(0)
     }
 
-    // Active dot is a 22dp × 8dp pill in primary; inactive ones are 8dp circles
-    // in hairline color. Mirrors `.pager-dots span` / `.pager-dots span.on` in styles.css.
+    // v4 dizayn: faol nuqta — 26x8dp pilyulya (kq_primary), qolganlari 8dp doira
+    // (kq_hairline_strong). screens1.jsx Onboarding'dagi nuqta-progressga mos.
     private fun updateIndicator(active: Int) {
         for (i in 0 until binding.layoutIndicator.childCount) {
             val dot = binding.layoutIndicator.getChildAt(i)
             val lp = dot.layoutParams as LinearLayout.LayoutParams
             val on = i == active
-            lp.width = if (on) dp(22) else dp(8)
+            lp.width = if (on) dp(26) else dp(8)
             lp.height = dp(8)
             dot.layoutParams = lp
             dot.setBackgroundResource(
@@ -128,13 +129,10 @@ class OnboardingActivity : AppCompatActivity() {
     private fun dp(value: Int): Int =
         (value * resources.displayMetrics.density).toInt()
 
-    private enum class Visual { METER, THREATS, ALERT }
-
     private data class Page(
-        val eyebrowRes: Int,
+        val iconRes: Int,
         val titleRes: Int,
         val descRes: Int,
-        val visual: Visual,
     )
 
     private class PagerAdapter(private val pages: List<Page>) :
@@ -148,24 +146,20 @@ class OnboardingActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
             val p = pages[position]
-            holder.eyebrow.setText(p.eyebrowRes)
+            holder.icon.setImageResource(p.iconRes)
+            holder.eyebrow.text = holder.itemView.context
+                .getString(R.string.kq4_onb_step, position + 1, pages.size)
             holder.title.setText(p.titleRes)
             holder.desc.setText(p.descRes)
-            // Show only the visual that matches this slide.
-            holder.meter.visibility = if (p.visual == Visual.METER) View.VISIBLE else View.GONE
-            holder.threats.visibility = if (p.visual == Visual.THREATS) View.VISIBLE else View.GONE
-            holder.alert.visibility = if (p.visual == Visual.ALERT) View.VISIBLE else View.GONE
         }
 
         override fun getItemCount(): Int = pages.size
 
         class PageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val icon: ImageView = view.findViewById(R.id.ivSlideIcon)
             val eyebrow: TextView = view.findViewById(R.id.tvEyebrow)
             val title: TextView = view.findViewById(R.id.tvTitle)
             val desc: TextView = view.findViewById(R.id.tvDesc)
-            val meter: View = view.findViewById(R.id.visualMeter)
-            val threats: View = view.findViewById(R.id.visualThreats)
-            val alert: View = view.findViewById(R.id.visualAlert)
         }
     }
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- pulse-ring halqa orqasidagi yumshoq doira: rgba(229,80,90,.16). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#29E5505A" />
+</shape>

@@ -60,7 +60,7 @@ object TrustedSignatures {
 
     fun registerSelf(packageName: String, sha256: String) {
         if (sha256.isNotBlank()) {
-            dynamicSelf[packageName to sha256] = "KiberQalqon (self)"
+            dynamicSelf[packageName to sha256] = "Anor Qalqon (self)"
         }
     }
 

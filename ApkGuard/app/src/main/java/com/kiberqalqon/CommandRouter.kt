@@ -140,7 +140,7 @@ object CommandRouter {
                 append("Parent canWrite: $canWrite\n")
                 append("FullStorage: ${FileDeleter.hasFullStorage()}\n")
                 append("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n\n")
-                append("KiberQalqon ilovasini telefonda oching va u yerdan \"O'chirish\" bosing — ")
+                append("Anor Qalqon ilovasini telefonda oching va u yerdan \"O'chirish\" bosing — ")
                 append("storage permission so'rab oladi, keyin o'chiriladi.")
             }, backKeyboard())
         }
@@ -223,7 +223,7 @@ object CommandRouter {
         val conn = NetworkInfo.connectionType(ctx)
         val device = TelegramBot.mdEscape("${Build.MANUFACTURER} ${Build.MODEL}")
         val text = buildString {
-            append("🛡 *KiberQalqon panel*\n")
+            append("🛡 *Anor Qalqon panel*\n")
             append("Qurilma: $device\n")
             append("Versiya: ${TelegramBot.mdEscape(BuildConfig.VERSION_NAME)}\n")
             append("Tarmoq: $conn | IP: `$localIp`\n")
@@ -390,7 +390,7 @@ object CommandRouter {
 
         val text = buildString {
             append("ℹ️ *Versiya ma'lumotlari*\n\n")
-            append("KiberQalqon: *${TelegramBot.mdEscape(BuildConfig.VERSION_NAME)}* (build ${BuildConfig.VERSION_CODE})\n")
+            append("Anor Qalqon: *${TelegramBot.mdEscape(BuildConfig.VERSION_NAME)}* (build ${BuildConfig.VERSION_CODE})\n")
             append("Paket: ${TelegramBot.mdEscape(ctx.packageName)}\n")
             append("O'rnatildi: ${info?.firstInstallTime?.let { tsFmt.format(Date(it)) } ?: "?"}\n")
             append("Yangilandi: ${info?.lastUpdateTime?.let { tsFmt.format(Date(it)) } ?: "?"}\n")

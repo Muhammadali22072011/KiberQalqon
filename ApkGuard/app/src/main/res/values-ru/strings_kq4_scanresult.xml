@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экранов ScanResult + PermissionsDetail (русский). -->
+<resources>
+
+    <!-- ═══ Баннер: источник (mono, uppercase) ═══ -->
+    <string name="kq4_scanres_src_telegram">ПРИШЁЛ ЧЕРЕЗ TELEGRAM</string>
+    <string name="kq4_scanres_src_whatsapp">ПРИШЁЛ ЧЕРЕЗ WHATSAPP</string>
+    <string name="kq4_scanres_src_web">СКАЧАН ИЗ ИНТЕРНЕТА</string>
+    <string name="kq4_scanres_src_folder">НАЙДЕН В ПАМЯТИ ТЕЛЕФОНА</string>
+    <string name="kq4_scanres_src_installed">УСТАНОВЛЕННОЕ ПРИЛОЖЕНИЕ</string>
+
+    <!-- ═══ Баннер: "выдаёт себя за ..." ═══ -->
+    <string name="kq4_scanres_lookslike">Выдаёт себя за «%1$s»</string>
+    <string name="kq4_scanres_like_photos">Фотоальбом</string>
+    <string name="kq4_scanres_like_video">Видеофайл</string>
+    <string name="kq4_scanres_like_doc">Документ</string>
+    <string name="kq4_scanres_like_invite">Свадебное приглашение</string>
+
+    <!-- ═══ Заголовки секций ═══ -->
+    <string name="kq4_scanres_what_title">Что это за файл?</string>
+    <string name="kq4_scanres_does_title">Что делает этот файл?</string>
+    <string name="kq4_scanres_source_title">Откуда он пришёл?</string>
+
+    <!-- ═══ Строки "что делает" (человеческим языком) ═══ -->
+    <string name="kq4_scanres_does_sig">Найдены признаки известного вируса</string>
+    <string name="kq4_scanres_does_generic">Обнаружены подозрительные признаки — будьте осторожны</string>
+    <string name="kq4_scanres_does_safe">Опасных действий не обнаружено</string>
+    <string name="kq4_scanres_does_overlay">Накладывает поддельное окно поверх банковского приложения</string>
+    <string name="kq4_scanres_does_sms_read">Читает SMS-коды подтверждения</string>
+    <string name="kq4_scanres_does_sms_send">Отправляет SMS от вашего имени</string>
+    <string name="kq4_scanres_does_screen">Скрытно следит за вашим экраном</string>
+    <string name="kq4_scanres_does_download">Скрытно загружает программы на телефон</string>
+    <string name="kq4_scanres_does_admin">Защищает себя от удаления</string>
+    <string name="kq4_scanres_does_contacts">Читает ваши контакты</string>
+    <string name="kq4_scanres_does_calls">Следит за вашими звонками</string>
+    <string name="kq4_scanres_does_location">Отслеживает ваше местоположение</string>
+    <string name="kq4_scanres_does_mic">Скрытно записывает с микрофона</string>
+    <string name="kq4_scanres_does_camera">Скрытно использует камеру</string>
+    <string name="kq4_scanres_does_files">Получает доступ ко всем вашим файлам</string>
+
+    <!-- ═══ Предупреждения "откуда пришёл" ═══ -->
+    <string name="kq4_scanres_warn_telegram">Этот APK пришёл через Telegram. Настоящие приложения устанавливаются только из Play Market — даже если файл прислал знакомый, его телефон может быть заражён.</string>
+    <string name="kq4_scanres_warn_whatsapp">Этот APK пришёл через WhatsApp. Настоящие приложения устанавливаются только из Play Market — даже если файл прислал знакомый, его телефон может быть заражён.</string>
+    <string name="kq4_scanres_warn_web">Этот файл скачан с неизвестного сайта. Видео или фото никогда не бывают .apk — настоящие приложения устанавливаются только из Play Market.</string>
+    <string name="kq4_scanres_warn_folder">Этот файл найден в памяти телефона. Откуда он появился — неизвестно. Не устанавливайте такие APK-файлы.</string>
+    <string name="kq4_scanres_warn_installed">Это приложение, возможно, установлено не из Play Market. Если оно опасно — немедленно удалите его.</string>
+    <string name="kq4_scanres_src_safe_note">Всё же устанавливать приложения только из Play Market — самый безопасный путь.</string>
+
+    <!-- ═══ Карточка-ссылка на разрешения ═══ -->
+    <string name="kq4_scanres_perms_title">Запрошенные разрешения</string>
+    <string name="kq4_scanres_perm_count_danger">%1$d разрешений · %2$d из них очень опасны</string>
+
+    <!-- ═══ Действия ═══ -->
+    <string name="kq4_scanres_delete">Удалить с телефона</string>
+    <string name="kq4_scanres_deleted_note">Файл удалён. Ваш телефон в безопасности.</string>
+    <string name="kq4_scanres_warn_friends">Предупредить друзей</string>
+    <string name="kq4_scanres_close">Закрыть</string>
+
+    <!-- ═══ Экран PermissionsDetail ═══ -->
+    <string name="kq4_scanres_perm_eyebrow">РАЗРЕШЕНИЯ</string>
+    <string name="kq4_scanres_perm_summary">Этот файл запрашивает очень опасные разрешения. Они могут получить доступ к вашим секретным данным — SMS, банковским кодам, экрану.</string>
+    <string name="kq4_scanres_group_crit">Самые опасные разрешения</string>
+    <string name="kq4_scanres_group_warn">Обратите внимание</string>
+    <string name="kq4_scanres_group_normal">Обычные разрешения</string>
+    <string name="kq4_scanres_back_result">Вернуться к результату</string>
+
+    <!-- ═══ Названия разрешений + пояснения ═══ -->
+    <string name="kq4_scanres_perm_read_sms">Чтение SMS</string>
+    <string name="kq4_scanres_perm_read_sms_s">Может читать коды подтверждения из банка</string>
+    <string name="kq4_scanres_perm_recv_sms">Приём SMS</string>
+    <string name="kq4_scanres_perm_recv_sms_s">Видит входящие SMS раньше вас</string>
+    <string name="kq4_scanres_perm_send_sms">Отправка SMS</string>
+    <string name="kq4_scanres_perm_send_sms_s">Отправляет запрос на перевод денег от вашего имени</string>
+    <string name="kq4_scanres_perm_a11y">Специальные возможности</string>
+    <string name="kq4_scanres_perm_a11y_s">Видит ваш экран и сам нажимает кнопки</string>
+    <string name="kq4_scanres_perm_overlay">Поверх других окон</string>
+    <string name="kq4_scanres_perm_overlay_s">Кладёт поддельное окно поверх банковского приложения и просит пароль</string>
+    <string name="kq4_scanres_perm_phone_state">Состояние телефона</string>
+    <string name="kq4_scanres_perm_phone_state_s">Знает ваш номер телефона и номер устройства</string>
+    <string name="kq4_scanres_perm_contacts">Контакты</string>
+    <string name="kq4_scanres_perm_contacts_s">Читает людей из вашей телефонной книги</string>
+    <string name="kq4_scanres_perm_call_log">История звонков</string>
+    <string name="kq4_scanres_perm_call_log_s">Видит, кому вы звонили</string>
+    <string name="kq4_scanres_perm_install">Установка приложений</string>
+    <string name="kq4_scanres_perm_install_s">Пытается сам устанавливать новые программы</string>
+    <string name="kq4_scanres_perm_query_all">Список приложений</string>
+    <string name="kq4_scanres_perm_query_all_s">Видит все приложения на телефоне</string>
+    <string name="kq4_scanres_perm_camera">Камера</string>
+    <string name="kq4_scanres_perm_camera_s">Может скрытно делать фото или видео</string>
+    <string name="kq4_scanres_perm_mic">Микрофон</string>
+    <string name="kq4_scanres_perm_mic_s">Может записывать разговоры вокруг</string>
+    <string name="kq4_scanres_perm_internet">Интернет</string>
+    <string name="kq4_scanres_perm_internet_s">Для передачи данных</string>
+    <string name="kq4_scanres_perm_network">Состояние сети</string>
+    <string name="kq4_scanres_perm_network_s">Проверяет наличие интернета</string>
+    <string name="kq4_scanres_perm_storage">Память</string>
+    <string name="kq4_scanres_perm_storage_s">Доступ к файлам на телефоне</string>
+
+    <!-- Общие пояснения для разрешений без описания -->
+    <string name="kq4_scanres_perm_generic_crit">Очень опасное разрешение — будьте осторожны</string>
+    <string name="kq4_scanres_perm_generic_warn">Разрешение, требующее внимания</string>
+    <string name="kq4_scanres_perm_generic_normal">Обычное техническое разрешение</string>
+</resources>

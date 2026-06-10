@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Splash background, linear gradient between kq_primary_light and kq_primary_2_light.
+  Splash background — anor brand gradient (kq_primary_light #E11D48 → kq_primary_2_light #8E0E2C).
   CSS source: linear-gradient(160deg, primary 0%, primary-2 100%); 160deg maps to
   top-right to bottom-left, which is android:angle=290.
 -->

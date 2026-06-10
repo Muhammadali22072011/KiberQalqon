@@ -1,85 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Welcome ekrani — v4 «Milliy Kiber Himoya» dizayni.
+  Layout hozircha hech bir Activity tomonidan ishlatilmaydi (orphan), shuning
+  uchun barcha eski id'lar saqlangan: badgeUz, imgLogoFrame, imgLogo, tvAppName,
+  divLine, tvTagline, cardForm, etFirstName, etLastName, checkboxAgree,
+  tvTerms, tvPrivacy, btnContinue, tvAbout.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_hex_pattern"
+    android:background="@color/kq_bg"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="30dp">
 
-        <!-- Национальный бейдж сверху -->
+        <!-- Milliy badge (tag outline) -->
         <LinearLayout
             android:id="@+id/badgeUz"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/bg_status_chip"
+            android:layout_height="30dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/kq4_tag_outline"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="10dp"
-            android:paddingTop="6dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="6dp"
+            android:paddingHorizontal="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <View
-                android:layout_width="5dp"
-                android:layout_height="14dp"
-                android:background="@drawable/bg_uz_flag_chip" />
+            <ImageView
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:contentDescription="@null"
+                android:src="@drawable/kq4_dot"
+                app:tint="@color/kq_primary" />
 
             <TextView
+                style="@style/KQ4.Mono"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:letterSpacing="0.2"
-                android:text="MILLIY KIBER HIMOYA"
-                android:textColor="@color/primary_glow"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                android:text="@string/kq4_milliy"
+                android:textAllCaps="true"
+                android:textSize="10.5sp" />
         </LinearLayout>
 
-        <!-- Светящийся логотип -->
+        <!-- Logo disk -->
         <FrameLayout
             android:id="@+id/imgLogoFrame"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_marginTop="24dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="26dp"
+            android:background="@drawable/kq4_circle_white"
+            android:elevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/badgeUz">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_scan_circle"
-                android:contentDescription="Glow" />
-
-            <ImageView
                 android:id="@+id/imgLogo"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:contentDescription="Logo"
-                android:src="@drawable/ic_shield_glow" />
+                android:contentDescription="@null"
+                android:src="@drawable/kq_logo_anor" />
         </FrameLayout>
 
-        <!-- Название -->
+        <!-- Nomi -->
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:letterSpacing="0.2"
-            android:text="KIBER QALQON"
-            android:textColor="@color/white"
-            android:textSize="32sp"
-            android:textStyle="bold"
+            android:layout_marginTop="18dp"
+            android:fontFamily="@font/onest_extrabold"
+            android:letterSpacing="-0.02"
+            android:text="@string/kq4_brand"
+            android:textAllCaps="true"
+            android:textColor="@color/kq_ink"
+            android:textSize="28sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imgLogoFrame" />
@@ -89,139 +94,98 @@
             android:layout_width="60dp"
             android:layout_height="2dp"
             android:layout_marginTop="10dp"
-            android:background="@color/primary_glow"
+            android:background="@color/kq_primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvAppName" />
 
         <TextView
             android:id="@+id/tvTagline"
+            style="@style/KQ4.HSub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Telefoningizni himoya qiling"
-            android:textColor="@color/text_cyan"
-            android:textSize="14sp"
+            android:text="@string/kq4_misc_welcome_tagline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divLine" />
 
-        <!-- Кибер-форма -->
+        <!-- Forma kartasi -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardForm"
+            style="@style/KQ4.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTagline"
-            app:strokeColor="@color/primary"
-            app:strokeWidth="1dp">
+            android:layout_marginTop="28dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTagline">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_cyber"
                 android:orientation="vertical"
-                android:padding="24dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="3dp"
-                        android:layout_height="22dp"
-                        android:background="@color/primary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Xush kelibsiz"
-                        android:textColor="@color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                android:padding="18dp">
 
                 <TextView
+                    style="@style/KQ4.SecTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Davom etish uchun ma'lumotlaringizni kiriting"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:text="@string/kq4_misc_welcome_title" />
 
-                <!-- Имя -->
-                <com.google.android.material.textfield.TextInputLayout
+                <TextView
+                    style="@style/KQ4.RowSub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/kq4_misc_welcome_sub" />
+
+                <!-- Ism -->
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:hint="Ismingiz"
-                    android:textColorHint="@color/text_hint"
-                    app:boxBackgroundColor="@color/background"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/primary_glow"
-                    app:hintTextColor="@color/primary_glow"
-                    app:startIconDrawable="@drawable/ic_person"
-                    app:startIconTint="@color/primary_glow">
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/kq4_input"
+                    android:fontFamily="@font/onest_regular"
+                    android:hint="@string/kq4_misc_welcome_first_name"
+                    android:inputType="textPersonName|textCapWords"
+                    android:minHeight="54dp"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/kq_ink"
+                    android:textColorHint="@color/kq_ink_3"
+                    android:textSize="15sp" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etFirstName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPersonName|textCapWords"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Фамилия -->
-                <com.google.android.material.textfield.TextInputLayout
+                <!-- Familiya -->
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etLastName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:hint="Familiyangiz"
-                    android:textColorHint="@color/text_hint"
-                    app:boxBackgroundColor="@color/background"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/primary_glow"
-                    app:hintTextColor="@color/primary_glow"
-                    app:startIconDrawable="@drawable/ic_person"
-                    app:startIconTint="@color/primary_glow">
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/kq4_input"
+                    android:fontFamily="@font/onest_regular"
+                    android:hint="@string/kq4_misc_welcome_last_name"
+                    android:inputType="textPersonName|textCapWords"
+                    android:minHeight="54dp"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/kq_ink"
+                    android:textColorHint="@color/kq_ink_3"
+                    android:textSize="15sp" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etLastName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPersonName|textCapWords"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Согласие -->
+                <!-- Rozilik -->
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/checkboxAgree"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:buttonTint="@color/primary_glow"
-                    android:text="Men shartlar va maxfiylik siyosati bilan tanishdim"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="16dp"
+                    android:buttonTint="@color/kq_primary"
+                    android:fontFamily="@font/onest_regular"
+                    android:text="@string/kq4_misc_welcome_agree"
+                    android:textColor="@color/kq_ink_2"
+                    android:textSize="12.5sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="4dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -231,17 +195,18 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="true"
+                        android:fontFamily="@font/onest_semibold"
                         android:padding="6dp"
-                        android:text="Foydalanish shartlari"
-                        android:textColor="@color/primary_glow"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:text="@string/terms_title"
+                        android:textColor="@color/kq_primary"
+                        android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" • "
-                        android:textColor="@color/text_hint" />
+                    <ImageView
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/kq4_dot"
+                        app:tint="@color/kq_ink_3" />
 
                     <TextView
                         android:id="@+id/tvPrivacy"
@@ -249,62 +214,52 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="true"
+                        android:fontFamily="@font/onest_semibold"
                         android:padding="6dp"
-                        android:text="Maxfiylik siyosati"
-                        android:textColor="@color/primary_glow"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:text="@string/privacy_title"
+                        android:textColor="@color/kq_primary"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
-                <!-- Кибер-кнопка -->
+                <!-- CTA -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnContinue"
+                    style="@style/KQ4.Button.Primary"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:enabled="false"
-                    android:letterSpacing="0.15"
-                    android:text="Davom etish"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="0dp"
-                    app:icon="@drawable/ic_arrow_right"
-                    app:iconGravity="end"
-                    app:iconTint="@color/white"
-                    app:strokeColor="@color/primary_glow"
-                    app:strokeWidth="1dp" />
+                    android:minHeight="58dp"
+                    android:text="@string/kq4_continue"
+                    android:textSize="17sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Подвал -->
+        <!-- Podval -->
         <TextView
             android:id="@+id/tvAbout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="18dp"
             android:clickable="true"
             android:focusable="true"
+            android:fontFamily="@font/onest_semibold"
             android:padding="10dp"
-            android:text="ℹ Loyiha haqida"
-            android:textColor="@color/text_cyan"
-            android:textSize="13sp"
-            android:textStyle="bold"
+            android:text="@string/kq4_misc_welcome_about"
+            android:textColor="@color/kq_primary"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardForm" />
 
         <TextView
+            style="@style/KQ4.Mono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="24dp"
-            android:letterSpacing="0.15"
-            android:text="VERSION 2.0 · O'ZBEKISTON"
-            android:textColor="@color/text_hint"
-            android:textSize="10sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/kq4_misc_welcome_footer"
+            android:textSize="10.5sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

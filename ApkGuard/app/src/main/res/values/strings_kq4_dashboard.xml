@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Dashboard / Asosiy ekran satrlari (screens1.jsx → Dashboard, data.jsx → GUARDS). -->
+<resources>
+    <!-- HERO holatlari (protectionLevel bo'yicha) -->
+    <string name="kq4_dash_hero_safe">Telefoningiz himoyalangan</string>
+    <string name="kq4_dash_hero_warn">Himoya to\'liq emas</string>
+    <string name="kq4_dash_hero_danger">Telefoningiz xavf ostida</string>
+    <string name="kq4_dash_last_scan">So\'nggi tekshiruv: %1$s</string>
+    <string name="kq4_dash_never">hali o\'tkazilmagan</string>
+    <string name="kq4_dash_scan_now">Hozir tekshirish</string>
+    <string name="kq4_dash_refresh">Yangilash</string>
+
+    <!-- 3 raqam kartasi -->
+    <string name="kq4_dash_stat_scanned">Tekshirildi</string>
+    <string name="kq4_dash_stat_deleted">O\'chirildi</string>
+    <string name="kq4_dash_stat_protection">Himoya</string>
+    <string name="kq4_dash_pct" translatable="false">%1$d%%</string>
+
+    <!-- Bo'lim sarlavhalari -->
+    <string name="kq4_dash_sec_blocked">Bugun bloklangan</string>
+    <string name="kq4_dash_sec_guards">Himoya qatlamlari</string>
+    <string name="kq4_dash_sec_apps">Qurilma ilovalari</string>
+
+    <!-- Himoya qatlamlari (data.jsx → GUARDS) -->
+    <string name="kq4_dash_guard_files_t">Fayllar nazorati</string>
+    <string name="kq4_dash_guard_files_s">Yangi fayllar tekshiriladi</string>
+    <string name="kq4_dash_guard_bank_t">Bank himoyasi</string>
+    <string name="kq4_dash_guard_bank_s">Bank ilovalaringiz qo\'riqlanadi</string>
+    <string name="kq4_dash_guard_sms_t">SMS himoyasi</string>
+    <string name="kq4_dash_guard_sms_s">Soxta xabarlar bloklanadi</string>
+    <string name="kq4_dash_guard_net_t">Internet himoyasi</string>
+    <string name="kq4_dash_guard_net_s">Zararli saytlar to\'siladi</string>
+
+    <!-- Bloklangan ro'yxati -->
+    <string name="kq4_dash_empty_title">Hozircha xavf topilmadi</string>
+    <string name="kq4_dash_empty_sub">Yangi APK aniqlanganda bu yerda paydo bo\'ladi</string>
+    <string name="kq4_dash_via_time">%1$s orqali · %2$s</string>
+    <string name="kq4_dash_source_scan">skan</string>
+
+    <!-- Vaqt ("qancha oldin") -->
+    <string name="kq4_dash_ago_recent">yaqinda</string>
+    <string name="kq4_dash_ago_now">hozirgina</string>
+    <string name="kq4_dash_ago_min">%1$d daq oldin</string>
+    <string name="kq4_dash_ago_hour">%1$d soat oldin</string>
+    <string name="kq4_dash_ago_day">%1$d kun oldin</string>
+
+    <!-- Qurilma ilovalari ro'yxati -->
+    <string name="kq4_dash_not_scanned">Tekshirilmagan</string>
+    <string name="kq4_dash_pkg_src" translatable="false">%1$s · %2$s</string>
+    <string name="kq4_dash_src_play" translatable="false">Play Market</string>
+    <string name="kq4_dash_src_galaxy" translatable="false">Galaxy Store</string>
+    <string name="kq4_dash_src_huawei" translatable="false">AppGallery</string>
+    <string name="kq4_dash_src_amazon" translatable="false">Amazon</string>
+    <string name="kq4_dash_src_sideload">APK orqali</string>
+    <string name="kq4_dash_src_system">Tizim</string>
+    <string name="kq4_dash_src_unknown">Noma\'lum</string>
+</resources>

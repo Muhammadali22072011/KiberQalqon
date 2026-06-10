@@ -87,3 +87,11 @@ result_analiza.txt
 /s3.png
 /s4.png
 /s5.png
+
+# ============================================================
+#  ISHCHI/VAQTINCHALIK FAYLLAR — repoга kerak emas
+#  (manba variable-shriftlar; statik instanslar app/res/font ичида,
+#   pitch'ga ulanmagan yuklab olingan video)
+# ============================================================
+/fonts_tmp/
+/pitch/SaveVid_Net_*.mp4

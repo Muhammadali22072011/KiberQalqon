@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Sozlamalar + Loyiha haqida ekranlari satrlari (o'zbekcha, default). -->
+<resources>
+
+    <!-- ── Sozlamalar ── -->
+    <string name="kq4_set_eyebrow">Sozlamalar</string>
+    <string name="kq4_set_title">Boshqaruv</string>
+    <string name="kq4_set_profile_version">VERSIYA %1$s · NAVOIY</string>
+    <string name="kq4_set_active">Faol</string>
+
+    <string name="kq4_set_sec_protection">Himoya</string>
+    <string name="kq4_set_row_autoscan_title">Avtomatik tekshirish</string>
+    <string name="kq4_set_row_autoscan_sub">Har 15 daqiqada papkalarni tekshiradi</string>
+    <string name="kq4_set_row_autodelete_title">Xavfli faylni o\'zi o\'chirsin</string>
+    <string name="kq4_set_row_autodelete_sub">Topilgan zararli fayl 5 soniyada o\'chiriladi</string>
+    <string name="kq4_set_row_phishing_title">Soxta SMS himoyasi</string>
+    <string name="kq4_set_row_phishing_sub">Kod so\'ragan shubhali xabarlarni yashiradi</string>
+    <string name="kq4_set_row_background_title">Fonda ishlash</string>
+    <string name="kq4_set_row_background_sub">Telefon o\'chsa ham himoya qayta yoqiladi</string>
+
+    <string name="kq4_set_sec_appearance">Ko\'rinish</string>
+    <string name="kq4_set_theme_title">Mavzu</string>
+    <string name="kq4_set_theme_sub">Kunduzgi yoki tungi</string>
+    <string name="kq4_set_accent_title">Asosiy rang</string>
+    <string name="kq4_set_accent_sub">Milliy rang uslubini tanlang</string>
+
+    <string name="kq4_set_sec_language">Til</string>
+
+    <string name="kq4_set_sec_about">Haqida</string>
+    <string name="kq4_set_row_report">Muammo haqida xabar berish</string>
+
+    <string name="kq4_set_sec_extra">Qo\'shimcha</string>
+    <string name="kq4_set_row_hidden">Yashirin tahdidlar skaneri</string>
+    <string name="kq4_set_row_telegram">Telegram bildirishnomalari</string>
+    <string name="kq4_set_row_protection">Himoya holati va ruxsatlar</string>
+    <string name="kq4_set_row_admin">Boshqaruv paneli</string>
+
+    <string name="kq4_set_footer">ANOR QALQON v%1$s · BUILD %2$d\n© 2026 · Muhammadali · Navoiy</string>
+
+    <!-- ── Loyiha haqida ── -->
+    <string name="kq4_about_eyebrow">Loyiha haqida</string>
+    <string name="kq4_about_desc">Anor Qalqon — O\'zbekiston uchun yaratilgan zamonaviy himoya ilovasi. Telefoningizni zararli APK fayllar va aldamchi hujumlardan asraydi. Hamma narsa oddiy o\'zbek tilida tushuntiriladi.</string>
+    <string name="kq4_about_sec_features">Imkoniyatlar</string>
+    <string name="kq4_about_f1_title">Avtomatik tekshirish</string>
+    <string name="kq4_about_f1_sub">Har 15 daqiqada yangi fayllarni tekshiradi</string>
+    <string name="kq4_about_f2_title">Xavfni o\'zi o\'chiradi</string>
+    <string name="kq4_about_f2_sub">Zararli faylni topib, darhol yo\'q qiladi</string>
+    <string name="kq4_about_f3_title">Soxta SMS himoyasi</string>
+    <string name="kq4_about_f3_sub">Bank kodi so\'ragan aldamchi xabarlarni yashiradi</string>
+    <string name="kq4_about_f4_title">Ikki til</string>
+    <string name="kq4_about_f4_sub">O\'zbekcha va Ruscha</string>
+    <string name="kq4_about_sec_author">Muallif</string>
+    <string name="kq4_about_author_name" translatable="false">Muhammadali</string>
+    <string name="kq4_about_author_sub">Navoiy · O\'zbekiston</string>
+    <string name="kq4_about_footer">© 2026 · ANOR QALQON · v%1$s</string>
+</resources>

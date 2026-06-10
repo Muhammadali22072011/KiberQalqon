@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Qalqon atrofida aylanadigan kichik yorug' nuqta ("sun'iy yo'ldosh").
+     Radial gradient — markazda oq, chetga shaffof so'nadi (glow effekti). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="7dp"
+        android:startColor="#FFFFFFFF"
+        android:centerColor="#B3FFFFFF"
+        android:endColor="#00FFFFFF" />
+</shape>

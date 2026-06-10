@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — русские переводы строк Onboarding + InitialScan. -->
+<resources>
+    <!-- ============ Onboarding ============ -->
+    <string name="kq4_onb_title_1">Телефон проверяется сам</string>
+    <string name="kq4_onb_body_1">Anor Qalqon сам следит за Telegram, WhatsApp и загруженными файлами. Вам ничего не нужно делать.</string>
+    <string name="kq4_onb_title_2">Находит опасные программы</string>
+    <string name="kq4_onb_body_2">Вредоносные файлы, спрятанные под видом фото или видео, будут обнаружены. Они пытаются украсть пароль от банка и SMS-коды.</string>
+    <string name="kq4_onb_title_3">Простой язык, сильная защита</string>
+    <string name="kq4_onb_body_3">Всё объясняется простыми словами, без сложных технических терминов — только то, что важно для вас.</string>
+    <string name="kq4_onb_enable">Включить защиту</string>
+
+    <!-- ============ InitialScan ============ -->
+    <string name="kq4_is_title">Идёт проверка телефона</string>
+    <string name="kq4_is_found_count">Найдено опасных файлов: %1$d</string>
+    <string name="kq4_is_all_deleted">Все опасные файлы удалены</string>
+    <string name="kq4_is_none_found">Опасных файлов не найдено</string>
+
+    <!-- Диалог «нужен доступ ко всем файлам» (заголовок/кнопки берутся из strings.xml:
+         permission_needed / grant / btn_later — переводы там уже есть). -->
+    <string name="kq4_is_perm_msg">Чтобы проверять файлы телефона (Загрузки, Telegram и другие), нужно включить «Доступ ко всем файлам». Без этого сканер НЕ ВИДИТ файлы и не сможет найти угрозу.</string>
+
+    <!-- Голосовое объявление результата сканирования (TTS) -->
+    <string name="kq4_is_tts_danger">Внимание! Обнаружено опасных файлов: %1$d.</string>
+    <string name="kq4_is_tts_susp">Внимание! Найдено подозрительных файлов: %1$d.</string>
+</resources>

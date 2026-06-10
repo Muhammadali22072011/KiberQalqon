@@ -351,7 +351,7 @@ class ProtectionService : Service() {
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW,
             ).apply {
-                description = "KiberQalqon doimiy himoya holati"
+                description = "Anor Qalqon doimiy himoya holati"
                 setShowBadge(false)
                 enableVibration(false)
                 setSound(null, null)

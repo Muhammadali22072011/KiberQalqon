@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Skaner (Apps) ekrani satrlari. Umumiy taglar strings_kq4_shared.xml da. -->
+<resources>
+    <string name="kq4_skaner_eyebrow">Skaner</string>
+    <string name="kq4_skaner_title">Tekshirilgan fayllar</string>
+    <string name="kq4_skaner_scan_cd">To\'liq tekshirish</string>
+    <string name="kq4_skaner_live_on_title">Avto-himoya yoniq</string>
+    <string name="kq4_skaner_live_on_sub">Yangi fayllar avtomatik tekshiriladi</string>
+    <string name="kq4_skaner_live_off_title">Avto-himoya o\'chiq</string>
+    <string name="kq4_skaner_live_off_sub">Yoqish uchun shu kartani bosing</string>
+    <string name="kq4_skaner_live_off_tag">O\'chiq</string>
+    <string name="kq4_skaner_tag_unknown">Tekshirilmagan</string>
+    <string name="kq4_skaner_rescan">Hammasini qayta tekshirish</string>
+    <string name="kq4_skaner_src_downloads">Yuklanmalar</string>
+    <!-- "{manba} · {hajm}" qator sub-satri formati -->
+    <string name="kq4_skaner_sub_format" translatable="false">%1$s · %2$s</string>
+    <!-- Qator skanidagi xatolik toastlari (avval Kotlin'da hardkod edi) -->
+    <string name="kq4_skaner_err_scan_failed">Faylni tekshirib bo\'lmadi</string>
+    <string name="kq4_skaner_err_scan_timeout">Tekshirish juda ko\'p vaqt oldi</string>
+    <string name="kq4_skaner_err_generic">Xatolik: %1$s</string>
+    <!-- E'lon dialogidagi daraja yorlig'i -->
+    <string name="kq4_skaner_news_level_critical">Muhim</string>
+    <string name="kq4_skaner_news_level_warning">Ogohlantirish</string>
+    <string name="kq4_skaner_news_level_info">E\'lon</string>
+</resources>

@@ -154,6 +154,12 @@
             android:name=".ScanResultActivity"
             android:exported="false"
             android:theme="@style/Theme.KiberQalqon" />
+
+        <!-- v4: skan natijasidan ochiladigan «So'ralgan ruxsatlar» batafsil ekrani. -->
+        <activity
+            android:name=".PermissionsDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon" />
         <activity
             android:name=".SettingsActivity"
             android:exported="false"

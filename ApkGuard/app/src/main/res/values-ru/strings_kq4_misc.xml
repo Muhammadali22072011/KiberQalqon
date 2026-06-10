@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ruscha tarjimalar — strings_kq4_misc.xml -->
+<resources>
+
+    <!-- ═══════ Общие (экраны-документы) ═══════ -->
+    <string name="kq4_misc_doc_eyebrow">Документы</string>
+
+    <!-- ═══════ Consent (согласие) ═══════ -->
+    <string name="kq4_misc_consent_review_title">Условия и политика конфиденциальности</string>
+    <string name="kq4_misc_decline_title">Вы уверены?</string>
+    <string name="kq4_misc_decline_msg">Если вы откажетесь, Anor Qalqon не сможет работать, и приложение закроется.\n\nОбратите внимание: ни обмен \"Общественная безопасность\", ни Telegram-телеметрия НЕ ОБЯЗАТЕЛЬНЫ — это отдельные, добровольные функции. Основная защита (сканер, предупреждения) полностью работает и без них. Нужно лишь согласие с Условиями и Политикой конфиденциальности.</string>
+    <string name="kq4_misc_decline_back">Вернуться к чтению</string>
+    <string name="kq4_misc_decline_exit">Выйти</string>
+
+    <!-- ═══════ Welcome ═══════ -->
+    <string name="kq4_misc_welcome_tagline">Защитите свой телефон</string>
+    <string name="kq4_misc_welcome_title">Добро пожаловать</string>
+    <string name="kq4_misc_welcome_sub">Введите свои данные, чтобы продолжить</string>
+    <string name="kq4_misc_welcome_first_name">Ваше имя</string>
+    <string name="kq4_misc_welcome_last_name">Ваша фамилия</string>
+    <string name="kq4_misc_welcome_agree">Я ознакомился с условиями и политикой конфиденциальности</string>
+    <string name="kq4_misc_welcome_about">О проекте</string>
+
+    <!-- ═══════ Terms (условия использования) ═══════ -->
+    <string name="kq4_misc_terms_s1">1 · Введение</string>
+    <string name="kq4_misc_terms_s2">2 · Назначение приложения</string>
+    <string name="kq4_misc_terms_s2_body">Anor Qalqon защищает ваш телефон от вредоносных APK-файлов:\n\n• Проверяет скачанные APK-файлы\n• Блокирует и удаляет опасные файлы\n• Распознаёт фишинговые уведомления\n• Отправляет опасные файлы на сервер (по желанию)</string>
+    <string name="kq4_misc_terms_s3">3 · Обязанности пользователя</string>
+    <string name="kq4_misc_terms_s3_body">Вы обязуетесь не делать следующее:\n\n• Использовать приложение в незаконных целях\n• Изменять или декомпилировать код приложения\n• Продавать приложение третьим лицам\n• Распространять вредоносные программы через приложение</string>
+    <string name="kq4_misc_terms_s4">4 · Ограничения и ответственность</string>
+    <string name="kq4_misc_terms_s4_body">ВАЖНО: Anor Qalqon не даёт 100% гарантии защиты. Приложение распознаёт только известные угрозы.\n\nРазработчики не несут ответственности за:\n• Потерю данных\n• Повреждение устройства\n• Финансовые потери\n• Сторонние сервисы</string>
+    <string name="kq4_misc_terms_s5">5 · Необходимые разрешения</string>
+    <string name="kq4_misc_terms_s5_body">• Файлы и медиа — для поиска APK\n• Уведомления — для обнаружения фишинга\n• Интернет — для отправки на сервер (по желанию)\n\nЭти разрешения используются только для функций приложения.</string>
+    <string name="kq4_misc_terms_s6">6 · Изменения</string>
+    <string name="kq4_misc_terms_s7">7 · Контакты</string>
+    <string name="kq4_misc_terms_s7_body">Если есть вопросы или предложения — обратитесь через раздел Настройки → Помощь.</string>
+
+    <!-- ═══════ Privacy (политика конфиденциальности) ═══════ -->
+    <string name="kq4_misc_privacy_intro">Anor Qalqon серьёзно относится к вашей конфиденциальности. Эта политика объясняет, какие данные собираются и как используются.</string>
+
+    <!-- ═══════ Список APK ═══════ -->
+    <string name="kq4_misc_eyebrow_scanner">Сканер</string>
+    <string name="kq4_misc_apk_list_sub">Скачанные APK-файлы</string>
+
+    <!-- ═══════ Общие (misc-экраны) ═══════ -->
+    <string name="kq4_misc_toast_copied">Скопировано</string>
+
+    <!-- ═══════ Диагностика ═══════ -->
+    <string name="kq4_misc_diag_eyebrow">Диагностика</string>
+    <string name="kq4_misc_diag_title">Техническое состояние</string>
+    <string name="kq4_misc_diag_btn_copy">📋 Скопировать</string>
+    <string name="kq4_misc_diag_btn_share">✉️ Отправить</string>
+    <string name="kq4_misc_diag_btn_send_dev">📨 Отправить разработчику (Telegram)</string>
+    <string name="kq4_misc_diag_btn_refresh">🔄 Обновить</string>
+    <string name="kq4_misc_diag_btn_telemetry">🤖 Telegram-телеметрия</string>
+    <string name="kq4_misc_diag_btn_hidden">🔍 Скрытые / неудаляемые угрозы</string>
+    <string name="kq4_misc_diag_share_subject">Anor Qalqon — диагностика</string>
+    <string name="kq4_misc_diag_send">Отправить</string>
+    <string name="kq4_misc_diag_toast_share_fail">Не удалось отправить: %1$s</string>
+    <string name="kq4_misc_diag_toast_no_channel">Telegram-канал не настроен — отправьте другим способом</string>
+    <string name="kq4_misc_diag_dev_title">Отправить разработчику</string>
+    <string name="kq4_misc_diag_dev_msg">Ваш комментарий и диагностика с этого экрана (устройство, разрешения, последняя ошибка) будут отправлены разработчику в Telegram.</string>
+    <string name="kq4_misc_diag_dev_hint">Кратко опишите проблему (необязательно)</string>
+    <string name="kq4_misc_diag_toast_sending">Отправляется…</string>
+    <string name="kq4_misc_diag_toast_sent_ok">✅ Отправлено. Спасибо!</string>
+    <string name="kq4_misc_diag_toast_sent_fail">❌ Не удалось отправить. Проверьте интернет.</string>
+
+    <!-- ═══════ Telegram-телеметрия ═══════ -->
+    <string name="kq4_misc_tg_eyebrow">Телеметрия</string>
+    <string name="kq4_misc_tg_title">Telegram-телеметрия</string>
+    <string name="kq4_misc_tg_intro">Все события (сканер, установка, ошибка, crash) отправляются в вашу Telegram-группу.</string>
+    <string name="kq4_misc_tg_label_token">Токен бота (от @BotFather):</string>
+    <string name="kq4_misc_tg_label_chat">Chat ID группы (с минусом, например -1001234567890):</string>
+    <string name="kq4_misc_tg_check_enable">Включить телеметрию (отправка сообщений)</string>
+    <string name="kq4_misc_tg_check_listen">🎧 Принимать команды из Telegram</string>
+    <string name="kq4_misc_tg_hint_listen">(напишите в группе /start — появится панель управления)</string>
+    <string name="kq4_misc_tg_check_send_apk">📤 Отправлять APK-файл в группу после сканирования</string>
+    <string name="kq4_misc_tg_hint_send_apk">(отправляются только опасные/подозрительные APK, до 50 МБ)</string>
+    <string name="kq4_misc_tg_btn_save">💾 Сохранить</string>
+    <string name="kq4_misc_tg_btn_test">🧪 Тестовое сообщение</string>
+    <string name="kq4_misc_tg_btn_panel">🎛 Отправить панель управления</string>
+    <string name="kq4_misc_tg_btn_autodetect">🤖 Автоопределение Chat ID</string>
+    <string name="kq4_misc_tg_btn_guide">❓ Как настроить?</string>
+    <string name="kq4_misc_tg_toast_saved">Сохранено</string>
+    <string name="kq4_misc_tg_toast_need_config">Сначала введите токен и chat_id</string>
+    <string name="kq4_misc_tg_toast_panel_sent">Панель отправлена в группу</string>
+    <string name="kq4_misc_tg_toast_need_token">Сначала введите токен бота</string>
+    <string name="kq4_misc_tg_toast_searching">Поиск… напишите в группе /start</string>
+    <string name="kq4_misc_tg_toast_bad_token">Токен бота неверный или заблокирован</string>
+    <string name="kq4_misc_tg_toast_found">Найдено: %1$s (%2$s)</string>
+    <string name="kq4_misc_tg_toast_not_found">Ничего не найдено. Напишите в группе /start и попробуйте снова.</string>
+    <string name="kq4_misc_tg_toast_test_sent">Тест отправлен — проверьте в группе</string>
+    <string name="kq4_misc_tg_guide_title">Создание Telegram-бота</string>
+    <string name="kq4_misc_tg_guide_body">1. Telegram → найдите @BotFather\n2. Командой /newbot создайте бота, получите токен\n\n3. Создайте новую группу и добавьте в неё бота\n\n4. Напишите в группу любое сообщение\n\n5. Откройте в браузере:\n   api.telegram.org/bot&lt;TOKEN&gt;/getUpdates\n   возьмите id чата (с минусом)\n\n6. Введите здесь токен и chat_id и нажмите «Тест»!</string>
+
+    <!-- ═══════ Скрытые угрозы ═══════ -->
+    <string name="kq4_misc_hidden_eyebrow">Глубокая проверка</string>
+    <string name="kq4_misc_hidden_title">Скрытые угрозы</string>
+    <string name="kq4_misc_hidden_intro">Приложения, установленные на телефоне, но скрывшие свою иконку или сопротивляющиеся удалению. Если вы установили их сами и осознанно — это безопасно.</string>
+    <string name="kq4_misc_hidden_checking">Проверка…</string>
+    <string name="kq4_misc_hidden_none">✓ Скрытых или неудаляемых угроз не найдено.</string>
+    <string name="kq4_misc_hidden_count">Приложений, заслуживающих проверки: %1$d</string>
+    <string name="kq4_misc_hidden_reason">Причина: %1$s</string>
+    <string name="kq4_misc_hidden_blacklist">Чёрный список: %1$s</string>
+    <string name="kq4_misc_hidden_sideload">Источник: НЕ Play Store (sideload)</string>
+    <string name="kq4_misc_hidden_dangerous_perms">Опасных разрешений: %1$d</string>
+    <string name="kq4_misc_hidden_act_admin">1) Отозвать права администратора</string>
+    <string name="kq4_misc_hidden_hint_admin">Безопасность → Администраторы устройства → снимите галочку с \"%1$s\". Затем удалите приложение.</string>
+    <string name="kq4_misc_hidden_act_access">2) Отключить Accessibility</string>
+    <string name="kq4_misc_hidden_hint_access">Специальные возможности → отключите сервис \"%1$s\".</string>
+    <string name="kq4_misc_hidden_act_notif">Отключить доступ к уведомлениям</string>
+    <string name="kq4_misc_hidden_act_uninstall">🗑 Удалить (uninstall)</string>
+    <string name="kq4_misc_hidden_act_appinfo">О приложении</string>
+    <string name="kq4_misc_hidden_footer_title">Если всё равно не удаляется:</string>
+    <string name="kq4_misc_hidden_footer_body">• БЕЗОПАСНЫЙ РЕЖИМ (Safe Mode): удерживайте кнопку питания → выберите \"Безопасный режим\". В нём все сторонние приложения (и их Accessibility) временно отключаются — тогда спокойно удалите.\n\n• Через компьютер (ADB): включите USB-отладку, подключите телефон и выполните команду (вместо &lt;paket&gt; подставьте имя пакета, указанное выше):</string>
+    <string name="kq4_misc_hidden_act_copy_adb">Скопировать команду ADB</string>
+    <string name="kq4_misc_hidden_open_fail">Не удалось открыть: %1$s</string>
+    <string name="kq4_misc_hidden_trait_hidden_icon">иконка скрыта</string>
+    <string name="kq4_misc_hidden_trait_admin">администратор устройства (блокирует удаление)</string>
+    <string name="kq4_misc_hidden_trait_access">контроль Accessibility</string>
+    <string name="kq4_misc_hidden_trait_notif">доступ к уведомлениям (OTP)</string>
+    <string name="kq4_misc_hidden_trait_blacklist">в чёрном списке</string>
+</resources>

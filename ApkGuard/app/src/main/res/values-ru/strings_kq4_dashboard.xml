@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экрана Dashboard / Главный (русский перевод). -->
+<resources>
+    <string name="kq4_dash_hero_safe">Ваш телефон защищён</string>
+    <string name="kq4_dash_hero_warn">Защита неполная</string>
+    <string name="kq4_dash_hero_danger">Ваш телефон под угрозой</string>
+    <string name="kq4_dash_last_scan">Последняя проверка: %1$s</string>
+    <string name="kq4_dash_never">ещё не проводилась</string>
+    <string name="kq4_dash_scan_now">Проверить сейчас</string>
+    <string name="kq4_dash_refresh">Обновить</string>
+
+    <string name="kq4_dash_stat_scanned">Проверено</string>
+    <string name="kq4_dash_stat_deleted">Удалено</string>
+    <string name="kq4_dash_stat_protection">Защита</string>
+
+    <string name="kq4_dash_sec_blocked">Заблокировано сегодня</string>
+    <string name="kq4_dash_sec_guards">Слои защиты</string>
+    <string name="kq4_dash_sec_apps">Приложения устройства</string>
+
+    <string name="kq4_dash_guard_files_t">Контроль файлов</string>
+    <string name="kq4_dash_guard_files_s">Новые файлы проверяются</string>
+    <string name="kq4_dash_guard_bank_t">Защита банка</string>
+    <string name="kq4_dash_guard_bank_s">Банковские приложения под охраной</string>
+    <string name="kq4_dash_guard_sms_t">SMS-защита</string>
+    <string name="kq4_dash_guard_sms_s">Поддельные сообщения блокируются</string>
+    <string name="kq4_dash_guard_net_t">Интернет-защита</string>
+    <string name="kq4_dash_guard_net_s">Вредоносные сайты блокируются</string>
+
+    <string name="kq4_dash_empty_title">Пока угроз не найдено</string>
+    <string name="kq4_dash_empty_sub">Новые APK появятся здесь при обнаружении</string>
+    <string name="kq4_dash_via_time">через %1$s · %2$s</string>
+    <string name="kq4_dash_source_scan">скан</string>
+
+    <string name="kq4_dash_ago_recent">недавно</string>
+    <string name="kq4_dash_ago_now">только что</string>
+    <string name="kq4_dash_ago_min">%1$d мин назад</string>
+    <string name="kq4_dash_ago_hour">%1$d ч назад</string>
+    <string name="kq4_dash_ago_day">%1$d дн назад</string>
+
+    <string name="kq4_dash_not_scanned">Не проверено</string>
+    <string name="kq4_dash_src_sideload">Через APK</string>
+    <string name="kq4_dash_src_system">Система</string>
+    <string name="kq4_dash_src_unknown">Неизвестно</string>
+</resources>

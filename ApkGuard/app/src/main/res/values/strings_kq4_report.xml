@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Report («Muammo haqida xabar») ekrani satrlari. Eski rp_* kalitlar qayta ishlatiladi. -->
+<resources>
+    <string name="kq4_report_title">Muammo haqida xabar</string>
+    <string name="kq4_report_sub">Xato yoki muammoni shu yerda yozing — to\'g\'ridan-to\'g\'ri dasturchiga boradi.</string>
+    <string name="kq4_report_privacy_title">Maxfiyligingiz himoyalangan</string>
+    <string name="kq4_report_privacy_body">Shaxsiy ma\'lumotlaringiz (ism, raqam, boshqa ilovalar) yuborilmaydi.</string>
+    <string name="kq4_report_thanks">Rahmat!</string>
+    <string name="kq4_report_sent_sub">Muammoingiz dasturchiga yuborildi. Tez orada hal qilamiz.</string>
+    <string name="kq4_report_close">Yopish</string>
+</resources>

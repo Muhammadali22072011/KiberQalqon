@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Бейдж «надо включить» (mockup .badge.todo): anor-контур, внутри +. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/transparent" />
+    <stroke android:width="2dp" android:color="@color/kq_primary" />
+</shape>

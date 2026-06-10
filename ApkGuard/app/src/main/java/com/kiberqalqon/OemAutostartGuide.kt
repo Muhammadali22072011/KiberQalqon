@@ -99,7 +99,7 @@ object OemAutostartGuide {
             "1. Ro'yxatda \"KIBER QALQON\"ni toping\n" +
             "2. Avtoyoqishni (Autostart) YOQING\n" +
             "3. Orqaga qaytib, Battery sozlamasida \"No restrictions\" tanlang\n" +
-            "4. Recents ekrandan KiberQalqon kartochkasini past tortib qulflang"
+            "4. Recents ekrandan Anor Qalqon kartochkasini past tortib qulflang"
         Oem.HUAWEI, Oem.HONOR ->
             "Huawei/Honor Phone Manager ochiladi:\n" +
             "1. \"App launch\" ro'yxatida KIBER QALQON'ni toping\n" +
@@ -108,7 +108,7 @@ object OemAutostartGuide {
         Oem.OPPO ->
             "Oppo/Realme Security ochiladi:\n" +
             "1. \"Auto-launch\" ro'yxatida KIBER QALQON'ni YOQING\n" +
-            "2. Settings → Battery → KiberQalqon → \"Allow background activity\""
+            "2. Settings → Battery → Anor Qalqon → \"Allow background activity\""
         Oem.VIVO ->
             "Vivo iManager ochiladi:\n" +
             "1. \"Auto-start manager\"da KIBER QALQON YOQILGAN bo'lsin\n" +
@@ -116,7 +116,7 @@ object OemAutostartGuide {
         Oem.ONEPLUS ->
             "OnePlus battery sozlamasi ochiladi:\n" +
             "1. \"Battery optimization\"da KIBER QALQON \"Don't optimize\"\n" +
-            "2. Recent apps'da KiberQalqon'ni qulflang"
+            "2. Recent apps'da Anor Qalqon'ni qulflang"
         Oem.SAMSUNG ->
             "Samsung battery sozlamasi ochiladi:\n" +
             "1. \"Background usage limits\"da KIBER QALQON'ni \"Never sleeping apps\" ro'yxatiga qo'shing\n" +

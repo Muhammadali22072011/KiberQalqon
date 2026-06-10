@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — AutoScan ekrani satrlari (design_v4_extracted/screens3.jsx + data.jsx). -->
+<resources>
+    <!-- Skan fazasi -->
+    <string name="kq4_as_checking">TEKSHIRILMOQDA</string>
+    <string name="kq4_as_percent" translatable="false">%1$d%%</string>
+    <string name="kq4_as_new_file">Yangi fayl tekshirilmoqda</string>
+    <string name="kq4_as_step1">Fayl ochilmoqda</string>
+    <string name="kq4_as_step2">Ruxsatlar tekshirilmoqda</string>
+    <string name="kq4_as_step3">Bank himoyasi tekshirilmoqda</string>
+    <string name="kq4_as_step4">Zararli belgilar qidirilmoqda</string>
+
+    <!-- Natija — xavfli -->
+    <string name="kq4_as_danger_title">Xavfli fayl topildi!</string>
+    <string name="kq4_as_short_bank">Bu fayl aslida bank ilovangizdagi pul va parolingizni o\'g\'irlamoqchi.</string>
+    <string name="kq4_as_short_dropper">Bu fayl ochilganda telefoningizga yashirincha boshqa zararli dasturlarni yuklaydi.</string>
+    <string name="kq4_as_short_sms">Bu fayl SMS tasdiq kodlaringizni — bank kodlarini o\'qib o\'g\'irlaydi.</string>
+    <string name="kq4_as_short_generic">Bu fayl telefoningizga zarar yetkazishi mumkin.</string>
+
+    <!-- «Bu fayl nima qiladi» kartasi -->
+    <string name="kq4_as_does_label">Bu fayl nima qiladi</string>
+    <string name="kq4_as_does_bankpass">Bank ilovasi parolini o\'g\'irlaydi</string>
+    <string name="kq4_as_does_sms">SMS tasdiq kodlarini o\'qiydi</string>
+    <string name="kq4_as_does_screen">Ekraningizni yashirincha kuzatadi</string>
+    <string name="kq4_as_does_hide">O\'zini telefondan yashiradi</string>
+    <string name="kq4_as_does_download">Telefonga yashirin dasturlar yuklaydi</string>
+    <string name="kq4_as_does_remote">Telefonni masofadan boshqaradi</string>
+    <string name="kq4_as_does_contacts">Kontaktlaringizni o\'qiydi</string>
+    <string name="kq4_as_does_calls">Qo\'ng\'iroqlaringizni kuzatadi</string>
+
+    <!-- Avto-o'chirish hisoblagichi -->
+    <string name="kq4_as_autodelete_in">%1$d soniyadan keyin avtomatik o\'chiriladi</string>
+    <string name="kq4_as_deleting">O\'chirilmoqda…</string>
+
+    <!-- Natija — xavfsiz -->
+    <string name="kq4_as_safe_title">Fayl xavfsiz</string>
+    <string name="kq4_as_close">Yopish</string>
+
+    <!-- Fon'da allaqachon o'chirilgan holat -->
+    <string name="kq4_as_handled_title">Virus topildi va o\'chirildi</string>
+    <string name="kq4_as_handled_body">%1$s fayli xavfli deb topildi va avtomatik o\'chirildi (karantin).</string>
+    <string name="kq4_as_handled_reason">Sabab: %1$s</string>
+    <string name="kq4_as_handled_restore">Agar bu xato bo\'lsa, 7 kun ichida tiklash mumkin.</string>
+</resources>

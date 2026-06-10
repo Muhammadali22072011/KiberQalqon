@@ -68,7 +68,7 @@ object Quarantine {
 
         // Самозащита: KiberQalqon в карантин не идёт.
         if (SelfGuard.isOwnApk(context, originalFile.absolutePath)) {
-            return Result.Failed("KiberQalqon o'zini karantinga qo'ya olmaydi")
+            return Result.Failed("Anor Qalqon o'zini karantinga qo'ya olmaydi")
         }
 
         purgeExpired(context)

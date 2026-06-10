@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экрана «Сканер» (Apps). Общие теги в strings_kq4_shared.xml. -->
+<resources>
+    <string name="kq4_skaner_eyebrow">Сканер</string>
+    <string name="kq4_skaner_title">Проверенные файлы</string>
+    <string name="kq4_skaner_scan_cd">Полная проверка</string>
+    <string name="kq4_skaner_live_on_title">Авто-защита включена</string>
+    <string name="kq4_skaner_live_on_sub">Новые файлы проверяются автоматически</string>
+    <string name="kq4_skaner_live_off_title">Авто-защита выключена</string>
+    <string name="kq4_skaner_live_off_sub">Нажмите на карточку, чтобы включить</string>
+    <string name="kq4_skaner_live_off_tag">Выкл</string>
+    <string name="kq4_skaner_tag_unknown">Не проверен</string>
+    <string name="kq4_skaner_rescan">Перепроверить всё</string>
+    <string name="kq4_skaner_src_downloads">Загрузки</string>
+    <!-- Тосты ошибок при проверке строки (раньше были захардкожены в Kotlin) -->
+    <string name="kq4_skaner_err_scan_failed">Не удалось проверить файл</string>
+    <string name="kq4_skaner_err_scan_timeout">Проверка заняла слишком много времени</string>
+    <string name="kq4_skaner_err_generic">Ошибка: %1$s</string>
+    <!-- Метка уровня в диалоге объявления -->
+    <string name="kq4_skaner_news_level_critical">Важно</string>
+    <string name="kq4_skaner_news_level_warning">Предупреждение</string>
+    <string name="kq4_skaner_news_level_info">Объявление</string>
+</resources>

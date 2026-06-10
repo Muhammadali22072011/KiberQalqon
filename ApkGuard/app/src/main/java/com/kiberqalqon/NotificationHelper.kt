@@ -387,7 +387,7 @@ object NotificationHelper {
             createChannels(context)
             // Перепакетлаш/имзо мос эмас = қатъий бузилиш; қолганлари = муҳит (root/эмулятор).
             val tamper = reason == "signature" || reason == "tamper"
-            val title = "KiberQalqon ishga tushmadi"
+            val title = "Anor Qalqon ishga tushmadi"
             val text = if (tamper) {
                 "Ilova buzib ochilgan (qayta paketlangan) bo'lishi mumkin — xavfsizlik uchun to'xtatildi."
             } else {

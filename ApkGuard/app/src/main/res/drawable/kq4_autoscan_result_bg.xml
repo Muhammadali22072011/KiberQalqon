@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AutoScan natija foni (design screens3.jsx → AutoScan result):
+     radial-gradient(80% 55% at 50% 22%, rgba(224,67,47,.5), transparent)
+     + linear-gradient(180deg, #2A1410, #0C0806). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#2A1410"
+                android:endColor="#0C0806" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.5"
+                android:centerY="0.22"
+                android:gradientRadius="420dp"
+                android:startColor="#80E0432F"
+                android:centerColor="#26E0432F"
+                android:endColor="#00E0432F" />
+        </shape>
+    </item>
+</layer-list>

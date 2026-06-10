@@ -115,7 +115,7 @@ export default function Overview() {
           </div>
           <div className="body-pad">
             <div className="duel-row">
-              <div className="duel-name"><i style={{ background: '#25e0b0' }} /><span>KiberQalqon (offline)</span></div>
+              <div className="duel-name"><i style={{ background: '#25e0b0' }} /><span>Anor Qalqon (offline)</span></div>
               <div className="track"><div className="fill" style={{ width: `${ourPct}%`, background: '#25e0b0' }} /></div>
               <div className="duel-cnt">{ourMs ? fmtMs(ourMs) : '—'}</div>
             </div>
@@ -127,7 +127,7 @@ export default function Overview() {
           </div>
           <div className="perf-foot">
             Raqobatchi vaqti — <b>taxminiy</b> model: fayl hajmi (~{(Math.round((avgBytes / 1024 / 1024) * 10) / 10)} MB) ÷ yuklash tezligi + tahlil navbati.
-            KiberQalqon faylni qurilmaning o‘zida, internetsiz tekshiradi.
+            Anor Qalqon faylni qurilmaning o‘zida, internetsiz tekshiradi.
           </div>
         </Panel>
 

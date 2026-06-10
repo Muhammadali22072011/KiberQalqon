@@ -7,24 +7,24 @@
 
     <!-- Внешний glow -->
     <path
-        android:fillColor="#3300B4D8"
+        android:fillColor="#33C2143D"
         android:pathData="M60,5L15,25v30c0,27.75 19.2,53.7 45,60 25.8,-6.3 45,-32.25 45,-60V25L60,5z"/>
 
     <!-- Средний слой -->
     <path
-        android:fillColor="#5500B4D8"
+        android:fillColor="#55C2143D"
         android:pathData="M60,10L20,28v27c0,25 17.3,48.3 40,54 22.7,-5.7 40,-29 40,-54V28L60,10z"/>
 
     <!-- Основной щит -->
     <path
-        android:fillColor="#00B4D8"
-        android:strokeColor="#48CAE4"
+        android:fillColor="#C2143D"
+        android:strokeColor="#E11D48"
         android:strokeWidth="1.5"
         android:pathData="M60,15L25,31v24c0,22.5 15.4,43.5 35,48 19.6,-4.5 35,-25.5 35,-48V31L60,15z"/>
 
     <!-- Внутренний градиент эффект -->
     <path
-        android:fillColor="#0077B6"
+        android:fillColor="#8E0E2C"
         android:pathData="M60,22L31,35v20c0,18.8 12.8,36.3 29,40 16.2,-3.8 29,-21.3 29,-40V35L60,22z"/>
 
     <!-- UZ звезда/полумесяц в центре -->
@@ -39,6 +39,6 @@
 
     <!-- Галочка-чек -->
     <path
-        android:fillColor="#39FF14"
+        android:fillColor="#39D27E"
         android:pathData="M52,75l-7,-7l3,-3l4,4l13,-13l3,3z"/>
 </vector>

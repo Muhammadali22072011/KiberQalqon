@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — ScanResult + PermissionsDetail ekran satrlari (o'zbekcha). -->
+<resources>
+
+    <!-- ═══ Banner: manba (mono, uppercase) ═══ -->
+    <string name="kq4_scanres_src_telegram">TELEGRAM ORQALI KELDI</string>
+    <string name="kq4_scanres_src_whatsapp">WHATSAPP ORQALI KELDI</string>
+    <string name="kq4_scanres_src_web">INTERNETDAN YUKLAB OLINGAN</string>
+    <string name="kq4_scanres_src_folder">TELEFON XOTIRASIDAN TOPILDI</string>
+    <string name="kq4_scanres_src_installed">O\'RNATILGAN ILOVA</string>
+
+    <!-- ═══ Banner: "o'zini ... qilib ko'rsatadi" ═══ -->
+    <string name="kq4_scanres_lookslike">O\'zini «%1$s» qilib ko\'rsatadi</string>
+    <string name="kq4_scanres_like_photos">Rasm albomi</string>
+    <string name="kq4_scanres_like_video">Video fayl</string>
+    <string name="kq4_scanres_like_doc">Hujjat</string>
+    <string name="kq4_scanres_like_invite">To\'y taklifnomasi</string>
+
+    <!-- ═══ Seksiya sarlavhalari ═══ -->
+    <string name="kq4_scanres_what_title">Bu fayl nima?</string>
+    <string name="kq4_scanres_does_title">Bu fayl nima qiladi?</string>
+    <string name="kq4_scanres_source_title">Qayerdan keldi?</string>
+
+    <!-- ═══ "Nima qiladi" satrlari (inson tilida) ═══ -->
+    <string name="kq4_scanres_does_sig">Ma\'lum virus belgilari topildi</string>
+    <string name="kq4_scanres_does_generic">Shubhali belgilar aniqlandi — ehtiyot bo\'ling</string>
+    <string name="kq4_scanres_does_safe">Hech qanday xavfli harakat topilmadi</string>
+    <string name="kq4_scanres_does_overlay">Bank ilovasi ustiga soxta oyna qo\'yadi</string>
+    <string name="kq4_scanres_does_sms_read">SMS tasdiq kodlarini o\'qiydi</string>
+    <string name="kq4_scanres_does_sms_send">Sizning nomingizdan SMS yuboradi</string>
+    <string name="kq4_scanres_does_screen">Ekraningizni yashirincha kuzatadi</string>
+    <string name="kq4_scanres_does_download">Telefonga yashirin dasturlar yuklaydi</string>
+    <string name="kq4_scanres_does_admin">O\'zini o\'chirishdan himoya qiladi</string>
+    <string name="kq4_scanres_does_contacts">Kontaktlaringizni o\'qiydi</string>
+    <string name="kq4_scanres_does_calls">Qo\'ng\'iroqlaringizni kuzatadi</string>
+    <string name="kq4_scanres_does_location">Joylashuvingizni kuzatadi</string>
+    <string name="kq4_scanres_does_mic">Mikrofondan yashirincha yozib oladi</string>
+    <string name="kq4_scanres_does_camera">Kameradan yashirincha foydalanadi</string>
+    <string name="kq4_scanres_does_files">Barcha fayllaringizga kiradi</string>
+
+    <!-- ═══ "Qayerdan keldi" ogohlantirishlari ═══ -->
+    <string name="kq4_scanres_warn_telegram">Bu APK Telegram orqali keldi. Haqiqiy ilovalar faqat Play Market\'dan o\'rnatiladi — tanish odamdan kelgan bo\'lsa ham, uning telefoni zararlangan bo\'lishi mumkin.</string>
+    <string name="kq4_scanres_warn_whatsapp">Bu APK WhatsApp orqali keldi. Haqiqiy ilovalar faqat Play Market\'dan o\'rnatiladi — tanish odamdan kelgan bo\'lsa ham, uning telefoni zararlangan bo\'lishi mumkin.</string>
+    <string name="kq4_scanres_warn_web">Bu fayl noma\'lum saytdan yuklab olingan. Video yoki rasm hech qachon .apk bo\'lmaydi — haqiqiy ilovalar faqat Play Market\'dan o\'rnatiladi.</string>
+    <string name="kq4_scanres_warn_folder">Bu fayl telefon xotirasidan topildi. Qayerdan kelgani noma\'lum — bunday APK fayllarni o\'rnatmang.</string>
+    <string name="kq4_scanres_warn_installed">Bu ilova Play Market\'dan tashqarida o\'rnatilgan bo\'lishi mumkin. Xavfli bo\'lsa — darhol o\'chirib tashlang.</string>
+    <string name="kq4_scanres_src_safe_note">Baribir ilovalarni faqat Play Market\'dan o\'rnatish — eng xavfsiz yo\'l.</string>
+
+    <!-- ═══ Ruxsatlar havola-kartasi ═══ -->
+    <string name="kq4_scanres_perms_title">So\'ralgan ruxsatlar</string>
+    <string name="kq4_scanres_perm_count_danger">%1$d ta ruxsat · %2$d tasi juda xavfli</string>
+
+    <!-- ═══ Harakatlar ═══ -->
+    <string name="kq4_scanres_delete">Telefondan o\'chirish</string>
+    <string name="kq4_scanres_deleted_note">Fayl o\'chirildi. Telefoningiz xavfsiz.</string>
+    <string name="kq4_scanres_warn_friends">Do\'stlarni ogohlantirish</string>
+    <string name="kq4_scanres_close">Yopish</string>
+
+    <!-- ═══ PermissionsDetail ekrani ═══ -->
+    <string name="kq4_scanres_perm_eyebrow">RUXSATLAR</string>
+    <string name="kq4_scanres_perm_summary">Bu fayl juda xavfli ruxsatlar so\'raydi. Ular maxfiy ma\'lumotlaringizga — SMS, bank kodlari, ekran — kirishi mumkin.</string>
+    <string name="kq4_scanres_group_crit">Eng xavfli ruxsatlar</string>
+    <string name="kq4_scanres_group_warn">E\'tibor bering</string>
+    <string name="kq4_scanres_group_normal">Oddiy ruxsatlar</string>
+    <string name="kq4_scanres_back_result">Natijaga qaytish</string>
+
+    <!-- ═══ Ruxsat nomlari + izohlar (data.jsx PERMS) ═══ -->
+    <string name="kq4_scanres_perm_read_sms">SMS o\'qish</string>
+    <string name="kq4_scanres_perm_read_sms_s">Bankdan kelgan tasdiq kodlarini o\'qiy oladi</string>
+    <string name="kq4_scanres_perm_recv_sms">SMS qabul qilish</string>
+    <string name="kq4_scanres_perm_recv_sms_s">Kelgan SMS xabarlarni sizdan oldin ko\'radi</string>
+    <string name="kq4_scanres_perm_send_sms">SMS yuborish</string>
+    <string name="kq4_scanres_perm_send_sms_s">Sizning nomingizdan pul o\'tkazma so\'rovi yuboradi</string>
+    <string name="kq4_scanres_perm_a11y">Maxsus imkoniyatlar</string>
+    <string name="kq4_scanres_perm_a11y_s">Ekraningizni ko\'radi va o\'zi tugmalarni bosadi</string>
+    <string name="kq4_scanres_perm_overlay">Oynalar ustida ko\'rsatish</string>
+    <string name="kq4_scanres_perm_overlay_s">Bank ilovasi ustiga soxta oyna qo\'yib parol so\'raydi</string>
+    <string name="kq4_scanres_perm_phone_state">Telefon holati</string>
+    <string name="kq4_scanres_perm_phone_state_s">Telefon raqamingizni va qurilma raqamini biladi</string>
+    <string name="kq4_scanres_perm_contacts">Kontaktlar</string>
+    <string name="kq4_scanres_perm_contacts_s">Telefon kitobingizdagi odamlarni o\'qiydi</string>
+    <string name="kq4_scanres_perm_call_log">Qo\'ng\'iroqlar tarixi</string>
+    <string name="kq4_scanres_perm_call_log_s">Kimga qo\'ng\'iroq qilganingizni ko\'radi</string>
+    <string name="kq4_scanres_perm_install">Ilova o\'rnatish</string>
+    <string name="kq4_scanres_perm_install_s">Yangi dasturlarni o\'zi o\'rnatishga urinadi</string>
+    <string name="kq4_scanres_perm_query_all">Ilovalar ro\'yxati</string>
+    <string name="kq4_scanres_perm_query_all_s">Telefondagi barcha ilovalarni ko\'radi</string>
+    <string name="kq4_scanres_perm_camera">Kamera</string>
+    <string name="kq4_scanres_perm_camera_s">Yashirincha rasm yoki video olishi mumkin</string>
+    <string name="kq4_scanres_perm_mic">Mikrofon</string>
+    <string name="kq4_scanres_perm_mic_s">Atrofdagi gaplarni yozib olishi mumkin</string>
+    <string name="kq4_scanres_perm_internet">Internet</string>
+    <string name="kq4_scanres_perm_internet_s">Ma\'lumot uzatish uchun</string>
+    <string name="kq4_scanres_perm_network">Tarmoq holati</string>
+    <string name="kq4_scanres_perm_network_s">Internet bor-yo\'qligini tekshiradi</string>
+    <string name="kq4_scanres_perm_storage">Xotira</string>
+    <string name="kq4_scanres_perm_storage_s">Telefondagi fayllarga kirish</string>
+
+    <!-- Katalogda izohi yo'q ruxsatlar uchun umumiy izohlar -->
+    <string name="kq4_scanres_perm_generic_crit">Juda xavfli ruxsat — ehtiyot bo\'ling</string>
+    <string name="kq4_scanres_perm_generic_warn">E\'tibor talab qiladigan ruxsat</string>
+    <string name="kq4_scanres_perm_generic_normal">Oddiy texnik ruxsat</string>
+</resources>

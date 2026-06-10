@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KIBER QALQON</string>
-    <string name="widget_description">KiberQalqon himoya holatini va oxirgi tekshiruvni ko\'rsatadi. Bir bosish bilan tezkor skan.</string>
+    <string name="app_name">ANOR QALQON</string>
+    <string name="widget_description">Anor Qalqon himoya holatini va oxirgi tekshiruvni ko\'rsatadi. Bir bosish bilan tezkor skan.</string>
 
     <!-- Permissions dialogs (SplashActivity) -->
     <string name="perm_storage_title">Fayllarga ruxsat</string>
-    <string name="perm_storage_msg">KiberQalqon barcha fayllaringizni tekshirishi uchun ruxsat kerak.\n\nOK bosib ruxsat bering.</string>
+    <string name="perm_storage_msg">Anor Qalqon barcha fayllaringizni tekshirishi uchun ruxsat kerak.\n\nOK bosib ruxsat bering.</string>
     <string name="perm_overlay_title">Boshqa oynalar ustida ruxsat</string>
     <string name="perm_overlay_msg">Virus topilganda darhol ogohlantirish chiqarish uchun ruxsat kerak.\n\nOK bosing.</string>
     <string name="perm_required_title">Ruxsat kerak</string>
-    <string name="perm_required_msg">Fayllarga kirmay turib KiberQalqon qurilmangizni himoya qila olmaydi.</string>
+    <string name="perm_required_msg">Fayllarga kirmay turib Anor Qalqon qurilmangizni himoya qila olmaydi.</string>
     <string name="btn_retry">Qayta urinish</string>
     <string name="btn_exit">Chiqish</string>
 
@@ -35,8 +35,8 @@
     <!-- Share scan result -->
     <string name="share_result">DO\'STLARGA OGOHLANTIRISH</string>
     <string name="share_subject">⚠️ Diqqat: zararli APK aniqlandi</string>
-    <string name="share_text_danger">⚠️ DIQQAT! KiberQalqon zararli faylni aniqladi:\n\n📦 %1$s\n\n❌ Bu fayl viruslar tarkibida — uni telefoningizga O\'RNATMANG!\n\n🛡️ KiberQalqon orqali tekshiring: t.me/kiberqalqon_alerts_bot</string>
-    <string name="share_text_suspicious">⚠️ KiberQalqon shubhali fayl aniqladi:\n\n📦 %1$s\n\nO\'rnatishdan oldin yaxshilab tekshiring.\n\nt.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_danger">⚠️ DIQQAT! Anor Qalqon zararli faylni aniqladi:\n\n📦 %1$s\n\n❌ Bu fayl viruslar tarkibida — uni telefoningizga O\'RNATMANG!\n\n🛡️ Anor Qalqon orqali tekshiring: t.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_suspicious">⚠️ Anor Qalqon shubhali fayl aniqladi:\n\n📦 %1$s\n\nO\'rnatishdan oldin yaxshilab tekshiring.\n\nt.me/kiberqalqon_alerts_bot</string>
     <string name="share_via">Yuborish</string>
 
     <!-- AutoScanActivity install/back -->
@@ -49,7 +49,7 @@
     <string name="autoscan_scanning">Tekshirilmoqda…</string>
     <string name="autoscan_delete_cancelled">O\'chirish bekor qilindi. Fayl hali ham qurilmada.</string>
     <string name="autoscan_no_path">Fayl yo\'li ko\'rsatilmagan.</string>
-    <string name="autoscan_self_refused">Bu KiberQalqonning o\'zi — himoyachini o\'chirish taqiqlangan.</string>
+    <string name="autoscan_self_refused">Bu Anor Qalqonning o\'zi — himoyachini o\'chirish taqiqlangan.</string>
 
     <!-- FileDeleter results -->
     <string name="filedel_no_permission">Faylni o\'chirib bo\'lmadi — ruxsat yo\'q. Qo\'lda o\'chiring.</string>
@@ -88,6 +88,9 @@
 
     <!-- Dashboard - redesign §3.3 -->
     <string name="status_protected">Himoyalangan</string>
+    <string name="status_partial">Qisman himoyalangan</string>
+    <string name="status_at_risk">Himoya yetarli emas</string>
+    <string name="kq_hero_sub">Jami %1$d ta tekshirildi · %2$d ta bloklandi</string>
     <string name="last_scan_subtitle">So\'nggi tekshiruv 12 daqiqa oldin</string>
     <string name="kq_scan_now">Hozir tekshirish</string>
     <string name="kq_threats_today">Bugungi topilmalar</string>
@@ -127,14 +130,14 @@
     <string name="ctx_from_telegram">Bu APK Telegram orqali keldi. Videolar hech qachon APK shaklida yuborilmaydi — ehtiyot bo\'ling.</string>
     <string name="ctx_from_whatsapp">Bu APK WhatsApp orqali keldi. Haqiqiy ilovalar faqat Play Store dan o\'rnatiladi.</string>
     <string name="ctx_from_download">Bu APK yuklab olingan. O\'rnatishdan oldin manbaiga ishonch hosil qiling.</string>
-    <string name="ctx_from_share">Siz bu APKni KiberQalqonga tekshirish uchun yubordingiz.</string>
+    <string name="ctx_from_share">Siz bu APKni Anor Qalqonga tekshirish uchun yubordingiz.</string>
 
     <!-- Onboarding (design copy from screens-onboarding.jsx) -->
     <string name="onb_eyebrow_1">01 · BOSHLASH</string>
     <string name="onb_eyebrow_2">02 · ANIQLASH</string>
     <string name="onb_eyebrow_3">03 · NAZORAT</string>
     <string name="onboarding_title_1">Avtomatik himoya — 24/7</string>
-    <string name="onboarding_desc_1">KiberQalqon Telegram, Yuklab olishlar va boshqa papkalarni har 15 daqiqada tekshirib turadi. Zararli APK fayl topilsa — darhol bloklanadi.</string>
+    <string name="onboarding_desc_1">Anor Qalqon Telegram, Yuklab olishlar va boshqa papkalarni har 15 daqiqada tekshirib turadi. Zararli APK fayl topilsa — darhol bloklanadi.</string>
     <string name="onboarding_title_2">5 ta zararli oilani aniqlaymiz</string>
     <string name="onboarding_desc_2">Ajina.Banker, RoundRift va boshqa Markaziy Osiyo bank troyanlarining yangi avlodlari sizning telefoningizgacha yetib bormaydi.</string>
     <string name="onboarding_title_3">Sodda til, kuchli himoya</string>
@@ -356,7 +359,7 @@
     <string name="scanning_text">Scanning...</string>
 
     <!-- Dashboard new redesign extras (2026-05-27 localization pass) -->
-    <string name="dash_brand">KiberQalqon</string>
+    <string name="dash_brand">Anor Qalqon</string>
     <string name="dash_protection_on">HIMOYA · FAOL</string>
     <string name="dash_your_phone">SIZNING TELEFONINGIZ</string>
     <string name="dash_recent_threats">SO\'NGGI XAVFLAR</string>
@@ -372,7 +375,7 @@
     <string name="settings_eyebrow">SOZLAMALAR</string>
     <string name="settings_header_title">Boshqaruv</string>
     <string name="settings_header_subtitle">Himoya darajasini moslashtiring</string>
-    <string name="settings_pro_title">KiberQalqon Pro</string>
+    <string name="settings_pro_title">Anor Qalqon Pro</string>
     <string name="settings_pro_version">VERSIYA 7.8 · NAVOIY</string>
     <string name="settings_pro_active">✓ FAOL</string>
     <string name="settings_section_protection">HIMOYA</string>
@@ -384,33 +387,33 @@
     <string name="settings_accent_label">Brendning asosiy rangi</string>
     <string name="settings_section_language">TIL</string>
     <string name="settings_section_about">HAQIDA</string>
-    <string name="settings_footer">KIBERQALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
+    <string name="settings_footer">ANOR QALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
 
     <!-- About / Terms / Privacy / Consent / Welcome / Settings hardcoded -->
-    <string name="about_intro">KIBER QALQON — bu O\'zbekiston uchun ishlab chiqilgan zamonaviy kiber-himoya ilovasi. Telefoningizni zararli APK fayllar, viruslar va aldamchi (fishing) hujumlardan asraydi.</string>
+    <string name="about_intro">ANOR QALQON — bu O\'zbekiston uchun ishlab chiqilgan zamonaviy kiber-himoya ilovasi. Telefoningizni zararli APK fayllar, viruslar va aldamchi (fishing) hujumlardan asraydi.</string>
     <string name="about_section_features">IMKONIYATLAR</string>
     <string name="about_features_body">🛡 Fonda avtomatik himoya\n  • Har 15 daqiqada tekshirish\n  • Xavfli fayllarni o\'chirish\n\n🔍 Qo\'lda tekshirish\n  • Barcha APK fayllar ro\'yxati\n  • Batafsil tahlil natijalari\n\n📡 Serverga yuklash\n  • Xavflilarni tahlil uchun yuborish\n\n🚫 Aldamchi bildirishnomalar himoyasi\n  • Shubhalilarni bloklash\n  • Bank va to\'lov xavfsizligi\n\n🌐 Ikki til\n  • O\'zbekcha (asosiy)\n  • Русский</string>
     <string name="about_tech_body">• Kotlin — zamonaviy dasturlash tili\n• Material Design 3 — chiroyli dizayn\n• Android Jetpack — ishonchli komponentlar\n• WorkManager — fonda ishlash\n• ProGuard — kod himoyasi\n• OkHttp — xavfsiz tarmoq</string>
     <string name="about_section_tech">TEXNOLOGIYALAR</string>
     <string name="about_section_author">MUALLIF</string>
-    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/KiberQalqon\nEmail: support@KiberQalqon.uz</string>
+    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/Anor Qalqon\nEmail: support@Anor Qalqon.uz</string>
     <string name="about_section_license">LITSENZIYA</string>
-    <string name="about_license_body">Bu loyiha ochiq kodli va o\'quv maqsadlarida ishlatilishi mumkin.\n\n© 2026 KIBER QALQON. Barcha huquqlar himoyalangan.</string>
+    <string name="about_license_body">Bu loyiha ochiq kodli va o\'quv maqsadlarida ishlatilishi mumkin.\n\n© 2026 ANOR QALQON. Barcha huquqlar himoyalangan.</string>
     <string name="about_section_project">LOYIHA HAQIDA</string>
     <string name="about_version">VERSION 7.6</string>
 
     <string name="terms_breadcrumb">Foydalanish shartlari</string>
     <string name="terms_intro_title">Foydalanishni boshlashdan oldin</string>
-    <string name="terms_last_update">OXIRGI YANGILANISH · 2026 · 05 · 29</string>
+    <string name="terms_last_update">OXIRGI YANGILANISH · 2026 · 06 · 10</string>
     <string name="terms_section_terms">FOYDALANISH SHARTLARI</string>
     <string name="terms_section_privacy">MAXFIYLIK SIYOSATI</string>
-    <string name="terms_terms_body">KIBER QALQON ilovasidan foydalanish orqali siz ushbu shartlarga rozilik bildirasiz. Agar shartlar bilan rozi bo\'lmasangiz, ilovadan foydalanmang.</string>
-    <string name="terms_privacy_body">KIBER QALQON sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
+    <string name="terms_terms_body">ANOR QALQON ilovasidan foydalanish orqali siz ushbu shartlarga rozilik bildirasiz. Agar shartlar bilan rozi bo\'lmasangiz, ilovadan foydalanmang.</string>
+    <string name="terms_privacy_body">ANOR QALQON sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
     <string name="terms_changes_body">Biz ushbu shartlarni istalgan vaqtda o\'zgartirish huquqini saqlab qolamiz. O\'zgarishlar ilovada e\'lon qilinadi.</string>
 
     <string name="consent_terms_chk">Foydalanish shartlarini o\'qib chiqdim *</string>
     <string name="consent_privacy_chk">Maxfiylik siyosatiga roziman *</string>
-    <string name="consent_community_chk">Jamoatchilik xavfsizligi uchun ma\'lumot ulashish *</string>
+    <string name="consent_community_chk">Jamoatchilik xavfsizligi uchun ma\'lumot ulashish (ixtiyoriy)</string>
     <string name="consent_reject">Rad etish</string>
     <string name="consent_accept">Qabul qilaman</string>
 
@@ -438,7 +441,7 @@
     <string name="auto_scan_label_detected">ANIQLANGAN</string>
     <string name="auto_scan_dangerous_perms">XAVFLI RUXSATLAR</string>
 
-    <string name="splash_logo_title">KIBER QALQON</string>
+    <string name="splash_logo_title">ANOR QALQON</string>
 
     <string name="apk_list_eyebrow">APK fayllar</string>
 
@@ -555,7 +558,7 @@
 
     <!-- ═══ Localization pass 2026-05-28: AutoScanActivity hardcoded UI ═══ -->
     <string name="autoscan_unknown_file">Noma\'lum fayl</string>
-    <string name="autoscan_need_write_perm">Faylni o\'chirish uchun \"Saqlash\" ruxsati kerak.\n\nSozlamalar → Ilovalar → KiberQalqon → Ruxsatlar → Saqlash</string>
+    <string name="autoscan_need_write_perm">Faylni o\'chirish uchun \"Saqlash\" ruxsati kerak.\n\nSozlamalar → Ilovalar → Anor Qalqon → Ruxsatlar → Saqlash</string>
     <string name="autoscan_open_settings_btn">SOZLAMALARNI OCHISH</string>
     <string name="autoscan_permission_granted_deleting">Ruxsat berildi — o\'chirilmoqda…</string>
     <string name="autoscan_cannot_show_result">Natijani ko\'rsatib bo\'lmadi: %1$s</string>
@@ -582,7 +585,7 @@
     <string name="is_sub_no_threats">Hech qanday xavfli APK fayl topilmadi.</string>
     <string name="is_sub_threats_found">%1$d ta zararli yoki shubhali APK topildi.</string>
     <string name="is_summary_no_threat">Xavf aniqlanmadi</string>
-    <string name="is_summary_no_threat_sub">KiberQalqon endi fonda yangi APK fayllarni avtomatik tekshirib turadi.</string>
+    <string name="is_summary_no_threat_sub">Anor Qalqon endi fonda yangi APK fayllarni avtomatik tekshirib turadi.</string>
     <string name="is_go_main">Asosiy ekranga o\'tish</string>
     <string name="is_dangerous_found_count">%1$d ta xavfli APK topildi</string>
     <string name="is_recommend_delete">Quyidagi fayllarni o\'chirish tavsiya etiladi.</string>
@@ -613,9 +616,11 @@
     <string name="set_row_background_sub">WorkManager · har 15 daqiqada</string>
     <string name="set_row_upload_title">Bulutga yuklash</string>
     <string name="set_row_upload_sub">Tahlil uchun xavfli APK\'ni serverga yuborish</string>
+    <string name="set_owner_mode_on">Egasi rejimi yoqildi — ichki boʻlimlar ochildi</string>
+    <string name="set_owner_mode_off">Egasi rejimi oʻchirildi — ichki boʻlimlar yashirildi</string>
     <string name="set_help_center">Yordam markazi</string>
-    <string name="set_about_dialog_title">KiberQalqon</string>
-    <string name="set_about_dialog_message">KiberQalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nMarkaziy Osiyo bank troyanlariga qarshi milliy himoya. Ajina.Banker, RoundRift va boshqa zararli oilalarni aniqlaydi.</string>
+    <string name="set_about_dialog_title">Anor Qalqon</string>
+    <string name="set_about_dialog_message">Anor Qalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nMarkaziy Osiyo bank troyanlariga qarshi milliy himoya. Ajina.Banker, RoundRift va boshqa zararli oilalarni aniqlaydi.</string>
     <string name="set_help_dialog_message">Savol yoki muammomi? Bizga aloqada bo\'ling:\n\n• Telegram: @kiberqalqon_uz\n• Email: support@kiberqalqon.uz\n• Web: https://kiberqalqon.uz</string>
     <string name="set_help_send_problem">Muammoni yuborish</string>
     <!-- Muammoni yuborish ekrani -->
@@ -640,7 +645,7 @@
     <string name="set_community_label">Jamoatchilik xavfsizligi (faqat hash + paket)</string>
     <string name="set_revoke_consent">Rozilikni qaytarib olish</string>
     <string name="set_revoke_confirm_title">Rozilikni bekor qilish?</string>
-    <string name="set_revoke_confirm_message">Bu Telegram telemetriyani o\'chiradi va keyingi ishga tushirishda KiberQalqon sizdan qayta rozilik so\'raydi.\n\nDavom etamizmi?</string>
+    <string name="set_revoke_confirm_message">Bu Telegram telemetriyani o\'chiradi va keyingi ishga tushirishda Anor Qalqon sizdan qayta rozilik so\'raydi.\n\nDavom etamizmi?</string>
     <string name="set_yes_revoke">Ha, bekor qilish</string>
     <string name="set_consent_revoked">Rozilik bekor qilindi.</string>
     <string name="set_no">Yo\'q</string>
@@ -649,21 +654,21 @@
     <string name="splash_subtitle">TELEFON HIMOYASI · V %1$s</string>
     <string name="splash_version">VERSION %1$s</string>
     <string name="splash_oem_extra_setting_title">%1$s qo\'shimcha sozlamasi</string>
-    <string name="splash_oem_guide_message">Sizning telefoningiz fon ilovalarini avtomatik o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun bir martagina qo\'shimcha sozlash kerak.</string>
+    <string name="splash_oem_guide_message">Sizning telefoningiz fon ilovalarini avtomatik o\'ldiradi. ANOR QALQON 24/7 ishlashi uchun bir martagina qo\'shimcha sozlash kerak.</string>
     <string name="splash_open_setting">Sozlamani ochish</string>
     <string name="splash_later">Keyinroq</string>
     <string name="splash_dont_show">Ko\'rsatma</string>
     <string name="splash_battery_title">Doimiy himoya uchun ruxsat</string>
-    <string name="splash_battery_message">Xiaomi, Huawei, Samsung va boshqalar \'batareya tejash\' uchun fon ilovalarini o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun ruxsat bering.\n\nRuxsat bermasangiz: skan har 2-3 soatda emas, balki kuniga 1 marta ishlaydi.</string>
+    <string name="splash_battery_message">Xiaomi, Huawei, Samsung va boshqalar \'batareya tejash\' uchun fon ilovalarini o\'ldiradi. ANOR QALQON 24/7 ishlashi uchun ruxsat bering.\n\nRuxsat bermasangiz: skan har 2-3 soatda emas, balki kuniga 1 marta ishlaydi.</string>
     <string name="splash_location_title">Joylashuv uchun ruxsat</string>
     <string name="splash_location_message">Markaziy himoya xaritasida qurilmangiz aniq joyda ko\'rinishi uchun joylashuvga ruxsat bering.\n\nRuxsat bermasangiz: qurilma xaritada faqat taxminiy shahar darajasida ko\'rinadi.</string>
     <string name="splash_storage_title">Fayllarga kirish uchun ruxsat</string>
-    <string name="splash_storage_message">KIBER QALQON ga APK fayllarni topish va tekshirish uchun barcha fayllarga kirish kerak.\n\nOK ni bosing va ruxsat bering.</string>
+    <string name="splash_storage_message">ANOR QALQON ga APK fayllarni topish va tekshirish uchun barcha fayllarga kirish kerak.\n\nOK ni bosing va ruxsat bering.</string>
     <string name="splash_overlay_title">Boshqa oynalar ustida ko\'rsatish uchun ruxsat</string>
-    <string name="splash_overlay_message">KIBER QALQON viruslarni aniqlaganda boshqa ilovalar ustida ogohlantirish ko\'rsatishi kerak.\n\nOK ni bosing va ruxsat bering.</string>
+    <string name="splash_overlay_message">ANOR QALQON viruslarni aniqlaganda boshqa ilovalar ustida ogohlantirish ko\'rsatishi kerak.\n\nOK ni bosing va ruxsat bering.</string>
     <string name="splash_oem_overlay_title">%1$s: qo\'shimcha sozlama</string>
     <string name="splash_oem_overlay_message">Standart \'Display over other apps\' yetarli emas. Sizning telefoningizda alohida sozlamalar bor.</string>
-    <string name="splash_storage_denied_message">Fayllarga kirish bo\'lmasa, KIBER QALQON qurilmangizni himoya qila olmaydi.</string>
+    <string name="splash_storage_denied_message">Fayllarga kirish bo\'lmasa, ANOR QALQON qurilmangizni himoya qila olmaydi.</string>
     <string name="splash_retry">Qaytarish</string>
     <string name="splash_subtitle2">Zararli APK fayllardan himoyalanish</string>
     <string name="hist_found_threats">Topilgan tahdidlar</string>
@@ -679,18 +684,18 @@
     <string name="widget_scan_btn">Skan</string>
     <string name="notif_dangerous_apk_title">🛡️ Xavfli APK topildi</string>
     <string name="notif_tap_to_check">%1$s — bosing va tekshiring</string>
-    <string name="notif_new_apk_big">Yangi APK fayli aniqlandi:\n%1$s\n\nBildirishnoma ustiga bosing — KiberQalqon to\'liq tekshiruv natijasini ko\'rsatadi va xavfli bo\'lsa o\'chirish tugmasini chiqaradi.</string>
+    <string name="notif_new_apk_big">Yangi APK fayli aniqlandi:\n%1$s\n\nBildirishnoma ustiga bosing — Anor Qalqon to\'liq tekshiruv natijasini ko\'rsatadi va xavfli bo\'lsa o\'chirish tugmasini chiqaradi.</string>
     <string name="notif_installed_danger_title">🔴 Xavfli ilova o\'rnatildi: %1$s</string>
     <string name="notif_verdict_danger">Xavfli APK topildi</string>
     <string name="notif_verdict_suspicious">Shubhali APK topildi</string>
     <string name="notif_verdict_found">APK topildi</string>
     <string name="notif_kill_title">⚠️ Himoya o\'chirilgan edi</string>
-    <string name="notif_kill_text">%1$d soat davomida KIBER QALQON ishlamadi</string>
-    <string name="notif_kill_big">Sizning %1$s qurilmangiz KIBER QALQON jarayonini %2$d soat oldin o\'ldirib qo\'ygan edi. Doimiy himoya uchun qo\'shimcha sozlash zarur.\n\nBosib, %3$s\'ni oching.</string>
+    <string name="notif_kill_text">%1$d soat davomida ANOR QALQON ishlamadi</string>
+    <string name="notif_kill_big">Sizning %1$s qurilmangiz ANOR QALQON jarayonini %2$d soat oldin o\'ldirib qo\'ygan edi. Doimiy himoya uchun qo\'shimcha sozlash zarur.\n\nBosib, %3$s\'ni oching.</string>
     <string name="notif_kill_center_miui">MIUI Security Center</string>
     <string name="notif_kill_center_default">tizim sozlamasi</string>
     <string name="notif_welcome_title">✓ Himoyangiz yoqildi</string>
-    <string name="notif_welcome_text">KIBER QALQON endi telefoningizni 24/7 himoya qiladi</string>
+    <string name="notif_welcome_text">ANOR QALQON endi telefoningizni 24/7 himoya qiladi</string>
     <string name="notif_welcome_big">Barcha standart sozlamalar avtomatik yoqildi:\n• Fon skani har 15 daqiqada\n• Yangi APK darhol tekshiriladi\n• Tovushli va tebranishli ogohlantirish\n• Avtomatik baza yangilanishi\n\nHech narsa o\'zgartirmasdan, telefoningiz himoyalangan.</string>
     <string name="notif_installed_suspicious_title">🟠 Shubhali ilova: %1$s</string>
 </resources>

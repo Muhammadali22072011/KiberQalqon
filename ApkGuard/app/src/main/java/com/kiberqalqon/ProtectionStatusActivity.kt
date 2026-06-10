@@ -3,38 +3,37 @@ package com.kiberqalqon
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.view.Gravity
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.material.button.MaterialButton
+import com.kiberqalqon.databinding.ActivityProtectionV4Binding
+import com.kiberqalqon.databinding.ItemKq4ProtectionRowBinding
 
 /**
  * Himoya holati — kirishda barcha ruxsat/sozlamalarni BIR ekranda ko'rsatadi:
- * ✓ yoqilgan / ✗ yo'q / ⚠ qo'lda. Har birining yonida "Yoqish" tugmasi tegishli
+ * ✓ yoqilgan / yo'q. Har birining yonida "Yoqish" tugmasi tegishli
  * tizim ekranini ochadi. Foydalanuvchi bir qarashda hammasi yoqilganini ko'radi.
+ *
+ * v4 dizayn (design_v4_extracted/screens2.jsx → Protection): layout
+ * activity_protection_v4.xml (halqa + hisob), qatorlar item_kq4_protection_row.xml.
+ * Logika o'zgarmagan: ruxsat tekshiruvlari, tizim sozlamalari intentlari,
+ * onboarding-gate ("Davom etish" majburiy ruxsatlarsiz o'tkazmaydi).
  *
  * MUHIM: bu ekran kirish yo'lida turadi, shuning uchun HECH QACHON yiqilmasligi
  * kerak — onCreate'dagi har qanday xato bo'lsa, to'g'ridan-to'g'ri Dashboard'ga o'tamiz.
  */
 class ProtectionStatusActivity : AppCompatActivity() {
 
-    private lateinit var list: LinearLayout
-
-    // "Davom etish" tugmasi — barcha majburiy ruxsat berilmaguncha ichkariga o'tkazmaydi.
-    private var continueBtn: MaterialButton? = null
+    private var binding: ActivityProtectionV4Binding? = null
 
     // Joylashuv ruxsati shu sessiyada bir marta so'ralganmi (loop bo'lmasligi uchun).
     private var locationAsked = false
@@ -52,12 +51,39 @@ class ProtectionStatusActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         try {
             try { ThemeHelper.applyAccent(this) } catch (_: Throwable) {}
-            buildUi()
+            val b = ActivityProtectionV4Binding.inflate(layoutInflater)
+            binding = b
+            setContentView(b.root)
+            b.ringProt.strokeWidthDp = 11f
+
+            b.btnProtBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+            b.btnProtContinue.setOnClickListener {
+                if (allCriticalPermissionsGranted(this)) {
+                    proceed(ack = true)
+                } else {
+                    // Ruxsatsiz davom ettirmaymiz — qaysi biri yetishmayotganini
+                    // "Yoqish" tugmali qatorlar ko'rsatadi.
+                    Toast.makeText(this, R.string.kq4_prot_continue_toast, Toast.LENGTH_LONG).show()
+                    renderRows()
+                }
+            }
+
             onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    // Barcha majburiy ruxsat berilgan bo'lsa — orqaga = davom etish.
-                    // Aks holda ichkariga O'TKAZMAYMIZ: ilovani fonga tushiramiz
-                    // (chiqib ketmaydi, lekin ruxsatsiz Dashboard'ga ham kira olmaydi).
+                    // Ekran ilova ICHIDAN ochilgan (onboarding allaqachon o'tilgan,
+                    // Dashboard/Sozlamalar'dan holatni ko'rish uchun kirilgan) —
+                    // oddiy "orqaga": ostidagi ekran joyida turibdi, faqat yopamiz.
+                    // Aks holda v4 ko'rinadigan "orqaga" strelkasi yo Dashboard
+                    // dublikatini yaratardi, yo moveTaskToBack bilan ilovani
+                    // "jimgina yo'q qilib" yuborardi (crash'dek ko'rinadi).
+                    if (isProtectionAckedSafe()) {
+                        finish()
+                        return
+                    }
+                    // Onboarding-gate: barcha majburiy ruxsat berilgan bo'lsa —
+                    // orqaga = davom etish. Aks holda ichkariga O'TKAZMAYMIZ:
+                    // ilovani fonga tushiramiz (chiqib ketmaydi, lekin ruxsatsiz
+                    // Dashboard'ga ham kira olmaydi).
                     if (allCriticalPermissionsGranted(this@ProtectionStatusActivity)) {
                         proceed(ack = true)
                     } else {
@@ -77,74 +103,17 @@ class ProtectionStatusActivity : AppCompatActivity() {
         try { renderRows() } catch (e: Throwable) { android.util.Log.e("ProtStatus", "render", e) }
     }
 
-    private fun buildUi() {
-        val scroll = ScrollView(this).apply {
-            setBackgroundColor(getColor(R.color.kq_bg))
-            isFillViewport = true
-        }
-        val content = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(40), dp(20), dp(24))
-        }
-        scroll.addView(content)
-        setContentView(scroll)
-
-        content.addView(TextView(this).apply {
-            text = "Himoya holati"
-            setTextColor(getColor(R.color.kq_ink))
-            textSize = 24f
-            setTypeface(typeface, Typeface.BOLD)
-        })
-        content.addView(TextView(this).apply {
-            text = "To'liq himoya uchun quyidagilar yoqilgan bo'lishi kerak. " +
-                "Qizil bo'lsa — yonidagi tugma orqali yoqing."
-            setTextColor(getColor(R.color.kq_ink_2))
-            textSize = 14f
-            setPadding(0, dp(6), 0, dp(16))
-        })
-
-        list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        content.addView(list)
-
-        val btn = MaterialButton(this).apply {
-            text = "Davom etish"
-            textSize = 16f
-            isAllCaps = false
-            setBackgroundColor(getColor(R.color.kq_primary))
-            setTextColor(getColor(R.color.kq_on_primary))
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { topMargin = dp(20) }
-            setOnClickListener {
-                if (allCriticalPermissionsGranted(this@ProtectionStatusActivity)) {
-                    proceed(ack = true)
-                } else {
-                    // Ruxsatsiz davom ettirmaymiz — qaysi biri yetishmayotganini
-                    // qizil ✗ bilan ko'rsatamiz va tushuntiramiz.
-                    Toast.makeText(
-                        this@ProtectionStatusActivity,
-                        "Davom etish uchun barcha majburiy ruxsatlarni yoqing (qizil ✗).",
-                        Toast.LENGTH_LONG,
-                    ).show()
-                    renderRows()
-                }
-            }
-        }
-        continueBtn = btn
-        content.addView(btn)
-    }
-
     /** Tugma ko'rinishini majburiy ruxsatlar holatiga moslaydi (yoqilmagan bo'lsa — xira). */
     private fun refreshContinueButton() {
-        val btn = continueBtn ?: return
+        val btn = binding?.btnProtContinue ?: return
         val ok = allCriticalPermissionsGranted(this)
         btn.alpha = if (ok) 1f else 0.5f
-        btn.text = if (ok) "Davom etish" else "Avval ruxsatlarni yoqing"
+        btn.setText(if (ok) R.string.kq4_continue else R.string.kq4_prot_continue_locked)
     }
 
     // 3 holat: true=yoqilgan, false=yo'q, null=qo'lda (tekshirib bo'lmaydi, masalan MIUI autostart).
     private data class Row(
+        val iconRes: Int,
         val title: String,
         val desc: String,
         val state: Boolean?,
@@ -156,39 +125,41 @@ class ProtectionStatusActivity : AppCompatActivity() {
         val out = ArrayList<Row>()
         out.add(
             Row(
-                "Barcha fayllarga ruxsat",
-                "Telefondagi APK fayllarni tekshirish uchun shart.",
+                R.drawable.ic4_folder,
+                getString(R.string.kq4_prot_row_files_t),
+                getString(R.string.kq4_prot_row_files_s),
                 VersionCompat.hasFileScanAccess(this), true,
             ) { openAllFiles() },
         )
         out.add(
             Row(
-                "Batareya cheklovisiz ishlash",
-                "Tavsiya etiladi — yopilgandan keyin ham fon'da kuzatishni davom ettiradi. " +
-                    "Samsung'da \"Cheklanmagan\" qilsangiz ham bu yerda ✗ qolishi mumkin: " +
-                    "majburiy emas, baribir davom etishingiz mumkin.",
+                R.drawable.ic4_clock,
+                getString(R.string.kq4_prot_row_battery_t),
+                getString(R.string.kq4_prot_row_battery_s),
                 batteryIgnored(), false,
             ) { openBattery() },
         )
         out.add(
             Row(
-                "Boshqa oynalar ustida ko'rsatish",
-                "Xavf topilganda ogohlantirish OYNASINI ochish uchun shart.",
-                VersionCompat.hasOverlayPermission(this), true,
+                R.drawable.ic4_alert,
+                getString(R.string.kq4_prot_row_overlay_t),
+                getString(R.string.kq4_prot_row_overlay_s),
+                VersionCompat.hasOverlayPermission(this), false,
             ) { openOverlay() },
         )
         out.add(
             Row(
-                "Bildirishnomalar",
-                "Tahdid haqida BILDIRISHNOMA yuborish uchun shart.",
+                R.drawable.ic4_bell,
+                getString(R.string.kq4_notifications),
+                getString(R.string.kq4_prot_row_notif_s),
                 VersionCompat.hasNotificationPermission(this), true,
             ) { openNotifications() },
         )
         out.add(
             Row(
-                "Joylashuv (geolokatsiya)",
-                "Hududingizdagi tahdidlar xaritasida ko'rinish uchun. Ixtiyoriy — " +
-                    "bermasangiz ham ilova to'liq ishlaydi.",
+                R.drawable.ic4_globe,
+                getString(R.string.kq4_prot_row_loc_t),
+                getString(R.string.kq4_prot_row_loc_s),
                 DeviceLocation.hasPermission(this), false,
             ) { requestLocation() },
         )
@@ -197,16 +168,18 @@ class ProtectionStatusActivity : AppCompatActivity() {
         if (oem != null && OemAutostartGuide.hasOemRestrictions(oem)) {
             out.add(
                 Row(
-                    "Avtomatik ishga tushirish (${oem.displayName})",
-                    "Telefon ilovani o'chirib qo'ymasligi uchun \"Autostart\"ni yoqing.",
+                    R.drawable.ic4_refresh,
+                    getString(R.string.kq4_prot_row_autostart_t, oem.displayName),
+                    getString(R.string.kq4_prot_row_autostart_s),
                     null, true,
                 ) { showAutostartGuide(oem) },
             )
         }
         out.add(
             Row(
-                "Doimiy himoya (fon)",
-                "Doimiy kuzatuv yoqilgan bo'lsin.",
+                R.drawable.ic4_shield,
+                getString(R.string.kq4_prot_row_bg_t),
+                getString(R.string.kq4_prot_row_bg_s),
                 Config.isBackgroundEnabled(this), true,
             ) { Config.setBackgroundEnabled(this, true); renderRows() },
         )
@@ -214,69 +187,59 @@ class ProtectionStatusActivity : AppCompatActivity() {
     }
 
     private fun renderRows() {
-        if (!::list.isInitialized) return
-        list.removeAllViews()
-        for (r in rows()) list.addView(rowCard(r))
+        val b = binding ?: return
+        val all = rows()
+        b.protList.removeAllViews()
+        all.forEachIndexed { i, r -> b.protList.addView(rowView(b, r, isLast = i == all.lastIndex)) }
+
+        // Hero: halqa + "{ok} / {total} ruxsat berilgan".
+        // MUHIM: faqat TEKSHIRIB BO'LADIGAN qatorlar hisoblanadi (state != null).
+        // OEM autostart (MIUI/EMUI/Oppo/Vivo) qatori state=null — tizim holatini
+        // bermaydi, shuning uchun u hisobga kirsa halqa HECH QACHON 100% bo'lmasdi
+        // ("6/7" abadiy). Qator ro'yxatda yo'l-yo'riq sifatida qoladi, lekin
+        // hisob/halqaga kirmaydi (dizayndagi okCount/items.length ham faqat
+        // boolean `ok` qatorlar ustida ishlaydi).
+        val checkable = all.filter { it.state != null }
+        val ok = checkable.count { it.state == true }
+        val total = checkable.size
+        val full = ok == total
+        val color = getColor(if (full) R.color.kq_safe else R.color.kq_warn)
+        b.ringProt.ringColor = color
+        b.ringProt.setValue(if (total == 0) 0f else ok * 100f / total)
+        b.imgProtShield.imageTintList = ColorStateList.valueOf(color)
+        b.tvProtCount.text = getString(R.string.kq4_prot_count, ok, total)
+        b.tvProtHint.setText(if (full) R.string.kq4_prot_all_on else R.string.kq4_prot_enable_one)
+
         refreshContinueButton()
     }
 
-    private fun rowCard(r: Row): View {
-        val card = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(getColor(R.color.kq_bg_elev))
-            setPadding(dp(16), dp(14), dp(16), dp(14))
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { topMargin = dp(10) }
-        }
-        val top = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        val (mark, color) = when (r.state) {
-            true -> "✓" to R.color.kq_safe
-            false -> "✗" to R.color.kq_danger
-            null -> "⚠" to R.color.kq_warn
-        }
-        top.addView(TextView(this).apply {
-            text = mark
-            setTextColor(getColor(color))
-            textSize = 20f
-            setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 0, dp(12), 0)
-        })
-        top.addView(TextView(this).apply {
-            text = r.title
-            setTextColor(getColor(R.color.kq_ink))
-            textSize = 16f
-            setTypeface(typeface, Typeface.BOLD)
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-        })
-        card.addView(top)
-        card.addView(TextView(this).apply {
-            text = r.desc
-            setTextColor(getColor(R.color.kq_ink_2))
-            textSize = 13f
-            setPadding(dp(32), dp(4), 0, 0)
-        })
+    /**
+     * v4 qator: av 44 (safe/warn) + sarlavha/izoh + o'ngda "Yoniq" tag yoki
+     * "Yoqish" tugmasi. Qator ham, tugma ham bosilganda tegishli tizim
+     * sozlamasi ochiladi (yoqilmagan bo'lsa).
+     */
+    private fun rowView(b: ActivityProtectionV4Binding, r: Row, isLast: Boolean): View {
+        val item = ItemKq4ProtectionRowBinding.inflate(layoutInflater, b.protList, false)
+        val ok = r.state == true
 
-        // ✓ bo'lmasa — "Yoqish" tugmasi (qo'lda bo'lsa ham ochib beramiz).
-        if (r.state != true && r.onFix != null) {
-            card.addView(MaterialButton(this).apply {
-                text = if (r.state == null) "Sozlamani ochish" else "Yoqish"
-                textSize = 14f
-                isAllCaps = false
-                setBackgroundColor(getColor(R.color.kq_bg))
-                setTextColor(getColor(R.color.kq_primary))
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                ).apply { topMargin = dp(8); marginStart = dp(32) }
-                setOnClickListener { r.onFix.invoke() }
-            })
+        item.imgProtRowIcon.setImageResource(r.iconRes)
+        item.tvProtRowTitle.text = r.title
+        item.tvProtRowSub.text = r.desc
+
+        item.avProt.setBackgroundResource(if (ok) R.drawable.kq4_av_safe else R.drawable.kq4_av_warn)
+        item.imgProtRowIcon.imageTintList = ColorStateList.valueOf(
+            getColor(if (ok) R.color.kq_safe else R.color.kq_warn),
+        )
+
+        item.tagProtOn.visibility = if (ok) View.VISIBLE else View.GONE
+        item.btnProtEnable.visibility = if (ok) View.GONE else View.VISIBLE
+
+        if (r.onFix != null) {
+            item.btnProtEnable.setOnClickListener { r.onFix.invoke() }
+            item.rowProt.setOnClickListener { if (r.state != true) r.onFix.invoke() }
         }
-        return card
+        item.divProt.visibility = if (isLast) View.GONE else View.VISIBLE
+        return item.root
     }
 
     // ---- Holat tekshiruvlari ----------------------------------------------
@@ -343,22 +306,17 @@ class ProtectionStatusActivity : AppCompatActivity() {
     private fun showAutostartGuide(oem: OemAutostartGuide.Oem) {
         try {
             AlertDialog.Builder(this)
-                .setTitle("Avtomatik ishga tushirish (${oem.displayName})")
+                .setTitle(getString(R.string.kq4_prot_row_autostart_t, oem.displayName))
                 .setMessage(OemAutostartGuide.instructions(oem))
-                .setPositiveButton("Sozlamani ochish") { _, _ ->
+                .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
                     val opened = try {
                         OemAutostartGuide.openAutostartSettings(this, oem)
                     } catch (_: Throwable) { false }
                     if (!opened) {
-                        Toast.makeText(
-                            this,
-                            "Avtomatik ochib bo'lmadi. Sozlamalar → Ilovalar → " +
-                                "KiberQalqon orqali qo'lda yoqing.",
-                            Toast.LENGTH_LONG,
-                        ).show()
+                        Toast.makeText(this, R.string.kq4_prot_autostart_fail, Toast.LENGTH_LONG).show()
                     }
                 }
-                .setNegativeButton("Yopish", null)
+                .setNegativeButton(R.string.kq4_prot_autostart_close, null)
                 .show()
         } catch (e: Throwable) {
             android.util.Log.w("ProtStatus", "autostart guide failed", e)
@@ -375,24 +333,33 @@ class ProtectionStatusActivity : AppCompatActivity() {
         }
     }
 
+    /** Onboarding o'tilganmi — xavfsiz o'qish (Config xatosi gate'ni buzmasin). */
+    private fun isProtectionAckedSafe(): Boolean =
+        try { Config.isProtectionAcked(this) } catch (_: Throwable) { false }
+
     private fun proceed(ack: Boolean) {
         if (ack) try { Config.setProtectionAcked(this, true) } catch (_: Throwable) {}
         // Chek-list to'liq (barcha kritik ruxsatlar berilgan) bo'lib "Davom etish" bosildi — himoya
         // ENDI haqiqatan tayyor. Xizmatni yoqamiz va birinchi marta "Himoyangiz yoqildi" chiqaramiz.
         try { ProtectionActivator.activateIfReady(this) } catch (_: Throwable) {}
         try {
-            startActivity(Intent(this, DashboardNewActivity::class.java))
+            // CLEAR_TOP|SINGLE_TOP: back-stack'da Dashboard bo'lsa, yangisini
+            // YARATMAYMIZ — borini yuqoriga chiqaramiz. Bu ekran Dashboard,
+            // Sozlamalar va MainActivity'dan ochiladi; flagsiz har "davom etish"
+            // stack'ka yana bitta Dashboard dublikatini qo'shardi.
+            startActivity(
+                Intent(this, DashboardNewActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            )
         } catch (_: Throwable) {}
         finish()
     }
-
-    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
     companion object {
         /**
          * Barcha MAJBURIY (tizim orqali tekshirib bo'ladigan) ruxsatlar berilganmi.
          *
-         * MUHIM: uchta narsa bu yerga KIRMAYDI (majburiy shart EMAS):
+         * MUHIM: bu narsalar bu yerga KIRMAYDI (majburiy shart EMAS):
          *  - OEM autostart (MIUI/EMUI...) — uni dasturiy yo'l bilan tekshirib bo'lmaydi,
          *    majburiy qilsak foydalanuvchi abadiy "davom eta olmaydigan" holatga tushardi.
          *  - Joylashuv — maxfiylik siyosatiga ko'ra IXTIYORIY (usiz ham ilova to'liq ishlaydi).
@@ -400,17 +367,20 @@ class ProtectionStatusActivity : AppCompatActivity() {
          *    qilsa ham isIgnoringBatteryOptimizations() ko'pincha false qaytaradi (Samsung
          *    "Unrestricted"ni Doze whitelist'ga qo'shmaydi). Majburiy qilsak — Samsung
          *    foydalanuvchilari KIRA OLMAY qoladi (real shikoyat). Shu sabab tavsiya, shart emas.
-         * Uchchalasi ham faqat holat/yo'l-yo'riq (⚠ / ✗) sifatida ko'rsatiladi.
+         *  - Overlay ("oyna ustida") — ba'zi telefon/proshivkalarda bu ruxsatni umuman yoqib
+         *    BO'LMAYDI (ishlab chiqaruvchi cheklovi); majburiy qilsak foydalanuvchi onboarding'da
+         *    abadiy qotib qolardi (real shikoyat). Usiz ogohlantirish to'liq-ekranli BILDIRISHNOMA
+         *    orqali baribir keladi (canLaunchActivityFromBackground → notification fallback), shu
+         *    sabab overlay endi TAVSIYA, shart emas.
+         * Hammasi faqat holat/yo'l-yo'riq sifatida ko'rsatiladi, davom etishni bloklamaydi.
          *
          * Majburiy ruxsatlar va ular nimani ta'minlaydi:
          *  - Barcha fayllarga ruxsat → APK fayllarni topish/o'chirish (Telegram/WhatsApp papkalari)
-         *  - Overlay (oyna ustida)   → tahdid OYNASI chiqishi
-         *  - Bildirishnoma           → tahdid BILDIRISHNOMASI chiqishi
+         *  - Bildirishnoma           → tahdid BILDIRISHNOMASI / to'liq-ekranli ogohlantirish chiqishi
          *  - Fon himoyasi yoqilgan   → doimiy kuzatuv (Config bayrog'i)
          */
         fun allCriticalPermissionsGranted(ctx: Context): Boolean {
             return VersionCompat.hasFileScanAccess(ctx) &&
-                VersionCompat.hasOverlayPermission(ctx) &&
                 VersionCompat.hasNotificationPermission(ctx) &&
                 Config.isBackgroundEnabled(ctx)
         }

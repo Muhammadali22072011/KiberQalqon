@@ -24,13 +24,19 @@ private const val KEY_USER_CONSENT = "user_consent_v1"
 private const val KEY_CONSENT_TS = "user_consent_ts"
 private const val KEY_PROTECTION_ACKED = "protection_acked_v1"
 private const val KEY_WELCOME_SHOWN = "welcome_shown_v1"
+// Egasi rejimi: Sozlamalardagi ichki bo'limlar (server URL, Telegram, boshqaruv paneli)
+// oddiy foydalanuvchidan yashirin; futer versiyasiga 7 marta bosilganda ochiladi.
+private const val KEY_OWNER_UI = "owner_ui_v1"
 // Version bump — esli izmenim ToS/Privacy, podnimaem versiyu chtoby zapustit' soglasie zanovo.
 // v1: minimal threat data (hash, package, verdict, device model)
 // v2: + APK file upload + crash logs (developer debugging telemetry, opt-in)
 // v3: community sharing stal MAJBURIY chast'yu osnovnogo soglasiya (2026-05-21)
 // v4: xavfli/shubhali APK fayli endi MARKAZIY BULUTGA (Storage) ham yuklanadi —
 //     ilgari faqat Telegram'ga ketardi; 4(a)-bo'lim yangilandi (2026-05-30)
-const val CURRENT_CONSENT_VERSION = 4
+// v5: community sharing yana IXTIYORIY bo'ldi (UX-02 fix, default OFF); yangi
+//     3-bo'lim — baza/sozlama/yangiliklar yuklab olish (texnik trafik) oshkor
+//     qilindi; uzatish xavfsizligi (pinning, imzolangan feed) bo'limi (2026-06-10)
+const val CURRENT_CONSENT_VERSION = 5
 
 object Config {
     private fun prefs(context: Context): SharedPreferences =
@@ -72,6 +78,13 @@ object Config {
 
     fun setWelcomeShown(context: Context, shown: Boolean) {
         prefs(context).edit { putBoolean(KEY_WELCOME_SHOWN, shown) }
+    }
+
+    fun isOwnerUiEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_OWNER_UI, false)
+
+    fun setOwnerUiEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_OWNER_UI, enabled) }
     }
 
     fun isUploadEnabled(context: Context): Boolean =
@@ -238,18 +251,19 @@ object Config {
         prefs(context).edit { putBoolean("community_thanks_shown", true) }
     }
     
-    // Tema rejimi. Default = "light" (Yorug' minimal dizayn — oqish-krem fon).
+    // Tema rejimi. Default = "dark" (2026-06 Anor redesign — brand/mockup.html
+    // qorong'i ekranlar; foydalanuvchi Sozlamalardan light'ga o'tkaza oladi).
     fun getDarkThemeMode(context: Context): String =
-        prefs(context).getString(KEY_DARK_THEME, "light") ?: "light"
+        prefs(context).getString(KEY_DARK_THEME, "dark") ?: "dark"
 
     fun setDarkThemeMode(context: Context, mode: String) {
         prefs(context).edit { putString(KEY_DARK_THEME, mode) }
     }
 
     // Asosiy rang (Settings §3.7 — Feruz / Za'faron / Anor).
-    // Default = turkuaz (Feruz) — "Yorug' minimal" dizayn akssenti.
+    // Default = Anor #C2143D — brend rangi (2026-06 redesign).
     fun getAccent(context: Context): String =
-        prefs(context).getString(KEY_ACCENT, "feruz") ?: "feruz"
+        prefs(context).getString(KEY_ACCENT, "anor") ?: "anor"
 
     fun setAccent(context: Context, variant: String) {
         prefs(context).edit { putString(KEY_ACCENT, variant) }
@@ -267,7 +281,8 @@ object Config {
      *  - tebranishli ogohlantirish
      *  - phishing blokeri
      *  - avtomatik baza yangilanishi
-     *  - community sharing (foydalanuvchi consent berishida allaqachon ON)
+     *  - (community sharing BU YERDA YOQILMAYDI — u alohida opt-in, default OFF;
+     *    qiymatni faqat ConsentActivity'dagi 3-galochka / Sozlamalar belgilaydi)
      *  - sezuvchanlik = "medium" (eng muvozanatli)
      *  - auto delete mode = "delete"
      *

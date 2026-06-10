@@ -4,30 +4,42 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
-import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.appcompat.widget.SwitchCompat
+import com.kiberqalqon.databinding.ActivityAboutBinding
 import com.kiberqalqon.databinding.ActivitySettingsNewBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 /**
- * Sozlamalar — KiberQalqon redesign §3.7.
+ * Sozlamalar — v4 «Milliy Kiber Himoya» (screens2.jsx → Settings).
  *
  * Bound to activity_settings_new.xml. All Config persistence happens reactively
  * (no Save tugmasi) — each toggle saves immediately. Theme/accent/lang changes
  * call recreate() so the affected views re-bind on the new palette.
+ *
+ * «Loyiha haqida» (About) manifestga yangi Activity qo'shmasdan shu yerda
+ * to'liq ekran overlay (activity_about.xml) sifatida ko'rsatiladi.
  */
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsNewBinding
 
+    /** About overlay (activity_about.xml) — null bo'lsa yopiq. */
+    private var aboutBinding: ActivityAboutBinding? = null
+
     /** Set to true after first bindState — guards listeners from firing during initial bind. */
     private var ready = false
+
+    /** Egasi rejimi uchun futer versiyasiga ketma-ket bosishlar soni. */
+    private var footerTapCount = 0
+    private var footerLastTapAt = 0L
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -35,18 +47,22 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Миграция легаси-значений акцента ("turquoise"/"pomegranate"/"saffron") к
+        // каноническим ("feruz"/"anor"/"zafaron") ДО applyAccent: иначе ThemeHelper
+        // не узнаёт старое значение и молча применяет Anor, хотя пользователь на
+        // прошлых версиях выбирал, например, Feruz (false UI state).
+        migrateLegacyAccent()
         ThemeHelper.applyAccent(this)
         binding = ActivitySettingsNewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnBack.setOnClickListener { finish() }
-
+        bindVersionLabels()
         labelToggleRows()
         labelChevronRows()
         bindState()
         wireListeners()
-        injectConsentSection()
-        injectAdminPanelEntry()
+        bindConsentSection()
+        applyOwnerRowsVisibility()
 
         KqBottomNav.attach(this, KqBottomNav.Tab.SETTINGS)
 
@@ -58,37 +74,45 @@ class SettingsActivity : AppCompatActivity() {
         ready = true
     }
 
-    /** Sets the title + sub on each of the 4 HIMOYA + 1 SERVER toggle rows. */
+    /** Profil kartochkasi + futerga real BuildConfig versiyani yozadi. */
+    private fun bindVersionLabels() {
+        binding.tvProfileVersion.text =
+            getString(R.string.kq4_set_profile_version, BuildConfig.VERSION_NAME)
+        binding.tvSettingsFooter.text =
+            getString(R.string.kq4_set_footer, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+    }
+
+    /** Sets the title + sub + ic4 icon on each of the HIMOYA + QO'SHIMCHA toggle rows. */
     private fun labelToggleRows() {
         bindRow(
             binding.rowAutoScan.root,
-            title = getString(R.string.set_row_autoscan_title),
-            sub = getString(R.string.set_row_autoscan_sub),
-            icon = R.drawable.ic_radar_scan,
+            title = getString(R.string.kq4_set_row_autoscan_title),
+            sub = getString(R.string.kq4_set_row_autoscan_sub),
+            icon = R.drawable.ic4_scan,
         )
         bindRow(
             binding.rowAutoDelete.root,
-            title = getString(R.string.set_row_autodelete_title),
-            sub = getString(R.string.set_row_autodelete_sub),
-            icon = R.drawable.ic_trash,
+            title = getString(R.string.kq4_set_row_autodelete_title),
+            sub = getString(R.string.kq4_set_row_autodelete_sub),
+            icon = R.drawable.ic4_trash,
         )
         bindRow(
             binding.rowPhishing.root,
-            title = getString(R.string.set_row_phishing_title),
-            sub = getString(R.string.set_row_phishing_sub),
-            icon = R.drawable.ic_bell_cyber,
+            title = getString(R.string.kq4_set_row_phishing_title),
+            sub = getString(R.string.kq4_set_row_phishing_sub),
+            icon = R.drawable.ic4_message,
         )
         bindRow(
             binding.rowBackground.root,
-            title = getString(R.string.set_row_background_title),
-            sub = getString(R.string.set_row_background_sub),
-            icon = R.drawable.ic_shield,
+            title = getString(R.string.kq4_set_row_background_title),
+            sub = getString(R.string.kq4_set_row_background_sub),
+            icon = R.drawable.ic4_refresh,
         )
         bindRow(
             binding.rowUpload.root,
             title = getString(R.string.set_row_upload_title),
             sub = getString(R.string.set_row_upload_sub),
-            icon = R.drawable.ic_upload_cyber,
+            icon = R.drawable.ic4_wifi,
         )
     }
 
@@ -101,13 +125,23 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun labelChevronRows() {
-        binding.rowAbout.root.findViewById<TextView>(R.id.tvChevronTitle).text = getString(R.string.about_title)
-        binding.rowHelp.root.findViewById<TextView>(R.id.tvChevronTitle).text = getString(R.string.set_help_center)
-        binding.rowPrivacy.root.findViewById<TextView>(R.id.tvChevronTitle).text = getString(R.string.privacy_title)
-        // UX-03: flagman ekranlarga kirish.
-        binding.rowHiddenThreats.root.findViewById<TextView>(R.id.tvChevronTitle).text = "Yashirin tahdidlar skaneri"
-        binding.rowTelegram.root.findViewById<TextView>(R.id.tvChevronTitle).text = "Telegram bildirishnomalari"
-        binding.rowProtectionStatus.root.findViewById<TextView>(R.id.tvChevronTitle).text = "Himoya holati va ruxsatlar"
+        // HAQIDA
+        bindChevron(binding.rowAbout.root, getString(R.string.about_title), R.drawable.ic4_heart)
+        bindChevron(binding.rowHelp.root, getString(R.string.set_help_center), R.drawable.ic4_help)
+        bindChevron(binding.rowReportProblem.root, getString(R.string.kq4_set_row_report), R.drawable.ic4_alert)
+        // QO'SHIMCHA — flagman ekranlar + maxfiylik + boshqaruv paneli.
+        bindChevron(binding.rowHiddenThreats.root, getString(R.string.kq4_set_row_hidden), R.drawable.ic4_eye)
+        bindChevron(binding.rowTelegram.root, getString(R.string.kq4_set_row_telegram), R.drawable.ic4_bell)
+        bindChevron(binding.rowProtectionStatus.root, getString(R.string.kq4_set_row_protection), R.drawable.ic4_shield_check)
+        bindChevron(binding.rowPrivacy.root, getString(R.string.privacy_title), R.drawable.ic4_lock)
+        bindChevron(binding.rowAdminPanel.root, getString(R.string.kq4_set_row_admin), R.drawable.ic4_key)
+    }
+
+    private fun bindChevron(root: View, title: String, icon: Int) {
+        root.findViewById<TextView>(R.id.tvChevronTitle).text = title
+        try {
+            root.findViewById<android.widget.ImageView>(R.id.ivChevronIcon).setImageResource(icon)
+        } catch (_: Throwable) { /* icon optional */ }
     }
 
     /** Snapshots current Config values into the UI. */
@@ -129,27 +163,27 @@ class SettingsActivity : AppCompatActivity() {
         // Accent swatches
         applyAccentUi(Config.getAccent(this))
 
-        // Language radios — both isChecked and the drawableEnd icon swap (the
-        // RadioButtons use android:button="@null" so the right-side icon IS
-        // the selected state to the user, not the radio circle).
-        val lang = Config.getLanguage(this)
-        binding.radioUzbek.isChecked = lang != "ru"
-        binding.radioRussian.isChecked = lang == "ru"
-        refreshRadioDrawables(lang)
+        // Language rows — faol til o'ngda check_circle (primary), boshqasi chevron.
+        applyLanguageUi(Config.getLanguage(this))
     }
 
-    private fun refreshRadioDrawables(lang: String) {
-        val check = R.drawable.ic_check_circle
-        val chevron = R.drawable.ic_chevron_right
-        binding.radioUzbek.setCompoundDrawablesWithIntrinsicBounds(
-            0, 0, if (lang != "ru") check else chevron, 0
+    private fun applyLanguageUi(lang: String) {
+        val uzActive = lang != "ru"
+        binding.ivLangUzState.setImageResource(
+            if (uzActive) R.drawable.ic4_check_circle else R.drawable.ic4_chevron
         )
-        binding.radioRussian.setCompoundDrawablesWithIntrinsicBounds(
-            0, 0, if (lang == "ru") check else chevron, 0
+        binding.ivLangUzState.setColorFilter(
+            getColor(if (uzActive) R.color.kq_primary else R.color.kq_ink_3)
+        )
+        binding.ivLangRuState.setImageResource(
+            if (!uzActive) R.drawable.ic4_check_circle else R.drawable.ic4_chevron
+        )
+        binding.ivLangRuState.setColorFilter(
+            getColor(if (!uzActive) R.color.kq_primary else R.color.kq_ink_3)
         )
     }
 
-    private fun toggleOf(rowRoot: View): SwitchMaterial =
+    private fun toggleOf(rowRoot: View): SwitchCompat =
         rowRoot.findViewById(R.id.swRow)
 
     private fun wireListeners() {
@@ -200,7 +234,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.rowServerUrl.setOnClickListener { showServerUrlDialog() }
         binding.etServerUrl.setOnClickListener { showServerUrlDialog() }
 
-        // Theme segmented switch.
+        // Theme segmented switch (sun/moon piktogramma tugmalar).
         binding.segThemeLight.setOnClickListener {
             if (!ready) return@setOnClickListener
             Config.setDarkThemeMode(this, "light")
@@ -214,27 +248,24 @@ class SettingsActivity : AppCompatActivity() {
             recreate()
         }
 
-        // Accent swatches.
-        binding.accentTurquoise.setOnClickListener { setAccentAndReload("turquoise") }
-        binding.accentSaffron.setOnClickListener { setAccentAndReload("saffron") }
-        binding.accentPomegranate.setOnClickListener { setAccentAndReload("pomegranate") }
+        // Accent swatches (dizayn tartibi: Anor · Feruz · Za'faron).
+        // Kanonik qiymatlar yoziladi — ThemeHelper.applyAccent xuddi shularni taniydi
+        // ("pomegranate"/"turquoise" eski nomlar edi, ThemeHelper ularni tanimay
+        // hammasini Anor'ga tushirib yuborardi).
+        binding.accentPomegranate.setOnClickListener { setAccentAndReload("anor") }
+        binding.accentTurquoise.setOnClickListener { setAccentAndReload("feruz") }
+        binding.accentSaffron.setOnClickListener { setAccentAndReload("zafaron") }
 
-        // Language radios. RadioGroup wires mutual exclusion already.
-        binding.radioGroupLanguage.setOnCheckedChangeListener { _, id ->
-            if (!ready) return@setOnCheckedChangeListener
-            val newLang = if (id == R.id.radioRussian) "ru" else "uz"
-            refreshRadioDrawables(newLang)
-            if (newLang != Config.getLanguage(this)) {
-                Config.setLanguage(this, newLang)
-                recreate()
-            }
-        }
+        // Language rows.
+        binding.rowLangUz.setOnClickListener { setLanguageAndReload("uz") }
+        binding.rowLangRu.setOnClickListener { setLanguageAndReload("ru") }
 
-        // HAQIDA chevron rows.
-        binding.rowAbout.root.setOnClickListener { showAboutDialog() }
-        binding.rowHelp.root.setOnClickListener { showHelpDialog() }
-        binding.rowPrivacy.root.setOnClickListener { ConsentActivity.openForReview(this) }
-        // UX-03: flagman ekranlar endi Sozlamalardan ochiladi (avval faqat sploshdagi maxfiy long-press).
+        // HAQIDA rows.
+        binding.rowAbout.root.setOnClickListener { showAboutOverlay() }
+        binding.rowHelp.root.setOnClickListener { openReportProblem() }
+        binding.rowReportProblem.root.setOnClickListener { openReportProblem() }
+
+        // QO'SHIMCHA rows — flagman ekranlar (UX-03: Sozlamalardan ochiladi).
         binding.rowHiddenThreats.root.setOnClickListener {
             startActivity(Intent(this, HiddenThreatsActivity::class.java))
         }
@@ -244,40 +275,137 @@ class SettingsActivity : AppCompatActivity() {
         binding.rowProtectionStatus.root.setOnClickListener {
             startActivity(Intent(this, ProtectionStatusActivity::class.java))
         }
+        binding.rowPrivacy.root.setOnClickListener { ConsentActivity.openForReview(this) }
+        // Boshqaruv paneli — veb-panel ilova ichida (WebView): admin login+parol bilan
+        // kiradi (ko'rish + eksport + e'lon), egasi master kalit bilan. Sirlar APK ichida emas.
+        binding.rowAdminPanel.root.setOnClickListener {
+            startActivity(Intent(this, AdminPanelActivity::class.java))
+        }
+
+        // Egasi rejimi: futerdagi versiyaga 7 marta ketma-ket bosish ichki
+        // bo'limlarni (server URL, Telegram, panel) ochadi/yashiradi.
+        binding.tvSettingsFooter.setOnClickListener { onFooterSecretTap() }
+    }
+
+    /**
+     * Server URL, Telegram-telemetriya va boshqaruv paneli — egasining ichki
+     * vositalari; oddiy foydalanuvchini chalg'itmasligi uchun sukut bo'yicha
+     * Sozlamalardan yashiriladi. Faqat egasi rejimida ko'rinadi.
+     */
+    private fun applyOwnerRowsVisibility() {
+        val v = if (Config.isOwnerUiEnabled(this)) View.VISIBLE else View.GONE
+        binding.rowServerUrl.visibility = v
+        binding.divServerUrl.visibility = v
+        binding.rowTelegram.root.visibility = v
+        binding.divTelegram.visibility = v
+        binding.rowAdminPanel.root.visibility = v
+        binding.divAdminPanel.visibility = v
+    }
+
+    private fun onFooterSecretTap() {
+        val now = android.os.SystemClock.elapsedRealtime()
+        // 2.5 soniyadan uzun pauza — hisob qaytadan boshlanadi.
+        footerTapCount = if (now - footerLastTapAt > 2500L) 1 else footerTapCount + 1
+        footerLastTapAt = now
+        if (footerTapCount < 7) return
+        footerTapCount = 0
+        val enable = !Config.isOwnerUiEnabled(this)
+        Config.setOwnerUiEnabled(this, enable)
+        applyOwnerRowsVisibility()
+        Toast.makeText(
+            this,
+            getString(if (enable) R.string.set_owner_mode_on else R.string.set_owner_mode_off),
+            Toast.LENGTH_SHORT,
+        ).show()
+    }
+
+    private fun openReportProblem() {
+        try {
+            startActivity(Intent(this, ReportProblemActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_bottom, android.R.anim.fade_out)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Xato: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun setAccentAndReload(variant: String) {
-        if (!ready || variant == Config.getAccent(this)) return
+        // Guard сравнивает КАНОНИЧЕСКИЕ формы: у старых пользователей в prefs могут
+        // лежать легаси-значения ("turquoise"/"pomegranate"/"saffron"/"turkuaz"),
+        // и без канонизации первый тап по уже активному акценту делал бы «холостой»
+        // recreate (или наоборот — реальная смена не проходила бы).
+        if (!ready || canonicalAccent(variant) == canonicalAccent(Config.getAccent(this))) return
         Config.setAccent(this, variant)
         // recreate() reruns onCreate → ThemeHelper.applyAccent() подхватит новый
         // вариант, и color state lists kq_primary* пересчитают `?attr/kqPrimary`.
         recreate()
     }
 
+    /**
+     * Приводит сохранённое значение акцента к канонической форме, которую понимает
+     * ThemeHelper.applyAccent: "anor" / "feruz" / "zafaron". Легаси-синонимы
+     * (старые сохранённые значения пользователей) мапятся на канон; всё неизвестное —
+     * на "anor", ровно как `else -> Anor` в ThemeHelper, чтобы подсветка свотча
+     * всегда совпадала с реально применённой темой.
+     */
+    private fun canonicalAccent(variant: String): String = when (variant) {
+        "feruz", "turkuaz", "turquoise" -> "feruz"
+        "zafaron", "saffron" -> "zafaron"
+        else -> "anor" // "anor", "pomegranate" va boshqa har qanday qiymat
+    }
+
+    /**
+     * Bir martalik prefs-миграция: если в Config лежит легаси-имя акцента,
+     * перезаписываем его канонической формой. После этого ThemeHelper.applyAccent
+     * применяет именно тот акцент, который пользователь выбирал раньше, и подсветка
+     * свотчей совпадает с реально применённой темой во всех Activity.
+     */
+    private fun migrateLegacyAccent() {
+        val stored = Config.getAccent(this)
+        val canon = canonicalAccent(stored)
+        if (stored != canon) Config.setAccent(this, canon)
+    }
+
+    private fun setLanguageAndReload(newLang: String) {
+        if (!ready) return
+        applyLanguageUi(newLang)
+        if (newLang != Config.getLanguage(this)) {
+            Config.setLanguage(this, newLang)
+            recreate()
+        }
+    }
+
     private fun applyThemeSegmentUi(isDark: Boolean) {
-        val active = R.drawable.kq_seg_active
-        binding.segThemeLight.background = if (!isDark) getDrawable(active) else null
-        binding.segThemeDark.background = if (isDark) getDrawable(active) else null
-        binding.segThemeLight.setTextColor(
-            getColor(if (!isDark) R.color.kq_on_primary else R.color.kq_ink_2)
+        binding.segThemeLight.background =
+            if (!isDark) getDrawable(R.drawable.kq4_settings_seg_active) else null
+        binding.segThemeDark.background =
+            if (isDark) getDrawable(R.drawable.kq4_settings_seg_active) else null
+        binding.ivSegSun.setColorFilter(
+            getColor(if (!isDark) R.color.kq_on_primary else R.color.kq_ink_3)
         )
-        binding.segThemeDark.setTextColor(
-            getColor(if (isDark) R.color.kq_on_primary else R.color.kq_ink_2)
+        binding.ivSegMoon.setColorFilter(
+            getColor(if (isDark) R.color.kq_on_primary else R.color.kq_ink_3)
         )
+        // Qator boshidagi av ikon: dizaynda theme === "dark" ? moon : sun.
+        binding.ivThemeIcon.setImageResource(if (isDark) R.drawable.ic4_moon else R.drawable.ic4_sun)
     }
 
     private fun applyAccentUi(variant: String) {
-        val selected = R.drawable.kq_accent_selected
-        binding.accentTurquoise.background = if (variant == "turquoise") getDrawable(selected) else null
-        binding.accentSaffron.background = if (variant == "saffron") getDrawable(selected) else null
-        binding.accentPomegranate.background = if (variant == "pomegranate") getDrawable(selected) else null
+        // Сравниваем по канонической форме — так и дефолт "anor", и легаси-значения
+        // ("pomegranate"/"turquoise"/"saffron"/"turkuaz") подсвечивают правильный свотч.
+        val canon = canonicalAccent(variant)
+        fun swatchBg(selected: Boolean) = getDrawable(
+            if (selected) R.drawable.kq4_settings_swatch_sel else R.drawable.kq4_settings_swatch_idle
+        )
+        binding.accentPomegranate.background = swatchBg(canon == "anor")
+        binding.accentTurquoise.background = swatchBg(canon == "feruz")
+        binding.accentSaffron.background = swatchBg(canon == "zafaron")
 
         // Mark the selected name in `kq_ink`, others in `kq_ink_2` — visual feedback.
         val sel = getColor(R.color.kq_ink)
         val unsel = getColor(R.color.kq_ink_2)
-        tintLabel(binding.accentTurquoise, if (variant == "turquoise") sel else unsel)
-        tintLabel(binding.accentSaffron, if (variant == "saffron") sel else unsel)
-        tintLabel(binding.accentPomegranate, if (variant == "pomegranate") sel else unsel)
+        tintLabel(binding.accentPomegranate, if (canon == "anor") sel else unsel)
+        tintLabel(binding.accentTurquoise, if (canon == "feruz") sel else unsel)
+        tintLabel(binding.accentSaffron, if (canon == "zafaron") sel else unsel)
     }
 
     /** Each accent card is a vertical LinearLayout(swatch + label). Tint just the label. */
@@ -311,169 +439,57 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showAboutDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.set_about_dialog_title))
-            .setMessage(getString(R.string.set_about_dialog_message))
-            .setPositiveButton(R.string.btn_ok, null)
-            .show()
-    }
-
-    private fun showHelpDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.set_help_center))
-            .setMessage(getString(R.string.set_help_dialog_message))
-            .setPositiveButton(R.string.btn_ok, null)
-            .setNeutralButton(getString(R.string.set_help_send_problem)) { _, _ ->
-                try {
-                    startActivity(android.content.Intent(this, ReportProblemActivity::class.java))
-                    overridePendingTransition(R.anim.slide_in_bottom, android.R.anim.fade_out)
-                } catch (e: Exception) {
-                    Toast.makeText(this, "Xato: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-            }
-            .show()
-    }
-
-    /** Adds a Maxfiylik card with community-sharing toggle + revoke button to the bottom. */
-    private fun injectConsentSection() {
-        try {
-            val footer = findFooterTextView() ?: return
-            val parent = footer.parent as? LinearLayout ?: return
-            val insertAt = parent.indexOfChild(footer) // inject before the footer caption
-
-            val ts = Config.userConsentTimestamp(this)
-            val tsStr = if (ts > 0) {
-                val fmt = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-                getString(R.string.set_consent_given_at, fmt.format(Date(ts)))
-            } else {
-                getString(R.string.set_consent_not_given)
-            }
-
-            val eyebrow = TextView(this).apply {
-                text = getString(R.string.set_privacy_eyebrow)
-                setTextColor(getColor(R.color.kq_primary))
-                textSize = 11f
-                typeface = android.graphics.Typeface.MONOSPACE
-                letterSpacing = 0.12f
-                isAllCaps = true
-                setPadding(0, dp(22), 0, 0)
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-            }
-
-            val card = com.google.android.material.card.MaterialCardView(this).apply {
-                radius = dp(22).toFloat()
-                cardElevation = 0f
-                strokeWidth = dp(1)
-                setStrokeColor(getColor(R.color.kq_hairline))
-                setCardBackgroundColor(getColor(R.color.kq_bg_elev))
-                val lp = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = dp(8) }
-                layoutParams = lp
-            }
-
-            val inner = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(dp(14), dp(14), dp(14), dp(14))
-            }
-
-            val tsLabel = TextView(this).apply {
-                text = tsStr
-                setTextColor(getColor(R.color.kq_ink_2))
-                textSize = 12f
-                setPadding(0, 0, 0, dp(8))
-            }
-
-            val communityRow = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-            }
-            val communityLabel = TextView(this).apply {
-                text = getString(R.string.set_community_label)
-                setTextColor(getColor(R.color.kq_ink))
-                textSize = 14f
-                val lp = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                layoutParams = lp
-            }
-            val communitySwitch = SwitchMaterial(this).apply {
-                isChecked = Config.hasCommunityShareConsent(this@SettingsActivity)
-                setOnCheckedChangeListener { _, on ->
-                    Config.setCommunityShareConsent(this@SettingsActivity, on)
-                    toastSaved()
-                }
-            }
-            communityRow.addView(communityLabel)
-            communityRow.addView(communitySwitch)
-
-            val divider = View(this).apply {
-                setBackgroundColor(getColor(R.color.kq_hairline))
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(1)
-                ).apply {
-                    topMargin = dp(10)
-                    bottomMargin = dp(10)
-                }
-            }
-
-            val revokeRow = TextView(this).apply {
-                text = getString(R.string.set_revoke_consent)
-                setTextColor(getColor(R.color.kq_danger))
-                textSize = 14f
-                setPadding(0, dp(4), 0, dp(4))
-                setOnClickListener { confirmRevokeConsent() }
-            }
-
-            inner.addView(tsLabel)
-            inner.addView(communityRow)
-            inner.addView(divider)
-            inner.addView(revokeRow)
-            card.addView(inner)
-
-            parent.addView(eyebrow, insertAt)
-            parent.addView(card, insertAt + 1)
-        } catch (e: Throwable) {
-            android.util.Log.e("SettingsActivity", "injectConsent failed", e)
-        }
-    }
-
-    /** Finds the footer caption TextView (KIBERQALQON v7.5 …) so we can inject above it. */
-    private fun findFooterTextView(): TextView? {
-        fun walk(v: View): TextView? {
-            if (v is TextView && v.text?.toString()?.startsWith("KIBERQALQON") == true) return v
-            if (v is android.view.ViewGroup) {
-                for (i in 0 until v.childCount) walk(v.getChildAt(i))?.let { return it }
-            }
-            return null
-        }
-        return walk(binding.root)
-    }
-
     /**
-     * "Boshqaruv paneli" — footer ustiga bitta tugma qo'shadi. Bosilsa veb-panel
-     * ilova ichida (WebView) ochiladi: admin login+parol bilan kiradi (ko'rish +
-     * eksport + e'lon), egasi master kalit bilan. Sirlar APK ichida emas.
+     * «Loyiha haqida» — activity_about.xml ni shu Activity ustiga to'liq ekran
+     * overlay qilib qo'shadi (manifest o'zgarmaydi, tema/aksent attr'lari
+     * Activity kontekstidan to'g'ri yechiladi). Orqaga tugma yoki tizim
+     * back → overlay yopiladi.
      */
-    private fun injectAdminPanelEntry() {
-        try {
-            val footer = findFooterTextView() ?: return
-            val parent = footer.parent as? LinearLayout ?: return
-            val footerIdx = parent.indexOfChild(footer)
-            val btn = TextView(this).apply {
-                text = "🛡  Boshqaruv paneli"
-                textSize = 15f
-                gravity = android.view.Gravity.CENTER
-                setPadding(0, dp(16), 0, dp(20))
-                isClickable = true
-                setOnClickListener {
-                    startActivity(android.content.Intent(this@SettingsActivity, AdminPanelActivity::class.java))
-                }
-            }
-            parent.addView(btn, footerIdx + 1)
-        } catch (e: Throwable) {
-            android.util.Log.e("SettingsActivity", "injectAdminPanelEntry failed", e)
+    private fun showAboutOverlay() {
+        if (aboutBinding != null) return
+        val about = ActivityAboutBinding.inflate(layoutInflater)
+        about.tvAboutFooter.text = getString(R.string.kq4_about_footer, BuildConfig.VERSION_NAME)
+        about.btnAboutBack.setOnClickListener { hideAboutOverlay() }
+        binding.root.addView(
+            about.root,
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        )
+        aboutBinding = about
+    }
+
+    private fun hideAboutOverlay() {
+        aboutBinding?.let { binding.root.removeView(it.root) }
+        aboutBinding = null
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (aboutBinding != null) {
+            hideAboutOverlay()
+            return
         }
+        @Suppress("DEPRECATION")
+        super.onBackPressed()
+    }
+
+    /** MAXFIYLIK kartochkasi: rozilik sanasi + jamoatchilik tumbleri + bekor qilish. */
+    private fun bindConsentSection() {
+        val ts = Config.userConsentTimestamp(this)
+        binding.tvConsentTimestamp.text = if (ts > 0) {
+            val fmt = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+            getString(R.string.set_consent_given_at, fmt.format(Date(ts)))
+        } else {
+            getString(R.string.set_consent_not_given)
+        }
+
+        binding.swCommunityShare.isChecked = Config.hasCommunityShareConsent(this)
+        binding.swCommunityShare.setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setCommunityShareConsent(this, on)
+            toastSaved()
+        }
+
+        binding.btnRevokeConsent.setOnClickListener { confirmRevokeConsent() }
     }
 
     private fun confirmRevokeConsent() {
@@ -496,6 +512,4 @@ class SettingsActivity : AppCompatActivity() {
     private fun toastSaved() {
         Toast.makeText(this, getString(R.string.save), Toast.LENGTH_SHORT).show()
     }
-
-    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 }
