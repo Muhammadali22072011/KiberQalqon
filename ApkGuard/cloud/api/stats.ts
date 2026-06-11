@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { canRead } from '../lib/auth.js';
+import { canRead, checkAdminSecret } from '../lib/auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
@@ -44,6 +44,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
   const sb = db();
+
+  // ?audit=1 → panel amallari jurnali (admin_audit_log, migratsiya 15) — FAQAT EGASI.
+  // Alohida funksiya emas (Vercel Hobby 12-funksiya limiti) — threats?feed=1 uslubida branch.
+  if (req.query.audit === '1') {
+    if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
+    const { data, error } = await sb
+      .from('admin_audit_log')
+      .select('id, at, actor, action, detail, ip')
+      .order('at', { ascending: false })
+      .limit(200);
+    if (error) { console.error(`[stats] audit db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, audit: data ?? [] });
+  }
 
   // ?perf=1 → tekshiruv tezligi (scan-perf shu yerga birlashtirildi: Vercel Hobby 12-funksiya
   // limitidan oshib ketmaslik uchun). Panel "Tekshiruv tezligi" widjeti `/api/stats?perf=1` chaqiradi.

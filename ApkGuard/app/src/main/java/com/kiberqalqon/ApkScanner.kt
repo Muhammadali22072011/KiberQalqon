@@ -26,7 +26,10 @@ data class ScanResult(
     val details: List<String>,
     val dangerousPermissions: List<String>,
     val malwareSignatures: List<String>,
-    val durationMs: Long = 0
+    val durationMs: Long = 0,
+    // ML advisory ([MlRiskModel]): 0..1 ehtimollik. -1 = hisoblanmagan (erta-chiqish
+    // yo'llari, kesh-hit). Verdictga TA'SIR QILMAYDI — faqat details/telemetriya uchun.
+    val mlRisk: Double = -1.0
 ) {
     enum class Verdict { SAFE, SUSPICIOUS, DANGER }
 }
@@ -275,6 +278,14 @@ object ApkScanner {
         }
     }
 
+    /** MlRiskModel darajasi — foydalanuvchiga ko'rinadigan matn faqat o'zbekcha. */
+    private fun mlBandUz(p: Double): String = when (MlRiskModel.band(p)) {
+        "critical" -> "juda yuqori"
+        "high" -> "yuqori"
+        "medium" -> "o'rtacha"
+        else -> "past"
+    }
+
     /** Размер файла в человекочитаемом формате (B/KB/MB). */
     internal fun humanSize(bytes: Long): String {
         if (bytes < 1024) return "${bytes}B"
@@ -445,7 +456,8 @@ object ApkScanner {
                 "Sabab: $reason\n" +
                 "Manba: $source\n" +
                 "Hajm: ${humanSize(f.length())}\n" +
-                "Vaqt: ${result.durationMs} ms"
+                "Vaqt: ${result.durationMs} ms" +
+                (if (result.mlRisk >= 0) "\nAI xavf bahosi: ${(result.mlRisk * 100).toInt()}% (${mlBandUz(result.mlRisk)})" else "")
             )
             // Vyspecializovannye sobytiya — chtoby user mog filtrovat' v gruppe.
             if (verdict == ScanResult.Verdict.DANGER) {
@@ -1134,6 +1146,34 @@ object ApkScanner {
                 ScanResult.Verdict.SAFE -> "Kritik belgilar topilmadi."
             }
 
+            // === ML advisory (MlRiskModel) — verdictni O'ZGARTIRMAYDI (golden qoida). ===
+            // Detektorlar allaqachon hisoblagan signallardan features yig'amiz; natija
+            // faqat details + telemetriya uchun. decideVerdict() bunga qaramaydi.
+            val mlRisk = try {
+                MlRiskModel.riskProbability(
+                    MlRiskModel.Features(
+                        dangerousPermCount = dangerousFound.size,
+                        permComboScore = comboScore,
+                        dexPatternHits = dexFindings.patterns.size,
+                        hasNativeSuspicious = nativeFindings.suspiciousLibs.isNotEmpty(),
+                        hasObfuscatedSig = signaturesFound.isNotEmpty(),
+                        evasionTechniques = evasionCount,
+                        // DropperDetector entropiyani tashqariga chiqarmaydi; shifrlangan
+                        // payload aniqlanishining o'zi >=7.5 entropy talab qiladi.
+                        maxAssetEntropy = if (dropperFindings.encryptedPayloads.isNotEmpty()) 7.5 else 0.0,
+                        hasHiddenPayload = dropperFindings.hiddenApks.isNotEmpty() ||
+                                dropperFindings.hiddenDex.isNotEmpty() ||
+                                dropperFindings.hiddenElf.isNotEmpty(),
+                        filenameSuspicion = filenameFindings.score,
+                        // ZIP-shifrlash yuqorida erta-DANGER bilan chiqib ketadi — bu yerga yetmaydi.
+                        zipEncrypted = false,
+                        iconImpersonation = iconMatch != null,
+                    )
+                )
+            } catch (e: Throwable) {
+                Log.w(TAG, "MlRiskModel failed", e); -1.0
+            }
+
             val details = mutableListOf<String>()
             if (dangerousFound.isNotEmpty()) {
                 val perms = dangerousFound.take(5).joinToString(", ") { it.substringAfterLast(".") }
@@ -1204,6 +1244,11 @@ object ApkScanner {
                 details.addAll(filenameFindings.flags.take(3))
             }
 
+            // === ML advisory ===
+            if (mlRisk >= 0.35) {
+                details.add("🤖 AI bahosi: zararli bo'lish ehtimoli ~${(mlRisk * 100).toInt()}% (daraja: ${mlBandUz(mlRisk)}) — maslahat, xulosaga ta'sir qilmaydi")
+            }
+
             if (details.isEmpty()) {
                 details.add("Shubhali elementlar topilmadi")
             }
@@ -1213,7 +1258,8 @@ object ApkScanner {
                 reason = reason,
                 details = details,
                 dangerousPermissions = dangerousFound,
-                malwareSignatures = signaturesFound
+                malwareSignatures = signaturesFound,
+                mlRisk = mlRisk
             )
             
             // Statistika + telemetriya + tarix + kesh + widget — barchasi yagona nuqtada.

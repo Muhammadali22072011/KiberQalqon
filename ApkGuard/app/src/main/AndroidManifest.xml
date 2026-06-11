@@ -355,11 +355,10 @@
         </service>
 
         <!-- TAJRIBAVIY (opt-in, default OFF): DNS-sinkhole VPN — ma'lum C2 domenlarini bloklaydi.
-             HOZIRCHA O'CHIRILGAN (deactivated): hech qayerda ulanmagan (settings toggle + VpnService.prepare
-             oqimi hali yo'q), shuning uchun manifestdan ham olib qo'yildi — yoqib bo'lmaydigan service
-             keraksiz hujum yuzasi (attack surface) bo'lib qolmasligi uchun. Manbаа (VpnFilterService.kt)
-             saqlanadi va fail-open qilib mustahkamlandi; opt-in UI tayyor bo'lgach, quyidagi blokni
-             qayta yoqing.
+             Settings'dagi toggle orqali yoqiladi (VpnService.prepare oqimi SettingsActivity'da).
+             Domenlar: baked IOC to'plami + bulut feed'i (ThreatDb, api/threats?feed=1).
+             Fail-open: upstream DNS ketma-ket ishlamasa VPN o'zini O'CHIRADI — filtr buzilsa
+             ham internet hech qachon bloklanib qolmaydi. -->
         <service
             android:name=".VpnFilterService"
             android:exported="false"
@@ -368,8 +367,6 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
-        -->
-        <!-- /VpnFilterService (o'chirilgan) -->
 
         <service
             android:name=".PhishingNotificationService"

@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
 import { canManageNews, canRead, checkAdminSecret, checkDeviceSecret } from '../lib/auth.js';
+import { audit } from '../lib/audit.js';
 
 // Yangiliklar / e'lonlar — panel bosh sahifasidagi lenta + APK bosh ekrani.
 //   GET  → o'qish: panel (x-admin-secret) YOKI qurilma (x-device-secret).
@@ -53,6 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select('id, title, body, level, image_url, pinned, created_at')
         .single();
       if (error) { console.error(`[news] create db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'news_create', `${data?.id ?? '?'}: ${title.slice(0, 80)}`);
       return res.status(200).json({ ok: true, item: data });
     }
 
@@ -63,6 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!id) return res.status(400).json({ ok: false, error: 'id kerak' });
       const { error } = await sb.from('news').delete().eq('id', id);
       if (error) { console.error(`[news] delete db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'news_delete', id);
       return res.status(200).json({ ok: true });
     }
 
@@ -73,6 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!id) return res.status(400).json({ ok: false, error: 'id kerak' });
       const { error } = await sb.from('news').update({ pinned: Boolean(b.pinned) }).eq('id', id);
       if (error) { console.error(`[news] toggle_pin db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'news_pin', `${id} → ${Boolean(b.pinned)}`);
       return res.status(200).json({ ok: true });
     }
 

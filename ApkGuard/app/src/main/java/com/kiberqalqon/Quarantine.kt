@@ -24,6 +24,10 @@ import java.security.MessageDigest
  *  • .quar расширение Android не открывает как APK — даже если юзер случайно тапнет,
  *    система не запустит установку.
  *  • Папка внутренняя (filesDir) → MODE_PRIVATE, другие приложения не достанут.
+ *  • v2: содержимое .quar шифруется AES-CTR per-install ключом — на диске лежит
+ *    НЕ валидный APK/ZIP (нет magic-байтов), его невозможно установить или
+ *    скопировать в обход restore(). Старые незашифрованные записи (enc=0)
+ *    восстанавливаются как раньше. CTR не меняет длину → sizeBytes честный.
  *  • Auto-purge: при каждом quarantine() удаляем записи старше 7 дней.
  *
  * Что делать с системно-установленным APK: карантин неприменим (apk в /data/app/
@@ -35,7 +39,12 @@ object Quarantine {
     private const val TAG = "Quarantine"
     private const val PREFS = "kiberqalqon_quarantine"
     private const val KEY_ENTRIES = "entries_v1"
+    private const val KEY_ENC_KEY = "enc_key_v1"
     private const val TTL_MS = 7L * 24 * 60 * 60 * 1000
+
+    // encVersion qiymatlari: 0 = eski ochiq nusxa, 1 = AES-CTR shifrlangan.
+    private const val ENC_NONE = 0
+    private const val ENC_AES_CTR = 1
 
     data class Entry(
         val token: String,
@@ -44,7 +53,8 @@ object Quarantine {
         val quarantinedAt: Long,
         val verdict: String,
         val reason: String,
-        val sizeBytes: Long
+        val sizeBytes: Long,
+        val encVersion: Int = ENC_NONE
     )
 
     sealed class Result {
@@ -78,11 +88,21 @@ object Quarantine {
         val payloadFile = File(quarDir, "$token.quar")
         val metaFile = File(quarDir, "$token.json")
 
+        // v2: nusxa AES-CTR bilan shifrlanadi — diskda yaroqli APK qolmasin.
+        // Shifrlash kutilmaganda ishlamasa — himoya birinchi o'rinda: ochiq nusxa
+        // bilan davom etamiz (karantin baribir asl faylni olib tashlaydi).
+        var encVersion = ENC_AES_CTR
         try {
-            originalFile.copyTo(payloadFile, overwrite = true)
+            transformCopy(originalFile, payloadFile, QuarCrypto.cipher(encKey(context), token, encrypt = true))
         } catch (e: Throwable) {
-            Log.w(TAG, "copy to quarantine failed", e)
-            return Result.Failed("Karantinga ko'chirib bo'lmadi: ${e.message}")
+            Log.w(TAG, "encrypt-copy failed, falling back to plain copy", e)
+            encVersion = ENC_NONE
+            try {
+                originalFile.copyTo(payloadFile, overwrite = true)
+            } catch (e2: Throwable) {
+                Log.w(TAG, "copy to quarantine failed", e2)
+                return Result.Failed("Karantinga ko'chirib bo'lmadi: ${e2.message}")
+            }
         }
 
         val entry = Entry(
@@ -92,7 +112,8 @@ object Quarantine {
             quarantinedAt = System.currentTimeMillis(),
             verdict = verdict,
             reason = reason.take(500),
-            sizeBytes = payloadFile.length()
+            sizeBytes = payloadFile.length(),
+            encVersion = encVersion
         )
 
         // Сохраняем мету и в JSON-файл рядом, и в SharedPreferences-индекс (для быстрого list).
@@ -138,7 +159,12 @@ object Quarantine {
         val target = File(entry.originalPath)
         try {
             target.parentFile?.mkdirs()
-            payloadFile.copyTo(target, overwrite = true)
+            if (entry.encVersion == ENC_AES_CTR) {
+                transformCopy(payloadFile, target, QuarCrypto.cipher(encKey(context), entry.token, encrypt = false))
+            } else {
+                // Eski (v1) ochiq yozuvlar — avvalgidek oddiy nusxa.
+                payloadFile.copyTo(target, overwrite = true)
+            }
         } catch (e: Throwable) {
             Log.w(TAG, "restore copy failed", e)
             return Result.Failed("Tiklab bo'lmadi: ${e.message}")
@@ -180,6 +206,35 @@ object Quarantine {
         val dir = File(context.applicationContext.filesDir, "quarantine")
         if (!dir.exists()) dir.mkdirs()
         return dir
+    }
+
+    /**
+     * Per-install karantin kaliti (32 bayt): birinchi murojaatda SecureRandom bilan
+     * yaratiladi va prefs'da hex ko'rinishda saqlanadi. Boshqa ilovalar prefs'ga
+     * yeta olmaydi (MODE_PRIVATE); kalit qurilmadan tashqariga hech qachon chiqmaydi.
+     */
+    private fun encKey(context: Context): ByteArray {
+        val cur = prefs(context).getString(KEY_ENC_KEY, null)
+        if (cur != null && cur.length == 64) {
+            try {
+                return QuarCrypto.hexToBytes(cur)
+            } catch (_: Throwable) {
+                // Buzilgan qiymat — yangisini yaratamiz (eski enc=1 yozuvlar tiklanmay
+                // qoladi, lekin bu faqat prefs qo'lda buzilganda bo'ladi).
+            }
+        }
+        val fresh = ByteArray(32).also { java.security.SecureRandom().nextBytes(it) }
+        prefs(context).edit { putString(KEY_ENC_KEY, QuarCrypto.bytesToHex(fresh)) }
+        return fresh
+    }
+
+    /** Oqimli nusxa shifr orqali — katta APK'lar uchun ham xotira-xavfsiz. */
+    private fun transformCopy(src: File, dst: File, cipher: javax.crypto.Cipher) {
+        src.inputStream().use { input ->
+            javax.crypto.CipherOutputStream(dst.outputStream(), cipher).use { out ->
+                input.copyTo(out)
+            }
+        }
     }
 
     private fun purgeExpired(context: Context) {
@@ -238,6 +293,7 @@ object Quarantine {
         put("verdict", e.verdict)
         put("reason", e.reason)
         put("sizeBytes", e.sizeBytes)
+        put("enc", e.encVersion)
     }
 
     private fun jsonToEntry(o: JSONObject): Entry = Entry(
@@ -247,6 +303,40 @@ object Quarantine {
         quarantinedAt = o.optLong("quarantinedAt", 0L),
         verdict = o.optString("verdict"),
         reason = o.optString("reason"),
-        sizeBytes = o.optLong("sizeBytes", 0L)
+        sizeBytes = o.optLong("sizeBytes", 0L),
+        // Eski yozuvlarda "enc" yo'q → 0 (ochiq) — restore avvalgidek ishlaydi.
+        encVersion = o.optInt("enc", ENC_NONE)
     )
+}
+
+/**
+ * Karantin shifrlash yadrosi — sof JVM (Android importsiz), unit-testlanadi.
+ *
+ * AES-CTR tanlovi sababi: oqimda ishlaydi, uzunlikni o'zgartirmaydi va padding
+ * kerak emas. IV = token (12 bayt, har yozuv uchun unikal) + 4 nol bayt hisoblagich —
+ * bir xil kalit bilan ikki yozuv hech qachon bir xil keystream olmaydi.
+ */
+internal object QuarCrypto {
+
+    fun cipher(key: ByteArray, tokenHex: String, encrypt: Boolean): javax.crypto.Cipher {
+        require(key.size == 32) { "kalit 32 bayt bo'lishi kerak" }
+        val tokenBytes = hexToBytes(tokenHex)
+        require(tokenBytes.size >= 12) { "token kamida 12 bayt bo'lishi kerak" }
+        val iv = ByteArray(16)
+        for (i in 0 until 12) iv[i] = tokenBytes[i]
+        val c = javax.crypto.Cipher.getInstance("AES/CTR/NoPadding")
+        val mode = if (encrypt) javax.crypto.Cipher.ENCRYPT_MODE else javax.crypto.Cipher.DECRYPT_MODE
+        c.init(mode, javax.crypto.spec.SecretKeySpec(key, "AES"), javax.crypto.spec.IvParameterSpec(iv))
+        return c
+    }
+
+    fun hexToBytes(hex: String): ByteArray {
+        require(hex.length % 2 == 0) { "hex uzunligi juft bo'lishi kerak" }
+        return ByteArray(hex.length / 2) { i ->
+            ((Character.digit(hex[i * 2], 16) shl 4) + Character.digit(hex[i * 2 + 1], 16)).toByte()
+        }
+    }
+
+    fun bytesToHex(bytes: ByteArray): String =
+        bytes.joinToString("") { "%02x".format(it) }
 }

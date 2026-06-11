@@ -271,7 +271,18 @@ class VpnFilterService : VpnService() {
 
     private fun isBlockedC2(domain: String): Boolean {
         val d = domain.trimEnd('.').lowercase()
-        return C2_DOMAINS.any { d == it || d.endsWith(".$it") }
+        if (C2_DOMAINS.any { d == it || d.endsWith(".$it") }) return true
+        // Bulut feed'idan kelgan domenlar (CloudBlacklist → ThreatDb.mergeCloudDomains).
+        // Subdomain ham bloklansin: a.b.evil.com → b.evil.com → evil.com (TLD tekshirilmaydi).
+        // ThreatDb yuklanmagan bo'lsa domainFamily null qaytaradi — fail-safe (blok yo'q).
+        var cur = d
+        while (true) {
+            if (try { ThreatDb.domainFamily(cur) } catch (_: Throwable) { null } != null) return true
+            val dot = cur.indexOf('.')
+            if (dot < 0 || dot == cur.lastIndexOf('.')) break
+            cur = cur.substring(dot + 1)
+        }
+        return false
     }
 
     private fun stopVpn() {
@@ -296,7 +307,8 @@ class VpnFilterService : VpnService() {
         // Upstream shuncha marta KETMA-KET ishlamasa — VPN o'chadi (fail-open kill-switch).
         private const val MAX_UPSTREAM_FAILURES = 8
 
-        // Ma'lum C2 domenlari (case-study IOC). Kelajakda CloudBlacklist'dan kengaytirish mumkin.
+        // Ma'lum C2 domenlari (case-study IOC) — baked minimal to'plam. Bulutdan kelganlar
+        // isBlockedC2() ichida ThreatDb orqali DINAMIK qo'shiladi (api/threats?feed=1).
         private val C2_DOMAINS = setOf(
             "elrxzx.com",
             "ydbllnjd.com",

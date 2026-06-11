@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "deploy": "vercel --prod",
     "set-webhook": "node scripts/set-webhook.mjs",
     "ping": "node scripts/ping.mjs"

@@ -14,4 +14,9 @@
     <!-- Переключатель еженедельного отчёта (Config.isWeeklyReportEnabled) -->
     <string name="kq4_set_row_weekly">Еженедельный отчёт</string>
     <string name="kq4_set_row_weekly_sub">Каждую неделю присылает уведомление с итогами проверки</string>
+
+    <!-- Переключатель DNS C2-фильтра (Config.isVpnFilterEnabled → VpnFilterService) -->
+    <string name="kq4_set_row_vpn">Защита интернета (DNS-фильтр)</string>
+    <string name="kq4_set_row_vpn_sub">Блокирует подключение вирусов к их серверам управления (экспериментально)</string>
+    <string name="kq4_vpn_perm_denied">Разрешение VPN не выдано — фильтр не включён</string>
 </resources>

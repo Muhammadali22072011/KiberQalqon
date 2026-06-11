@@ -6,6 +6,7 @@ import { db } from '../../lib/supabase.js';
 import {
   clientKey, checkLocked, recordFailure, recordSuccess, warnWeakSecrets, looksLikePlaceholder,
 } from '../../lib/ratelimit.js';
+import { audit } from '../../lib/audit.js';
 
 // Veb-panelga kirish — IKKI xil odam uchun:
 //   • EGASI (dasturchi) — ADMIN_SECRET (master kalit) + ixtiyoriy TOTP. TO'LIQ huquq.
@@ -44,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Admin (login+parol) kirishi — login yoki parol berilgan bo'lsa shu oqim.
   if (adminFlow) {
-    return loginAdmin(res, b, rlKey);
+    return loginAdmin(req, res, b, rlKey);
   }
 
   // Egasi (owner) kirishi — master sir (+2FA).
@@ -63,6 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!safeEq(secret, expected)) {
     await recordFailure(rlKey);
+    await audit(req, 'login_fail', 'egasi oqimi: kalit notogri', 'anon');
     return res.status(401).json(FAIL);
   }
 
@@ -96,13 +98,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   await recordSuccess(rlKey);
+  await audit(req, 'login', 'egasi kirdi', 'owner');
   const { token, exp } = issueSession();
   return res.status(200).json({ ok: true, token, exp, level: 'owner', twofa: Boolean(totpSecret) });
 }
 
 // --- Bitta cheklangan ADMIN (login + parol) ----------------------------------
 // Hisob env'da: ADMIN_LOGIN va ADMIN_PASSWORD. Rol/baza yo'q — bitta hisob.
-async function loginAdmin(res: VercelResponse, b: Body, rlKey: string) {
+async function loginAdmin(req: VercelRequest, res: VercelResponse, b: Body, rlKey: string) {
   const login = (b.login ?? '').trim();
   const password = b.password ?? '';
   const FAIL = { ok: false as const, error: "Login yoki parol noto'g'ri" };
@@ -130,10 +133,12 @@ async function loginAdmin(res: VercelResponse, b: Body, rlKey: string) {
   const okPassword = safeEq(password, expPassword);
   if (!okLogin || !okPassword) {
     await recordFailure(rlKey);
+    await audit(req, 'login_fail', 'admin oqimi: login/parol notogri', 'anon');
     return res.status(401).json(FAIL);
   }
 
   await recordSuccess(rlKey);
+  await audit(req, 'login', 'admin kirdi', `admin:${login}`);
   const { token, exp } = issueAdminSession(login);
   return res.status(200).json({ ok: true, token, exp, level: 'admin', name: login });
 }

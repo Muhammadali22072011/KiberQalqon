@@ -14,4 +14,9 @@
     <!-- Haftalik hisobot toggle (Config.isWeeklyReportEnabled) -->
     <string name="kq4_set_row_weekly">Haftalik hisobot</string>
     <string name="kq4_set_row_weekly_sub">Har hafta tekshiruv natijasini bildirishnoma qiladi</string>
+
+    <!-- DNS C2-filtri toggle (Config.isVpnFilterEnabled → VpnFilterService) -->
+    <string name="kq4_set_row_vpn">Internet himoyasi (DNS filtri)</string>
+    <string name="kq4_set_row_vpn_sub">Viruslarning boshqaruv serverlariga ulanishini bloklaydi (tajribaviy)</string>
+    <string name="kq4_vpn_perm_denied">VPN ruxsati berilmadi — filtr yoqilmadi</string>
 </resources>

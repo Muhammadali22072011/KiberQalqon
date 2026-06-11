@@ -729,6 +729,16 @@
                         android:layout_height="1dp"
                         android:background="@color/kq_hairline" />
 
+                    <!-- DNS C2-filtri toggle (Config.isVpnFilterEnabled → VpnFilterService) -->
+                    <include
+                        android:id="@+id/rowVpnFilter"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
                     <include
                         android:id="@+id/rowPrivacy"
                         layout="@layout/inc_settings_chevron_row" />

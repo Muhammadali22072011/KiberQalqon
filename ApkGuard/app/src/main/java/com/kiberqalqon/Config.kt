@@ -17,6 +17,7 @@ private const val KEY_SOUND = "sound_enabled"
 private const val KEY_VIBRATION = "vibration_enabled"
 private const val KEY_AUTO_UPDATE = "auto_update_enabled"
 private const val KEY_WEEKLY_REPORT = "weekly_report_enabled"
+private const val KEY_VPN_FILTER = "vpn_filter_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
 private const val KEY_DARK_THEME = "dark_theme"
@@ -165,6 +166,15 @@ object Config {
 
     fun setWeeklyReportEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_WEEKLY_REPORT, enabled) }
+    }
+
+    // DNS C2-filtri (VpnFilterService) — TAJRIBAVIY, default O'CHIQ (qat'iy opt-in:
+    // foydalanuvchi toggle bosadi + tizim VPN ruxsat oynasini tasdiqlaydi).
+    fun isVpnFilterEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_VPN_FILTER, false)
+
+    fun setVpnFilterEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_VPN_FILTER, enabled) }
     }
 
     fun lastDatabaseUpdate(context: Context): Long =

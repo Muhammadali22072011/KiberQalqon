@@ -143,6 +143,18 @@ class App : android.app.Application() {
         //  shuning uchun asosiy ishonchli yoqish nuqtasi — foreground Activity onResume.)
         ProtectionActivator.activateIfReady(this)
 
+        // DNS C2-filtri (opt-in): foydalanuvchi Settings'da yoqqan VA tizim VPN ruxsati
+        // hali amal qilsa (prepare == null) — qayta ishga tushiramiz (reboot/process-kill'dan
+        // keyin). Ruxsat bekor qilingan bo'lsa jim qolamiz — tizim oynasini faqat
+        // foydalanuvchining o'zi (Settings toggle) ochadi.
+        try {
+            if (Config.isVpnFilterEnabled(this) && VpnFilterService.prepareIntent(this) == null) {
+                VpnFilterService.start(this)
+            }
+        } catch (e: Throwable) {
+            Log.w("KiberQalqon", "VPN filter autostart failed", e)
+        }
+
         // WorkManager.getInstance() диск, CloudBlacklist.refresh/RemoteConfig — сеть (OkHttp .execute),
         // captureInstalledTrusted — PackageManager IO. Всё это блокирующее → Dispatchers.IO, а не
         // Default (CPU-пул): не занимаем вычислительные потоки сетевым ожиданием.

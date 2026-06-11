@@ -41,6 +41,21 @@ class SettingsActivity : AppCompatActivity() {
     private var footerTapCount = 0
     private var footerLastTapAt = 0L
 
+    /** VPN ruxsat oynasi (VpnService.prepare) natijasi — tasdiq bo'lsa filtr start. */
+    private val vpnPermissionLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            Config.setVpnFilterEnabled(this, true)
+            VpnFilterService.start(this)
+            toastSaved()
+        } else {
+            // Ruxsat berilmadi — toggle'ni qaytaramiz, Config'ga yozilmaydi.
+            toggleOf(binding.rowVpnFilter.root).isChecked = false
+            Toast.makeText(this, getString(R.string.kq4_vpn_perm_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
     }
@@ -121,6 +136,13 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_weekly_sub),
             icon = R.drawable.ic4_chart,
         )
+        // QO'SHIMCHA — DNS C2-filtri (tajribaviy, opt-in).
+        bindRow(
+            binding.rowVpnFilter.root,
+            title = getString(R.string.kq4_set_row_vpn),
+            sub = getString(R.string.kq4_set_row_vpn_sub),
+            icon = R.drawable.ic4_wifi,
+        )
     }
 
     private fun bindRow(root: View, title: String, sub: String, icon: Int) {
@@ -184,6 +206,7 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowBackground.root).isChecked = Config.isAutoUpdateEnabled(this)
         toggleOf(binding.rowUpload.root).isChecked = Config.isUploadEnabled(this)
         toggleOf(binding.rowWeeklyReport.root).isChecked = Config.isWeeklyReportEnabled(this)
+        toggleOf(binding.rowVpnFilter.root).isChecked = Config.isVpnFilterEnabled(this)
 
         // Server URL display
         val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
@@ -263,6 +286,24 @@ class SettingsActivity : AppCompatActivity() {
             if (!ready) return@setOnCheckedChangeListener
             Config.setWeeklyReportEnabled(this, on)
             toastSaved()
+        }
+        toggleOf(binding.rowVpnFilter.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            if (on) {
+                // VpnService.prepare null = ruxsat allaqachon bor; aks holda tizim oynasi.
+                val prepare = try { VpnFilterService.prepareIntent(this) } catch (_: Throwable) { null }
+                if (prepare == null) {
+                    Config.setVpnFilterEnabled(this, true)
+                    VpnFilterService.start(this)
+                    toastSaved()
+                } else {
+                    vpnPermissionLauncher.launch(prepare)
+                }
+            } else {
+                Config.setVpnFilterEnabled(this, false)
+                VpnFilterService.stop(this)
+                toastSaved()
+            }
         }
 
         // Server URL → edit dialog. Привязываем клик ко ВСЕМУ ряду (rowServerUrl),
