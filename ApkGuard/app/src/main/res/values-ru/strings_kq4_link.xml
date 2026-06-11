@@ -28,11 +28,17 @@
     <string name="kq4_link_flag_blacklisted">Этот домен в списке известных мошеннических/вирусных</string>
     <string name="kq4_link_flag_typosquat">Поддельный домен, похожий на название банка</string>
     <string name="kq4_link_flag_punycode">Уловка со скрытыми буквами (homoglyph)</string>
+    <string name="kq4_link_flag_apk">Ссылка отдаёт файл .apk напрямую — риск дроппера</string>
+    <string name="kq4_link_flag_phishing_path">Известный вредоносный путь (C2 / кража SMS)</string>
     <string name="kq4_link_flag_lookalike_tld">Название банка на неверном адресе (не \.uz)</string>
+    <string name="kq4_link_flag_social">Имитация Telegram/соцсети (не официальный домен)</string>
     <string name="kq4_link_flag_ip">Вместо домена числовой IP-адрес — подозрительно</string>
     <string name="kq4_link_flag_at">В адресе символ «@» — он скрывает настоящий сайт</string>
+    <string name="kq4_link_flag_redirect">Внутри адреса скрытое перенаправление (на другой сайт)</string>
     <string name="kq4_link_flag_subdomains">Слишком много частей — запутанный адрес</string>
     <string name="kq4_link_flag_tld">Дешёвый домен, который часто используют мошенники</string>
+    <string name="kq4_link_flag_scam">Слова приз/скидка/выигрыш — признак мошенничества</string>
+    <string name="kq4_link_flag_idn">Международный (не латинский) домен — проверьте внимательно</string>
     <string name="kq4_link_flag_shortener">Сокращатель — настоящий адрес скрыт</string>
     <string name="kq4_link_flag_financial">Слова банк/пароль/код — признак фишинга</string>
     <string name="kq4_link_flag_nonhttps">Незашифрованное (http) соединение — небезопасно</string>

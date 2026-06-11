@@ -28,11 +28,17 @@
     <string name="kq4_link_flag_blacklisted">Bu domen ma\'lum firibgar/virus ro\'yxatida</string>
     <string name="kq4_link_flag_typosquat">Bank nomiga o\'xshatib yasalgan soxta domen</string>
     <string name="kq4_link_flag_punycode">Yashirin harflar bilan yasalgan (homoglyph) hiyla</string>
+    <string name="kq4_link_flag_apk">Havola to\'g\'ridan-to\'g\'ri .apk fayl beradi — dropper xavfi</string>
+    <string name="kq4_link_flag_phishing_path">Ma\'lum zararli manzil (C2/SMS o\'g\'irlash) yo\'li</string>
     <string name="kq4_link_flag_lookalike_tld">Bank nomi noto\'g\'ri manzilda (\.uz emas)</string>
+    <string name="kq4_link_flag_social">Telegram/ijtimoiy tarmoq nomiga taqlid (rasmiy emas)</string>
     <string name="kq4_link_flag_ip">Domen o\'rniga raqamli IP manzil — shubhali</string>
     <string name="kq4_link_flag_at">Manzilda «@» belgisi — haqiqiy saytni yashiradi</string>
+    <string name="kq4_link_flag_redirect">Manzil ichida yashirin yo\'naltirish (boshqa saytga)</string>
     <string name="kq4_link_flag_subdomains">Juda ko\'p qism — chalg\'ituvchi manzil</string>
     <string name="kq4_link_flag_tld">Arzon/firibgarlar ishlatadigan domen turi</string>
+    <string name="kq4_link_flag_scam">Sovrin/chegirma/yutuq lure so\'zlari — firibgarlik alomati</string>
+    <string name="kq4_link_flag_idn">Xalqaro (lotin bo\'lmagan) domen — diqqat bilan tekshiring</string>
     <string name="kq4_link_flag_shortener">Qisqartirgich — haqiqiy manzil yashiringan</string>
     <string name="kq4_link_flag_financial">Bank/parol/kod so\'zlari bor — fishing alomati</string>
     <string name="kq4_link_flag_nonhttps">Shifrlanmagan (http) ulanish — xavfsiz emas</string>
