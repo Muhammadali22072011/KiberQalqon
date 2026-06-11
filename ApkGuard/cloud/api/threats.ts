@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { canRead, checkDeviceSecret } from '../lib/auth.js';
+import { canRead, checkAdminSecret, checkDeviceSecret } from '../lib/auth.js';
+import { audit } from '../lib/audit.js';
 import { createHmac } from 'crypto';
 
 /**
@@ -67,7 +68,57 @@ function isNeverFeedDomain(host: string): boolean {
  * threats jadvalida sertifikat ustuni YO'Q → feed faqat hash + package beradi
  * (sertifikatlar mijozda assets/malicious_certs.txt orqali qoladi).
  */
+// Domen validatsiyasi: kichik harf, sxema/yo'l/portsiz, kamida bitta nuqta, faqat
+// [a-z0-9.-] (punycode xn-- ham shu alifboda). Bo'sh yorliq/chetki defis rad etiladi.
+function normalizeDomain(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  let d = raw.trim().toLowerCase();
+  d = d.replace(/^https?:\/\//, '').replace(/^\/\//, '');
+  d = d.split('/')[0].split('?')[0].split('#')[0].split('@').pop() || '';
+  d = d.split(':')[0].replace(/\.$/, '');
+  if (d.length < 4 || d.length > 253) return null;
+  if (!/^[a-z0-9.-]+$/.test(d) || !d.includes('.')) return null;
+  if (d.split('.').some((l) => !l || l.startsWith('-') || l.endsWith('-'))) return null;
+  return d;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // ===== POST — domen qora ro'yxatini boshqarish (FAQAT EGASI) =====
+  // Alohida funksiya emas (Vercel Hobby 12-funksiya limiti) — stats?audit=1 uslubida branch.
+  if (req.method === 'POST') {
+    if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
+    const body = (req.body ?? {}) as { action?: string; domain?: unknown; category?: string; severity?: string };
+    const domain = normalizeDomain(body.domain);
+    if (!domain) return res.status(400).json({ ok: false, error: 'domen noto\'g\'ri' });
+
+    if (body.action === 'add_domain') {
+      // Allowlist (gov.uz / bank domenlari) hech qachon qora ro'yxatga tushmaydi — xato
+      // bosish butun parkning bank saytini bloklab qo'ymasin.
+      if (isNeverFeedDomain(domain)) {
+        return res.status(400).json({ ok: false, error: 'himoyalangan domen (bank/gov)' });
+      }
+      const severity = ['low', 'medium', 'high', 'critical'].includes(body.severity || '')
+        ? (body.severity as string) : 'high';
+      const category = (body.category || 'phishing').slice(0, 40);
+      const { error } = await db().from('threat_domains').upsert(
+        { domain, category, severity, source: 'owner', last_seen: new Date().toISOString() },
+        { onConflict: 'domain' },
+      );
+      if (error) { console.error(`[threats] domain upsert: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'domain_add', `${domain} (${severity}/${category})`);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (body.action === 'delete_domain') {
+      const { error } = await db().from('threat_domains').delete().eq('domain', domain);
+      if (error) { console.error(`[threats] domain delete: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'domain_del', domain);
+      return res.status(200).json({ ok: true });
+    }
+
+    return res.status(400).json({ ok: false, error: 'action' });
+  }
+
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
 
   const isAdmin = canRead(req);
@@ -75,6 +126,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!isAdmin && !isDevice) return res.status(401).json({ ok: false, error: 'auth' });
 
   const sb = db();
+
+  // ===== Panel: domen qora ro'yxati jadvali (ko'rish — egasi ham, admin ham) =====
+  if (req.query.domains === '1' && isAdmin) {
+    const { data, error } = await sb
+      .from('threat_domains')
+      .select('domain, category, severity, source, first_seen, last_seen')
+      .order('last_seen', { ascending: false })
+      .limit(500);
+    if (error) { console.error(`[threats] domains db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, domains: data ?? [] });
+  }
   // CLOUD-01: bitta soxta "danger" yuklama butun parkni bloklab qo'ymasligi uchun feed'ga
   // faqat KAMIDA shuncha HAR XIL qurilmada tasdiqlangan tahdid tushadi.
   const MIN_FEED_DEVICES = 2;

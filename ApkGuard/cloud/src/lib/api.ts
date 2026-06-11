@@ -146,3 +146,14 @@ export interface NewsItem {
   id: string; title: string; body?: string | null; level?: string;
   image_url?: string | null; pinned?: boolean; created_at: string;
 }
+export interface AuditRow {
+  id: number; at: string; actor: string; action: string;
+  detail?: string | null; ip?: string | null;
+}
+export interface ThreatDomain {
+  domain: string; category?: string | null; severity?: string | null;
+  source?: string | null; first_seen?: string; last_seen?: string;
+}
+export interface AppUpdateInfo {
+  versionCode: number; apkUrl: string; apkSha256: string;
+}

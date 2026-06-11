@@ -1,11 +1,134 @@
+import { useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, type ThreatFamily } from '../lib/api';
+import { apiGet, apiPost, type ThreatDomain, type ThreatFamily } from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner, Tag } from '../components/ui';
 import { agoSafe, catUz, SEV_COLOR, uzDateSafe } from '../lib/format';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../components/Toast';
 
 const SEV_UZ: Record<string, string> = {
   critical: 'Kritik', high: 'Yuqori', medium: "O'rta", low: 'Past',
 };
+
+/**
+ * Domen qora ro'yxati boshqaruvi. Bu yerga qo'shilgan domen IMZOLANGAN feed orqali
+ * BARCHA telefonlarga tushadi: LinkScanner havolani DANGER deydi, VPN C2-filtri esa
+ * DNS darajasida bloklaydi. Qo'shish/o'chirish FAQAT EGADA (server ham 403 bilan qaytaradi).
+ */
+function DomainsPanel() {
+  const { isOwner } = useAuth();
+  const { show } = useToast();
+  const { data, loading, reload } = usePoll(
+    () => apiGet<{ domains: ThreatDomain[] }>('/api/threats?domains=1'),
+    60000,
+  );
+  const [domain, setDomain] = useState('');
+  const [severity, setSeverity] = useState('high');
+  const [busy, setBusy] = useState(false);
+  const rows = data?.domains || [];
+
+  const add = async () => {
+    const d = domain.trim();
+    if (!d || busy) return;
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', { action: 'add_domain', domain: d, severity });
+      setDomain('');
+      show(`${d} bloklandi — barcha telefonlarga tarqaladi`);
+      reload();
+    } catch (e) {
+      show(`Qo‘shib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const del = async (d: string) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', { action: 'delete_domain', domain: d });
+      show(`${d} ro‘yxatdan olib tashlandi`);
+      reload();
+    } catch (e) {
+      show(`O‘chirib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Panel className="gap-top">
+      <PanelHead
+        sub="Havola himoyasi · barcha telefonlarga tarqaladi"
+        title={`Domen qora ro‘yxati (${rows.length})`}
+      />
+      <div className="body-pad">
+        {isOwner && (
+          <div className="row-inline" style={{ marginBottom: 12, flexWrap: 'wrap' }}>
+            <input
+              placeholder="masalan: payme-bonus.top"
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
+              style={{ flex: '1 1 220px' }}
+            />
+            <select value={severity} onChange={(e) => setSeverity(e.target.value)} style={{ width: 130 }}>
+              <option value="critical">Kritik</option>
+              <option value="high">Yuqori</option>
+              <option value="medium">O‘rta</option>
+            </select>
+            <button className="btn" onClick={add} disabled={busy || !domain.trim()}>
+              {busy ? <span className="spinner" /> : '+ Bloklash'}
+            </button>
+          </div>
+        )}
+        {loading && !rows.length ? (
+          <Spinner label="Yuklanmoqda…" />
+        ) : !rows.length ? (
+          <Empty>Domen qo‘shilmagan. Yuqoriga firibgar saytni yozing — barcha telefonlar bloklaydi.</Empty>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Domen</th>
+                  <th>Toifa</th>
+                  <th>Daraja</th>
+                  <th>Manba</th>
+                  <th>Qo‘shilgan</th>
+                  {isOwner && <th />}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.domain}>
+                    <td className="mono" style={{ fontSize: 13 }}><b>{r.domain}</b></td>
+                    <td><Tag kind="comp">{catUz(r.category)}</Tag></td>
+                    <td>
+                      <span style={{ color: SEV_COLOR[r.severity || 'high'] || 'var(--warn)', fontWeight: 700, fontSize: 12 }}>
+                        {SEV_UZ[r.severity || 'high'] || r.severity}
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{r.source === 'owner' ? 'Egasi' : r.source || '—'}</td>
+                    <td style={{ color: 'var(--ink-2)', fontSize: 12 }}>{agoSafe(r.last_seen)}</td>
+                    {isOwner && (
+                      <td>
+                        <button className="btn sm danger" onClick={() => del(r.domain)} disabled={busy}>
+                          O‘chirish
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
 
 export default function Threats() {
   const { data, loading, error } = usePoll(() => apiGet<{ threats: ThreatFamily[] }>('/api/threats'), 20000);
@@ -121,7 +244,7 @@ export default function Threats() {
                           download
                           rel="noopener noreferrer"
                           title="APK namunasini yuklab olish (o‘rganish uchun)"
-                          style={{ color: 'var(--accent, #25e0b0)', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}
+                          style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}
                         >
                           ⬇ APK
                         </a>
@@ -136,6 +259,8 @@ export default function Threats() {
           </table>
         </div>
       </Panel>
+
+      <DomainsPanel />
     </>
   );
 }

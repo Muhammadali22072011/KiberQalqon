@@ -36,6 +36,18 @@
         "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\cloud\\public"
       ],
       "port": 8755
+    },
+    {
+      "name": "cloud-panel",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5180",
+        "--directory",
+        "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\cloud\\dist"
+      ],
+      "port": 5180
     }
   ]
 }

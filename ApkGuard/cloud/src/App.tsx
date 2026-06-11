@@ -10,6 +10,7 @@ import Threats from './pages/Threats';
 import Devices from './pages/Devices';
 import News from './pages/News';
 import Profile from './pages/Profile';
+import Audit from './pages/Audit';
 
 function RequireAuth() {
   const { authed, ready } = useAuth();
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="threats" element={<Threats />} />
           <Route path="devices" element={<Devices />} />
           <Route path="news" element={<News />} />
+          <Route path="audit" element={<Audit />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Route>
