@@ -18,6 +18,13 @@ private const val KEY_VIBRATION = "vibration_enabled"
 private const val KEY_AUTO_UPDATE = "auto_update_enabled"
 private const val KEY_WEEKLY_REPORT = "weekly_report_enabled"
 private const val KEY_VPN_FILTER = "vpn_filter_enabled"
+// Havola qalqoni (link interceptor): tashqi http(s) havolalar ochilishidan oldin
+// avtomatik [LinkScanner] orqali tekshiriladi. Default YOQILGAN — lekin u faqat
+// foydalanuvchi KiberQalqon'ni standart havola ochuvchi qilib tanlasagina ishlaydi.
+private const val KEY_LINK_GUARD = "link_guard_enabled"
+// Xavfsiz havola yo'naltiriladigan standart brauzer paketi (o'zimiz EMAS). Bir marta
+// tanlanadi (yoki tizim default'idan aniqlanadi), keyin jim ishlaydi.
+private const val KEY_PREFERRED_BROWSER = "preferred_browser_pkg"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
 private const val KEY_DARK_THEME = "dark_theme"
@@ -175,6 +182,26 @@ object Config {
 
     fun setVpnFilterEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_VPN_FILTER, enabled) }
+    }
+
+    // Havola qalqoni — default YOQILGAN (interceptor faqat foydalanuvchi bizni standart
+    // havola ochuvchi qilib tanlasagina ishga tushadi, shuning uchun default-on xavfsiz).
+    fun isLinkGuardEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_LINK_GUARD, true)
+
+    fun setLinkGuardEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_LINK_GUARD, enabled) }
+    }
+
+    /** Xavfsiz havola yo'naltiriladigan brauzer paketi (null = hali tanlanmagan). */
+    fun getPreferredBrowser(context: Context): String? =
+        prefs(context).getString(KEY_PREFERRED_BROWSER, null)?.takeIf { it.isNotBlank() }
+
+    fun setPreferredBrowser(context: Context, pkg: String?) {
+        prefs(context).edit {
+            if (pkg.isNullOrBlank()) remove(KEY_PREFERRED_BROWSER)
+            else putString(KEY_PREFERRED_BROWSER, pkg)
+        }
     }
 
     fun lastDatabaseUpdate(context: Context): Long =

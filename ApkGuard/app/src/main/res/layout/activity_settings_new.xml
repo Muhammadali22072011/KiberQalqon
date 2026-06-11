@@ -739,6 +739,26 @@
                         android:layout_height="1dp"
                         android:background="@color/kq_hairline" />
 
+                    <!-- Havola qalqoni toggle (Config.isLinkGuardEnabled → LinkGuardActivity) -->
+                    <include
+                        android:id="@+id/rowLinkGuard"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Ishonchli ro'yxat (UserWhitelist) — ko'rish/olib tashlash dialogi -->
+                    <include
+                        android:id="@+id/rowTrustList"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
                     <include
                         android:id="@+id/rowPrivacy"
                         layout="@layout/inc_settings_chevron_row" />

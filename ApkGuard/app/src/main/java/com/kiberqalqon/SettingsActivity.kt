@@ -143,6 +143,58 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_vpn_sub),
             icon = R.drawable.ic4_wifi,
         )
+        // QO'SHIMCHA — Havola qalqoni (link interceptor).
+        bindRow(
+            binding.rowLinkGuard.root,
+            title = getString(R.string.kq4_set_row_linkguard),
+            sub = getString(R.string.kq4_set_row_linkguard_sub),
+            icon = R.drawable.ic4_link,
+        )
+        // QO'SHIMCHA — Ishonchli ro'yxat (UserWhitelist boshqaruvi).
+        bindChevronWithSub(
+            binding.rowTrustList.root,
+            getString(R.string.kq4_set_row_trustlist),
+            getString(R.string.kq4_set_row_trustlist_sub),
+            R.drawable.ic4_check_circle,
+        )
+        binding.rowTrustList.root.setOnClickListener { showTrustListDialog() }
+    }
+
+    /**
+     * Ishonchli ro'yxat dialogi: yozuvlar ro'yxati, yozuvga bosilsa — olib tashlash tasdig'i.
+     * Bo'sh bo'lsa — tushuntiruvchi xabar. (Alohida Activity'siz, soddalik uchun dialog.)
+     */
+    private fun showTrustListDialog() {
+        val items = UserWhitelist.entries(this)
+        if (items.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.kq4_set_row_trustlist)
+                .setMessage(R.string.kq4_trustlist_empty)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+            return
+        }
+        val labels = items.map { e ->
+            val kind = if (e.type == UserWhitelist.TYPE_APP) "📦" else "📄"
+            val name = e.label.ifBlank { e.key.take(16) + "…" }
+            "$kind $name"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.kq4_set_row_trustlist)
+            .setItems(labels) { _, which ->
+                val e = items[which]
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.kq4_trustlist_remove_title)
+                    .setMessage(getString(R.string.kq4_trustlist_remove_msg, e.label.ifBlank { e.key.take(16) }))
+                    .setPositiveButton(R.string.kq4_trustlist_remove_yes) { _, _ ->
+                        UserWhitelist.remove(this, e.type, e.key)
+                        Toast.makeText(this, R.string.kq4_trustlist_removed, Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton(R.string.kq4_btn_later, null)
+                    .show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun bindRow(root: View, title: String, sub: String, icon: Int) {
@@ -207,6 +259,7 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowUpload.root).isChecked = Config.isUploadEnabled(this)
         toggleOf(binding.rowWeeklyReport.root).isChecked = Config.isWeeklyReportEnabled(this)
         toggleOf(binding.rowVpnFilter.root).isChecked = Config.isVpnFilterEnabled(this)
+        toggleOf(binding.rowLinkGuard.root).isChecked = Config.isLinkGuardEnabled(this)
 
         // Server URL display
         val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
@@ -240,6 +293,38 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun toggleOf(rowRoot: View): SwitchCompat =
         rowRoot.findViewById(R.id.swRow)
+
+    /**
+     * Havola qalqoni yoqilganda — interceptor faqat KiberQalqon STANDART havola ochuvchi
+     * bo'lsagina ishlaydi. Foydalanuvchiga buni tushuntirib, tizim «standart ilovalar»
+     * ekranini ochishni taklif qilamiz (Telegram ichki brauzeri haqida eslatma bilan).
+     */
+    private fun showLinkGuardSetupDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.kq4_linkguard_setup_title)
+            .setMessage(R.string.kq4_linkguard_setup_msg)
+            .setPositiveButton(R.string.kq4_linkguard_setup_open) { _, _ ->
+                openDefaultAppsSettings()
+            }
+            .setNegativeButton(R.string.kq4_btn_later, null)
+            .show()
+    }
+
+    /** Tizim «Standart ilovalar» ekranini ochadi (bo'lmasa — ilova tafsilotlari). */
+    private fun openDefaultAppsSettings() {
+        val candidates = listOf(
+            Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"),
+            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = android.net.Uri.fromParts("package", packageName, null)
+            },
+        )
+        for (intent in candidates) {
+            try {
+                startActivity(intent)
+                return
+            } catch (_: Throwable) { /* keyingisini sinaymiz */ }
+        }
+    }
 
     private fun wireListeners() {
         // Each HIMOYA toggle → immediate Config save.
@@ -304,6 +389,14 @@ class SettingsActivity : AppCompatActivity() {
                 VpnFilterService.stop(this)
                 toastSaved()
             }
+        }
+        toggleOf(binding.rowLinkGuard.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setLinkGuardEnabled(this, on)
+            toastSaved()
+            // Yoqilganda — foydalanuvchiga bizni standart havola ochuvchi qilishni eslatamiz
+            // (interceptor faqat shunda ishlaydi).
+            if (on) showLinkGuardSetupDialog()
         }
 
         // Server URL → edit dialog. Привязываем клик ко ВСЕМУ ряду (rowServerUrl),

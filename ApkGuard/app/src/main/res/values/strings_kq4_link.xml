@@ -47,4 +47,16 @@
     <!-- ═══ Share qabul qiluvchi ═══ -->
     <string name="kq4_link_no_url">Matnda havola topilmadi</string>
 
+    <!-- ═══ Havola qalqoni — blok ekрани (LinkBlockActivity) ═══ -->
+    <string name="kq4_block_danger_title">Bu xavfli sayt</string>
+    <string name="kq4_block_suspicious_title">Bu shubhali sayt</string>
+    <string name="kq4_block_danger_sub">KiberQalqon bu saytni xavfli deb topdi va ochilishini to\'xtatdi. Iltimos, OCHMANG va hech kimga yubormang.</string>
+    <string name="kq4_block_suspicious_sub">Bu saytda shubhali belgilar bor. Ishonchingiz komil bo\'lmasa — ochmang.</string>
+    <string name="kq4_block_close">Yopish</string>
+    <string name="kq4_block_open_anyway">Baribir ochaman</string>
+
+    <!-- ═══ Brauzer tanlash (xavfsiz havolani yo'naltirishda) ═══ -->
+    <string name="kq4_link_pick_browser">Qaysi brauzerda ochilsin?</string>
+    <string name="kq4_link_no_browser">Qurilmada brauzer topilmadi</string>
+
 </resources>

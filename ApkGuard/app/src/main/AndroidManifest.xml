@@ -223,6 +223,47 @@
             android:theme="@style/Theme.KiberQalqon"
             android:screenOrientation="portrait" />
 
+        <!-- HAVOLA QALQONI (link interceptor): foydalanuvchi KiberQalqon'ni standart havola
+             ochuvchi qilib tanlasa, har bir tashqi http(s) havola AVVAL shu ko'rinmas Activity'ga
+             keladi — LinkScanner tekshiradi, xavfsiz bo'lsa brauzerga uzatadi, xavfli bo'lsa
+             LinkBlockActivity'ni ko'rsatadi. exported=true (tashqi VIEW intent ushlanadi), lekin
+             u faqat URL'ni tahlil qiladi — apk_path injeksiyasiga o'rin yo'q. Translucent + sof
+             Activity (AppCompat EMAS) — ShareUrlReceiverActivity bilan bir xil sabab. -->
+        <activity
+            android:name=".LinkGuardActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+        </activity>
+
+        <!-- Havola blok ekrani — SHUBHALI/XAVFLI havolada saytni ochmasdan logo+ogohlantirish
+             ko'rsatadi. exported=false: faqat LinkGuardActivity ichki intent bilan ochadi. -->
+        <activity
+            android:name=".LinkBlockActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait" />
+
+        <!-- O'z-o'zini yangilash tasdiq oynasi (bildirishnomadan ochiladi). Ko'rinmas
+             (translucent) + sof Activity. exported=false: faqat ichki PendingIntent. -->
+        <activity
+            android:name=".SelfUpdateActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
         <!-- QR-skaner — kamera orqali QR o'qiydi va ichidagi havolani tekshiruvga uzatadi. -->
         <activity
             android:name=".QrScanActivity"

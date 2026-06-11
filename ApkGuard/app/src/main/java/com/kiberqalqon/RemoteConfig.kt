@@ -189,11 +189,38 @@ object RemoteConfig {
         if (payload.has("randomPkgDangerousPermsMin"))
             putClampedMin(ed, "rc_random_perms_min", payload.optInt("randomPkgDangerousPermsMin", baked.randomPkgDangerousPermsMin), baked.randomPkgDangerousPermsMin)
 
+        // Ixtiyoriy o'z-o'zini yangilash bloki: {"update": {"versionCode": N, "apkUrl": "https://…",
+        // "apkSha256": "…"}}. Butun payload HMAC bilan imzolangan + rollback-guard — bu metadata
+        // ishonchli. Qo'shimcha himoya baribir [SelfUpdate]'da: yuklangan APK SHA-256 va IMZO
+        // SERTIFIKATI o'zimiznikiga mos kelmasa O'RNATILMAYDI. Maydonlar yo'q bo'lsa — hech narsa.
+        val up = payload.optJSONObject("update")
+        if (up != null) {
+            val upVc = up.optInt("versionCode", -1)
+            val upUrl = up.optString("apkUrl", "")
+            val upSha = up.optString("apkSha256", "")
+            if (upVc > 0 && upUrl.startsWith("https://") && upSha.length >= 32) {
+                ed.putInt("rc_up_vc", upVc)
+                ed.putString("rc_up_url", upUrl)
+                ed.putString("rc_up_sha", upSha.lowercase())
+            }
+        }
+
         ed.putInt(KEY_V, remoteV)
         ed.putLong(KEY_FETCHED_AT, System.currentTimeMillis())
         ed.apply()
         Log.i(TAG, "remote config qo'llandi (v=$remoteV, clamp=min)")
     }
+
+    /** O'z-o'zini yangilash ma'lumoti (imzolangan config'dan keshlangan). Yo'q bo'lsa null. */
+    fun updateInfo(ctx: Context): SelfUpdate.Info? = try {
+        val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val vc = sp.getInt("rc_up_vc", -1)
+        val url = sp.getString("rc_up_url", null)
+        val sha = sp.getString("rc_up_sha", null)
+        if (vc > 0 && !url.isNullOrBlank() && !sha.isNullOrBlank()) {
+            SelfUpdate.Info(vc, url, sha)
+        } else null
+    } catch (_: Throwable) { null }
 
     // clamp: faqat baked'dan KICHIK (yoki teng) qiymatlar saqlanadi — ko'proq aniqlash tomon.
     // Manfiy/aqlsiz qiymatlardan ham himoya: 0 dan kichik bo'lsa baked.

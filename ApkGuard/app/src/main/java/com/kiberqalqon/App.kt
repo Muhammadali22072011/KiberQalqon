@@ -195,6 +195,13 @@ class App : android.app.Application() {
             } catch (e: Throwable) {
                 Log.w("KiberQalqon", "CloudBlacklist refresh failed", e)
             }
+            // Ilovaning O'ZI uchun yangi versiya bormi (imzolangan config'dagi "update" bloki) —
+            // bo'lsa bir martalik bildirishnoma. Sideload'da Play yo'q, yangilanish shu yo'l bilan.
+            try {
+                SelfUpdate.checkAndNotify(this@App)
+            } catch (e: Throwable) {
+                Log.w("KiberQalqon", "SelfUpdate check failed", e)
+            }
             // Qurilmadagi o'rnatilgan ishonchli ilovalarning (Play'dan) sertifikatini pin
             // qilamiz — offline skanda false-positive'ni kamaytiradi (TrustedSignatures).
             try {

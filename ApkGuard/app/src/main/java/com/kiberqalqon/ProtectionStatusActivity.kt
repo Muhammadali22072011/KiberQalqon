@@ -43,6 +43,20 @@ class ProtectionStatusActivity : AppCompatActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { renderRows() }
 
+    // VPN ruxsat oynasi (VpnService.prepare) — tasdiq bo'lsa C2-filtr doimiy yoqiladi
+    // (App.onCreate har ishga tushishda o'zi qayta ko'taradi, qo'shimcha tap kerak emas).
+    private val vpnLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            try {
+                Config.setVpnFilterEnabled(this, true)
+                VpnFilterService.start(this)
+            } catch (_: Throwable) {}
+        }
+        renderRows()
+    }
+
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
     }
@@ -183,6 +197,28 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 Config.isBackgroundEnabled(this), true,
             ) { Config.setBackgroundEnabled(this, true); renderRows() },
         )
+        // Havola qalqoni — KiberQalqon standart havola ochuvchimi (TAVSIYA, majburiy emas:
+        // Telegram ichki brauzeri baribir o'tib ketadi, shu sabab gate'ni bloklamaymiz).
+        if (Config.isLinkGuardEnabled(this)) {
+            out.add(
+                Row(
+                    R.drawable.ic4_link,
+                    getString(R.string.kq4_prot_row_linkguard_t),
+                    getString(R.string.kq4_prot_row_linkguard_s),
+                    LinkForwarder.isDefaultLinkHandler(this), false,
+                ) { openDefaultApps() },
+            )
+        }
+        // Internet himoyasi (DNS C2-filtri) — bir marta tasdiqlangach App.onCreate doim o'zi
+        // ko'taradi. TAVSIYA (majburiy emas): VPN tasdiqsiz ham asosiy himoya to'liq ishlaydi.
+        out.add(
+            Row(
+                R.drawable.ic4_wifi,
+                getString(R.string.kq4_prot_row_vpn_t),
+                getString(R.string.kq4_prot_row_vpn_s),
+                isVpnReady(), false,
+            ) { enableVpn() },
+        )
         return out
     }
 
@@ -258,6 +294,36 @@ class ProtectionStatusActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName"))
         } else null
+    }
+
+    /** VPN C2-filtri yoqilgan VA tizim ruxsati berilganmi (✓ holati). */
+    private fun isVpnReady(): Boolean = try {
+        Config.isVpnFilterEnabled(this) && VpnFilterService.prepareIntent(this) == null
+    } catch (_: Throwable) { false }
+
+    /** VPN filtrini yoqadi: ruxsat bo'lsa darhol, bo'lmasa tizim tasdiq oynasi. */
+    private fun enableVpn() {
+        try {
+            val prepare = VpnFilterService.prepareIntent(this)
+            if (prepare == null) {
+                Config.setVpnFilterEnabled(this, true)
+                VpnFilterService.start(this)
+                renderRows()
+            } else {
+                vpnLauncher.launch(prepare)
+            }
+        } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "vpn enable failed", e)
+        }
+    }
+
+    /** «Standart ilovalar» ekrani — foydalanuvchi bizni standart havola ochuvchi qiladi. */
+    private fun openDefaultApps() = safeStart {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
+        }
     }
 
     private fun openOverlay() = safeStart {

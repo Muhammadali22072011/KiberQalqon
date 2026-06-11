@@ -373,6 +373,8 @@ class AutoScanActivity : AppCompatActivity() {
             try { binding.layoutScanning.visibility = View.GONE } catch (_: Throwable) {}
             try { binding.layoutResult.visibility = View.VISIBLE } catch (_: Throwable) {}
             try { AnimationHelper.bounce(binding.cardResult, duration = 600) } catch (_: Throwable) {}
+            // «Ishonaman» havolasi faqat SHUBHALI'da — har render oldidan reset.
+            try { binding.tvTrustHint.visibility = View.GONE } catch (_: Throwable) {}
 
             // Fon almashinuvi — design §AutoScan result: DANGER qizil nur, SAFE odatiy fon,
             // qolganlari qorong'i skan foni.
@@ -706,7 +708,53 @@ class AutoScanActivity : AppCompatActivity() {
         binding.tvDeleteHint.text = getString(R.string.share_result)
         binding.tvDeleteHint.setOnClickListener { shareScanResult(ScanResult.Verdict.SUSPICIOUS) }
 
+        // «Bu faylga ishonaman» — oq ro'yxatga qo'shish (faqat SHUBHALI'da; DANGER'da BO'LMAYDI).
+        binding.tvTrustHint.visibility = View.VISIBLE
+        binding.tvTrustHint.text = getString(R.string.kq4_trust_mark)
+        binding.tvTrustHint.setOnClickListener { confirmTrustFile() }
+
         sendNotification("🟠 Shubhali fayl", "$apkName faylida shubhali belgilar bor", false)
+    }
+
+    /**
+     * Foydalanuvchi SHUBHALI faylga "ishonaman" dedi — tasdiq so'raymiz, so'ng faylning
+     * SHA-256 + (package, imzo-cert) juftligini [UserWhitelist] ga yozamiz. Hash/cert fon
+     * thread'da hisoblanadi (katta faylda UI qotmasin). DANGER'da bu havola CHIQMAYDI.
+     */
+    private fun confirmTrustFile() {
+        val path = apkPath ?: return
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.kq4_trust_confirm_title)
+            .setMessage(R.string.kq4_trust_confirm_msg)
+            .setPositiveButton(R.string.kq4_trust_confirm_yes) { _, _ ->
+                Thread {
+                    val label = apkName ?: File(path).name
+                    val sha = try { CertUtil.apkFileSha256(path) } catch (_: Throwable) { null }
+                    val cert = try { CertUtil.fingerprintSha256(this, path) } catch (_: Throwable) { null }
+                    val pkg = try {
+                        packageManager.getPackageArchiveInfo(path, 0)?.packageName
+                    } catch (_: Throwable) { null }
+                    val okFile = UserWhitelist.addFile(this, sha, label)
+                    val okApp = if (pkg != null && cert != null) {
+                        UserWhitelist.addApp(this, pkg, cert, label)
+                    } else false
+                    runOnUiThread {
+                        if (isFinishing || isDestroyed) return@runOnUiThread
+                        if (okFile || okApp) {
+                            android.widget.Toast.makeText(
+                                this, R.string.kq4_trust_added, android.widget.Toast.LENGTH_LONG
+                            ).show()
+                            finish()
+                        } else {
+                            android.widget.Toast.makeText(
+                                this, R.string.kq4_trust_failed, android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }.start()
+            }
+            .setNegativeButton(R.string.kq4_btn_later, null)
+            .show()
     }
 
     /**

@@ -1253,9 +1253,30 @@ object ApkScanner {
                 details.add("Shubhali elementlar topilmadi")
             }
 
+            // === FOYDALANUVCHI OQ RO'YXATI (UserWhitelist) ===
+            // FAQAT SHUBHALI bosiladi. DANGER'ga TEGILMAYDI (oltin qoida): qat'iy IOC'lar
+            // (ma'lum hash/imzo/paket, ZIP-shifr) yuqorida erta-return bilan allaqachon chiqib
+            // ketgan, bu nuqtaga yetmaydi; qolgan DANGER ham kuchli signal — oqlanmaydi.
+            // Mos kelish kriptografik: fayl SHA-256 YOKI (package + imzo-cert) juftligi.
+            var finalVerdict = verdict
+            var finalReason = reason
+            if (verdict == ScanResult.Verdict.SUSPICIOUS) {
+                val userTrusted = try {
+                    UserWhitelist.isWhitelistedFile(context, apkHash) ||
+                        UserWhitelist.isWhitelistedApp(context, packageNameForHeuristic, certFingerprint)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "UserWhitelist lookup failed", e); false
+                }
+                if (userTrusted) {
+                    finalVerdict = ScanResult.Verdict.SAFE
+                    finalReason = "Siz bu fayl/ilovani ishonchli deb belgilagansiz."
+                    details.add(0, "ℹ️ Ishonchli ro'yxatingizda — shubhali belgilar bosildi (Sozlamalar → Ishonchli ro'yxat)")
+                }
+            }
+
             val result = ScanResult(
-                verdict = verdict,
-                reason = reason,
+                verdict = finalVerdict,
+                reason = finalReason,
                 details = details,
                 dangerousPermissions = dangerousFound,
                 malwareSignatures = signaturesFound,

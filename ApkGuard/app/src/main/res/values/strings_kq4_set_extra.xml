@@ -19,4 +19,46 @@
     <string name="kq4_set_row_vpn">Internet himoyasi (DNS filtri)</string>
     <string name="kq4_set_row_vpn_sub">Viruslarning boshqaruv serverlariga ulanishini bloklaydi (tajribaviy)</string>
     <string name="kq4_vpn_perm_denied">VPN ruxsati berilmadi — filtr yoqilmadi</string>
+
+    <!-- Havola qalqoni toggle (Config.isLinkGuardEnabled → LinkGuardActivity) -->
+    <string name="kq4_set_row_linkguard">Havola qalqoni</string>
+    <string name="kq4_set_row_linkguard_sub">Xavfli havolalarni ochilishidan oldin avtomatik bloklaydi</string>
+    <string name="kq4_linkguard_setup_title">Havola qalqonini sozlash</string>
+    <string name="kq4_linkguard_setup_msg">Havolalar avtomatik tekshirilishi uchun KiberQalqon\'ni standart havola ochuvchi (default browser) qilib tanlang. Eslatma: Telegram havolani o\'z ichki brauzerida ochsa — uни Telegram sozlamalaridan «tashqi brauzerda ochish»ga o\'tkazing.</string>
+    <string name="kq4_linkguard_setup_open">Sozlamalarni ochish</string>
+    <string name="kq4_btn_later">Keyinroq</string>
+
+    <!-- Himoya holati chek-listidagi Havola qalqoni qatori (ProtectionStatusActivity) -->
+    <string name="kq4_prot_row_linkguard_t">Havola qalqoni</string>
+    <string name="kq4_prot_row_linkguard_s">KiberQalqon\'ni standart havola ochuvchi qilib tanlang</string>
+
+    <!-- Himoya holati chek-listidagi Internet himoyasi (VPN C2-filtri) qatori -->
+    <string name="kq4_prot_row_vpn_t">Internet himoyasi</string>
+    <string name="kq4_prot_row_vpn_s">Viruslarning serverlarga ulanishini bloklaydi — bir marta tasdiqlang</string>
+
+    <!-- Ishonchli ro'yxat (UserWhitelist): AutoScan «ishonaman» + Sozlamalar boshqaruvi -->
+    <string name="kq4_trust_mark">Bu faylga ishonaman — boshqa ogohlantirilmasin</string>
+    <string name="kq4_trust_confirm_title">Ishonchli deb belgilash?</string>
+    <string name="kq4_trust_confirm_msg">Bu fayl ishonchli ro\'yxatga qo\'shiladi va bundan keyin shubhali deb ogohlantirilmaydi. Faqat o\'zingiz yaxshi biladigan ilovalar uchun ishlating. (Ma\'lum viruslar baribir bloklanadi.)</string>
+    <string name="kq4_trust_confirm_yes">Ha, ishonaman</string>
+    <string name="kq4_trust_added">Ishonchli ro\'yxatga qo\'shildi ✓</string>
+    <string name="kq4_trust_failed">Qo\'shib bo\'lmadi — fayl o\'qilmadi</string>
+    <string name="kq4_set_row_trustlist">Ishonchli ro\'yxat</string>
+    <string name="kq4_set_row_trustlist_sub">Siz ishonchli deb belgilagan fayllar/ilovalar</string>
+    <string name="kq4_trustlist_empty">Ro\'yxat bo\'sh. Shubhali fayl oynasida «Bu faylga ishonaman» bossangiz, shu yerga tushadi.</string>
+    <string name="kq4_trustlist_remove_title">Ro\'yxatdan olib tashlash?</string>
+    <string name="kq4_trustlist_remove_msg">«%1$s» yana shubhali deb tekshiriladigan bo\'ladi.</string>
+    <string name="kq4_trustlist_remove_yes">Olib tashlash</string>
+    <string name="kq4_trustlist_removed">Olib tashlandi</string>
+
+    <!-- O'z-o'zini yangilash (SelfUpdate) -->
+    <string name="kq4_update_notif_title">Yangi versiya chiqdi</string>
+    <string name="kq4_update_notif_body">Anor Qalqon\'ning yangilangan versiyasini o\'rnatish uchun bosing</string>
+    <string name="kq4_update_dialog_title">Ilovani yangilash</string>
+    <string name="kq4_update_dialog_msg">Yangi versiya (build %1$d) tayyor. Yuklab olib o\'rnatilsinmi? Yangilanish imzo bilan tekshiriladi.</string>
+    <string name="kq4_update_do">Yangilash</string>
+    <string name="kq4_update_downloading">Yuklab olinmoqda — tayyor bo\'lgach o\'rnatish oynasi chiqadi…</string>
+    <string name="kq4_update_already">Sizda eng so\'nggi versiya o\'rnatilgan</string>
+    <string name="kq4_update_err_download">Yuklab olib bo\'lmadi — internetni tekshirib qayta urinib ko\'ring</string>
+    <string name="kq4_update_err_verify">Yangilanish imzo tekshiruvidan o\'tmadi — o\'rnatilmaydi (xavfsizlik)</string>
 </resources>

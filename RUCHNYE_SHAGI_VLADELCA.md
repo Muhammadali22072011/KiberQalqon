@@ -58,3 +58,25 @@ GET https://kiberqalqon-cloud.vercel.app/api/stats?audit=1
 - FCM (мгновенные обновления чёрного списка) — нужен Firebase-проект и
   `google-services.json`; инструкция в `ApkGuard/FCM_SETUP.md`. Кода ещё нет.
 - Play Integrity API (аттестация устройств для облака) — нужен Play Console.
+
+## 7. Выпуск обновления приложения (self-update, добавлено 2026-06-12)
+
+Телефоны сами показывают «Yangi versiya chiqdi», когда в подписанном конфиге
+появляется блок `update`. Как выпустить новую версию:
+
+1. Поднять `versionCode`/`versionName` в `ApkGuard/app/build.gradle.kts`,
+   собрать **подписанный release**: `./gradlew assembleRelease`.
+2. Запустить помощник — он посчитает versionCode и SHA-256 и напечатает все команды:
+   ```
+   bash ApkGuard/scripts/publish_update.sh
+   ```
+3. Загрузить APK в Supabase Storage: Dashboard → Storage → bucket `updates`
+   (создать **public**, один раз) → Upload → скопировать public URL.
+   (GitHub Releases НЕ подходит — репозиторий приватный, телефон не скачает.)
+4. В Vercel env (Production) задать: `UPDATE_VERSION_CODE`, `UPDATE_APK_SHA256`,
+   `UPDATE_APK_URL` (+ поднять `CONFIG_VERSION` на 1) — команды печатает скрипт.
+5. `cd ApkGuard/cloud && vercel --prod`.
+
+Безопасность: телефон ставит обновление ТОЛЬКО если совпали (а) HMAC-подпись
+конфига, (б) SHA-256 файла, (в) подпись APK = подпись установленного приложения.
+Чужой/подменённый APK молча удаляется.
