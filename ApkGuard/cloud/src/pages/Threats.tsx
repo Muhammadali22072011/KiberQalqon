@@ -154,7 +154,7 @@ export default function Threats() {
               <Empty>Hozircha tahdid qayd etilmagan</Empty>
             ) : (
               top.map((t) => {
-                const color = SEV_COLOR[t.severity || 'low'] || '#25e0b0';
+                const color = SEV_COLOR[t.severity || 'low'] || '#1A9E54';
                 return (
                   <div className="bar-row" key={t.apk_hash}>
                     <div className="bar-name">
@@ -230,7 +230,7 @@ export default function Threats() {
                     <td className="mono" style={{ color: 'var(--ink-3)', fontSize: 12 }}>{t.package_name || '—'}</td>
                     <td><Tag kind="comp">{catUz(t.category)}</Tag></td>
                     <td>
-                      <span style={{ color: SEV_COLOR[t.severity || 'low'] || '#25e0b0', fontWeight: 700, fontSize: 12 }}>
+                      <span style={{ color: SEV_COLOR[t.severity || 'low'] || '#1A9E54', fontWeight: 700, fontSize: 12 }}>
                         {SEV_UZ[t.severity || 'low'] || t.severity || '—'}
                       </span>
                     </td>

@@ -81,7 +81,7 @@ export default function Feed() {
               const k = keyOf(f);
               return (
                 <div className={'fi' + (fresh.has(k) ? ' fresh' : '')} key={k}>
-                  <span className="sev" style={{ color: VERDICT_DOT[f.verdict] || '#9aa7c2' }} />
+                  <span className="sev" style={{ color: VERDICT_DOT[f.verdict] || '#9A8D82' }} />
                   <div className="fi-main">
                     <div className="fi-app">{f.app_label || f.package_name || 'Nomaʼlum ilova'}</div>
                     <div className="fi-meta">

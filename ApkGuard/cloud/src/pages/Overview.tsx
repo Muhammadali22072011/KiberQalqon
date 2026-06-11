@@ -66,7 +66,7 @@ export default function Overview() {
   }, [s.total_scans, s.danger_count, s.suspicious_count, s.safe_count]);
   const noHealthData = health == null;
   const h = health ?? 0;
-  const healthColor = noHealthData ? '#5d6b8a' : h > 70 ? '#25e0b0' : h > 40 ? '#ffb020' : '#ff3b5c';
+  const healthColor = noHealthData ? '#9A8D82' : h > 70 ? '#1A9E54' : h > 40 ? '#DF8A18' : '#E0432F';
   const ARC = Math.PI * 50; // yarim doira yoyi uzunligi (r = 50)
   const knobAng = ((180 - 1.8 * h) * Math.PI) / 180;
   const knobX = 60 + 50 * Math.cos(knobAng);
@@ -115,13 +115,13 @@ export default function Overview() {
           </div>
           <div className="body-pad">
             <div className="duel-row">
-              <div className="duel-name"><i style={{ background: '#25e0b0' }} /><span>Anor Qalqon (offline)</span></div>
-              <div className="track"><div className="fill" style={{ width: `${ourPct}%`, background: '#25e0b0' }} /></div>
+              <div className="duel-name"><i style={{ background: '#1A9E54' }} /><span>Anor Qalqon (offline)</span></div>
+              <div className="track"><div className="fill" style={{ width: `${ourPct}%`, background: '#1A9E54' }} /></div>
               <div className="duel-cnt">{ourMs ? fmtMs(ourMs) : '—'}</div>
             </div>
             <div className="duel-row">
-              <div className="duel-name"><i style={{ background: '#5d6b8a' }} /><span>Raqobatchi (VirusTotal'ga yuklab)</span></div>
-              <div className="track"><div className="fill" style={{ width: '100%', background: '#5d6b8a' }} /></div>
+              <div className="duel-name"><i style={{ background: '#9A8D82' }} /><span>Raqobatchi (VirusTotal'ga yuklab)</span></div>
+              <div className="track"><div className="fill" style={{ width: '100%', background: '#9A8D82' }} /></div>
               <div className="duel-cnt">~{fmtMs(competitorMs)}</div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function Overview() {
               <polyline className="ekg-line" points={ekgPoints} />
               {ekg.map((f, i) => {
                 const isFresh = fresh.has(ekgKey(f));
-                const c = VERDICT_DOT[f.verdict] || '#9aa7c2';
+                const c = VERDICT_DOT[f.verdict] || '#9A8D82';
                 return (
                   <circle
                     key={i}
@@ -157,9 +157,9 @@ export default function Overview() {
               <span>Hozircha tekshiruv yo‘q</span>
             ) : (
               <>
-                <span><i style={{ background: '#25e0b0' }} />Xavfsiz</span>
-                <span><i style={{ background: '#ffb020' }} />Shubhali</span>
-                <span><i style={{ background: '#ff3b5c' }} />Xavfli</span>
+                <span><i style={{ background: '#1A9E54' }} />Xavfsiz</span>
+                <span><i style={{ background: '#DF8A18' }} />Shubhali</span>
+                <span><i style={{ background: '#E0432F' }} />Xavfli</span>
               </>
             )}
           </div>
@@ -169,7 +169,7 @@ export default function Overview() {
           <PanelHead sub="Umumiy holat" title="Mamlakat himoya darajasi" />
           <div className="gauge-box">
             <svg className="gauge" viewBox="0 0 120 72">
-              <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="9" strokeLinecap="round" />
+              <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(32,22,15,.08)" strokeWidth="9" strokeLinecap="round" />
               <path
                 className="gauge-fill"
                 d="M 10 60 A 50 50 0 0 1 110 60"
@@ -208,7 +208,7 @@ export default function Overview() {
                     style={clickable ? { cursor: 'pointer' } : undefined}
                     title={clickable ? 'Tahlil tafsilotlari' : undefined}
                   >
-                    <span className="sev" style={{ color: VERDICT_DOT[f.verdict] || '#9aa7c2' }} />
+                    <span className="sev" style={{ color: VERDICT_DOT[f.verdict] || '#9A8D82' }} />
                     <div className="fi-main">
                       <div className="fi-app">{f.app_label || f.package_name || 'Nomaʼlum ilova'}</div>
                       <div className="fi-meta">{(f.city || '—') + ' · ' + agoSafe(f.scanned_at)}</div>
@@ -234,7 +234,7 @@ export default function Overview() {
               <Empty />
             ) : (
               top.map((t) => {
-                const color = SEV_COLOR[t.severity || 'low'] || '#25e0b0';
+                const color = SEV_COLOR[t.severity || 'low'] || '#1A9E54';
                 return (
                   <div className="bar-row" key={t.apk_hash}>
                     <div className="bar-name">
