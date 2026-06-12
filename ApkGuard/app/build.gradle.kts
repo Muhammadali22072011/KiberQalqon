@@ -90,8 +90,8 @@ android {
         applicationId = "com.kiberqalqon"
         minSdk = 24
         targetSdk = 34
-        versionCode = 81
-        versionName = "8.1"
+        versionCode = 82
+        versionName = "8.2"
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"\"")
 
         // OPT-IN community threat sharing (dev's Telegram). Sirlar APK'da OCHIQ EMAS —
@@ -171,6 +171,15 @@ android {
             isShrinkResources = false
             applicationIdSuffix = ".debug"  // дебажная сборка ставится рядом с релизной
             versionNameSuffix = "-DEBUG"
+        }
+        // БЫСТРАЯ релизная сборка для проверки self-update: та же release-подпись и тот же
+        // applicationId (com.kiberqalqon), но БЕЗ R8 — собирается в разы быстрее. Для
+        // self-update важны лишь подпись-сертификат + пакет + versionCode; обфускация не
+        // нужна. На Play / в прод по-прежнему идёт `release` (с R8).
+        create("releasefast") {
+            initWith(getByName("release"))
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 

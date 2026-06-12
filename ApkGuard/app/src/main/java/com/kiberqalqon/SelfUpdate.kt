@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -64,6 +65,12 @@ object SelfUpdate {
             if (info.versionCode <= BuildConfig.VERSION_CODE) return
             val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             if (sp.getInt(KEY_NOTIFIED_VC, -1) == info.versionCode) return  // allaqachon aytilgan
+
+            // Bildirishnoma ruxsati YO'Q bo'lsa (Android 13+ POST_NOTIFICATIONS hali berilmagan):
+            // KO'RSATMAYMIZ va "aytilgan" bayrog'ini ham QO'YMAYMIZ — keyingi sovuq startda
+            // (ruxsat berilgach) qayta urinamiz. Aks holda bildirishnoma jim yo'qolib, foydalanuvchi
+            // yangi versiyani umuman ko'rmasdi (faqat undan ham keyingi versiyada ko'rinardi).
+            if (!NotificationManagerCompat.from(ctx).areNotificationsEnabled()) return
 
             val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

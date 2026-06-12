@@ -1,0 +1,8 @@
+# Vercel deploy uchun ignore. MUHIM: bu fayl bo'lsa Vercel .gitignore'ni O'QIMAYDI —
+# shu sabab public/ ichidagi self-update APK (*.apk root .gitignore'da bor) baribir
+# yuklanadi va remote `vite build` uni dist/ ga ko'chiradi (https://…/kq-update-*.apk).
+node_modules
+.git
+dist
+.vercel
+.env*
