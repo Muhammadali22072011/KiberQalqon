@@ -32,6 +32,25 @@ object MaliciousDomains {
     )
 
     /**
+     * Ommaviy suffikslar (eTLD) va ko'p-ijarali bepul hosting zonalari — suffiks yurishida
+     * shu darajada HECH QACHON moslik bermaymiz. Aks holda feed'ga xato kiritilgan bitta
+     * zona-yozuv (masalan "co.uz" yoki "netlify.app") butun zonani fleet bo'ylab bloklab
+     * qo'yardi (har bir *.netlify.app sayti DANGER → qattiq blok). Server tomonda ham
+     * (threats.ts add_domain) rad etiladi — bu mijozdagi ikkinchi himoya qatlami.
+     * [LinkScanner.MULTI_PART_SUFFIXES] bilan mos + keng tarqalgan SaaS hosting zonalari.
+     */
+    internal val PUBLIC_SUFFIXES: Set<String> = setOf(
+        "com.uz", "co.uz", "org.uz", "net.uz", "gov.uz", "mil.uz", "ac.uz", "edu.uz",
+        "co.ru", "com.ru", "co.uk", "org.uk", "gov.uk", "com.tr", "co.jp",
+        "github.io", "netlify.app", "vercel.app", "web.app", "firebaseapp.com",
+        "blogspot.com", "telegra.ph", "pages.dev", "workers.dev", "glitch.me",
+        "herokuapp.com", "repl.co", "000webhostapp.com", "weebly.com", "wixsite.com",
+    )
+
+    /** Host shu zonaning O'ZIMI (subdomeni emas) — suffiks yurishida moslik bermaymiz. */
+    internal fun isPublicSuffix(host: String): Boolean = host in PUBLIC_SUFFIXES
+
+    /**
      * Host (domen) zararli bo'lsa — oila nomi, aks holda null.
      *
      * Tartib: curated CURATED ro'yxati (suffiks moslik bilan) → topilmasa
@@ -47,8 +66,23 @@ object MaliciousDomains {
             for ((dom, fam) in CURATED) {
                 if (h == dom || h.endsWith(".$dom")) return fam
             }
-            // Bulut feed (CloudBlacklist → ThreatDb): faqat aniq host moslik.
-            ThreatDb.domainFamily(h)
+            // Bulut feed (CloudBlacklist → ThreatDb): suffiks moslik — egasi paneldan
+            // "evil.com" qo'shsa, "www.evil.com" / "a.b.evil.com" ham bloklanadi.
+            // Yurish VpnFilterService.isBlockedC2 bilan AYNAN bir xil: yorliqni bittadan
+            // tashlab boramiz, yakka TLD ("com") hech qachon so'ralmaydi. Ommaviy suffiks
+            // darajasida ([PUBLIC_SUFFIXES]) ham SO'RAMAYMIZ — bitta xato zona-yozuv butun
+            // zonani bloklab qo'ymasin.
+            var cur = h
+            while (true) {
+                if (!isPublicSuffix(cur)) {
+                    val fam = ThreatDb.domainFamily(cur)
+                    if (fam != null) return fam
+                }
+                val dot = cur.indexOf('.')
+                if (dot < 0 || dot == cur.lastIndexOf('.')) break
+                cur = cur.substring(dot + 1)
+            }
+            null
         } catch (e: Throwable) {
             Log.w(TAG, "maliciousFamily lookup failed", e)
             null

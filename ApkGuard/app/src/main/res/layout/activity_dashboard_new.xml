@@ -184,6 +184,59 @@
                     </FrameLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- ▌ YANGILIKLAR — bulut e'lonlari karuseli (NewsStore /api/news).
+                     Kesh ham, tarmoq ham bo'sh bo'lsa butun seksiya GONE qoladi —
+                     bulutga ulanmagan qurilmada foydalanuvchi bo'sh blok ko'rmaydi. -->
+                <LinearLayout
+                    android:id="@+id/kq4NewsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/KQ4.Eyebrow"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/kq4_news_eyebrow" />
+
+                        <TextView
+                            android:id="@+id/kq4NewsAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:fontFamily="@font/onest_semibold"
+                            android:padding="4dp"
+                            android:text="@string/kq4_all"
+                            android:textColor="@color/kq_primary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/kq4NewsPager"
+                        android:layout_width="match_parent"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="8dp" />
+
+                    <LinearLayout
+                        android:id="@+id/kq4NewsDots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal" />
+                </LinearLayout>
+
                 <!-- ▌ 3 raqam kartasi: Tekshirildi / O'chirildi / Himoya % -->
                 <LinearLayout
                     android:layout_width="match_parent"

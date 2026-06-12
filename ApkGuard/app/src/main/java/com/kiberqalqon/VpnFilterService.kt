@@ -275,9 +275,12 @@ class VpnFilterService : VpnService() {
         // Bulut feed'idan kelgan domenlar (CloudBlacklist → ThreatDb.mergeCloudDomains).
         // Subdomain ham bloklansin: a.b.evil.com → b.evil.com → evil.com (TLD tekshirilmaydi).
         // ThreatDb yuklanmagan bo'lsa domainFamily null qaytaradi — fail-safe (blok yo'q).
+        // Ommaviy suffiks darajasida ([MaliciousDomains.PUBLIC_SUFFIXES]) so'ramaymiz —
+        // xato kiritilgan "netlify.app" kabi zona butun *.netlify.app'ni NXDOMAIN qilmasin.
         var cur = d
         while (true) {
-            if (try { ThreatDb.domainFamily(cur) } catch (_: Throwable) { null } != null) return true
+            if (!MaliciousDomains.isPublicSuffix(cur) &&
+                try { ThreatDb.domainFamily(cur) } catch (_: Throwable) { null } != null) return true
             val dot = cur.indexOf('.')
             if (dot < 0 || dot == cur.lastIndexOf('.')) break
             cur = cur.substring(dot + 1)

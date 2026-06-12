@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Новости — облачные объявления (карусель на главном + NewsActivity). -->
+<resources>
+    <string name="kq4_news_eyebrow">Новости</string>
+    <string name="kq4_news_title">Новости</string>
+    <string name="kq4_news_sub">Официальные объявления и предупреждения</string>
+    <string name="kq4_news_pinned">Закреплено</string>
+
+    <string name="kq4_news_level_info">Информация</string>
+    <string name="kq4_news_level_warn">Предупреждение</string>
+    <string name="kq4_news_level_crit">Важно</string>
+
+    <string name="kq4_news_empty_title">Пока объявлений нет</string>
+    <string name="kq4_news_empty_sub">Новые сообщения появятся здесь</string>
+
+    <string name="kq4_news_today">Сегодня</string>
+    <string name="kq4_news_yesterday">Вчера</string>
+    <string name="kq4_news_days_ago">%1$d дн. назад</string>
+
+    <string name="kq4_news_image_cd">Изображение объявления</string>
+</resources>

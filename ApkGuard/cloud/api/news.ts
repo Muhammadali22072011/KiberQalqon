@@ -40,14 +40,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const action = String(b.action ?? '');
 
     if (action === 'create') {
-      const title = String(b.title ?? '').trim();
+      // Uzunlik chegarasi: cheksiz sarlavha/matn har qurilmada keshlanib (NewsStore),
+      // TextView'da ochilganda UI'ni qotirardi. Mijoz ham himoya uchun qisqartiradi.
+      const title = String(b.title ?? '').trim().slice(0, 300);
       if (!title) return res.status(400).json({ ok: false, error: 'sarlavha kerak' });
-      const body = String(b.body ?? '').trim();
+      const body = String(b.body ?? '').trim().slice(0, 8000);
       const lvl = String(b.level ?? 'info');
       const level = LEVELS.includes(lvl) ? lvl : 'info';
-      // Faqat http(s) havola — javascript:/data: kabi xavfli URI'larni rad etamiz.
+      // FAQAT https havola — mijozlar ham https'sizini tashlaydi (cleartext bloklangan),
+      // shuning uchun http:// ni DB'ga ham kiritmaymiz (aks holda telefonда rasm ko'rinmasdi,
+      // panelда ko'rinardi — jim nomuvofiqlik). javascript:/data: kabi URI'lar ham rad etiladi.
       const rawImg = String(b.image_url ?? '').trim();
-      const image_url = /^https?:\/\//i.test(rawImg) ? rawImg : null;
+      const image_url = /^https:\/\//i.test(rawImg) ? rawImg : null;
       const { data, error } = await sb
         .from('news')
         .insert({ title, body, level, image_url })
@@ -82,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Rasmni serverda Supabase Storage'ga yuklab, ochiq https havola qaytaramiz.
     // Brauzer SERVICE_KEY ko'rmaydi — yuklash shu yerda (serverda) bo'ladi. Qaytgan
-    // https havola create action'dagi /^https?:\/\// filtridan o'tadi.
+    // https havola create action'dagi /^https:\/\// filtridan o'tadi.
     if (action === 'upload_image') {
       const dataUrl = String(b.data ?? '');
       const m = /^data:(image\/(?:png|jpe?g|gif|webp));base64,([a-z0-9+/=\s]+)$/i.exec(dataUrl);

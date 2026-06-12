@@ -65,7 +65,9 @@ export default function News() {
     // Rasm havolasi http(s) bo'lmasa server uni jim tashlab yuboradi (e'lon rasmsiz chiqadi).
     // Foydalanuvchiga oldindan aytamiz — "joyladim, rasm yo'q" sirli holatini oldini olamiz.
     const img = imgUrl.trim();
-    if (img && !/^https?:\/\//i.test(img)) {
+    // Telefon faqat https rasmni ko'rsatadi (cleartext bloklangan) — toast aytgani bilan bir xil
+    // bo'lishi uchun bu yerda ham FAQAT https'ni qabul qilamiz (server ham http'ni rad etadi).
+    if (img && !/^https:\/\//i.test(img)) {
       show("Rasm havolasi noto‘g‘ri — https:// bilan boshlanishi kerak");
       return;
     }

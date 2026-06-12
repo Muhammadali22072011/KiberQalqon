@@ -38,6 +38,28 @@ class GuardWorker(
 
     override suspend fun doWork(): Result {
         return try {
+            // Bulut qora ro'yxati (hash/paket/domen) muzlab qolmasin: ilova kunlab sovuq
+            // startsiz yashasa ham, panel qo'shgan yangi domen ≤30 daqiqada yetib keladi.
+            // isBackgroundEnabled'dan OLDIN — havola qalqoni fon-skan o'chiq bo'lsa ham ishlaydi.
+            // Fail-safe: oflayn/xato keshga tegmaydi.
+            //
+            // MUHIM: REAL-VAQT yo'lida (ProtectionService aniqlagan aniq APK = KEY_APK_PATHS)
+            // tarmoqqa CHIQMAYMIZ — skan issiq yo'li oflayn qolishi shart (yangi zararli faylni
+            // karantinlash sekin tarmoq tufayli ~25s kechikmasin). Feed allaqachon startda
+            // (App.onCreate loadCached/refresh) yuklangan; bu yerda faqat davriy/to'liq rejim yangilaydi.
+            val isRealtime = !inputData.getStringArray(KEY_APK_PATHS).isNullOrEmpty()
+            if (!isRealtime) {
+                try {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        CloudBlacklist.refreshIfStale(applicationContext)
+                    }
+                } catch (ce: kotlinx.coroutines.CancellationException) {
+                    throw ce  // bekor qilish yutilmasin — Worker to'xtatilsa skan davom etmasin
+                } catch (e: Throwable) {
+                    Log.w(TAG, "cloud blacklist refreshIfStale failed", e)
+                }
+            }
+
             if (!Config.isBackgroundEnabled(applicationContext)) {
                 return Result.success()
             }

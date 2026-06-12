@@ -36,6 +36,7 @@ object CloudBlacklist {
     private const val KEY_DV = "cbl_dv"    // domen feed versiyasi (domainMaxSeen) — MUSTAQIL rollback-guard
     private const val KEY_PAYLOAD = "cbl_payload"
     private const val KEY_FETCHED_AT = "cbl_fetched_at"
+    private const val KEY_ATTEMPTED_AT = "cbl_attempted_at"  // oxirgi URINISH (muvaffaqiyatdan qat'i nazar) — backoff
 
     private val client by lazy {
         OkHttpClient.Builder()
@@ -62,6 +63,26 @@ object CloudBlacklist {
         } catch (e: Throwable) {
             Log.w(TAG, "loadCached failed", e)
         }
+    }
+
+    /**
+     * Davriy yangilash (GuardWorker, har 15 daqiqada chaqiriladi): oxirgi MUVAFFAQIYATLI
+     * yuklab olishdan beri kamida [minAgeMs] o'tgan bo'lsagina tarmoqqa chiqadi — server
+     * 5 daqiqa keshlaydi, har 15 daqiqada urishning ma'nosi yo'q. App.onCreate'dagi
+     * to'g'ridan-to'g'ri [refresh] throttlesiz qoladi (sovuq start kamdan-kam bo'ladi).
+     */
+    fun refreshIfStale(ctx: Context, minAgeMs: Long = 30L * 60 * 1000) {
+        val sp = ctx.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        // Throttle URINISH bo'yicha, MUVAFFAQIYAT bo'yicha emas: refresh() FETCHED_AT'ni faqat
+        // to'liq muvaffaqiyatda yozadi, shuning uchun server o'chiq/imzo xato/versiya regress
+        // bo'lsa edi har 15 daqiqada (har Worker) qayta tarmoqqa chiqaverardi. Endi urinish
+        // vaqtini OLDIN belgilaymiz — muvaffaqiyatsiz bo'lsa ham keyingi urinish ≥ minAgeMs'dan keyin.
+        val lastAttempt = sp.getLong(KEY_ATTEMPTED_AT, 0L)
+        // Soat orqaga surilgan bo'lsa (now < lastAttempt) throttle abadiy qolib ketmasin.
+        if (now in lastAttempt..(lastAttempt + minAgeMs)) return
+        sp.edit().putLong(KEY_ATTEMPTED_AT, now).apply()
+        refresh(ctx)
     }
 
     /**

@@ -56,6 +56,17 @@ function isNeverFeedDomain(host: string): boolean {
   return false;
 }
 
+// Ommaviy suffikslar (eTLD) + ko'p-ijarali bepul hosting zonalari. Bularning O'ZINI qora
+// ro'yxatga qo'shib bo'lmaydi — telefonda suffiks-yurish (MaliciousDomains/VpnFilterService)
+// butun zonani bloklab qo'yardi (har *.netlify.app DANGER). Mijozdagi PUBLIC_SUFFIXES bilan mos.
+const PUBLIC_SUFFIXES = new Set<string>([
+  'com.uz', 'co.uz', 'org.uz', 'net.uz', 'gov.uz', 'mil.uz', 'ac.uz', 'edu.uz',
+  'co.ru', 'com.ru', 'co.uk', 'org.uk', 'gov.uk', 'com.tr', 'co.jp',
+  'github.io', 'netlify.app', 'vercel.app', 'web.app', 'firebaseapp.com',
+  'blogspot.com', 'telegra.ph', 'pages.dev', 'workers.dev', 'glitch.me',
+  'herokuapp.com', 'repl.co', '000webhostapp.com', 'weebly.com', 'wixsite.com',
+]);
+
 /**
  * GET /api/threats
  *
@@ -96,6 +107,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // bosish butun parkning bank saytini bloklab qo'ymasin.
       if (isNeverFeedDomain(domain)) {
         return res.status(400).json({ ok: false, error: 'himoyalangan domen (bank/gov)' });
+      }
+      // Ommaviy suffiks / bepul-hosting zonasining O'ZINI bloklab bo'lmaydi (co.uz, netlify.app…)
+      // — aks holda telefonda butun zona (har subdomen) bloklanardi. Aniq saytni kiriting.
+      if (PUBLIC_SUFFIXES.has(domain)) {
+        return res.status(400).json({ ok: false, error: 'butun zonani bloklab bo\'lmaydi — aniq domen kiriting' });
       }
       const severity = ['low', 'medium', 'high', 'critical'].includes(body.severity || '')
         ? (body.severity as string) : 'high';

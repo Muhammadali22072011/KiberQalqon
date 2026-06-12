@@ -223,6 +223,13 @@
             android:theme="@style/Theme.KiberQalqon"
             android:screenOrientation="portrait" />
 
+        <!-- Yangiliklar — bulut e'lonlari to'liq ro'yxati (dashboard karuseli → Hammasi). -->
+        <activity
+            android:name=".NewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KiberQalqon"
+            android:screenOrientation="portrait" />
+
         <!-- HAVOLA QALQONI (link interceptor): foydalanuvchi KiberQalqon'ni standart havola
              ochuvchi qilib tanlasa, har bir tashqi http(s) havola AVVAL shu ko'rinmas Activity'ga
              keladi — LinkScanner tekshiradi, xavfsiz bo'lsa brauzerga uzatadi, xavfli bo'lsa

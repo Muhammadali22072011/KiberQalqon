@@ -4,19 +4,28 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import com.kiberqalqon.databinding.ActivityDashboardNewBinding
+import com.kiberqalqon.databinding.IncKq4NewsCardBinding
 import kotlinx.coroutines.*
 
 class DashboardNewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardNewBinding
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    // O'rnatilgan ilovalar ro'yxatini to'ldiruvchi oxirgi korutina — qayta-resume'da bekor qilinadi.
+    private var installedAppsJob: Job? = null
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -34,6 +43,7 @@ class DashboardNewActivity : AppCompatActivity() {
         }
 
         setupUI()
+        loadNews()
         // loadStatistics() bu yerda chaqirilmaydi — onResume() har doim onCreate'dan keyin
         // keladi va statistikani o'zi yuklaydi (ikki marta yuklashning hojati yo'q).
     }
@@ -93,10 +103,121 @@ class DashboardNewActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
         }
 
+        // "Hammasi" (yangiliklar) → to'liq e'lonlar ro'yxati.
+        binding.kq4NewsAll.setOnClickListener {
+            startActivity(Intent(this, NewsActivity::class.java))
+        }
+
+        // Karusel sahifalari orasida 10dp bo'shliq + nuqta-indikator sinxroni.
+        binding.kq4NewsPager.setPageTransformer(
+            MarginPageTransformer((10 * resources.displayMetrics.density).toInt())
+        )
+        binding.kq4NewsPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) = updateNewsDots(position)
+        })
+
         // Единая нижняя нав. — активна вкладка HOME.
         KqBottomNav.attach(this, KqBottomNav.Tab.HOME)
 
         AnimationHelper.ripple(binding.btnQuickScan)
+    }
+
+    // ─────────────────────────── Yangiliklar karuseli ───────────────────────────
+
+    /** Karuselda ko'rsatiladigan e'lonlar soni (server tartibi: qadalgan → yangi). */
+    private val newsCarouselLimit = 5
+
+    /**
+     * Avval kesh (oflayn ham darhol), keyin fonda tarmoqdan yangilash (NewsStore o'zi
+     * throttle qiladi). Ikkalasi ham bo'sh bo'lsa seksiya GONE qoladi — bulutga
+     * ulanmagan qurilmada bo'sh blok ko'rinmaydi.
+     */
+    private fun loadNews() {
+        scope.launch {
+            val cached = withContext(Dispatchers.IO) { NewsStore.loadCached(this@DashboardNewActivity) }
+            if (cached.isNotEmpty()) showNews(cached)
+            val fresh = withContext(Dispatchers.IO) { NewsStore.refresh(this@DashboardNewActivity) }
+            if (fresh != null && fresh != cached) showNews(fresh)
+        }
+    }
+
+    private fun showNews(items: List<NewsStore.Item>) {
+        val top = items.take(newsCarouselLimit)
+        if (top.isEmpty()) {
+            binding.kq4NewsSection.visibility = View.GONE
+            return
+        }
+        binding.kq4NewsSection.visibility = View.VISIBLE
+        // cascadeChildren GONE seksiyani ham animatsiya qilgan — qoldiq alpha bo'lmasin.
+        binding.kq4NewsSection.alpha = 1f
+        binding.kq4NewsSection.translationY = 0f
+        binding.kq4NewsPager.adapter = NewsPagerAdapter(top) {
+            startActivity(Intent(this, NewsActivity::class.java))
+        }
+        buildNewsDots(top.size)
+        updateNewsDots(binding.kq4NewsPager.currentItem.coerceIn(0, top.size - 1))
+    }
+
+    private fun buildNewsDots(count: Int) {
+        val dots = binding.kq4NewsDots
+        dots.removeAllViews()
+        if (count < 2) return
+        val d = resources.displayMetrics.density
+        repeat(count) {
+            dots.addView(View(this).apply {
+                setBackgroundResource(R.drawable.kq4_dot)
+                layoutParams = LinearLayout.LayoutParams((6 * d).toInt(), (6 * d).toInt()).apply {
+                    marginStart = (3 * d).toInt()
+                    marginEnd = (3 * d).toInt()
+                }
+            })
+        }
+    }
+
+    /** Faol nuqta — cho'zilgan pill (16dp) + primary; qolganlari 6dp hairline. */
+    private fun updateNewsDots(active: Int) {
+        val dots = binding.kq4NewsDots
+        val d = resources.displayMetrics.density
+        for (i in 0 until dots.childCount) {
+            val dot = dots.getChildAt(i)
+            dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).apply {
+                width = ((if (i == active) 16 else 6) * d).toInt()
+            }
+            dot.backgroundTintList = ColorStateList.valueOf(
+                getColor(if (i == active) R.color.kq_primary else R.color.kq_hairline_strong)
+            )
+        }
+    }
+
+    /** ViewPager2 sahifa-adapteri: har sahifa — inc_kq4_news_card (rasm + teg + sarlavha + matn). */
+    private inner class NewsPagerAdapter(
+        private val items: List<NewsStore.Item>,
+        private val onClick: () -> Unit,
+    ) : RecyclerView.Adapter<NewsPagerAdapter.VH>() {
+
+        inner class VH(val card: IncKq4NewsCardBinding) : RecyclerView.ViewHolder(card.root)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            VH(IncKq4NewsCardBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+
+        override fun getItemCount() = items.size
+
+        override fun onBindViewHolder(holder: VH, position: Int) {
+            val item = items[position]
+            val c = holder.card
+            c.kq4NewsTitle.text = item.title
+            c.kq4NewsBody.text = item.body
+            c.kq4NewsBody.visibility = if (item.body.isBlank()) View.GONE else View.VISIBLE
+            c.kq4NewsDate.text = NewsUi.humanDate(this@DashboardNewActivity, item.createdAt)
+            NewsUi.applyLevelTag(item.level, c.kq4NewsTag, c.kq4NewsTagDot, c.kq4NewsTagText)
+            // maxLines RASM HAQIQATAN ko'ringaniga qarab: rasm bo'lsa 2 qator, rasm yo'q/
+            // yuklanmasa 5 qator (aks holda rasm joyi yo'qoladi-yu, matn 2 qatorda qotib,
+            // 240dp sahifada bo'sh joy qoladi).
+            NewsUi.loadImage(scope, c.kq4NewsImg, item.imageUrl) { loaded ->
+                c.kq4NewsBody.maxLines = if (loaded) 2 else 5
+            }
+            c.root.setOnClickListener { onClick() }
+        }
     }
 
     override fun onResume() {
@@ -174,7 +295,10 @@ class DashboardNewActivity : AppCompatActivity() {
         val container = binding.appList
         container.removeAllViews()
 
-        scope.launch {
+        // Tez pause/resume'da oldingi (hali IO'dagi) korutina qaytib, ro'yxatni IKKINCHI marta
+        // qo'shib qo'ymasin (har ilova ikki marta ko'rinardi) — avvalgisini bekor qilamiz.
+        installedAppsJob?.cancel()
+        installedAppsJob = scope.launch {
             val rows = withContext(Dispatchers.IO) {
                 val pm = packageManager
                 val packages = try {

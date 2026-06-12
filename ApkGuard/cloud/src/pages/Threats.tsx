@@ -73,10 +73,12 @@ function DomainsPanel() {
               onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
               style={{ flex: '1 1 220px' }}
             />
+            {/* Faqat critical/high — qurilma feed'i (api/threats?feed=1) FAQAT shu ikkitasini
+                tarqatadi. "O'rta" varianti telefonlarga yetib bormaydigan yozuv yaratardi,
+                panel esa "bloklandi" deb aldab qo'yardi. */}
             <select value={severity} onChange={(e) => setSeverity(e.target.value)} style={{ width: 130 }}>
               <option value="critical">Kritik</option>
               <option value="high">Yuqori</option>
-              <option value="medium">O‘rta</option>
             </select>
             <button className="btn" onClick={add} disabled={busy || !domain.trim()}>
               {busy ? <span className="spinner" /> : '+ Bloklash'}
