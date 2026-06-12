@@ -29,13 +29,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Markaziy skan ramkasi -->
-        <View
+        <!-- Markaziy skan ramkasi — shaffof oyna + anor burchak qavslar (kamerani yopmaydi).
+             Avval kq4_card_selected (to'liq fon) edi → kamera ko'rinmasdi. -->
+        <com.kiberqalqon.QrScanFrameView
             android:id="@+id/scanFrame"
             android:layout_width="248dp"
             android:layout_height="248dp"
-            android:layout_gravity="center"
-            android:background="@drawable/kq4_card_selected" />
+            android:layout_gravity="center" />
 
         <!-- Yo'riqnoma satri (pastda) -->
         <LinearLayout
