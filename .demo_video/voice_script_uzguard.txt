@@ -1,0 +1,71 @@
+UZGUARD — demo video voiceover script (O'zbekcha)
+=================================================
+Format: record ONE file per line below.
+File names MUST match exactly (save as MP3 or WAV).
+Folder: .demo_video/voice3_human/
+
+Style:
+- Male or female, confident, warm, not robotic
+- Like a TV ad / product demo, not news reading
+- Short pauses where "..." appears
+- "UzGuard" = pronounce: UZ-gard (English "Guard", stress on UZ)
+
+Technical:
+- 44.1 kHz or 48 kHz, mono or stereo
+- Quiet room, no echo, no music
+- Peak around -6 dB (not clipping)
+- One take per file is OK; we sync in FFmpeg
+
+-------------------------------------------------
+FILE: m0_hook.mp3
+SCENE: Hook — phone + virus (0:00)
+TEXT:
+Tasavvur qiling... telefoningizga virus keldi.
+
+-------------------------------------------------
+FILE: m1_tg.mp3
+SCENE: Telegram scam file (0:04)
+TEXT:
+Telegramdan «rasmlar» fayli keldi. Aslida bu — bank o'g'risi!
+
+-------------------------------------------------
+FILE: m2_danger.mp3
+SCENE: Danger — one tap (0:11)
+TEXT:
+Bitta bosish — va kartangizdagi pul yo'qoladi!
+
+-------------------------------------------------
+FILE: m3_hero.mp3
+SCENE: UzGuard installed (0:14)
+TEXT:
+Lekin bu telefonda UzGuard o'rnatilgan!
+
+-------------------------------------------------
+FILE: m4_detect.mp3
+SCENE: Auto-detect (0:22)
+TEXT:
+Fayl tushdi — darhol sezdi!
+
+-------------------------------------------------
+FILE: m5_virus.mp3
+SCENE: Threat blocked (0:24)
+TEXT:
+Virus topildi! UzGuard uni o'zi o'chirdi — siz hech narsa bosmadingiz.
+
+-------------------------------------------------
+FILE: m7_result.mp3
+SCENE: Phone safe (0:32)
+TEXT:
+Tahdid bloklandi — telefon xavfsiz.
+
+-------------------------------------------------
+FILE: m6_feat.mp3
+SCENE: Features montage (0:37)
+TEXT:
+UzGuard afzalliklari: internetsiz ham ishlaydi. Havolalar va QR-kodlarni tekshiradi. Soxta bank ilovalarini aniqlaydi. Va bu — bepul!
+
+-------------------------------------------------
+FILE: m8_outro.mp3
+SCENE: Outro + CTA (0:49)
+TEXT:
+UzGuard. Telefoningiz — himoya ostida. Hoziroq o'rnating!
