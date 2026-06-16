@@ -575,9 +575,17 @@ class ScanResultActivity : AppCompatActivity() {
                 }
 
                 is FileDeleter.Result.SandboxedByOwner -> {
+                    // /Android/data/<owner>/ — Android hech kimga o'chirtirmaydi, lekin fayl
+                    // o'rnatilmaguncha xavfsiz (o'rnatishni bloklaymiz). Tozalash uchun egasi
+                    // ilovani bir tugma bilan ochamiz.
+                    val owner = ownerAppLabel(result.ownerPackage)
                     AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.autoscan_sandboxed_owner, result.ownerPackage))
-                        .setPositiveButton(getString(R.string.btn_ok), null)
+                        .setTitle(getString(R.string.sandboxed_dialog_title))
+                        .setMessage(getString(R.string.sandboxed_inert_msg, owner))
+                        .setPositiveButton(getString(R.string.sandboxed_open_owner, owner)) { _, _ ->
+                            openOwnerApp(result.ownerPackage)
+                        }
+                        .setNegativeButton(getString(R.string.cancel), null)
                         .show()
                     binding.btnDelete.isEnabled = true
                 }
@@ -627,6 +635,35 @@ class ScanResultActivity : AppCompatActivity() {
             binding.btnDelete.setOnClickListener { deleteApk() }
         } catch (e: Exception) {
             android.util.Log.e("ScanResult", "openManageStorageSettings failed", e)
+        }
+    }
+
+    /** Egasi ilovaning inson o'qiy oladigan nomi (Telegram, WhatsApp...). Topilmasa — paket nomi. */
+    private fun ownerAppLabel(pkg: String): String = try {
+        packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString()
+    } catch (_: Throwable) { pkg }
+
+    /**
+     * Egasi ilovani ochadi (foydalanuvchi u yerda keshni/yuklamalarni tozalashi uchun).
+     * Ishga tushirish intent'i bo'lmasa — ilova sozlamalari (Xotira → Tozalash) ekraniga.
+     */
+    private fun openOwnerApp(pkg: String) {
+        try {
+            val launch = packageManager.getLaunchIntentForPackage(pkg)
+            if (launch != null) {
+                startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return
+            }
+        } catch (_: Throwable) {}
+        try {
+            startActivity(
+                Intent(
+                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:$pkg"),
+                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        } catch (e: Throwable) {
+            android.util.Log.e("ScanResult", "openOwnerApp failed", e)
         }
     }
 

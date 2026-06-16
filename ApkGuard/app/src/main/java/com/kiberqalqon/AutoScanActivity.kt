@@ -1055,13 +1055,15 @@ class AutoScanActivity : AppCompatActivity() {
 
                 is FileDeleter.Result.SandboxedByOwner -> {
                     reportDelete("Boshqa ilova papkasida", path, extra = result.ownerPackage)
-                    // Файл в /Android/data/<owner>/ — даже с MANAGE_EXTERNAL_STORAGE
-                    // Android отказывает. Юзеру надо удалять через само приложение.
-                    binding.tvResultMessage.text =
-                        getString(R.string.autoscan_sandboxed_owner, result.ownerPackage)
-                    binding.btnDelete.text = getString(R.string.btn_ok)
+                    // Файл в /Android/data/<owner>/ — НИКТО (даже с MANAGE_EXTERNAL_STORAGE) удалить
+                    // не может, это аппаратное ограничение Android. Но он БЕЗОПАСЕН: пока не установлен,
+                    // не вредит, а установку мы блокируем (ShareReceiver + PackageInstallReceiver).
+                    // Вместо тупикового "OK" даём одну кнопку "Открыть <owner>" для ручной очистки.
+                    val owner = ownerAppLabel(result.ownerPackage)
+                    binding.tvResultMessage.text = getString(R.string.sandboxed_inert_msg, owner)
+                    binding.btnDelete.text = getString(R.string.sandboxed_open_owner, owner)
                     binding.btnDelete.isEnabled = true
-                    binding.btnDelete.setOnClickListener { finish() }
+                    binding.btnDelete.setOnClickListener { openOwnerApp(result.ownerPackage) }
                 }
 
                 is FileDeleter.Result.Failed -> {
@@ -1132,6 +1134,38 @@ class AutoScanActivity : AppCompatActivity() {
             binding.btnDelete.setOnClickListener { deleteApk() }
         } catch (e: Exception) {
             android.util.Log.e("AutoScanActivity", "openManageStorageSettings failed", e)
+        }
+    }
+
+    /** Egasi ilovaning inson o'qiy oladigan nomi (Telegram, WhatsApp...). Topilmasa — paket nomi. */
+    private fun ownerAppLabel(pkg: String): String = try {
+        packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString()
+    } catch (_: Throwable) { pkg }
+
+    /**
+     * Egasi ilovani ochadi (foydalanuvchi u yerda faylni/keshni tozalashi uchun). Sandbox
+     * (/Android/data/<owner>/) faylini Android boshqa hech kimga o'chirtirmaydi, lekin u
+     * o'rnatilmaguncha xavfsiz — bu tugma faqat tozalashni qulaylashtiradi. Ishga tushirish
+     * intent'i bo'lmasa — ilova sozlamalari (Xotira → Tozalash) ekraniga o'tamiz.
+     */
+    private fun openOwnerApp(pkg: String) {
+        try {
+            val launch = packageManager.getLaunchIntentForPackage(pkg)
+            if (launch != null) {
+                startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                finish()
+                return
+            }
+        } catch (_: Throwable) {}
+        try {
+            startActivity(
+                Intent(
+                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:$pkg"),
+                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        } catch (e: Throwable) {
+            android.util.Log.w("AutoScanActivity", "openOwnerApp failed", e)
         }
     }
 

@@ -576,6 +576,10 @@
     <string name="autoscan_need_all_files">Faylni o\'chirish uchun \"Barcha fayllarga kirish\" ruxsati kerak.\n\nPastdagi tugmani bosing va tugmachani yoqing.</string>
     <string name="autoscan_grant_btn">RUXSAT BERISH</string>
     <string name="autoscan_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida.\n\nFaylni faqat \"%1$s\" ilovasi orqali o\'chirish mumkin (masalan: Telegram → Sozlamalar → Ma\'lumotlarni tozalash).</string>
+    <!-- Sandbox (/Android/data/<owner>/) faylini hech kim o'chira olmaydi — lekin u xavfsiz: o'rnatilmaguncha zarar yetkazmaydi, UzGuard o'rnatishni bloklaydi. Bir tugma bilan egasi ilovani ochamiz. -->
+    <string name="sandboxed_inert_msg">Bu fayl «%1$s» ilovasining ichki papkasida. Android uni boshqa ilovaga (UzGuardga ham) o\'chirishga ruxsat bermaydi — bu tizim cheklovi, xato emas.\n\nMUHIM: bu fayl O\'RNATILMAGUNCHA zarar yetkazmaydi, UzGuard esa uni o\'rnatishga yo\'l qo\'ymaydi. Telefon xotirasidan butunlay olib tashlash uchun «%1$s»ni oching va keshni/yuklamalarni tozalang.</string>
+    <string name="sandboxed_open_owner">«%1$s»ni ochish</string>
+    <string name="sandboxed_dialog_title">Fayl boshqa ilova papkasida</string>
     <string name="autoscan_delete_btn">O\'CHIRISH</string>
     <string name="autoscan_delete_hint_done">O\'chirish bu APK ni telefoningizga o\'rnatishga imkon bermaydi</string>
 
