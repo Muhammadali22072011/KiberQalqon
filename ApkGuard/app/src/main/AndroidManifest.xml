@@ -457,5 +457,11 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <!-- NewsAlarmReceiver: ekran O'CHIQ / Doze paytida ham yangilikni tekshirish uchun
+             AlarmManager (setAndAllowWhileIdle) uyg'otadi. Faqat o'zimiz chaqiramiz. -->
+        <receiver
+            android:name=".NewsAlarmReceiver"
+            android:exported="false" />
     </application>
 </manifest>

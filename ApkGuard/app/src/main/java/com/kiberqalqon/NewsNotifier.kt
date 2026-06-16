@@ -1,7 +1,11 @@
 package com.uzguard
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.util.Log
+import androidx.core.app.AlarmManagerCompat
 
 /**
  * Panel ("Yangiliklar") yangi e'lon joylaganda — qurilmaga BILDIRISHNOMA (rasm bilan).
@@ -119,5 +123,49 @@ object NewsNotifier {
         merged.addAll(oldSeen)
         val capped = if (merged.size > MAX_SEEN) merged.take(MAX_SEEN).toHashSet() else merged
         sp.edit().putStringSet(KEY_SEEN_IDS, capped).apply()
+    }
+
+    // ── Ekran O'CHIQ / Doze paytida yetkazish (AlarmManager) ──────────────────────
+    //
+    // MUAMMO: foreground ProtectionService PROTSESS'ni tirik tutadi, lekin CPU'ni emas.
+    // Ekran o'chib qurilma uxlaganda loop'dagi delay() muzlaydi va tarmoq kesiladi —
+    // shu sabab yangilik "ekran o'chiq bo'lsa kelmaydi". WorkManager ham Doze'da
+    // kechiktiriladi. YagonaFCMsiz ishonchli yo'l — AlarmManager.setAndAllowWhileIdle:
+    // u Doze'da ham ishlaydi (OS ~9 daqiqada birga cheklaydi) va qisqa tarmoq+wakelock
+    // oynasi beradi. Inexact — SCHEDULE_EXACT_ALARM ruxsati SHART EMAS.
+    private const val ALARM_INTERVAL_MS = 12L * 60 * 1000   // ~12 daq (Doze poli ~9 daq)
+    private const val ALARM_REQUEST = 7311
+    private const val ALARM_ACTION = "com.uzguard.NEWS_CHECK"
+
+    /**
+     * Keyingi uyg'otishni rejalashtiradi. [NewsAlarmReceiver] har fire'da buni qayta
+     * chaqiradi (o'z-o'zini tiklaydigan zanjir; protsess o'lsa ham alarm tizimda qoladi
+     * va fire bo'lganda protsessni qayta ko'taradi). O'chirilgan bo'lsa — bekor qiladi.
+     * App.onCreate, BootReceiver va Sozlamalar toggle'idan chaqiriladi.
+     */
+    fun scheduleNext(ctx: Context) {
+        try {
+            if (!Config.isNewsNotificationEnabled(ctx)) { cancel(ctx); return }
+            val am = ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val triggerAt = System.currentTimeMillis() + ALARM_INTERVAL_MS
+            AlarmManagerCompat.setAndAllowWhileIdle(am, AlarmManager.RTC_WAKEUP, triggerAt, alarmPi(ctx))
+        } catch (e: Throwable) {
+            Log.w(TAG, "scheduleNext failed", e)
+        }
+    }
+
+    fun cancel(ctx: Context) {
+        try {
+            val am = ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            am.cancel(alarmPi(ctx))
+        } catch (_: Throwable) {}
+    }
+
+    private fun alarmPi(ctx: Context): PendingIntent {
+        val intent = Intent(ctx.applicationContext, NewsAlarmReceiver::class.java).setAction(ALARM_ACTION)
+        return PendingIntent.getBroadcast(
+            ctx.applicationContext, ALARM_REQUEST, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 }

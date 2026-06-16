@@ -79,6 +79,13 @@ class BootReceiver : BroadcastReceiver() {
         } catch (e: Throwable) {
             Log.w(TAG, "GuardWorker schedule failed", e)
         }
+        // Reboot alarmlarni tozalaydi — yangilik uyg'otish zanjirini qayta boshlaymiz
+        // (ekran o'chiq / Doze'da ham e'lon yetib kelishi uchun).
+        try {
+            NewsNotifier.scheduleNext(app)
+        } catch (e: Throwable) {
+            Log.w(TAG, "news alarm schedule failed", e)
+        }
     }
 
     companion object {

@@ -206,6 +206,9 @@ class App : android.app.Application() {
             // (GuardWorker'gacha kutmasdan). Ichki throttle/seed/dedup spamга yo'l qo'ymaydi.
             try {
                 NewsNotifier.checkAndNotify(this@App)
+                // Ekran o'chiq / Doze'da ham yetkazish: AlarmManager uyg'otish zanjirini boshlaymiz
+                // (ProtectionService loop'i CPU uxlaganda muzlaydi — alarm uni qoplaydi).
+                NewsNotifier.scheduleNext(this@App)
             } catch (e: Throwable) {
                 Log.w("UzGuard", "News notify check failed", e)
             }

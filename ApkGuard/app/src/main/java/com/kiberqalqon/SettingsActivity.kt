@@ -383,6 +383,8 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowNewsNotif.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
             Config.setNewsNotificationEnabled(this, on)
+            // Ekran o'chiq / Doze yetkazish uyg'otish zanjirini yoqamiz/bekor qilamiz.
+            NewsNotifier.scheduleNext(this)
             toastSaved()
         }
         toggleOf(binding.rowVpnFilter.root).setOnCheckedChangeListener { _, on ->
