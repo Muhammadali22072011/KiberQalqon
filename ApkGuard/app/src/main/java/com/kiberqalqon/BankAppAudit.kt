@@ -143,9 +143,11 @@ object BankAppAudit {
         // O'ZIMIZNING ilova HECH QACHON soxta bank deb belgilanmaydi. Rebrand'dan keyin
         // "uzguard" tokeni "uzcard" brendiga Levenshtein 2 (= MAX_DISTANCE) bo'lib qoldi —
         // shu sabab token solishtirishdan OLDIN o'z paketimizni (debug ham) chiqaramiz.
-        // Audit halqasi allaqachon paket bo'yicha chiqaradi; bu — qo'shimcha pure himoya.
-        val ownBase = BuildConfig.APPLICATION_ID.removeSuffix(".debug")
-        if (pkg?.removeSuffix(".debug") == ownBase) return null
+        // MUHIM: namespace ("com.uzguard") ≠ applicationId ("com.kiberqalqon") — ikkalasi
+        // ham "biz". Audit halqasi context.packageName (=applicationId) bo'yicha chiqaradi;
+        // bu — har ikkala identifikatorni qamrab oluvchi qo'shimcha pure himoya.
+        val base = pkg?.removeSuffix(".debug")
+        if (base == "com.uzguard" || base == BuildConfig.APPLICATION_ID.removeSuffix(".debug")) return null
 
         val tokens = HashSet<String>()
         tokens += tokenize(label)
