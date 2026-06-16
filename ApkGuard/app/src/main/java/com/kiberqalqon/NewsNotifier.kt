@@ -31,7 +31,10 @@ object NewsNotifier {
     private const val KEY_SEEDED = "seeded_v1"         // birinchi marta backlog seed qilindimi
     private const val KEY_LAST_CHECK = "last_check_ts" // urinish-throttle
 
-    private const val CHECK_INTERVAL_MS = 30L * 60 * 1000      // 30 daq: tez-tez urmaslik
+    // 3 daq: ProtectionService loop'idan chaqirilganda yangilik ~3 daqiqada keladi
+    // (FCMsiz "deyarli real-vaqt"). NewsStore tarmoq-throttle'i (2 daq) bundan kichik —
+    // shu sabab bu intervalda refresh haqiqatan yangi e'lonni tarmoqdan oladi.
+    private const val CHECK_INTERVAL_MS = 3L * 60 * 1000
     private const val MAX_AGE_MS = 7L * 24 * 60 * 60 * 1000    // 7 kundan eski e'lonni push qilmaymiz
     private const val MAX_NOTIFY_PER_RUN = 3                   // bir yugurishda ko'pi bilan 3 ta
     private const val MAX_SEEN = 500                           // saqlanadigan id'lar chegarasi

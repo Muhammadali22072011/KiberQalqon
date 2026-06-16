@@ -181,6 +181,16 @@ class ProtectionService : Service() {
                 // shunda fon'da telefon qizimaydi (eski qat'iy 1s loop asosiy qizish sababi edi).
                 val interactive = isScreenInteractiveAndUnlocked(applicationContext)
                 delay(if (interactive) POLL_INTERVAL_ACTIVE_MS else POLL_INTERVAL_IDLE_MS)
+
+                // Yangiliklar (panel e'lonlari) — fon-SKANDAN MUSTAQIL, alohida coroutine'da
+                // (NewsNotifier ichida 3 daqiqalik throttle + dedup). Foreground service tirik
+                // ekan, yangi e'lon ~3 daqiqada qurilmaga keladi — FCM/Google'siz "deyarli
+                // real-vaqt". Alohida launch: sekin tarmoq skan zaxira-loop'ini bloklamaydi;
+                // isBackgroundEnabled gate'idan OLDIN — yangiliklar fon-skan o'chiq bo'lsa ham keladi.
+                serviceScope.launch {
+                    try { NewsNotifier.checkAndNotify(applicationContext) } catch (_: Throwable) {}
+                }
+
                 try {
                     if (!Config.isBackgroundEnabled(applicationContext)) continue
                     // Arzon o'zgarish-detektori: kuzatilayotgan papkalar mtime imzosi o'zgarmagan

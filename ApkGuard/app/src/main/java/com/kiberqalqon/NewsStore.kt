@@ -30,8 +30,13 @@ object NewsStore {
     private const val KEY_PAYLOAD = "news_json"
     private const val KEY_FETCHED_AT = "news_fetched_at"
 
-    /** Tarmoqqa qayta chiqishlar orasidagi minimal interval (dashboard har ochilganda urmaslik uchun). */
-    private const val MIN_REFRESH_INTERVAL_MS = 10L * 60 * 1000
+    /**
+     * Tarmoqqa qayta chiqishlar orasidagi minimal interval (dashboard har ochilganda urmaslik uchun).
+     * 2 daq: [NewsNotifier] (~3 daqiqalik tekshiruv, ProtectionService loop'idan) yangi e'lonni
+     * "deyarli real-vaqt"da olishi uchun bundan kichik bo'lishi shart. Yengil HTTPS GET — batareyaga
+     * sezilarsiz; rasm faqat YANGI e'lon bo'lganda yuklanadi.
+     */
+    private const val MIN_REFRESH_INTERVAL_MS = 2L * 60 * 1000
 
     data class Item(
         val id: String,
