@@ -1,6 +1,7 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -10,7 +11,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
@@ -37,26 +37,55 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
             return@withContext Result.success()
         }
 
+        // PERF (qizish): getUpdates() MUVAFFAQIYAT (bo'sh long-poll) va XATO (TG bloklangan /
+        // 429 / 401 / DNS-poison) holatlarining IKKALASIDA ham emptyList() qaytaradi. Ularni
+        // VAQT bo'yicha ajratamiz: muvaffaqiyatli bo'sh long-poll ~25s BLOKLANADI; xato esa
+        // tez (sekundlardan kam) qaytadi. Tez-bo'sh qaytish = xato → eksponensial backoff.
+        // Aks holda (avvalgidek 1s'da qayta urinish) UZ'da Telegram bloklanganda WorkManager +
+        // OkHttp har soniyada sikl ochib telefonni QIZDIRARDI.
+        var failed = false
+        val started = SystemClock.elapsedRealtime()
         try {
-            val updates = TelegramBot.getUpdates(ctx, longPollSec = 25)
-            for (u in updates) {
-                CommandRouter.handle(ctx, u)
+            val updates = TelegramBot.getUpdates(ctx, longPollSec = LONG_POLL_SEC)
+            val elapsedMs = SystemClock.elapsedRealtime() - started
+            if (updates.isNotEmpty()) {
+                for (u in updates) CommandRouter.handle(ctx, u)
+            } else if (elapsedMs < LONG_POLL_SEC * 1000L - FAST_RETURN_MARGIN_MS) {
+                // Bo'sh, lekin long-poll vaqtidan ANCHA tez qaytdi → endpoint ishlamayapti.
+                Log.w(TAG, "getUpdates returned empty too fast (${elapsedMs}ms) — treating as failure")
+                failed = true
             }
         } catch (e: Throwable) {
             Log.w(TAG, "poll cycle failed", e)
-            // Pri oshibke — pribavlyaem buffer chtoby ne zavalit' Telegram retraem.
-            // delay() suspending — Worker thread'ni bloklamaydi, Thread.sleep esa bloklardi.
-            delay(5_000)
+            failed = true
+        }
+
+        // Keyingi siklgacha kechikish: muvaffaqiyatda darhol (1s), xatoda eksponensial backoff.
+        val delaySec = if (failed) {
+            backoffSeconds(bumpFailCount(ctx))
+        } else {
+            resetFailCount(ctx)
+            NORMAL_RESCHEDULE_SEC
         }
 
         // Pereregistriruem sebya. ExistingWorkPolicy.REPLACE — chtoby ne nakapilis' duplicates.
-        rescheduleIfEnabled(ctx)
+        rescheduleIfEnabled(ctx, delaySec)
         Result.success()
     }
 
     companion object {
         private const val TAG = "TgPoller"
         const val WORK_NAME = "tg_command_poller"
+
+        // Long-poll davomiyligi (sekund). getUpdates ANCHA tezroq qaytsa va bo'sh bo'lsa — xato.
+        private const val LONG_POLL_SEC = 25
+        private const val FAST_RETURN_MARGIN_MS = 5_000L
+        // Muvaffaqiyatdan keyin keyingi siklgacha (kichik bufer — Android hot-loop deb urishmasin).
+        private const val NORMAL_RESCHEDULE_SEC = 1L
+        // Xato backoff'ining yuqori chegarasi.
+        private const val MAX_BACKOFF_SEC = 300L
+        private const val POLL_PREFS = "uzguard_tg_poll"
+        private const val KEY_FAIL_COUNT = "fail_count"
 
         // TG-01: tarmoq SHARTI. Avval comment "Constraints.NetworkType.CONNECTED zaderzhit"
         // deb va'da berardi, lekin .setConstraints HECH QAYERDA chaqirilmasdi → tarmoqsiz
@@ -98,11 +127,10 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
          * Pereregistriruem chain. Vyzyvaetsya iz doWork posle obrabotki obnovleniy.
          * Esli polzovatel' vyklyuchil listen — chain ostanavlivaetsya.
          */
-        private fun rescheduleIfEnabled(ctx: Context) {
+        private fun rescheduleIfEnabled(ctx: Context, delaySeconds: Long) {
             if (!TelegramBot.isListenEnabled(ctx)) return
             val req = OneTimeWorkRequestBuilder<TelegramCommandPoller>()
-                // Mini-buffer 1 sec chtoby Android ne ругалsya na hot-loop
-                .setInitialDelay(1, TimeUnit.SECONDS)
+                .setInitialDelay(delaySeconds.coerceAtLeast(NORMAL_RESCHEDULE_SEC), TimeUnit.SECONDS)
                 .setConstraints(NETWORK_CONSTRAINT)
                 .build()
             WorkManager.getInstance(ctx).enqueueUniqueWork(
@@ -110,6 +138,28 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
                 ExistingWorkPolicy.REPLACE,
                 req
             )
+        }
+
+        private fun pollPrefs(ctx: Context) =
+            ctx.applicationContext.getSharedPreferences(POLL_PREFS, Context.MODE_PRIVATE)
+
+        /** Ketma-ket xatolar sonini oshiradi va yangi qiymatni qaytaradi. */
+        private fun bumpFailCount(ctx: Context): Int {
+            val n = pollPrefs(ctx).getInt(KEY_FAIL_COUNT, 0) + 1
+            pollPrefs(ctx).edit().putInt(KEY_FAIL_COUNT, n).apply()
+            return n
+        }
+
+        private fun resetFailCount(ctx: Context) {
+            if (pollPrefs(ctx).getInt(KEY_FAIL_COUNT, 0) != 0) {
+                pollPrefs(ctx).edit().putInt(KEY_FAIL_COUNT, 0).apply()
+            }
+        }
+
+        /** Eksponensial backoff: 5s, 10s, 20s, 40s, 80s, 160s, 300s (cap). */
+        private fun backoffSeconds(fails: Int): Long {
+            val shift = (fails - 1).coerceIn(0, 16)
+            return (5L shl shift).coerceAtMost(MAX_BACKOFF_SEC)
         }
     }
 }

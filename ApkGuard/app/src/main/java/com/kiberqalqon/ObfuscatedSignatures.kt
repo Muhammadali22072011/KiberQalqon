@@ -1,9 +1,9 @@
-package com.kiberqalqon
+package com.uzguard
 
 import java.security.MessageDigest
 
 /**
- * Зашифрованные сигнатуры — чтобы `strings kiberqalqon.apk | grep` не показал
+ * Зашифрованные сигнатуры — чтобы `strings uzguard.apk | grep` не показал
  * список malware-доменов и индикаторов. Виды защиты:
  *
  * 1) [MALICIOUS_TOKEN_HASHES] — SHA-256 хэши конкретных индикаторов
@@ -105,11 +105,28 @@ object ObfuscatedSignatures {
 
     @Volatile private var decryptedCache: List<Pair<String, String>>? = null
 
+    // PERF: matchTokenHashes() bitta DEX uchun o'n minglab token'ni hash qiladi. Avval HAR token
+    // uchun MessageDigest.getInstance("SHA-256") (yangi obyekt) + "%02X".format() (String.format)
+    // chaqirilardi → katta CPU/GC bosimi. Endi thread-local digest qayta ishlatiladi (skanlar
+    // bir vaqtda ishlaydi — shuning uchun ThreadLocal, oddiy maydon emas) va hex lookup ishlatiladi.
+    // Natija BAYT-AYNAN o'sha (katta harf, 16 hex) — ShieldTest/ObfuscatedSignaturesTest invariantlari saqlanadi.
+    private val sha256Local = object : ThreadLocal<MessageDigest>() {
+        override fun initialValue(): MessageDigest = MessageDigest.getInstance("SHA-256")
+    }
+    private val HEX = "0123456789ABCDEF".toCharArray()
+
     /** SHA-256 → first 16 hex chars (uppercase). */
     fun hash(s: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
+        val md = sha256Local.get()!!
+        md.reset()
         val digest = md.digest(s.lowercase().toByteArray(Charsets.UTF_8))
-        return digest.take(8).joinToString("") { "%02X".format(it) }
+        val sb = StringBuilder(16)
+        for (i in 0 until 8) {
+            val b = digest[i].toInt() and 0xFF
+            sb.append(HEX[b ushr 4])
+            sb.append(HEX[b and 0x0F])
+        }
+        return sb.toString()
     }
 
     /**

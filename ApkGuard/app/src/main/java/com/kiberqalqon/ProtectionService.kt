@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
  * Doimiy himoya foreground service'i.
  *
  * Status bar'da har doim ko'rinib turuvchi bildirishnoma:
- * "🛡️ KIBER QALQON faol · Telefoningiz himoyalangan"
+ * "🛡️ UZGUARD faol · Telefoningiz himoyalangan"
  *
  * Bu — foydalanuvchiga eng kuchli signal: "himoya ishlayapti". Hech qanday
  * sozlama o'zgartirmasdan, ilovani o'rnatib ochish bilan darhol shu yozuv
@@ -64,7 +64,7 @@ class ProtectionService : Service() {
         val notification = buildNotification(this)
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                // Android 14+: foreground service type kerak. KiberQalqon antivirus
+                // Android 14+: foreground service type kerak. UzGuard antivirus
                 // bo'lgani uchun SPECIAL_USE eng yaqin kategoriya (DATA_SYNC ham bo'ladi
                 // lekin biz hech narsa sync qilmaymiz — special_use to'g'riroq).
                 startForeground(
@@ -288,8 +288,15 @@ class ProtectionService : Service() {
          *     FileObserver + 15 daqiqalik GuardWorker + ekran ochilishidagi bir martalik
          *     skan baribir qamrab oladi.
          */
-        private const val POLL_INTERVAL_ACTIVE_MS = 12_000L
-        private const val POLL_INTERVAL_IDLE_MS = 90_000L
+        // PERF (qizish): bu poll — ZAXIRA yo'l. Real-vaqt aniqlash MultiPathFileObserver
+        // (inotify) + 15 daqiqalik GuardWorker + ekran ochilishidagi bir martalik skan
+        // zimmasida. Shuning uchun oraliqni uzaytirdik: ekran ochiq bo'lganda har 12s da
+        // butun xotirani skanlash (≈5 obhod/min, 24/7) protsessorni isitardi. Endi 45s
+        // (≈1.3 obhod/min) — inotify o'tkazib yuborgan kamdan-kam holat uchun ham yetarlicha
+        // tez, lekin issiqlik ~73% kamayadi. Idle (ekran o'chiq/qulflangan — APK o'rnatib
+        // bo'lmaydi) — yanada kamdan-kam.
+        private const val POLL_INTERVAL_ACTIVE_MS = 45_000L
+        private const val POLL_INTERVAL_IDLE_MS = 180_000L
 
         /**
          * Bitta poll iteratsiyasi uchun vaqt byudjeti. Eng kichik oraliq (active)dan
@@ -329,7 +336,7 @@ class ProtectionService : Service() {
         /** Status matnini yangilash (scan tugagach yoki sozlama o'zgargach). */
         fun refresh(context: Context) {
             try {
-                // BG-02: fon himoyasi O'CHIRILGAN bo'lsa "KIBER QALQON faol" bildirishnomasini
+                // BG-02: fon himoyasi O'CHIRILGAN bo'lsa "UZGUARD faol" bildirishnomasini
                 // TIKLAMAYMIZ — aks holda foydalanuvchi himoyani o'chirgach ham har skandан keyin
                 // belgi qayta paydo bo'lib, "o'chirdim-ku" degan holatga zid yolg'on ko'rsatardi.
                 if (!Config.isBackgroundEnabled(context)) return
@@ -351,7 +358,7 @@ class ProtectionService : Service() {
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW,
             ).apply {
-                description = "Anor Qalqon doimiy himoya holati"
+                description = "UzGuard doimiy himoya holati"
                 setShowBadge(false)
                 enableVibration(false)
                 setSound(null, null)
@@ -375,7 +382,7 @@ class ProtectionService : Service() {
             val statusText = computeStatusText(context)
             val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_shield)
-                .setContentTitle("KIBER QALQON faol")
+                .setContentTitle("UZGUARD faol")
                 .setContentText(statusText)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(statusText))
                 .setPriority(NotificationCompat.PRIORITY_LOW)

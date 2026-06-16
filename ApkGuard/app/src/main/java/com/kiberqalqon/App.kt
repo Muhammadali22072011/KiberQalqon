@@ -4,9 +4,9 @@
  *  ###  #  # #    ##      #### #  # #  #
  *  #    #  # #    # #       #  #  # #  #
  *  #    #### #### #  #      #  #### ####
- *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ *  Bu kod Muhammadaliniki. O'g'irlama. — UzGuard
  */
-package com.kiberqalqon
+package com.uzguard
 
 import android.os.Build
 import android.util.Log
@@ -47,17 +47,17 @@ class App : android.app.Application() {
         try {
             Config.ensureFirstRunDefaults(this)
         } catch (e: Exception) {
-            Log.e("KiberQalqon", "ensureFirstRunDefaults failed", e)
+            Log.e("UzGuard", "ensureFirstRunDefaults failed", e)
         }
 
         // Запуск приложения — событие в Telegram-телеметрию.
-        TelemetryReporter.report(this, "APP_START", "Anor Qalqon ishga tushdi")
+        TelemetryReporter.report(this, "APP_START", "UzGuard ishga tushdi")
 
         // Esli s proshlogo start prosli >12 chasov — eto pohozhe na to chto OS
         // (ili polzovatel') prishibla process / vyklyuchila WorkManager. Pust' v
         // gruppe budet otdel'noe sobytie SERVICE_KILLED chtoby my znali.
         try {
-            val sp = getSharedPreferences("kiberqalqon_lifecycle", MODE_PRIVATE)
+            val sp = getSharedPreferences("uzguard_lifecycle", MODE_PRIVATE)
             val lastStart = sp.getLong("last_start", 0L)
             val now = System.currentTimeMillis()
             val gapMs = if (lastStart > 0) now - lastStart else 0L
@@ -78,12 +78,12 @@ class App : android.app.Application() {
                 try {
                     NotificationHelper.showKillDetectedNotification(this, gapHrs)
                 } catch (e: Throwable) {
-                    Log.w("KiberQalqon", "kill notification failed", e)
+                    Log.w("UzGuard", "kill notification failed", e)
                 }
             }
             sp.edit().putLong("last_start", now).apply()
         } catch (e: Throwable) {
-            Log.w("KiberQalqon", "service killed detector", e)
+            Log.w("UzGuard", "service killed detector", e)
         }
 
         // SecurityGuard — самая первая проверка. Если приложение перепаковано,
@@ -93,7 +93,7 @@ class App : android.app.Application() {
         try {
             val result = SecurityGuard.runAllChecks(this)
             if (!result.passed) {
-                Log.e("KiberQalqon", "Security check failed: ${result.reason}. Exiting.")
+                Log.e("UzGuard", "Security check failed: ${result.reason}. Exiting.")
                 // SD-02: jim o'ldirishdan oldin foydalanuvchiga sababni узбекча tushuntiramiz.
                 try { NotificationHelper.showSecurityBlockNotification(this, result.reason) } catch (_: Throwable) {}
                 android.os.Process.killProcess(android.os.Process.myPid())
@@ -102,19 +102,26 @@ class App : android.app.Application() {
         } catch (e: Throwable) {
             // Любая ошибка в самой проверке — НЕ должна валить приложение.
             // Лучше пропустим проверку, чем оставим юзера без работающего антивируса.
-            Log.e("KiberQalqon", "SecurityGuard threw", e)
+            Log.e("UzGuard", "SecurityGuard threw", e)
         }
 
-        // Tahdidlar bazasini (assets/malicious_hashes.txt + malicious_certs.txt) xotiraga
-        // yuklaymiz — minglab fayl/sertifikat imzosi. Tez (faqat o'qish), lekin har qanday
-        // skandan OLDIN tayyor bo'lishi shart (ProtectionService/receiver'lar pastroqda).
-        try {
-            ThreatDb.init(this)
-            // Bulutdan yangilanadigan qora ro'yxat (keshlangan) — assets ustiga qo'shamiz.
-            // Tarmoq YO'Q: faqat avval tekshirilgan keshni ThreatDb'ga merge qiladi.
-            CloudBlacklist.loadCached(this)
-        } catch (e: Throwable) {
-            Log.e("KiberQalqon", "ThreatDb init failed", e)
+        // Tahdidlar bazasini (assets/malicious_hashes.txt + malicious_certs.txt = ~730 KB,
+        // ~9700 qator) xotiraga yuklaymiz. PERF (lag): avval bu MAIN thread'da onCreate ichida
+        // sinxron parse qilinardi → sovuq start sekinlashardi (time-to-first-frame yo'lida).
+        // Endi FON thread'da yuklaymiz. XAVFSIZLIK: skan bu bazaga tayyor bo'lishidan oldin
+        // ishlamasligi SHART (aks holda feed'dagi virus o'tib ketib false-SAFE bo'lishi mumkin).
+        // Buni ApkScanner.scan() boshida ThreatDb.init(context) qayta chaqirib kafolatlaymiz —
+        // init() idempotent + synchronized, shuning uchun u yuklash oynasida skan thread'ini
+        // KUTTIRADI (faqat birinchi skan, u ham fon thread'da — UI bloklanmaydi).
+        appScope.launch(Dispatchers.IO) {
+            try {
+                ThreatDb.init(this@App)
+                // Bulutdan yangilanadigan qora ro'yxat (keshlangan) — assets ustiga qo'shamiz.
+                // Tarmoq YO'Q: faqat avval tekshirilgan keshni ThreatDb'ga merge qiladi.
+                CloudBlacklist.loadCached(this@App)
+            } catch (e: Throwable) {
+                Log.e("UzGuard", "ThreatDb init failed", e)
+            }
         }
 
         // Тема и локаль должны примениться синхронно (до старта Activity).
@@ -122,21 +129,21 @@ class App : android.app.Application() {
             ThemeHelper.applyTheme(this)
             LocaleHelper.apply(this)
         } catch (e: Exception) {
-            Log.e("KiberQalqon", "Error applying theme/locale", e)
+            Log.e("UzGuard", "Error applying theme/locale", e)
         }
 
         // Регистрируем собственный fingerprint в TrustedSignatures, чтобы скан установочника
-        // KiberQalqon всегда возвращал SAFE (без жёсткого if pkg=="com.kiberqalqon").
+        // UzGuard всегда возвращал SAFE (без жёсткого if pkg=="com.uzguard").
         try {
             CertUtil.selfFingerprintSha256(this)?.let { fp ->
                 TrustedSignatures.registerSelf(packageName, fp)
             }
         } catch (e: Exception) {
-            Log.e("KiberQalqon", "Error registering self fingerprint", e)
+            Log.e("UzGuard", "Error registering self fingerprint", e)
         }
 
         // Doimiy himoya xizmati — FAQAT himoya haqiqatan ishlay olganda (fon yoqilgan + fayl ruxsati
-        // bor) boshlanadi va shundagina "KIBER QALQON faol · himoyalangan" bildirishnomasi chiqadi.
+        // bor) boshlanadi va shundagina "UZGUARD faol · himoyalangan" bildirishnomasi chiqadi.
         // Ruxsatdan oldin yolg'on "himoyalangan" KO'RSATILMAYDI (foydalanuvchi talabi). Ruxsat
         // berilgach, Activity onResume (Splash/Dashboard/Main/Himoya holati) shu yerdan qayta yoqadi.
         // (Birinchi ochilishda fon'dan startForegroundService Android 12+ da rad etilishi mumkin —
@@ -152,7 +159,7 @@ class App : android.app.Application() {
                 VpnFilterService.start(this)
             }
         } catch (e: Throwable) {
-            Log.w("KiberQalqon", "VPN filter autostart failed", e)
+            Log.w("UzGuard", "VPN filter autostart failed", e)
         }
 
         // WorkManager.getInstance() диск, CloudBlacklist.refresh/RemoteConfig — сеть (OkHttp .execute),
@@ -162,7 +169,7 @@ class App : android.app.Application() {
             try {
                 scheduleGuardWork()
             } catch (e: Exception) {
-                Log.e("KiberQalqon", "Error scheduling work", e)
+                Log.e("UzGuard", "Error scheduling work", e)
             }
             // Telegram command poller — стартуем только если юзер вручную включил «listen»
             // в настройках. Без явного opt-in ничего не слушаем.
@@ -171,7 +178,7 @@ class App : android.app.Application() {
                     TelegramCommandPoller.start(this@App)
                 }
             } catch (e: Exception) {
-                Log.e("KiberQalqon", "Error starting Telegram poller", e)
+                Log.e("UzGuard", "Error starting Telegram poller", e)
             }
             // Markaziy panel xaritasida qurilma nuqtasi skansiz ham ko'rinishi uchun
             // ro'yxatdan o'tkazamiz. Ichida opt-in + 12 soatlik throttle tekshiriladi —
@@ -179,35 +186,42 @@ class App : android.app.Application() {
             try {
                 CloudTelemetry.registerDevice(this@App)
             } catch (e: Exception) {
-                Log.e("KiberQalqon", "Cloud register failed", e)
+                Log.e("UzGuard", "Cloud register failed", e)
             }
             // Imzolangan masofaviy config (verdikt chegaralari) ni fonda yangilaymiz — skan
             // chegaralari APK ichida ANIQ turmasin. Xato/oflayn/imzo noto'g'ri → baked standartlar.
             try {
                 RemoteConfig.refresh(this@App)
             } catch (e: Throwable) {
-                Log.w("KiberQalqon", "RemoteConfig refresh failed", e)
+                Log.w("UzGuard", "RemoteConfig refresh failed", e)
             }
             // Bulut qora ro'yxatini fonda yangilaymiz (yangi hash/paketlar ilovani
             // yangilamasdan bloklanadi). Imzo majburiy; xato/oflayn → assets bazasi qoladi.
             try {
                 CloudBlacklist.refresh(this@App)
             } catch (e: Throwable) {
-                Log.w("KiberQalqon", "CloudBlacklist refresh failed", e)
+                Log.w("UzGuard", "CloudBlacklist refresh failed", e)
+            }
+            // Panel joylagan yangi e'lon bo'lsa — ilova ochilishida ham darhol tekshiramiz
+            // (GuardWorker'gacha kutmasdan). Ichki throttle/seed/dedup spamга yo'l qo'ymaydi.
+            try {
+                NewsNotifier.checkAndNotify(this@App)
+            } catch (e: Throwable) {
+                Log.w("UzGuard", "News notify check failed", e)
             }
             // Ilovaning O'ZI uchun yangi versiya bormi (imzolangan config'dagi "update" bloki) —
             // bo'lsa bir martalik bildirishnoma. Sideload'da Play yo'q, yangilanish shu yo'l bilan.
             try {
                 SelfUpdate.checkAndNotify(this@App)
             } catch (e: Throwable) {
-                Log.w("KiberQalqon", "SelfUpdate check failed", e)
+                Log.w("UzGuard", "SelfUpdate check failed", e)
             }
             // Qurilmadagi o'rnatilgan ishonchli ilovalarning (Play'dan) sertifikatini pin
             // qilamiz — offline skanda false-positive'ni kamaytiradi (TrustedSignatures).
             try {
                 TrustedSignatures.captureInstalledTrusted(this@App)
             } catch (e: Throwable) {
-                Log.w("KiberQalqon", "TrustedSignatures capture failed", e)
+                Log.w("UzGuard", "TrustedSignatures capture failed", e)
             }
         }
 
@@ -230,26 +244,26 @@ class App : android.app.Application() {
                 registerReceiver(PackageInstallReceiver(), filter)
             }
         } catch (e: Exception) {
-            Log.e("KiberQalqon", "Failed to register PackageInstallReceiver", e)
+            Log.e("UzGuard", "Failed to register PackageInstallReceiver", e)
         }
 
         // Heartbeat — раз в N часов "я жив" в Telegram. Никаких чувствительных данных,
         // только batteryLevel + free storage + uptime.
         appScope.launch {
-            try { HeartbeatWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "heartbeat", e) }
-            try { DailyReportWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "daily", e) }
+            try { HeartbeatWorker.schedule(this@App) } catch (e: Exception) { Log.e("UzGuard", "heartbeat", e) }
+            try { DailyReportWorker.schedule(this@App) } catch (e: Exception) { Log.e("UzGuard", "daily", e) }
             // Haftalik hisobot bildirishnomasi (skanlar/bloklangan/karantin) — har hafta 20:00.
-            try { WeeklyReportWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "weekly schedule", e) }
+            try { WeeklyReportWorker.schedule(this@App) } catch (e: Exception) { Log.e("UzGuard", "weekly schedule", e) }
             // Кажные сутки сканируем уже-установленные приложения с СВЕЖЕЙ базой —
             // если blacklist обновился, ловим эти приложения как threat.
-            try { InstalledAppsRescanWorker.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "rescan", e) }
+            try { InstalledAppsRescanWorker.schedule(this@App) } catch (e: Exception) { Log.e("UzGuard", "rescan", e) }
             // Каждые 4 часа смотрим Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES.
             // Любая новая запись — алерт в Telegram, потому что accessibility — главный
             // вектор современных банковских троянов.
-            try { AccessibilityWatcher.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "a11y", e) }
+            try { AccessibilityWatcher.schedule(this@App) } catch (e: Exception) { Log.e("UzGuard", "a11y", e) }
             // Каждые 4 часа смотрим enabled_notification_listeners — кража OTP через доступ
             // к уведомлениям (банкеры воруют коды без RECEIVE_SMS).
-            try { NotificationAccessWatcher.schedule(this@App) } catch (e: Exception) { Log.e("KiberQalqon", "notifaccess", e) }
+            try { NotificationAccessWatcher.schedule(this@App) } catch (e: Exception) { Log.e("UzGuard", "notifaccess", e) }
         }
 
         // Slushaem state SIM/airplane/screen — vse v odnom dinamicheskom receivere,
@@ -266,7 +280,7 @@ class App : android.app.Application() {
                 registerReceiver(SystemStateReceiver(), sysFilter)
             }
         } catch (e: Exception) {
-            Log.e("KiberQalqon", "Failed to register SystemStateReceiver", e)
+            Log.e("UzGuard", "Failed to register SystemStateReceiver", e)
         }
 
         // User-present (telefon QULFDAN chiqarilgan) eventi orqali darhol skan ishga tushiramiz.
@@ -284,7 +298,7 @@ class App : android.app.Application() {
                 registerReceiver(ScreenUnlockReceiver(), screenFilter)
             }
         } catch (e: Exception) {
-            Log.e("KiberQalqon", "Failed to register ScreenUnlockReceiver", e)
+            Log.e("UzGuard", "Failed to register ScreenUnlockReceiver", e)
         }
     }
 

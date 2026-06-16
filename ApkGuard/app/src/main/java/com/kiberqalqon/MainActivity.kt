@@ -4,9 +4,9 @@
  *  ###  #  # #    ##      #### #  # #  #
  *  #    #  # #    # #       #  #  # #  #
  *  #    #### #### #  #      #  #### ####
- *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ *  Bu kod Muhammadaliniki. O'g'irlama. — UzGuard
  */
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -28,9 +28,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
-import com.kiberqalqon.databinding.ActivityMainBinding
-import com.kiberqalqon.databinding.DialogNewsBinding
+import com.uzguard.databinding.ActivityMainBinding
+import com.uzguard.databinding.DialogNewsBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -47,6 +49,16 @@ class MainActivity : AppCompatActivity() {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var multiPathObserver: MultiPathFileObserver? = null
 
+    // PERF: "Hammasini skanlash" bir vaqtning o'zida HAR BIR APK uchun coroutine ochardi
+    // (apks.forEach { launch(Dispatchers.IO) }) — Dispatchers.IO 64 thread'gacha ko'taradi,
+    // Telegram/Downloads'da 50-200 APK bo'lsa o'nlab og'ir skan (SHA-256/ZIP/DEX) bir vaqtda
+    // ishlab BARCHA yadroni band qilardi → telefon qizardi. Endi bir vaqtda ko'pi bilan N ta
+    // skan (yadrolarning yarmi, 2..4 oralig'ida) — fayllar o'sha-o'sha, movJ o'sha-o'sha,
+    // faqat parallellik cheklangan. Aniqlash kuchi O'ZGARMAYDI.
+    private val scanGate = Semaphore(
+        (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, 4)
+    )
+
     // Beruvchi lenta (news ticker) holati.
     private var tickerAdapter: NewsTickerAdapter? = null
     private var lastNewsSig: String? = null
@@ -54,8 +66,10 @@ class MainActivity : AppCompatActivity() {
     private var tickerRunnable: Runnable? = null
     private var tickerPaused = false
     private var tickerAccum = 0f
-    // Kadrlararo siljish (~0.7dp/16ms ≈ 44dp/s) — sokin, o'qish mumkin bo'lgan tezlik.
-    private val tickerStepPx by lazy { (resources.displayMetrics.density * 0.7f).coerceAtLeast(1f) }
+    // PERF: lenta har 16ms da (≈60fps) RecyclerView.scrollBy chaqirib UI-thread'ni doimiy
+    // band qilardi. Endi har 32ms (≈30fps) — sokin marquee uchun ko'zga bilinmaydi, lekin
+    // UI ish ikki barobar kamayadi. Tezlik o'sha-o'sha: qadam 2 barobar (1.4dp/32ms ≈ 44dp/s).
+    private val tickerStepPx by lazy { (resources.displayMetrics.density * 1.4f).coerceAtLeast(1f) }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -239,11 +253,11 @@ class MainActivity : AppCompatActivity() {
                         tickerAccum -= dx
                     }
                 }
-                tickerHandler.postDelayed(this, 16)
+                tickerHandler.postDelayed(this, TICKER_FRAME_MS)
             }
         }
         tickerRunnable = r
-        tickerHandler.postDelayed(r, 16)
+        tickerHandler.postDelayed(r, TICKER_FRAME_MS)
     }
 
     private fun stopTicker() {
@@ -555,11 +569,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 
-                // Проверяем каждый APK асинхронно
+                // Проверяем каждый APK асинхронно — НО scanGate bilan parallellik cheklangan
+                // (yuqoridagi izohga qarang): bir vaqtda ko'pi bilan N ta skan, qolganlari navbatda.
                 apks.forEach { apkItem ->
                     scope.launch(Dispatchers.IO) {
                         try {
-                            val result = ApkScanner.scan(applicationContext, apkItem.path)
+                            val result = scanGate.withPermit {
+                                ApkScanner.scan(applicationContext, apkItem.path)
+                            }
 
                             withContext(Dispatchers.Main) {
                                 // v4: real verdikt qatorga (av/tag) va chip hisoblariga tushadi.
@@ -802,5 +819,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             android.util.Log.e("MainActivity", "Ошибка показа диалога", e)
         }
+    }
+
+    companion object {
+        // Yangiliklar lentasi kadr oralig'i (ms). 32ms ≈ 30fps — sokin marquee uchun
+        // yetarli, eski 16ms (60fps) ga nisbatan UI-thread ishini ikki barobar kamaytiradi.
+        private const val TICKER_FRAME_MS = 32L
     }
 }

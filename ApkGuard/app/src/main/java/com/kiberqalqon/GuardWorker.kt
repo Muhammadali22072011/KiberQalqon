@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -58,6 +58,18 @@ class GuardWorker(
                 } catch (e: Throwable) {
                     Log.w(TAG, "cloud blacklist refreshIfStale failed", e)
                 }
+                // Panel joylagan yangi e'lon (yangilik) bo'lsa — rasm bilan bildirishnoma.
+                // isBackgroundEnabled'dan OLDIN: yangiliklar fon-skan o'chiq bo'lsa ham keladi.
+                // Ichida 30 daqiqalik throttle + first-run seed + dedup bor; oflayn/xato no-op.
+                try {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        NewsNotifier.checkAndNotify(applicationContext)
+                    }
+                } catch (ce: kotlinx.coroutines.CancellationException) {
+                    throw ce
+                } catch (e: Throwable) {
+                    Log.w(TAG, "news notify check failed", e)
+                }
             }
 
             if (!Config.isBackgroundEnabled(applicationContext)) {
@@ -100,7 +112,7 @@ class GuardWorker(
                         Log.e(TAG, "Full sweep find error", e); return Result.success()
                     }
 
-                    val prefs = applicationContext.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                    val prefs = applicationContext.getSharedPreferences("uzguard_checked", Context.MODE_PRIVATE)
                     // getStringSet() immutable Set qaytaradi — to'g'ridan-to'g'ri .add() qilsa crash.
                     val checked = HashSet<String>().apply {
                         addAll(prefs.getStringSet("checked_paths", emptySet()) ?: emptySet())
@@ -154,7 +166,7 @@ class GuardWorker(
                     // chiqardi (antivirusni o'chirishning #1 sababi). Endi "allaqachon ogohlantirilgan"
                     // to'plamini (path|mtime|size) saqlaymiz: o'sha fayl uchun qayta alert chiqmaydi,
                     // faqat YANGI (yoki o'zgargan) fayl ogohlantiradi. Skan baribir bajariladi.
-                    val prefs = applicationContext.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                    val prefs = applicationContext.getSharedPreferences("uzguard_checked", Context.MODE_PRIVATE)
                     val warned = HashSet<String>().apply {
                         addAll(prefs.getStringSet("unlock_warned", emptySet()) ?: emptySet())
                     }
@@ -416,10 +428,10 @@ class GuardWorker(
         const val KEY_FULL_SWEEP = "full_sweep"
 
         /** Yagona periodik ish nomi. App.onCreate va BootReceiver SHU nomdan foydalanadi. */
-        const val UNIQUE_PERIODIC = "kiberqalqon_scan"
+        const val UNIQUE_PERIODIC = "uzguard_scan"
 
         /**
-         * Yagona 15 daqiqalik periodik GuardWorker (full_sweep=true). Avvalgi alohida
+         * Yagona 30 daqiqalik periodik GuardWorker (full_sweep=true). Avvalgi alohida
          * PeriodicCheckWorker o'rnida butun telefonni dedup bilan skanlaydi. App.onCreate
          * ham, BootReceiver ham shu yerdan chaqiradi — bitta unique nom, bitta zanjir.
          * UPDATE policy: mavjud o'rnatishlarda ham yangi full_sweep flag qo'llanadi.
@@ -430,7 +442,12 @@ class GuardWorker(
             val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)
                 .build()
-            val request = PeriodicWorkRequestBuilder<GuardWorker>(15, TimeUnit.MINUTES)
+            // PERF (qizish/batareya): to'liq xotira obhodi (FullPhoneScan) — og'ir ish.
+            // Avval har 15 daqiqada (batareyada ham) ishlardi. Real-vaqt aniqlash event-driven
+            // yo'l (FileObserver + PackageInstallReceiver + ProtectionService) zimmasida; bu
+            // periodik sweep faqat ilova o'lik bo'lganda tushgan fayllarni ushlaydigan zaxira,
+            // shuning uchun 30 daqiqa ham yetarli — uyg'onishlar soni ikki barobar kamayadi.
+            val request = PeriodicWorkRequestBuilder<GuardWorker>(30, TimeUnit.MINUTES)
                 .setInputData(workDataOf(KEY_FULL_SWEEP to true))
                 .setConstraints(constraints)
                 .build()
@@ -449,7 +466,7 @@ class GuardWorker(
          */
         private fun cancelLegacyPeriodic(context: Context) {
             try {
-                val sp = context.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                val sp = context.getSharedPreferences("uzguard_checked", Context.MODE_PRIVATE)
                 if (sp.getBoolean("legacy_periodic_cancelled", false)) return
                 WorkManager.getInstance(context).cancelUniqueWork("periodic_apk_check")
                 sp.edit().putBoolean("legacy_periodic_cancelled", true).apply()

@@ -4,9 +4,9 @@
  *  ###  #  # #    ##      #### #  # #  #
  *  #    #  # #    # #       #  #  # #  #
  *  #    #### #### #  #      #  #### ####
- *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ *  Bu kod Muhammadaliniki. O'g'irlama. — UzGuard
  */
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -97,7 +97,7 @@ object ApkScanner {
             Log.e(TAG, "Fallback scan failed", e)
         }
 
-        // Никогда не показываем сам KiberQalqon в списке — иначе юзер может его случайно удалить.
+        // Никогда не показываем сам UzGuard в списке — иначе юзер может его случайно удалить.
         return result
             .filterNot { SelfGuard.isOwnApk(context, it.path) }
             .sortedByDescending { it.file.lastModified() }
@@ -275,6 +275,37 @@ object ApkScanner {
             "/cache/shared/" in lower || "/sharereceiver/" in lower -> "share"
             "bluetooth" in lower -> "bluetooth"
             else -> null
+        }
+    }
+
+    /**
+     * [pkg] ishonchli ilova-do'konidan (Play Market / Galaxy Store / AppGallery / RuStore /
+     * Xiaomi...) o'rnatilganmi? — o'rnatuvchi (installer) bo'yicha ANIQ tekshiruv.
+     *
+     * Shunday bo'lsa — ilovani QAYTA SKANLASH SHART EMAS: do'kon moderatsiyasi / Play Protect uni
+     * allaqachon tekshirgan, va o'rnatilgan ilovaning base.apk'sini qayta skanlash telefonni
+     * bekorga qizdiradi (hamda foydalanuvchiga "base.apk" nomi ko'rinadi). Noma'lum manbadan
+     * (sideload — Telegram / brauzer / fayl menejeri) o'rnatilgan ilova esa HAR DOIM skanlanadi.
+     *
+     * DIQQAT: bu yerda tizim-ilova bayrog'iga TAYANMAYMIZ ([installedFromTrustedSource]'dan farqi
+     * shu) — faqat haqiqiy o'rnatuvchini tekshiramiz. Shu sababli tizim ilovasi ustiga sideload
+     * qilingan (installer = null) "yangilanish-hujum" ham skanlashdan chetda qolmaydi.
+     *
+     * Bu — o'rnatish/yangilanish kuzatuvchisi (PackageInstallReceiver) va kunlik qayta-skan
+     * (InstalledAppsRescanWorker) uchun yagona "skanlash kerakmi?" qoidasi.
+     */
+    fun isFromTrustedStore(context: Context, pkg: String?): Boolean {
+        if (pkg.isNullOrBlank()) return false
+        return try {
+            val pm = context.packageManager
+            val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                pm.getInstallSourceInfo(pkg).installingPackageName
+            } else {
+                @Suppress("DEPRECATION") pm.getInstallerPackageName(pkg)
+            }
+            installer != null && installer in TRUSTED_INSTALLERS
+        } catch (_: Exception) {
+            false
         }
     }
 
@@ -583,12 +614,19 @@ object ApkScanner {
         if (isSelf) {
             return ScanResult(
                 verdict = ScanResult.Verdict.SAFE,
-                reason = "Bu Anor Qalqonning o'zi — o'tkazib yuboriladi",
+                reason = "Bu UzGuardning o'zi — o'tkazib yuboriladi",
                 details = listOf("Himoyachi o'zini o'zi skanerlamaydi va o'chirmaydi."),
                 dangerousPermissions = emptyList(),
                 malwareSignatures = emptyList()
             )
         }
+
+        // PERF/XAVFSIZLIK: ThreatDb endi App.onCreate'da FON thread'da yuklanadi (UI bloklanmasin).
+        // Shu sababli skan boshlanishidan oldin uning tayyorligini KAFOLATLAYMIZ: init() idempotent +
+        // synchronized, agar yuklash hali davom etayotgan bo'lsa shu (fon) skan thread'i uni kutadi —
+        // shunda feed'dagi xeshlar har doim tekshiriladi va false-SAFE bo'lmaydi. Yuklanib bo'lgach —
+        // bu shunchaki bitta @Volatile o'qish (deyarli bepul).
+        try { ThreatDb.init(context) } catch (_: Throwable) {}
 
         // Skan keshi: agar shu yo'l + mtime + size bo'yicha avval skanlangan bo'lsa,
         // qayta hisoblamaymiz va yangi telemetry/history yozmaymiz. Bu list refresh,
