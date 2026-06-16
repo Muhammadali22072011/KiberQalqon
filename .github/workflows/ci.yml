@@ -36,6 +36,16 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      # Qurilmada sinash uchun yig'ilgan debug APK'ni yuklab olinadigan artefakt qilamiz.
+      # Mahalliy build imkonsiz (RAM) — shu sabab telefonga o'rnatish uchun yagona yo'l.
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uzguard-debug-apk
+          path: ApkGuard/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
       - name: Upload test reports (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
