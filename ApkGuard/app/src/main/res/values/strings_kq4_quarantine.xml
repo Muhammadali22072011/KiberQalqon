@@ -35,13 +35,23 @@
     <string name="kq4_prot_count">%1$d / %2$d ruxsat berilgan</string>
     <string name="kq4_prot_all_on">Himoya to\'liq yoqilgan</string>
     <string name="kq4_prot_enable_one">Bitta ruxsatni yoqing — himoya kuchayadi</string>
+    <!-- «Hammasini yoqish» sehrgari (bitta tugma → barcha ruxsatlarni ketma-ket so'raydi) -->
+    <string name="kq4_prot_enable_all">Hammasini yoqish</string>
+    <string name="kq4_prot_wizard_start">Ruxsatlar ketma-ket so\'raladi. Har birida «Ruxsat» yoki «Yoqish»ni bosib, orqaga qayting.</string>
+    <string name="kq4_prot_wizard_open">«%1$s» — yoqib, orqaga qayting</string>
+    <string name="kq4_prot_wizard_done_ok">Barcha ruxsatlar yoqildi ✓</string>
+    <string name="kq4_prot_wizard_done_partial">Ba\'zi ruxsatlar yoqilmadi. Ro\'yxatdan qo\'lda yoqishingiz mumkin.</string>
 
     <string name="kq4_prot_row_files_t">Fayllarga kirish</string>
     <string name="kq4_prot_row_files_s">APK fayllarni tekshirish uchun shart</string>
     <string name="kq4_prot_row_battery_t">Batareya cheklovisiz ishlash</string>
     <string name="kq4_prot_row_battery_s">Yopilgandan keyin ham fonda kuzatadi. Samsungda yoqilmagan ko\'rinishi mumkin — majburiy emas.</string>
     <string name="kq4_prot_row_overlay_t">Oynalar ustida ko\'rsatish</string>
-    <string name="kq4_prot_row_overlay_s">Xavf topilganda ogohlantirish oynasi darhol ochiladi. Ba\'zi telefonlarda yoqib bo\'lmaydi — majburiy emas.</string>
+    <string name="kq4_prot_row_overlay_s">Xavf topilganda ogohlantirish OYNASI o\'zi ochilishi uchun kerak. Ba\'zi telefonlarda yoqib bo\'lmaydi — shunda ogohlantirish bildirishnoma orqali keladi.</string>
+    <string name="kq4_prot_row_fsi_t">To\'liq ekranli ogohlantirish</string>
+    <string name="kq4_prot_row_fsi_s">Qulflangan yoki o\'chiq ekranda virus oynasi o\'zi chiqishi uchun ruxsat bering (Android 14+ uchun shart).</string>
+    <string name="kq4_prot_row_oempopup_t">Fonda popup oynasi</string>
+    <string name="kq4_prot_row_oempopup_s">Fonda ishlaganda oyna chiqarish ruxsati — Xiaomi/MIUI uchun shart, aks holda oyna chiqmaydi.</string>
     <string name="kq4_prot_row_notif_s">Xavf haqida ogohlantirish yuborish uchun shart</string>
     <string name="kq4_prot_row_loc_t">Joylashuv</string>
     <string name="kq4_prot_row_loc_s">Hududingizdagi tahdidlar xaritasi uchun. Ixtiyoriy — bermasangiz ham ilova to\'liq ishlaydi.</string>
@@ -54,6 +64,31 @@
     <string name="kq4_prot_continue_toast">Davom etish uchun barcha majburiy ruxsatlarni yoqing.</string>
     <string name="kq4_prot_autostart_open">Sozlamani ochish</string>
     <string name="kq4_prot_autostart_close">Yopish</string>
-    <string name="kq4_prot_autostart_fail">Avtomatik ochib bo\'lmadi. Sozlamalar → Ilovalar → Anor Qalqon orqali qo\'lda yoqing.</string>
+    <string name="kq4_prot_autostart_fail">Avtomatik ochib bo\'lmadi. Sozlamalar → Ilovalar → UzGuard orqali qo\'lda yoqing.</string>
+
+    <!-- Avto-oyna ruxsatlari yetishmaganda "Davom etish" ogohlantirishi -->
+    <string name="kq4_prot_window_warn_title">Avto-oyna o\'chirilgan</string>
+    <string name="kq4_prot_window_warn_msg">«Oynalar ustida ko\'rsatish» va «To\'liq ekranli ogohlantirish» ruxsatlarisiz xavf topilganda OYNA o\'zi chiqmaydi — faqat bildirishnoma keladi. To\'liq himoya uchun ularni yoqing.</string>
+    <string name="kq4_prot_window_warn_enable">Yoqish</string>
+    <string name="kq4_prot_window_warn_skip">Baribir davom etish</string>
+
+    <!-- ───────── Bildirishnoma matnlari (NotificationHelper) — ru tarjimasi values-ru'da ───────── -->
+    <string name="kq4_notif_quar_title">🛡️ Virus o\'chirildi</string>
+    <string name="kq4_notif_quar_text">%1$s — avtomatik karantinga olindi</string>
+    <string name="kq4_notif_quar_big">%1$s fayli xavfli deb topildi va avtomatik o\'chirildi (karantin).\n\nSabab: %2$s\n\nAgar bu xato bo\'lsa, 7 kun ichida tiklash mumkin.</string>
+
+    <string name="kq4_notif_secblock_title">UzGuard ishga tushmadi</string>
+    <string name="kq4_notif_secblock_tamper">Ilova buzib ochilgan (qayta paketlangan) bo\'lishi mumkin — xavfsizlik uchun to\'xtatildi.</string>
+    <string name="kq4_notif_secblock_env">Qurilmada root yoki o\'zgartirilgan tizim aniqlandi — himoya bu muhitda ishlay olmaydi.</string>
+
+    <string name="kq4_notif_a11y_title">⚠️ Ilova ekran ustidan nazoratni oldi</string>
+    <string name="kq4_notif_a11y_text">%1$s — Accessibility yoqildi. Banker troyanlari shunday qiladi.</string>
+    <string name="kq4_notif_a11y_big">%1$s (%2$s) Accessibility xizmatini yoqdi — endi u ekraningizni o\'qiy oladi, tugmalarni o\'zi bosa oladi va bank ilovalari ustidan nazorat qila oladi.\n\nAgar buni SIZ bilib yoqmagan bo\'lsangiz — darhol o\'chiring (banker bo\'lishi mumkin).\nBosing: Accessibility sozlamalari → xizmatni o\'chiring.</string>
+    <string name="kq4_notif_a11y_action">Accessibility sozlamalari</string>
+
+    <string name="kq4_notif_notifacc_title">⚠️ Ilova bildirishnomalarni o\'qiy oladi</string>
+    <string name="kq4_notif_notifacc_text">%1$s — bildirishnomalarga kirish oldi. OTP kodlar xavf ostida.</string>
+    <string name="kq4_notif_notifacc_big">%1$s (%2$s) bildirishnomalarni o\'qish huquqini oldi — endi u bank va Telegram push\'laridagi bir martalik kodlarni (OTP) ko\'ra oladi. Bankerlar SMS ruxsatisiz aynan shunday o\'g\'irlaydi.\n\nAgar buni SIZ bilib bermagan bo\'lsangiz — darhol o\'chiring.\nBosing: bildirishnoma kirish sozlamalari → ruxsatni olib tashlang.</string>
+    <string name="kq4_notif_notifacc_action">Sozlamalar</string>
 
 </resources>

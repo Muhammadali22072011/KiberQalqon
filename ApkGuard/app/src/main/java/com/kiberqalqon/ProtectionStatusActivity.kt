@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -15,8 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.kiberqalqon.databinding.ActivityProtectionV4Binding
-import com.kiberqalqon.databinding.ItemKq4ProtectionRowBinding
+import com.uzguard.databinding.ActivityProtectionV4Binding
+import com.uzguard.databinding.ItemKq4ProtectionRowBinding
 
 /**
  * Himoya holati — kirishda barcha ruxsat/sozlamalarni BIR ekranda ko'rsatadi:
@@ -43,6 +43,16 @@ class ProtectionStatusActivity : AppCompatActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { renderRows() }
 
+    // Bildirishnoma shu sessiyada bir marta runtime-so'ralganmi (loop bo'lmasligi uchun).
+    private var notifAsked = false
+
+    // Bildirishnoma (POST_NOTIFICATIONS) runtime-so'rovi — Android 13+. Avval Sozlamalarga
+    // yo'naltirardik (faqat deep-link); natijada ruxsat hech qachon SO'RALMAS edi va
+    // fallback bildirishnoma jim ishlamasdi. Endi haqiqiy tizim dialogini ko'rsatamiz.
+    private val notifLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { renderRows() }
+
     // VPN ruxsat oynasi (VpnService.prepare) — tasdiq bo'lsa C2-filtr doimiy yoqiladi
     // (App.onCreate har ishga tushishda o'zi qayta ko'taradi, qo'shimcha tap kerak emas).
     private val vpnLauncher = registerForActivityResult(
@@ -55,7 +65,30 @@ class ProtectionStatusActivity : AppCompatActivity() {
             } catch (_: Throwable) {}
         }
         renderRows()
+        onWizardLauncherResult()
     }
+
+    // «Hammasini yoqish» sehrgari: bildirishnoma + joylashuvni BITTA tizim dialogida so'raydi
+    // (alohida notif/location launcher'lardan farqli — bir tapda ikkalasi ham so'raladi).
+    private val wizardPermLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { renderRows(); onWizardLauncherResult() }
+
+    // ---- «Hammasini yoqish» sehrgari holati -------------------------------
+    // Android bitta tap bilan 9 ta ruxsatni BERA OLMAYDI (har bir maxsus ruxsat alohida
+    // tizim ekranini ochadi). Shuning uchun bitta tugma ularni KETMA-KET so'raydi:
+    // runtime ruxsatlar bitta dialogda, qolganlari har biri o'z ekranida (foydalanuvchi
+    // qaytgach — onResume keyingisini ochadi).
+    private var wizardActive = false
+    private var wizardOutstanding: WizKind? = null // SETTINGS → onResume kutadi, LAUNCHER → callback kutadi
+    private val wizardDone = HashSet<String>()
+
+    private enum class WizKind { INSTANT, SETTINGS, LAUNCHER }
+    private data class WizStep(
+        val id: String,
+        val pending: () -> Boolean,
+        val run: () -> WizKind,
+    )
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -71,16 +104,8 @@ class ProtectionStatusActivity : AppCompatActivity() {
             b.ringProt.strokeWidthDp = 11f
 
             b.btnProtBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
-            b.btnProtContinue.setOnClickListener {
-                if (allCriticalPermissionsGranted(this)) {
-                    proceed(ack = true)
-                } else {
-                    // Ruxsatsiz davom ettirmaymiz — qaysi biri yetishmayotganini
-                    // "Yoqish" tugmali qatorlar ko'rsatadi.
-                    Toast.makeText(this, R.string.kq4_prot_continue_toast, Toast.LENGTH_LONG).show()
-                    renderRows()
-                }
-            }
+            b.btnProtContinue.setOnClickListener { onContinueClicked() }
+            b.btnProtEnableAll.setOnClickListener { startWizard() }
 
             onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
@@ -115,14 +140,64 @@ class ProtectionStatusActivity : AppCompatActivity() {
         super.onResume()
         // Foydalanuvchi tizim sozlamalaridan qaytsa — holatni qayta o'qiymiz.
         try { renderRows() } catch (e: Throwable) { android.util.Log.e("ProtStatus", "render", e) }
+        // Sehrgar tizim EKRANINI kutayotgan bo'lsa (SETTINGS) — qaytib kelindi, keyingisini ochamiz.
+        // LAUNCHER (runtime/VPN dialog) bo'lsa — uni callback yopadi, bu yerda tegmaymiz.
+        if (wizardActive && wizardOutstanding == WizKind.SETTINGS) {
+            wizardOutstanding = null
+            try { pumpWizard() } catch (e: Throwable) { android.util.Log.w("ProtStatus", "wizard resume", e) }
+        }
     }
 
     /** Tugma ko'rinishini majburiy ruxsatlar holatiga moslaydi (yoqilmagan bo'lsa — xira). */
     private fun refreshContinueButton() {
         val btn = binding?.btnProtContinue ?: return
-        val ok = allCriticalPermissionsGranted(this)
+        // Tugma "tayyor" ko'rinishi: majburiy ruxsatlar + avto-oyna ruxsatlari (overlay/to'liq-ekran)
+        // ham berilganda. Avto-oyna ruxsatlari yetishsa ham tugma bosiladi — onContinueClicked
+        // ogohlantirish ko'rsatadi (qattiq bloklamaymiz, lockout bo'lmasin).
+        val ok = allCriticalPermissionsGranted(this) && allWindowPermsGranted(this)
         btn.alpha = if (ok) 1f else 0.5f
         btn.setText(if (ok) R.string.kq4_continue else R.string.kq4_prot_continue_locked)
+    }
+
+    /**
+     * "Davom etish" bosilganda: majburiy (fayl/bildirishnoma/fon) ruxsatlarsiz UMUMAN
+     * o'tkazmaymiz — ular har bir telefonda beriladi va ularsiz ilova ishlamaydi. Avto-oyna
+     * ruxsatlari (overlay + to'liq-ekran) yetishmasa — ogohlantirib, foydalanuvchi xohlasa
+     * baribir o'tkazamiz (ba'zi ROM'larda bu ruxsatlarni umuman berib bo'lmaydi → aks holda
+     * onboarding'da abadiy qotib qolardi, bu ilgari real shikoyat bo'lgan).
+     */
+    private fun onContinueClicked() {
+        when {
+            !allCriticalPermissionsGranted(this) -> {
+                Toast.makeText(this, R.string.kq4_prot_continue_toast, Toast.LENGTH_LONG).show()
+                renderRows()
+            }
+            !allWindowPermsGranted(this) -> showWindowPermWarning()
+            else -> proceed(ack = true)
+        }
+    }
+
+    /**
+     * Avto-oyna ruxsatlari yetishmaganda: yoqishni qattiq tavsiya qilamiz, lekin bloklamaymiz.
+     *
+     * MUHIM (tuzatish): ilgari "Yoqish" tugmasi faqat renderRows() chaqirardi — ya'ni HECH NARSA
+     * QILMASDI, foydalanuvchi ruxsatni qanday berishni bilmay qolardi va "skip" bosib o'tib ketardi.
+     * Natijada Android 14+ (Samsung A56 va h.k.) qurilmalarda to'liq-ekran ruxsati hech qachon
+     * berilmas, virus OYNASI o'zi ochilmasdi (asosiy shikoyat: "oyna chiqmaydi"). Endi "Yoqish" —
+     * sehrgarni ishga tushiradi: u overlay + to'liq-ekran ruxsatlarini ketma-ket tizim ekranlarida
+     * so'raydi. "Skip" baribir o'tkazadi (ba'zi ROM'da bu ruxsatlarni berib bo'lmaydi — lockout yo'q).
+     */
+    private fun showWindowPermWarning() {
+        try {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.kq4_prot_window_warn_title)
+                .setMessage(R.string.kq4_prot_window_warn_msg)
+                .setPositiveButton(R.string.kq4_prot_window_warn_enable) { _, _ -> startWizard() }
+                .setNegativeButton(R.string.kq4_prot_window_warn_skip) { _, _ -> proceed(ack = true) }
+                .show()
+        } catch (_: Throwable) {
+            proceed(ack = true)
+        }
     }
 
     // 3 holat: true=yoqilgan, false=yo'q, null=qo'lda (tekshirib bo'lmaydi, masalan MIUI autostart).
@@ -161,13 +236,40 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 VersionCompat.hasOverlayPermission(this), false,
             ) { openOverlay() },
         )
+        // To'liq ekranli ogohlantirish (USE_FULL_SCREEN_INTENT) — Android 14+ (API 34) bu ruxsatni
+        // oddiy ilovalardan oldi. Ruxsatsiz: qulflangan/o'chiq ekranda virus OYNASI o'zi ochilmaydi
+        // (faqat oddiy bildirishnoma). Yangi qurilmalarda (Samsung A56 va h.k.) asosiy sabab — shu.
+        // Boolean qator (ring'ga kiradi), lekin gate'ni bloklamaydi (ba'zi ROM'da berilmasligi mumkin).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            out.add(
+                Row(
+                    R.drawable.ic4_alert,
+                    getString(R.string.kq4_prot_row_fsi_t),
+                    getString(R.string.kq4_prot_row_fsi_s),
+                    VersionCompat.canUseFullScreenIntent(this), false,
+                ) { openFullScreenIntentSettings() },
+            )
+        }
+        // MIUI/EMUI/ColorOS: standart overlay yetarli emas — "Fonda popup oynasi" alohida
+        // tugmasi kerak (default O'CHIQ). Tizim holatini bermaydi → qo'lda (state=null).
+        val oemPopup = try { OemAutostartGuide.detect() } catch (_: Throwable) { null }
+        if (oemPopup != null && OemAutostartGuide.needsExtraOverlayPermissions(oemPopup)) {
+            out.add(
+                Row(
+                    R.drawable.ic4_alert,
+                    getString(R.string.kq4_prot_row_oempopup_t),
+                    getString(R.string.kq4_prot_row_oempopup_s),
+                    null, false,
+                ) { showOemPopupGuide(oemPopup) },
+            )
+        }
         out.add(
             Row(
                 R.drawable.ic4_bell,
                 getString(R.string.kq4_notifications),
                 getString(R.string.kq4_prot_row_notif_s),
                 VersionCompat.hasNotificationPermission(this), true,
-            ) { openNotifications() },
+            ) { requestNotifications() },
         )
         out.add(
             Row(
@@ -177,18 +279,9 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 DeviceLocation.hasPermission(this), false,
             ) { requestLocation() },
         )
-        // MIUI/OEM autostart — holatini tizim bermaydi, shuning uchun "qo'lda" (null).
-        val oem = try { OemAutostartGuide.detect() } catch (_: Throwable) { null }
-        if (oem != null && OemAutostartGuide.hasOemRestrictions(oem)) {
-            out.add(
-                Row(
-                    R.drawable.ic4_refresh,
-                    getString(R.string.kq4_prot_row_autostart_t, oem.displayName),
-                    getString(R.string.kq4_prot_row_autostart_s),
-                    null, true,
-                ) { showAutostartGuide(oem) },
-            )
-        }
+        // «Avtomatik ishga tushirish (MIUI/OEM)» qatori egasi xohishi bilan OLIB TASHLANDI
+        // (2026-06-16) — bu ruxsatning holatini tizim bermaydi (null) va u faqat qo'lda
+        // yoqilardi. OEM «fonda popup» qatori (showOemPopupGuide) o'z joyida qoladi.
         out.add(
             Row(
                 R.drawable.ic4_shield,
@@ -197,7 +290,7 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 Config.isBackgroundEnabled(this), true,
             ) { Config.setBackgroundEnabled(this, true); renderRows() },
         )
-        // Havola qalqoni — KiberQalqon standart havola ochuvchimi (TAVSIYA, majburiy emas:
+        // Havola qalqoni — UzGuard standart havola ochuvchimi (TAVSIYA, majburiy emas:
         // Telegram ichki brauzeri baribir o'tib ketadi, shu sabab gate'ni bloklamaymiz).
         if (Config.isLinkGuardEnabled(this)) {
             out.add(
@@ -245,6 +338,11 @@ class ProtectionStatusActivity : AppCompatActivity() {
         b.imgProtShield.imageTintList = ColorStateList.valueOf(color)
         b.tvProtCount.text = getString(R.string.kq4_prot_count, ok, total)
         b.tvProtHint.setText(if (full) R.string.kq4_prot_all_on else R.string.kq4_prot_enable_one)
+
+        // «Hammasini yoqish» — faqat hali yoqilmagan (sehrgar so'ray oladigan) ruxsat
+        // qolganda ko'rsatamiz; hammasi yoqilgach yashiramiz (faqat «Davom etish» qoladi).
+        val anyPending = try { wizardSteps().any { it.pending() } } catch (_: Throwable) { false }
+        b.btnProtEnableAll.visibility = if (anyPending) View.VISIBLE else View.GONE
 
         refreshContinueButton()
     }
@@ -317,6 +415,144 @@ class ProtectionStatusActivity : AppCompatActivity() {
         }
     }
 
+    // ---- «Hammasini yoqish» sehrgari --------------------------------------
+    // BITTA tugma → barcha (tekshirib bo'ladigan) ruxsatlarni ketma-ket yoqadi.
+    // OEM autostart/popup qatorlari bu yerda YO'Q: ularning holatini tizim bermaydi
+    // va ularni faqat qo'lda berish mumkin — shuning uchun ular qatorda yo'l-yo'riq
+    // sifatida qoladi (sehrgar abadiy tsiklga tushmasligi uchun).
+    private fun wizardSteps(): List<WizStep> {
+        val s = ArrayList<WizStep>()
+        // 1) Fon himoyasi — bir zumda (Config bayrog'i, tizim ekrani kerak emas).
+        s.add(WizStep("bg", { !Config.isBackgroundEnabled(this) }) {
+            Config.setBackgroundEnabled(this, true); WizKind.INSTANT
+        })
+        // 2) Bildirishnoma + joylashuv — BITTA tizim dialogi.
+        s.add(WizStep("runtime", {
+            !VersionCompat.hasNotificationPermission(this) || !DeviceLocation.hasPermission(this)
+        }) {
+            val req = ArrayList<String>()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                !VersionCompat.hasNotificationPermission(this)
+            ) {
+                req.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            if (!DeviceLocation.hasPermission(this)) {
+                req.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                req.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            if (req.isEmpty()) {
+                WizKind.INSTANT
+            } else {
+                wizardPermLauncher.launch(req.toTypedArray()); WizKind.LAUNCHER
+            }
+        })
+        // 3) Fayllarga kirish (MANAGE_EXTERNAL_STORAGE / READ) — tizim ekrani.
+        s.add(WizStep("files", { !VersionCompat.hasFileScanAccess(this) }) {
+            toastStep(R.string.kq4_prot_row_files_t); openAllFiles(); WizKind.SETTINGS
+        })
+        // 4) Batareya cheklovisiz ishlash — tizim ekrani.
+        s.add(WizStep("battery", { !batteryIgnored() }) {
+            toastStep(R.string.kq4_prot_row_battery_t); openBattery(); WizKind.SETTINGS
+        })
+        // 5) Oynalar ustida ko'rsatish (overlay) — tizim ekrani.
+        s.add(WizStep("overlay", { !VersionCompat.hasOverlayPermission(this) }) {
+            toastStep(R.string.kq4_prot_row_overlay_t); openOverlay(); WizKind.SETTINGS
+        })
+        // 6) To'liq ekranli ogohlantirish (Android 14+) — tizim ekrani.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            s.add(WizStep("fsi", { !VersionCompat.canUseFullScreenIntent(this) }) {
+                toastStep(R.string.kq4_prot_row_fsi_t); openFullScreenIntentSettings(); WizKind.SETTINGS
+            })
+        }
+        // 7) Havola qalqoni (standart ilova) — yoqilgan bo'lsa, tizim ekrani.
+        if (Config.isLinkGuardEnabled(this)) {
+            s.add(WizStep("linkguard", { !LinkForwarder.isDefaultLinkHandler(this) }) {
+                toastStep(R.string.kq4_prot_row_linkguard_t); openDefaultApps(); WizKind.SETTINGS
+            })
+        }
+        // 8) Internet himoyasi (VPN C2-filtri) — ruxsat bo'lsa darhol, bo'lmasa tasdiq oynasi.
+        s.add(WizStep("vpn", { !isVpnReady() }) {
+            val prep = try { VpnFilterService.prepareIntent(this) } catch (_: Throwable) { null }
+            if (prep == null) {
+                try {
+                    Config.setVpnFilterEnabled(this, true); VpnFilterService.start(this)
+                } catch (_: Throwable) {}
+                WizKind.INSTANT
+            } else {
+                vpnLauncher.launch(prep); WizKind.LAUNCHER
+            }
+        })
+        return s
+    }
+
+    /** Sehrgarni boshlaydi: holatni tozalab, birinchi yoqilmagan ruxsatni so'raydi. */
+    private fun startWizard() {
+        if (wizardActive) return
+        wizardDone.clear()
+        wizardOutstanding = null
+        wizardActive = true
+        try { Toast.makeText(this, R.string.kq4_prot_wizard_start, Toast.LENGTH_LONG).show() } catch (_: Throwable) {}
+        pumpWizard()
+    }
+
+    /**
+     * Navbatdagi yoqilmagan ruxsatni topib so'raydi. Bir vaqtda FAQAT bitta amal
+     * "kutuvda" bo'ladi (wizardOutstanding) — shu sabab tizim ekrani/dialogidan
+     * qaytishda ikki marta o'tib ketmaymiz. INSTANT amal darhol keyingisiga o'tadi.
+     */
+    private fun pumpWizard() {
+        if (!wizardActive || wizardOutstanding != null) return
+        val next = try {
+            wizardSteps().firstOrNull { it.id !in wizardDone && it.pending() }
+        } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "wizard scan", e); null
+        }
+        if (next == null) { finishWizard(); return }
+        wizardDone.add(next.id)
+        val kind = try { next.run() } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "wizard step ${next.id}", e); WizKind.INSTANT
+        }
+        when (kind) {
+            WizKind.INSTANT -> pumpWizard() // darhol keyingisiga
+            WizKind.SETTINGS, WizKind.LAUNCHER -> wizardOutstanding = kind // qaytishni kutamiz
+        }
+    }
+
+    /** runtime/VPN dialog yopilgach (callback) — sehrgarni davom ettiramiz. */
+    private fun onWizardLauncherResult() {
+        if (wizardActive && wizardOutstanding == WizKind.LAUNCHER) {
+            wizardOutstanding = null
+            try { pumpWizard() } catch (e: Throwable) { android.util.Log.w("ProtStatus", "wizard cb", e) }
+        }
+    }
+
+    private fun finishWizard() {
+        wizardActive = false
+        wizardOutstanding = null
+        renderRows()
+        val ok = try {
+            allCriticalPermissionsGranted(this) && allWindowPermsGranted(this)
+        } catch (_: Throwable) { false }
+        try {
+            Toast.makeText(
+                this,
+                if (ok) R.string.kq4_prot_wizard_done_ok else R.string.kq4_prot_wizard_done_partial,
+                Toast.LENGTH_LONG,
+            ).show()
+        } catch (_: Throwable) {}
+    }
+
+    /** Tizim ekrani ochilishidan oldin "nimani yoqish" kerakligini Toast bilan aytamiz. */
+    private fun toastStep(titleRes: Int) {
+        try {
+            Toast.makeText(
+                this,
+                getString(R.string.kq4_prot_wizard_open, getString(titleRes)),
+                Toast.LENGTH_SHORT,
+            ).show()
+        } catch (_: Throwable) {}
+    }
+
     /** «Standart ilovalar» ekrani — foydalanuvchi bizni standart havola ochuvchi qiladi. */
     private fun openDefaultApps() = safeStart {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -332,6 +568,18 @@ class ProtectionStatusActivity : AppCompatActivity() {
         } else null
     }
 
+    /**
+     * "To'liq ekranli bildirishnoma" tizim ekrani — Android 14+ (API 34) da virus oynasi
+     * qulflangan ekranda o'zi ochilishi uchun zarur ruxsat shu yerdan beriladi.
+     */
+    private fun openFullScreenIntentSettings() = safeStart {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, Uri.parse("package:$packageName"))
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
+        }
+    }
+
     private fun openNotifications() = safeStart {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
@@ -339,6 +587,27 @@ class ProtectionStatusActivity : AppCompatActivity() {
         } else {
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
         }
+    }
+
+    /**
+     * Bildirishnoma ruxsatini so'raydi (joylashuv qatori bilan bir xil idioma). Android 13+ da
+     * avval HAQIQIY tizim dialogini ko'rsatamiz; "boshqa so'ralmasin" tanlangan (rationale=false
+     * va avval so'ralgan) bo'lsa — Sozlamalarga. Bildirishnoma — tahdid ogohlantirishining
+     * UNIVERSAL kanali (overlay/FSI bo'lmaganda ham keladi), shuning uchun uni real so'rashimiz SHART.
+     */
+    private fun requestNotifications() {
+        if (VersionCompat.hasNotificationPermission(this)) { renderRows(); return }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val perm = Manifest.permission.POST_NOTIFICATIONS
+            val rationale = ActivityCompat.shouldShowRequestPermissionRationale(this, perm)
+            if (!notifAsked || rationale) {
+                notifAsked = true
+                notifLauncher.launch(perm)
+                return
+            }
+        }
+        // API < 33 (install-time ruxsat) yoki doimiy rad — tizim sozlamalariga.
+        openNotifications()
     }
 
     /**
@@ -363,20 +632,20 @@ class ProtectionStatusActivity : AppCompatActivity() {
     }
 
     /**
-     * Avtomatik ishga tushirish (OEM autostart) — avval o'zbekcha yo'riqnomani
-     * KO'RSATAMIZ, so'ng tegishli OEM ekranini ochamiz. Ekran ochilmasa
-     * (openAutostartSettings=false bo'lsa) jim qolmaymiz — foydalanuvchiga qo'lda
-     * yo'lni aytamiz. Ilgari xato jim yutilib, tugma "ishlamayotgandek" tuyulardi
-     * (foydalanuvchi shikoyati: "avtomatik ishga tushirish xato bilan ishlaydi").
+     * MIUI/EMUI/ColorOS "fonda popup oynasi" + "lock ekranda ko'rsatish" ruxsatlari.
+     * Standart [Settings.canDrawOverlays] bu telefonlarda YETARLI EMAS — fon'dan oyna ochish
+     * uchun alohida vendor tugmasi kerak (default o'chiq). Avval o'zbekcha yo'riqnoma, so'ng
+     * OemAutostartGuide tegishli "Other permissions" ekranini ochadi. Ochilmasa — qo'lda
+     * yo'lni Toast bilan aytamiz.
      */
-    private fun showAutostartGuide(oem: OemAutostartGuide.Oem) {
+    private fun showOemPopupGuide(oem: OemAutostartGuide.Oem) {
         try {
             AlertDialog.Builder(this)
-                .setTitle(getString(R.string.kq4_prot_row_autostart_t, oem.displayName))
-                .setMessage(OemAutostartGuide.instructions(oem))
+                .setTitle(getString(R.string.kq4_prot_row_oempopup_t))
+                .setMessage(OemAutostartGuide.overlayInstructions(oem))
                 .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
                     val opened = try {
-                        OemAutostartGuide.openAutostartSettings(this, oem)
+                        OemAutostartGuide.openOemAppPermissions(this, oem)
                     } catch (_: Throwable) { false }
                     if (!opened) {
                         Toast.makeText(this, R.string.kq4_prot_autostart_fail, Toast.LENGTH_LONG).show()
@@ -385,7 +654,7 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 .setNegativeButton(R.string.kq4_prot_autostart_close, null)
                 .show()
         } catch (e: Throwable) {
-            android.util.Log.w("ProtStatus", "autostart guide failed", e)
+            android.util.Log.w("ProtStatus", "oem popup guide failed", e)
         }
     }
 
@@ -449,6 +718,22 @@ class ProtectionStatusActivity : AppCompatActivity() {
             return VersionCompat.hasFileScanAccess(ctx) &&
                 VersionCompat.hasNotificationPermission(ctx) &&
                 Config.isBackgroundEnabled(ctx)
+        }
+
+        /**
+         * Avto-oyna (AutoScanActivity) fon'dan o'zi chiqishi uchun kerakli, TEKSHIRIB BO'LADIGAN
+         * ruxsatlar: overlay (Android 10+ BAL exemption) + Android 14+ da to'liq-ekran intent.
+         * Bular A56/Redmi'da beriladi. MUHIM: bu allCriticalPermissionsGranted'ga QO'SHILMAYDI —
+         * aks holda berib bo'lmaydigan ROM'da SplashActivity har safar gate'ga qaytarib tsiklga
+         * tushirardi. O'rniga "Davom etish" tugmasida ogohlantirish bilan qattiq tavsiya qilamiz.
+         */
+        fun allWindowPermsGranted(ctx: Context): Boolean {
+            // API < 29 (Q): fon'dan startActivity cheklovsiz — overlay shart EMAS (J4/Android 8-9 da
+            // oyna baribir chiqadi), shuning uchun overlay'ni faqat 29+ da talab qilamiz; aks holda
+            // eski telefonda ishlab turgani holda ortiqcha "avto-oyna o'chirilgan" ogohlantirish chiqardi.
+            val overlayOk = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
+                VersionCompat.hasOverlayPermission(ctx)
+            return overlayOk && VersionCompat.canUseFullScreenIntent(ctx)
         }
 
         private fun isBatteryIgnored(ctx: Context): Boolean {
