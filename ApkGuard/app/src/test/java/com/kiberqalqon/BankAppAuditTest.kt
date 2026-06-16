@@ -78,14 +78,15 @@ class BankAppAuditTest {
         assertEquals("payme", bank!!.brand)
     }
 
-    // ─── O'ZIMIZNING ilova: "UzGuard" — "anorbank" bilan to'qnashmasligi kerak ───
+    // ─── O'ZIMIZNING ilova: "UzGuard" — hech qaysi bankka taqlid deb belgilanmasligi kerak ───
 
     @Test
-    fun ownApp_anorQalqon_doesNotMatchAnorbank() {
-        // "anor" (4 harf) MIN_TOKEN_LEN(5) dan qisqa → Levenshtein qo'llanmaydi;
-        // "qalqon"/"anorqalqon" "anorbank"dan masofasi >2 → mos kelmaydi.
+    fun ownApp_uzguard_doesNotMatchUzcard() {
+        // Rebrand'dan keyin "uzguard" tokeni "uzcard" brendiga Levenshtein 2 (= MAX_DISTANCE) —
+        // ya'ni token solishtirish o'zimizni "uzcard"ka taqlid deb belgilab qo'yardi.
+        // looksLikeBank o'z paketimizni (debug ham) ANIQ chiqarib tashlaydi → doim null.
         assertNull(
-            "O\'zimizning \"UzGuard\" hech qachon \"anorbank\"ka taqlid deb belgilanmasligi kerak",
+            "O\'zimizning \"UzGuard\" hech qachon bankka taqlid deb belgilanmasligi kerak",
             BankAppAudit.looksLikeBank("UzGuard", OWN_PKG)
         )
         assertNull(BankAppAudit.looksLikeBank("UzGuard", "$OWN_PKG.debug"))

@@ -140,6 +140,13 @@ object BankAppAudit {
         // Birinchi navbatda: paket aniq bir bankka teng bo'lsa, o'sha bank.
         KnownBanks.byPackage(pkg)?.let { return it }
 
+        // O'ZIMIZNING ilova HECH QACHON soxta bank deb belgilanmaydi. Rebrand'dan keyin
+        // "uzguard" tokeni "uzcard" brendiga Levenshtein 2 (= MAX_DISTANCE) bo'lib qoldi —
+        // shu sabab token solishtirishdan OLDIN o'z paketimizni (debug ham) chiqaramiz.
+        // Audit halqasi allaqachon paket bo'yicha chiqaradi; bu — qo'shimcha pure himoya.
+        val ownBase = BuildConfig.APPLICATION_ID.removeSuffix(".debug")
+        if (pkg?.removeSuffix(".debug") == ownBase) return null
+
         val tokens = HashSet<String>()
         tokens += tokenize(label)
         tokens += tokenize(pkg)
