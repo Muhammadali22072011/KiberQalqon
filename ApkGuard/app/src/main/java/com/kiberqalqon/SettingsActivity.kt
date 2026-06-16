@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -12,8 +12,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.SwitchCompat
-import com.kiberqalqon.databinding.ActivityAboutBinding
-import com.kiberqalqon.databinding.ActivitySettingsNewBinding
+import com.uzguard.databinding.ActivityAboutBinding
+import com.uzguard.databinding.ActivitySettingsNewBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -127,7 +127,7 @@ class SettingsActivity : AppCompatActivity() {
             binding.rowUpload.root,
             title = getString(R.string.set_row_upload_title),
             sub = getString(R.string.set_row_upload_sub),
-            icon = R.drawable.ic4_wifi,
+            icon = R.drawable.ic4_download,
         )
         // QO'SHIMCHA — haftalik hisobot bildirishnomasi.
         bindRow(
@@ -135,6 +135,13 @@ class SettingsActivity : AppCompatActivity() {
             title = getString(R.string.kq4_set_row_weekly),
             sub = getString(R.string.kq4_set_row_weekly_sub),
             icon = R.drawable.ic4_chart,
+        )
+        // QO'SHIMCHA — Yangilik bildirishnomalari (panel e'lonlari → push).
+        bindRow(
+            binding.rowNewsNotif.root,
+            title = getString(R.string.kq4_set_row_newsnotif),
+            sub = getString(R.string.kq4_set_row_newsnotif_sub),
+            icon = R.drawable.ic4_bell,
         )
         // QO'SHIMCHA — DNS C2-filtri (tajribaviy, opt-in).
         bindRow(
@@ -258,6 +265,7 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowBackground.root).isChecked = Config.isAutoUpdateEnabled(this)
         toggleOf(binding.rowUpload.root).isChecked = Config.isUploadEnabled(this)
         toggleOf(binding.rowWeeklyReport.root).isChecked = Config.isWeeklyReportEnabled(this)
+        toggleOf(binding.rowNewsNotif.root).isChecked = Config.isNewsNotificationEnabled(this)
         toggleOf(binding.rowVpnFilter.root).isChecked = Config.isVpnFilterEnabled(this)
         toggleOf(binding.rowLinkGuard.root).isChecked = Config.isLinkGuardEnabled(this)
 
@@ -295,7 +303,7 @@ class SettingsActivity : AppCompatActivity() {
         rowRoot.findViewById(R.id.swRow)
 
     /**
-     * Havola qalqoni yoqilganda — interceptor faqat KiberQalqon STANDART havola ochuvchi
+     * Havola qalqoni yoqilganda — interceptor faqat UzGuard STANDART havola ochuvchi
      * bo'lsagina ishlaydi. Foydalanuvchiga buni tushuntirib, tizim «standart ilovalar»
      * ekranini ochishni taklif qilamiz (Telegram ichki brauzeri haqida eslatma bilan).
      */
@@ -370,6 +378,11 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowWeeklyReport.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
             Config.setWeeklyReportEnabled(this, on)
+            toastSaved()
+        }
+        toggleOf(binding.rowNewsNotif.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setNewsNotificationEnabled(this, on)
             toastSaved()
         }
         toggleOf(binding.rowVpnFilter.root).setOnCheckedChangeListener { _, on ->
@@ -679,7 +692,7 @@ class SettingsActivity : AppCompatActivity() {
                 TelegramBot.setListenEnabled(this, false)
                 TelegramBot.setSendApkEnabled(this, false)
                 TelegramCommandPoller.stop(this)
-                val tprefs = getSharedPreferences("kiberqalqon_telemetry", Context.MODE_PRIVATE)
+                val tprefs = getSharedPreferences("uzguard_telemetry", Context.MODE_PRIVATE)
                 tprefs.edit().putBoolean("tg_enabled", false).apply()
                 Toast.makeText(this, getString(R.string.set_consent_revoked), Toast.LENGTH_LONG).show()
             }

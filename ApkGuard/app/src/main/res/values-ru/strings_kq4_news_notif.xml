@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Уведомления о новостях (объявлениях) — канал CH_NEWS + NewsNotifier. Русский. -->
+<resources>
+    <!-- Имя/описание канала уведомлений (видно в системных настройках) -->
+    <string name="kq4_news_channel_name">Новости</string>
+    <string name="kq4_news_channel_desc">Новые объявления и сообщения</string>
+
+    <!-- Текст по умолчанию, если тело объявления пустое -->
+    <string name="kq4_news_notif_default_body">Новое объявление — нажмите, чтобы открыть</string>
+</resources>

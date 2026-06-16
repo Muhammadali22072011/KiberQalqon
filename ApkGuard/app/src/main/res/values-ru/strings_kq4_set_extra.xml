@@ -15,6 +15,10 @@
     <string name="kq4_set_row_weekly">Еженедельный отчёт</string>
     <string name="kq4_set_row_weekly_sub">Каждую неделю присылает уведомление с итогами проверки</string>
 
+    <!-- Переключатель уведомлений о новостях (Config.isNewsNotificationEnabled → NewsNotifier) -->
+    <string name="kq4_set_row_newsnotif">Уведомления о новостях</string>
+    <string name="kq4_set_row_newsnotif_sub">Присылает уведомление, когда появляется новое объявление</string>
+
     <!-- Переключатель DNS C2-фильтра (Config.isVpnFilterEnabled → VpnFilterService) -->
     <string name="kq4_set_row_vpn">Защита интернета (DNS-фильтр)</string>
     <string name="kq4_set_row_vpn_sub">Блокирует подключение вирусов к их серверам управления (экспериментально)</string>

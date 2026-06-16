@@ -1,10 +1,10 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
-private const val PREFS = "kiberqalqon_prefs"
+private const val PREFS = "uzguard_prefs"
 private const val KEY_SERVER_URL = "srv_url"
 private const val KEY_BACKGROUND = "background_on"
 private const val KEY_UPLOAD = "upload_on"
@@ -17,10 +17,12 @@ private const val KEY_SOUND = "sound_enabled"
 private const val KEY_VIBRATION = "vibration_enabled"
 private const val KEY_AUTO_UPDATE = "auto_update_enabled"
 private const val KEY_WEEKLY_REPORT = "weekly_report_enabled"
+// Yangilik (e'lon) bildirishnomalari — panel yangi e'lon joylasa, qurilmada push.
+private const val KEY_NEWS_NOTIFY = "news_notify_enabled"
 private const val KEY_VPN_FILTER = "vpn_filter_enabled"
 // Havola qalqoni (link interceptor): tashqi http(s) havolalar ochilishidan oldin
 // avtomatik [LinkScanner] orqali tekshiriladi. Default YOQILGAN — lekin u faqat
-// foydalanuvchi KiberQalqon'ni standart havola ochuvchi qilib tanlasagina ishlaydi.
+// foydalanuvchi UzGuard'ni standart havola ochuvchi qilib tanlasagina ishlaydi.
 private const val KEY_LINK_GUARD = "link_guard_enabled"
 // Xavfsiz havola yo'naltiriladigan standart brauzer paketi (o'zimiz EMAS). Bir marta
 // tanlanadi (yoki tizim default'idan aniqlanadi), keyin jim ishlaydi.
@@ -175,6 +177,16 @@ object Config {
         prefs(context).edit { putBoolean(KEY_WEEKLY_REPORT, enabled) }
     }
 
+    // Yangilik bildirishnomalari (NewsNotifier) — panel yangi e'lon joylasa, qurilmaga
+    // bildirishnoma (rasm bilan) keladi. Default YOQILGAN. Kanal alohida ("Yangiliklar"),
+    // shu sabab foydalanuvchi tizimdan ham, shu toggle'dan ham o'chira oladi.
+    fun isNewsNotificationEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_NEWS_NOTIFY, true)
+
+    fun setNewsNotificationEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_NEWS_NOTIFY, enabled) }
+    }
+
     // DNS C2-filtri (VpnFilterService) — TAJRIBAVIY, default O'CHIQ (qat'iy opt-in:
     // foydalanuvchi toggle bosadi + tizim VPN ruxsat oynasini tasdiqlaydi).
     fun isVpnFilterEnabled(context: Context): Boolean =
@@ -256,7 +268,7 @@ object Config {
 
     /**
      * Optional, separate opt-in: пользователь согласился делиться minimal threat data
-     * (SHA-256, package, verdict, device model) с KiberQalqon командой.
+     * (SHA-256, package, verdict, device model) с UzGuard командой.
      *
      * Default OFF. Меняется в ConsentActivity (3-я галочка) или Settings.
      */
@@ -356,7 +368,7 @@ object Config {
 private const val KEY_DEFAULTS_BAKED = "defaults_baked_v1"
 
 object Statistics {
-    private const val STATS_PREFS = "kiberqalqon_stats"
+    private const val STATS_PREFS = "uzguard_stats"
     
     private fun statsPrefs(context: Context): SharedPreferences =
         context.getSharedPreferences(STATS_PREFS, Context.MODE_PRIVATE)
