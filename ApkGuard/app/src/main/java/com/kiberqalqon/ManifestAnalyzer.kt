@@ -39,29 +39,44 @@ object ManifestAnalyzer {
         val declaresNotificationListener: Boolean = false
     )
 
-    /** Главный API. */
+    /**
+     * Bu analizator talab qiladigan getPackageArchiveInfo flag to'plami. ApkScanner umumiy
+     * (union) fetch'da SHULARNI QAMRAB olishi SHART — kamroq flag bilan kelgan PackageInfo'da
+     * receivers/services/activities/providers null bo'lib, tahdid signallari JIM yo'qoladi
+     * (false-SAFE). const emas (bitwise `or` compile-time const emas), oddiy val.
+     */
+    val MANIFEST_FLAGS = PackageManager.GET_PERMISSIONS or
+            PackageManager.GET_RECEIVERS or
+            PackageManager.GET_SERVICES or
+            PackageManager.GET_ACTIVITIES or
+            PackageManager.GET_PROVIDERS or
+            PackageManager.GET_META_DATA
+
+    /** Главный API (path-based) — сам fetch'ит PackageInfo. Eski chaqiruvlar/testlar buzilmaydi. */
     fun analyze(pm: PackageManager, apkPath: String): Findings {
+        val info = try {
+            pm.getPackageArchiveInfo(apkPath, MANIFEST_FLAGS)
+        } catch (e: Throwable) {
+            Log.w(TAG, "getPackageArchiveInfo failed", e)
+            null
+        }
+        return analyze(info, apkPath)
+    }
+
+    /**
+     * OLDINDAN olingan [PackageInfo] bilan tahlil — ApkScanner umumiy union-flags natijani
+     * uzatadi, shunda APK qayta tahlil qilinmaydi (issiqlik kamayadi). MUHIM: [info] kamida
+     * [MANIFEST_FLAGS] (yoki superset) bilan olingan bo'lishi SHART. [info] == null bo'lsa —
+     * eski yo'l bilan AYNAN bir xil: komponent topilmalari bo'sh/false, faqat readGlobalActions
+     * (AXML) baribir ishlaydi.
+     */
+    fun analyze(info: PackageInfo?, apkPath: String): Findings {
         val red = mutableListOf<String>()
         val orange = mutableListOf<String>()
         var declaresAccessibility = false
         var declaresDeviceAdmin = false
         val highPrio = mutableListOf<String>()
         val exposed = mutableListOf<String>()
-
-        val info = try {
-            pm.getPackageArchiveInfo(
-                apkPath,
-                PackageManager.GET_PERMISSIONS or
-                        PackageManager.GET_RECEIVERS or
-                        PackageManager.GET_SERVICES or
-                        PackageManager.GET_ACTIVITIES or
-                        PackageManager.GET_PROVIDERS or
-                        PackageManager.GET_META_DATA
-            )
-        } catch (e: Throwable) {
-            Log.w(TAG, "getPackageArchiveInfo failed", e)
-            null
-        }
 
         // <application> уровневые флаги — берём напрямую из ApplicationInfo.flags.
         info?.applicationInfo?.let { app ->

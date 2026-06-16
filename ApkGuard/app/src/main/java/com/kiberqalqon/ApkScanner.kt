@@ -9,6 +9,7 @@
 package com.uzguard
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -715,9 +716,30 @@ object ApkScanner {
                 ), scanStartNs = scanStartNs)
             }
 
-            // Проверка подписи — каждый шаг защищён, даже если PackageManager отсутствует.
+            // PERF (qizish): butun APK'ni har bosqich ALOHIDA getPackageArchiveInfo bilan
+            // 4 marta qayta tahlil qilardi (eng og'ir ish — framework APK'ni to'liq o'qiydi:
+            // imzo, ruxsat, yorliq, manifest komponentlari). Endi BIR marta UNION-flag bilan
+            // olamiz va shu BITTA natijani imzo/ruxsat/yorliq/manifest — barchasiga beramiz.
+            // Union = ManifestAnalyzer.MANIFEST_FLAGS (perms + komponentlar) + imzo flag'i →
+            // har iste'molchi o'z maydonlarini SUPERSET'dan oladi, demak natija AYNAN bir xil.
+            // Olib bo'lmasa (null) — pastda har iste'molchi eski yo'l bilan O'ZI qayta oladi,
+            // shuning uchun xulq aynan o'zgarmaydi (false-SAFE kiritmaydi).
+            val signFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                PackageManager.GET_SIGNING_CERTIFICATES
+            } else {
+                @Suppress("DEPRECATION")
+                PackageManager.GET_SIGNATURES
+            }
+            val sharedArchiveInfo: PackageInfo? = try {
+                context.packageManager.getPackageArchiveInfo(apkPath, ManifestAnalyzer.MANIFEST_FLAGS or signFlags)
+            } catch (e: Throwable) {
+                Log.w(TAG, "shared getPackageArchiveInfo failed", e); null
+            }
+
+            // Проверка подписи — переиспользуем общий PackageInfo (null → старый путь, идентично).
             val certFingerprint = try {
-                CertUtil.fingerprintSha256(context, apkPath)
+                if (sharedArchiveInfo != null) CertUtil.fingerprintSha256(sharedArchiveInfo)
+                else CertUtil.fingerprintSha256(context, apkPath)
             } catch (e: Throwable) {
                 Log.w(TAG, "fingerprintSha256 failed", e); null
             }
@@ -748,7 +770,9 @@ object ApkScanner {
             try {
                 val pm = context.packageManager
                 val flags = PackageManager.GET_PERMISSIONS
-                val info = pm.getPackageArchiveInfo(apkPath, flags)
+                // Umumiy fetch bo'lsa qayta ishlatamiz (union GET_PERMISSIONS'ni qamraydi);
+                // bo'lmasa eski yo'l bilan o'zimiz olamiz — natija bir xil.
+                val info = sharedArchiveInfo ?: pm.getPackageArchiveInfo(apkPath, flags)
                 val packageName = info?.packageName
                 packageNameForHeuristic = packageName
 
@@ -926,7 +950,10 @@ object ApkScanner {
             // ============================================================
 
             val manifestFindings = try {
-                ManifestAnalyzer.analyze(context.packageManager, apkPath)
+                // Umumiy union-PackageInfo bo'lsa qayta ishlatamiz (qayta tahlil yo'q → issiqlik kam);
+                // bo'lmasa eski path-asosli yo'l (ManifestAnalyzer o'zi fetch qiladi) — aynan bir xil.
+                if (sharedArchiveInfo != null) ManifestAnalyzer.analyze(sharedArchiveInfo, apkPath)
+                else ManifestAnalyzer.analyze(context.packageManager, apkPath)
             } catch (e: Throwable) {
                 Log.w(TAG, "ManifestAnalyzer failed", e)
                 ManifestAnalyzer.Findings(0, emptyList(), emptyList(), false, false, emptyList(), emptyList())
@@ -1004,7 +1031,10 @@ object ApkScanner {
 
             // Извлекаем app label для filename heuristic L7 (label vs filename mismatch).
             val appLabel = try {
-                val info = context.packageManager.getPackageArchiveInfo(apkPath, 0)
+                // Umumiy union-PackageInfo bo'lsa qayta ishlatamiz (applicationInfo unda bor);
+                // bo'lmasa eski yo'l. sourceDir mutatsiyasi quyida — ManifestAnalyzer allaqachon
+                // ishlab bo'lgan (faqat .flags o'qiydi), shu sabab bu mutatsiya unga ta'sir qilmaydi.
+                val info = sharedArchiveInfo ?: context.packageManager.getPackageArchiveInfo(apkPath, 0)
                 info?.applicationInfo?.let { appInfo ->
                     // applicationInfo.loadLabel требует чтобы sourceDir указывал на apk —
                     // иначе вернёт packageName. Подставляем.

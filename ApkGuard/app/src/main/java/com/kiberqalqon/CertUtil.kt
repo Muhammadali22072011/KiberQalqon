@@ -37,6 +37,25 @@ object CertUtil {
         null
     }
 
+    /**
+     * SHA-256 imzosi OLDINDAN olingan [PackageInfo]'dan — qayta getPackageArchiveInfo
+     * CHAQIRMAYDI (ApkScanner umumiy fetch'ni qayta ishlatadi → APK ikki marta tahlil
+     * qilinmaydi, telefon kamroq qiziydi). [info] GET_SIGNING_CERTIFICATES (P+) yoki
+     * GET_SIGNATURES (pre-P) bilan olingan bo'lishi kerak. Natija path-asosli variant
+     * bilan AYNAN bir xil: bir xil SDK-shoxlanish, bir xil firstOrNull → sha256Hex.
+     */
+    fun fingerprintSha256(info: PackageInfo?): String? = try {
+        val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            info?.signingInfo?.apkContentsSigners
+        } else {
+            @Suppress("DEPRECATION")
+            info?.signatures
+        }
+        signatures?.firstOrNull()?.toByteArray()?.let { sha256Hex(it) }
+    } catch (_: Exception) {
+        null
+    }
+
     /** SHA-256 от подписи самого UzGuard, для авто-whitelist. */
     fun selfFingerprintSha256(context: Context): String? = try {
         val pm = context.packageManager
