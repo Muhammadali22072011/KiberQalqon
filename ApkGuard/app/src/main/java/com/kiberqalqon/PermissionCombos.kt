@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Анализ КОМБИНАЦИЙ разрешений, а не их количества.

@@ -13,9 +13,18 @@
     android:layout_height="match_parent"
     android:background="@drawable/kq4_scan_bg">
 
-    <androidx.core.widget.NestedScrollView
+    <!-- Vertikal ustun: scroll (qolgan joyni egallaydi) + pastdagi tugmalar (doim ko'rinadi).
+         Ilgari tugmalar scroll ustiga QOPLANIB, uzun sabablar ro'yxatini pastга surib
+         ko'rsatib bo'lmasdi — endi ular alohida joylashadi, scroll to'liq ishlaydi. -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
         android:scrollbars="none">
 
@@ -29,7 +38,7 @@
             android:paddingEnd="24dp"
             android:paddingBottom="24dp">
 
-            <!-- KiberQalqon logosi -->
+            <!-- UzGuard logosi -->
             <ImageView
                 android:id="@+id/imgLogo"
                 android:layout_width="56dp"
@@ -128,11 +137,10 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Pastki tugmalar -->
+    <!-- Pastki tugmalar — scroll ostida, alohida (qoplanmaydi). -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:background="@drawable/kq4_scan_bg"
         android:orientation="vertical"
         android:paddingStart="22dp"
@@ -163,6 +171,8 @@
             android:textColor="#99FFFFFF"
             android:textSize="15sp"
             android:visibility="gone" />
+    </LinearLayout>
+
     </LinearLayout>
 
     <!-- Yopish (X) -->

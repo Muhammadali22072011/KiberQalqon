@@ -112,6 +112,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:minHeight="90dp"
-            tools:text="Anor Qalqon Telegram, WhatsApp va yuklab olingan fayllarni o\'zi kuzatib turadi." />
+            tools:text="UzGuard Telegram, WhatsApp va yuklab olingan fayllarni o\'zi kuzatib turadi." />
     </LinearLayout>
 </LinearLayout>

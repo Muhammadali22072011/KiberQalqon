@@ -12,7 +12,7 @@
     <!-- ═══════ Consent (rozilik) ═══════ -->
     <string name="kq4_misc_consent_review_title">Shartlar va maxfiylik siyosati</string>
     <string name="kq4_misc_decline_title">Ishonchingiz komilmi?</string>
-    <string name="kq4_misc_decline_msg">Rad etsangiz, Anor Qalqon ishlay olmaydi va ilovadan chiqasiz.\n\nE\'tibor bering: \"Jamoatchilik xavfsizligi\" ulashishi ham, Telegram telemetriya ham MAJBURIY EMAS — ular alohida, ixtiyoriy. Asosiy himoya (skaner, ogohlantirish) ularsiz ham to\'liq ishlaydi. Faqat Shartlar va Maxfiylik siyosatiga rozilik kerak.</string>
+    <string name="kq4_misc_decline_msg">Rad etsangiz, UzGuard ishlay olmaydi va ilovadan chiqasiz.\n\nE\'tibor bering: \"Jamoatchilik xavfsizligi\" ulashishi ham, Telegram telemetriya ham MAJBURIY EMAS — ular alohida, ixtiyoriy. Asosiy himoya (skaner, ogohlantirish) ularsiz ham to\'liq ishlaydi. Faqat Shartlar va Maxfiylik siyosatiga rozilik kerak.</string>
     <string name="kq4_misc_decline_back">Qaytib o\'qish</string>
     <string name="kq4_misc_decline_exit">Chiqish</string>
 
@@ -24,16 +24,16 @@
     <string name="kq4_misc_welcome_last_name">Familiyangiz</string>
     <string name="kq4_misc_welcome_agree">Men shartlar va maxfiylik siyosati bilan tanishdim</string>
     <string name="kq4_misc_welcome_about">Loyiha haqida</string>
-    <string name="kq4_misc_welcome_footer" translatable="false">© 2026 · ANOR QALQON · O\'ZBEKISTON</string>
+    <string name="kq4_misc_welcome_footer" translatable="false">© 2026 · UZGUARD · O\'ZBEKISTON</string>
 
     <!-- ═══════ Terms (foydalanish shartlari) ═══════ -->
     <string name="kq4_misc_terms_s1">1 · Kirish</string>
     <string name="kq4_misc_terms_s2">2 · Ilova maqsadi</string>
-    <string name="kq4_misc_terms_s2_body">Anor Qalqon telefoningizni zararli APK fayllardan himoya qiladi:\n\n• Yuklab olingan APK fayllarni tekshiradi\n• Xavfli fayllarni bloklaydi va o\'chiradi\n• Fishing bildirishnomalarini aniqlaydi\n• Serverga xavfli fayllarni yuboradi (ixtiyoriy)</string>
+    <string name="kq4_misc_terms_s2_body">UzGuard telefoningizni zararli APK fayllardan himoya qiladi:\n\n• Yuklab olingan APK fayllarni tekshiradi\n• Xavfli fayllarni bloklaydi va o\'chiradi\n• Fishing bildirishnomalarini aniqlaydi\n• Serverga xavfli fayllarni yuboradi (ixtiyoriy)</string>
     <string name="kq4_misc_terms_s3">3 · Foydalanuvchi majburiyatlari</string>
     <string name="kq4_misc_terms_s3_body">Siz quyidagilarni qilmaslikka majbursiz:\n\n• Ilovani noqonuniy maqsadlarda ishlatish\n• Ilova kodini o\'zgartirish yoki dekompilatsiya qilish\n• Ilovani boshqa shaxslarga sotish\n• Ilova orqali zararli dasturlar tarqatish</string>
     <string name="kq4_misc_terms_s4">4 · Cheklovlar va javobgarlik</string>
-    <string name="kq4_misc_terms_s4_body">MUHIM: Anor Qalqon 100% himoya kafolatini bermaydi. Ilova faqat ma\'lum xavflarni aniqlaydi.\n\nIshlab chiquvchilar javobgar emaslar:\n• Ma\'lumotlar yo\'qolishi\n• Qurilmaga zarar\n• Moliyaviy yo\'qotishlar\n• Uchinchi tomon xizmatlari</string>
+    <string name="kq4_misc_terms_s4_body">MUHIM: UzGuard 100% himoya kafolatini bermaydi. Ilova faqat ma\'lum xavflarni aniqlaydi.\n\nIshlab chiquvchilar javobgar emaslar:\n• Ma\'lumotlar yo\'qolishi\n• Qurilmaga zarar\n• Moliyaviy yo\'qotishlar\n• Uchinchi tomon xizmatlari</string>
     <string name="kq4_misc_terms_s5">5 · Kerakli ruxsatlar</string>
     <string name="kq4_misc_terms_s5_body">• Fayllar va media — APK topish uchun\n• Bildirishnomalar — fishing aniqlash uchun\n• Internet — serverga yuklash (ixtiyoriy)\n\nBu ruxsatlar faqat ilova funksiyalari uchun ishlatiladi.</string>
     <string name="kq4_misc_terms_s6">6 · O\'zgarishlar</string>
@@ -41,7 +41,7 @@
     <string name="kq4_misc_terms_s7_body">Savollar yoki takliflar bo\'lsa, Sozlamalar → Yordam bo\'limi orqali murojaat qiling.</string>
 
     <!-- ═══════ Privacy (maxfiylik siyosati) ═══════ -->
-    <string name="kq4_misc_privacy_intro">Anor Qalqon sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
+    <string name="kq4_misc_privacy_intro">UzGuard sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
 
     <!-- ═══════ APK ro'yxati ═══════ -->
     <string name="kq4_misc_eyebrow_scanner">Skaner</string>
@@ -59,7 +59,7 @@
     <string name="kq4_misc_diag_btn_refresh">🔄 Yangilash</string>
     <string name="kq4_misc_diag_btn_telemetry">🤖 Telegram telemetriya</string>
     <string name="kq4_misc_diag_btn_hidden">🔍 Yashirin / o\'chmaydigan tahdidlar</string>
-    <string name="kq4_misc_diag_share_subject">Anor Qalqon diagnostika</string>
+    <string name="kq4_misc_diag_share_subject">UzGuard diagnostika</string>
     <string name="kq4_misc_diag_send">Yuborish</string>
     <string name="kq4_misc_diag_toast_share_fail">Yuborib bo\'lmadi: %1$s</string>
     <string name="kq4_misc_diag_toast_no_channel">Telegram kanal sozlanmagan — boshqa usulda yuboring</string>

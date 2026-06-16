@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import androidx.core.content.edit
@@ -13,7 +13,7 @@ import org.json.JSONObject
  */
 object ScanHistory {
 
-    private const val PREFS = "kiberqalqon_history"
+    private const val PREFS = "uzguard_history"
     private const val KEY = "entries"
     private const val MAX_ENTRIES = 200
 

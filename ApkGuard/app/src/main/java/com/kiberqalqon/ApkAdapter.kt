@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.kiberqalqon.databinding.ItemApkBinding
+import com.uzguard.databinding.ItemApkBinding
 
 /**
  * Skaner ro'yxati adapteri — v4 «.li» qatorlar (design screens1.jsx → Apps).

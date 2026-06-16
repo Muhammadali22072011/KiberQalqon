@@ -9,7 +9,7 @@
 
       Default = Anor #C52A3E — THE brand.
     -->
-    <style name="Theme.KiberQalqon" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.UzGuard" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/kq_anor</item>
         <item name="colorPrimaryDark">@color/kq_anor_2</item>
         <item name="colorAccent">@color/kq_anor</item>
@@ -64,7 +64,7 @@
     <!-- Accent overlays — applied via Activity.setTheme() in onCreate.
          colorPrimary/colorAccent set too so MaterialSwitch / MaterialButton /
          MaterialCheckBox honor the accent without per-widget tinting. -->
-    <style name="Theme.KiberQalqon.Anor" parent="Theme.KiberQalqon">
+    <style name="Theme.UzGuard.Anor" parent="Theme.UzGuard">
         <item name="kqPrimary">@color/kq_anor</item>
         <item name="kqPrimary2">@color/kq_anor_2</item>
         <item name="kqPrimarySoft">@color/kq_anor_soft</item>
@@ -76,7 +76,7 @@
         <item name="colorControlHighlight">@color/kq_anor_soft</item>
     </style>
 
-    <style name="Theme.KiberQalqon.Feruz" parent="Theme.KiberQalqon">
+    <style name="Theme.UzGuard.Feruz" parent="Theme.UzGuard">
         <item name="kqPrimary">@color/kq_feruz</item>
         <item name="kqPrimary2">@color/kq_feruz_2</item>
         <item name="kqPrimarySoft">@color/kq_feruz_soft</item>
@@ -88,7 +88,7 @@
         <item name="colorControlHighlight">@color/kq_feruz_soft</item>
     </style>
 
-    <style name="Theme.KiberQalqon.Zafaron" parent="Theme.KiberQalqon">
+    <style name="Theme.UzGuard.Zafaron" parent="Theme.UzGuard">
         <item name="kqPrimary">@color/kq_zafaron</item>
         <item name="kqPrimary2">@color/kq_zafaron_2</item>
         <item name="kqPrimarySoft">@color/kq_zafaron_soft</item>

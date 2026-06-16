@@ -61,7 +61,7 @@ export default function Login() {
     <div className="gate">
       <form className="gate-card" onSubmit={submit}>
         <div className="logo" style={{ margin: '0 auto' }}>🛡</div>
-        <div className="gate-sub">Anor Qalqon · maxfiy panel</div>
+        <div className="gate-sub">UzGuard · maxfiy panel</div>
         <h1 className="gate-title">Boshqaruvga kirish</h1>
 
         <div className="gate-tabs" role="tablist">

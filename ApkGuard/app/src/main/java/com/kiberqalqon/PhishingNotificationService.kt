@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification

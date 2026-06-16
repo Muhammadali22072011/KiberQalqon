@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

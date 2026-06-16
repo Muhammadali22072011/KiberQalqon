@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageInfo
@@ -37,7 +37,7 @@ object CertUtil {
         null
     }
 
-    /** SHA-256 от подписи самого KiberQalqon, для авто-whitelist. */
+    /** SHA-256 от подписи самого UzGuard, для авто-whitelist. */
     fun selfFingerprintSha256(context: Context): String? = try {
         val pm = context.packageManager
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

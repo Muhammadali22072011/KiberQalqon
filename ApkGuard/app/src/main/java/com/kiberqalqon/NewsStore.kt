@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 object NewsStore {
 
     private const val TAG = "NewsStore"
-    private const val PREFS = "kiberqalqon_news"
+    private const val PREFS = "uzguard_news"
     private const val KEY_PAYLOAD = "news_json"
     private const val KEY_FETCHED_AT = "news_fetched_at"
 

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Launcher icon foreground — Anor Qalqon (утверждённое лого ApkGuard/logo-anor.png,
-  геометрия = kq_shield_mark.xml). Adaptive icon канвас 108×108dp, safe zone —
-  центральный диаметр 66dp, поэтому арт (viewport 512) уменьшен group'ой
-  scale=0.13 и отцентрован. Фон лаунчера = крем #FBE9EE (ic_launcher_background).
+  Launcher icon foreground — UzGuard LG mark (logo-uzguard.png).
+  Raster: @mipmap/ic_launcher_foreground. Background = white @color/ic_launcher_background.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"

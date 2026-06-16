@@ -107,7 +107,7 @@ export default function News() {
         <h1>Yangiliklar va e‘lonlar</h1>
         <p>
           {canManage
-            ? 'Bu yerga joylangan e‘lonlar darhol foydalanuvchilarning Anor Qalqon ilovasi bosh ekranida ko‘rinadi.'
+            ? 'Bu yerga joylangan e‘lonlar darhol foydalanuvchilarning UzGuard ilovasi bosh ekranida ko‘rinadi.'
             : 'Rahbariyat e‘lonlari. Bu yerda faqat o‘qiy olasiz — e‘lon joylash huquqi egada.'}
         </p>
       </div>

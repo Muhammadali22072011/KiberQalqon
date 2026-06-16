@@ -3,7 +3,7 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 Размер: ~7.7 МБ
 Дата: 08.02.2026
 
@@ -17,7 +17,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
    - Список обновляется автоматически
 
 2. ✅ ЛОГОТИП:
-   - Используется logo-kiberqalqon.jpg (Android с галочкой)
+   - Используется logo-uzguard.jpg (Android с галочкой)
    - Отображается на Splash Screen
    - Правильный размер и пропорции
 
@@ -75,7 +75,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 БЫЛО (v7.3):
 ┌─────────────────────────────────┐
-│  KIBERQALQON                      │
+│  UZGUARD                      │
 ├─────────────────────────────────┤
 │  [Фоновая защита] ON            │
 │                                 │
@@ -86,7 +86,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 СТАЛО (v7.4):
 ┌─────────────────────────────────┐
-│  KIBERQALQON                      │
+│  UZGUARD                      │
 ├─────────────────────────────────┤
 │  [Фоновая защита] ON            │
 │                                 │
@@ -163,7 +163,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 ПРОБЛЕМА: "Topilgan APK: 0" хотя APK есть
 РЕШЕНИЕ:
 1. Проверь что "Фоновая защита" ВКЛЮЧЕНА
-2. Проверь разрешение на файлы (Настройки → KiberQalqon → Разрешения)
+2. Проверь разрешение на файлы (Настройки → UzGuard → Разрешения)
 3. Перезапусти приложение
 4. Подожди 5-10 секунд после запуска
 

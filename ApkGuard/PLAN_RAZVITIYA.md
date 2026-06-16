@@ -1,4 +1,4 @@
-# 🚀 ПЛАН РАЗВИТИЯ KIBERQALQON
+# 🚀 ПЛАН РАЗВИТИЯ UZGUARD
 
 ## ✅ ЧТО УЖЕ РАБОТАЕТ (Версия 6.1):
 
@@ -91,7 +91,7 @@ class PeriodicCheckWorker(context: Context, params: WorkerParameters) : Worker(c
 **Дизайн:**
 ```
 ┌─────────────────────────────────┐
-│  🛡️ KIBERQALQON                   │
+│  🛡️ UZGUARD                   │
 ├─────────────────────────────────┤
 │                                 │
 │      ╱───────╲                  │
@@ -166,7 +166,7 @@ CREATE TABLE whitelist (
 **Зачем:** Не удалять сразу, а переместить в карантин
 
 **Что делать:**
-- Создать папку /KiberQalqon/Quarantine
+- Создать папку /UzGuard/Quarantine
 - Вместо удаления - переместить туда
 - Экран "Карантин" со списком файлов
 - Кнопки: "Восстановить" / "Удалить навсегда"
@@ -300,7 +300,7 @@ fun checkVirusTotal(sha256: String): VirusTotalResult {
 4. ✅ Исправлена структура MainActivity.kt
 5. ✅ Собран APK версии 7.0
 
-**Файл:** `KiberQalqon\app\build\outputs\apk\debug\app-debug.apk`
+**Файл:** `UzGuard\app\build\outputs\apk\debug\app-debug.apk`
 
 ### ✅ НЕДЕЛЯ 2: UI улучшения (ЗАВЕРШЕНО НА 100%! 🎉)
 1. ✅ Главный экран с графиками и спидометром (ГОТОВО!)

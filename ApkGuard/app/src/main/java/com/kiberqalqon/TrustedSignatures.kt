@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -17,7 +17,7 @@ import android.os.Build
  *
  * ТРИ ИСТОЧНИКА доверенных (package, cert) пар:
  *   1) [ENTRIES] — статически зашитые (нужны РЕАЛЬНЫЕ fingerprints; пусто по умолчанию).
- *   2) [dynamicSelf] — сам KiberQalqon (вычисляется в рантайме, [registerSelf]).
+ *   2) [dynamicSelf] — сам UzGuard (вычисляется в рантайме, [registerSelf]).
  *   3) [dynamicVendors] — сертификаты доверенных вендоров, РЕАЛЬНО установленных на
  *      устройстве ИЗ Google Play ([captureInstalledTrusted]). Без выдуманных хэшей.
  *
@@ -28,7 +28,7 @@ object TrustedSignatures {
 
     /** Пара (package, sha256 cert) -> читаемое имя для логов и UI. */
     private val ENTRIES: Map<Pair<String, String>, String> = mapOf(
-        // Сам KiberQalqon — fingerprint вычисляется в рантайме (см. registerSelf()).
+        // Сам UzGuard — fingerprint вычисляется в рантайме (см. registerSelf()).
         // Здесь только остальные.
 
         // ----- НИЖЕ FINGERPRINTS НУЖНО ЗАПОЛНИТЬ ВРУЧНУЮ -----
@@ -46,7 +46,7 @@ object TrustedSignatures {
     )
 
     /**
-     * Динамически вычисляемые доверенные fingerprints — сам KiberQalqon.
+     * Динамически вычисляемые доверенные fingerprints — сам UzGuard.
      * Заполняется при старте App.kt через [registerSelf].
      */
     private val dynamicSelf = mutableMapOf<Pair<String, String>, String>()
@@ -60,7 +60,7 @@ object TrustedSignatures {
 
     fun registerSelf(packageName: String, sha256: String) {
         if (sha256.isNotBlank()) {
-            dynamicSelf[packageName to sha256] = "Anor Qalqon (self)"
+            dynamicSelf[packageName to sha256] = "UzGuard (self)"
         }
     }
 

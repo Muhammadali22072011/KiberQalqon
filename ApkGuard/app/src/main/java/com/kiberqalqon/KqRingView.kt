@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -16,7 +16,7 @@ import android.view.animation.DecelerateInterpolator
  *
  * Layout misol:
  *   <FrameLayout>
- *     <com.kiberqalqon.KqRingView android:id="@+id/ring" ... />
+ *     <com.uzguard.KqRingView android:id="@+id/ring" ... />
  *     <ImageView android:layout_gravity="center" ... />
  *   </FrameLayout>
  *

@@ -1,6 +1,6 @@
-# KiberQalqon — Himoya zararli APK fayllardan
+# UzGuard — Himoya zararli APK fayllardan
 
-**KiberQalqon** — Android uchun zamonaviy xavfsizlik ilovasi. Avtomatik ravishda zararli APK fayllarni topadi, bloklaydi va o'chiradi. Telegram va boshqa manbalardan yuklab olingan xavfli fayllardan himoya qiladi.
+**UzGuard** — Android uchun zamonaviy xavfsizlik ilovasi. Avtomatik ravishda zararli APK fayllarni topadi, bloklaydi va o'chiradi. Telegram va boshqa manbalardan yuklab olingan xavfli fayllardan himoya qiladi.
 
 ![Version](https://img.shields.io/badge/version-7.3-blue)
 ![Platform](https://img.shields.io/badge/platform-Android-green)
@@ -121,7 +121,7 @@ ZAPUSK_NA_TELEFONE.bat
 ### Android Studio bilan
 
 1. Android Studio ni oching
-2. `File → Open` → `KiberQalqon` papkasini tanlang
+2. `File → Open` → `UzGuard` papkasini tanlang
 3. Gradle sinxronizatsiyasini kuting
 4. `Run` tugmasini bosing (▶️)
 
@@ -182,10 +182,10 @@ Ilovada sozlamalarda server URL ni kiriting:
 ## 📁 Loyiha Tuzilishi
 
 ```
-KiberQalqon/
+UzGuard/
 ├── app/                          # Android ilovasi
 │   ├── src/main/
-│   │   ├── java/com/kiberqalqon/
+│   │   ├── java/com/uzguard/
 │   │   │   ├── MainActivity.kt           # Asosiy ekran
 │   │   │   ├── AutoScanActivity.kt       # Avtomatik skanerlash oynasi
 │   │   │   ├── ScanResultActivity.kt     # Natijalar ekrani
@@ -219,7 +219,7 @@ KiberQalqon/
 
 ### Nima Tekshiriladi?
 
-KiberQalqon quyidagilarni tekshiradi:
+UzGuard quyidagilarni tekshiradi:
 - Xavfli ruxsatlar (SMS, qo'ng'iroqlar, kontaktlar)
 - Ma'lum zararli paketlar
 - Shubhali fayl nomlari
@@ -284,13 +284,13 @@ android.overridePathCheck=true
 
 ### APK Topilmadi
 **Yechim:** Ruxsatlarni tekshiring:
-- Sozlamalar → Ilovalar → KiberQalqon → Ruxsatlar
+- Sozlamalar → Ilovalar → UzGuard → Ruxsatlar
 - "Fayllar va media" ruxsatini bering
 
 ### Bildirishnomalar Ishlamayapti
 **Yechim:** Bildirishnomalarga kirishni yoqing:
 - Sozlamalar → Bildirishnomalar → Bildirishnomalarga kirish
-- KiberQalqon ni toping va yoqing
+- UzGuard ni toping va yoqing
 
 ## 📝 Litsenziya
 
@@ -316,4 +316,4 @@ Savollar yoki takliflar bo'lsa, issue oching yoki pull request yuboring.
 
 **⚠️ Ogohlantirish:** Bu ilova faqat ma'lum xavflarni aniqlaydi. 100% himoya kafolati bermaydi. Noma'lum manbalardan APK o'rnatishdan ehtiyot bo'ling!
 
-**🛡️ KiberQalqon - Telefoningizni himoya qiling!**
+**🛡️ UzGuard - Telefoningizni himoya qiling!**

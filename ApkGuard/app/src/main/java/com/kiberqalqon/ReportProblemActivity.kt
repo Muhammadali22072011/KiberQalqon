@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Build
@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
-import com.kiberqalqon.databinding.ActivityReportProblemBinding
+import com.uzguard.databinding.ActivityReportProblemBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -108,7 +108,7 @@ class ReportProblemActivity : AppCompatActivity() {
     /** Yengil diagnostika to'plami — qurilma, ruxsatlar, sozlamalar, oxirgi crash. PII yo'q. */
     private fun collectDiagnostics(): String {
         val sb = StringBuilder()
-        sb.appendLine("=== Anor Qalqon muammo hisoboti ===")
+        sb.appendLine("=== UzGuard muammo hisoboti ===")
         sb.appendLine("Vaqt: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}")
         sb.appendLine()
         sb.appendLine("[Qurilma] ${Build.MANUFACTURER} ${Build.MODEL}")

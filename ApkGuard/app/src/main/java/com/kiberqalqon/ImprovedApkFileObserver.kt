@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -91,7 +91,8 @@ class ImprovedApkFileObserver(
      *
      * Android 10+ da fon'dan startActivity() JIM ishlamaydi (exception ham
      * tashlamaydi). Shuning uchun:
-     *   1. Agar overlay ruxsati bor (SYSTEM_ALERT_WINDOW) — to'g'ridan ochamiz
+     *   1. Ekran ochiq+qulfsiz VA overlay ruxsati bor (SYSTEM_ALERT_WINDOW) — to'g'ridan ochamiz
+     *      (qulflangan ekranda MIUI to'g'ridan-to'g'ri launch'ni JIM bloklaydi — shu sabab gate)
      *   2. Aks holda — full-screen-intent notification chiqaramiz (lock screen'da
      *      ham faollashadi, telefon ochilsa Activity avtomatik ochiladi)
      *
@@ -112,7 +113,11 @@ class ImprovedApkFileObserver(
             Log.w(TAG, "telemetry download_detected failed", e)
         }
 
-        val canStartActivity = canLaunchActivityFromBackground(context)
+        // Ekran ochiq+qulfsiz BO'LSAGINA to'g'ridan-to'g'ri oyna — aks holda MIUI startActivity'ni
+        // JIM bloklaydi (exception yo'q) va ilgari shunda hech narsa ko'rinmasdi. Endi qulflangan/
+        // o'chiq ekranda notification (full-screen-intent) yo'liga o'tamiz (GuardWorker bilan bir xil).
+        val canStartActivity = isScreenInteractiveAndUnlocked() &&
+            canLaunchActivityFromBackground(context)
         Log.d(TAG, "APK ready: ${file.name}, canStartActivity=$canStartActivity")
 
         if (canStartActivity) {
@@ -135,6 +140,21 @@ class ImprovedApkFileObserver(
             NotificationHelper.showScanNotification(context, file)
         } catch (e: Throwable) {
             Log.e(TAG, "Notification fallback failed", e)
+        }
+    }
+
+    /**
+     * Ekran ayni paytda ochiq (interactive) VA qulfdan chiqarilganmi? Faqat shu holatda
+     * fon'dan startActivity() real ko'rinadi; aks holda (qulflangan/o'chiq) MIUI uni JIM
+     * bloklaydi va biz notification (full-screen-intent) yo'liga o'tamiz.
+     */
+    private fun isScreenInteractiveAndUnlocked(): Boolean {
+        return try {
+            val pm = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            val km = context.getSystemService(Context.KEYGUARD_SERVICE) as android.app.KeyguardManager
+            pm.isInteractive && !km.isKeyguardLocked
+        } catch (_: Throwable) {
+            false
         }
     }
 

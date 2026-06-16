@@ -50,7 +50,7 @@
     <!-- ═══ Havola qalqoni — blok ekрани (LinkBlockActivity) ═══ -->
     <string name="kq4_block_danger_title">Bu xavfli sayt</string>
     <string name="kq4_block_suspicious_title">Bu shubhali sayt</string>
-    <string name="kq4_block_danger_sub">KiberQalqon bu saytni xavfli deb topdi va ochilishini to\'xtatdi. Iltimos, OCHMANG va hech kimga yubormang.</string>
+    <string name="kq4_block_danger_sub">UzGuard bu saytni xavfli deb topdi va ochilishini to\'xtatdi. Iltimos, OCHMANG va hech kimga yubormang.</string>
     <string name="kq4_block_suspicious_sub">Bu saytda shubhali belgilar bor. Ishonchingiz komil bo\'lmasa — ochmang.</string>
     <string name="kq4_block_close">Yopish</string>
     <string name="kq4_block_open_anyway">Baribir ochaman</string>

@@ -14,8 +14,8 @@ Firebase, кладёшь `google-services.json`, потом применяешь
 
 ## Шаг 1. Firebase Console (один раз)
 1. https://console.firebase.google.com → **Add project** → имя любое.
-2. **Add app → Android**. Package name: `com.kiberqalqon`. Добавь **второй** Android-app с
-   `com.kiberqalqon.debug` (debug-вариант ставится рядом).
+2. **Add app → Android**. Package name: `com.uzguard`. Добавь **второй** Android-app с
+   `com.uzguard.debug` (debug-вариант ставится рядом).
 3. Скачай `google-services.json` (он содержит ОБА app-id) → положи в `ApkGuard/app/google-services.json`.
    Файл уже в `.gitignore`-логике секретов — не коммить его (содержит project/sender id).
 4. В **Project Settings → Cloud Messaging** включи **Firebase Cloud Messaging API (V1)**.
@@ -56,9 +56,9 @@ dependencies {
 </service>
 ```
 
-## Шаг 4. `app/src/main/java/com/kiberqalqon/FirebasePushService.kt`
+## Шаг 4. `app/src/main/java/com/uzguard/FirebasePushService.kt`
 ```kotlin
-package com.kiberqalqon
+package com.uzguard
 
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -72,7 +72,7 @@ class FirebasePushService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         // Tokenni saqlaymiz; keyingi CloudTelemetry POST bilan serverga boradi.
-        getSharedPreferences("kiberqalqon_fcm", MODE_PRIVATE)
+        getSharedPreferences("uzguard_fcm", MODE_PRIVATE)
             .edit().putString("fcm_token", token).apply()
         try { CloudTelemetry.sendFcmToken(this, token) } catch (_: Throwable) {}
     }
@@ -84,7 +84,7 @@ class FirebasePushService : FirebaseMessagingService() {
             "blacklist" -> try { CloudBlacklist.refresh(applicationContext) } catch (_: Throwable) {}
             // Tahdid alert → mahalliy bildirishnoma.
             else -> {
-                val title = msg.notification?.title ?: data["title"] ?: "KiberQalqon"
+                val title = msg.notification?.title ?: data["title"] ?: "UzGuard"
                 val body = msg.notification?.body ?: data["body"] ?: ""
                 try { NotificationHelper.showSimpleAlert(applicationContext, title, body) } catch (e: Throwable) {
                     Log.w("FCM", "alert failed", e)

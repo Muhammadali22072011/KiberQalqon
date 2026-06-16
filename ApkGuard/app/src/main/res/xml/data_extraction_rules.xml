@@ -2,7 +2,7 @@
 <!--
   Android 12+ (API 31+): запрещаем cloud-backup и device-transfer для всех данных приложения.
   Без этого файла adb backup / Google Drive backup / device-to-device transfer
-  утаскивают SharedPreferences и /data/data/com.kiberqalqon/* — оттуда злоумышленник
+  утаскивают SharedPreferences и /data/data/com.uzguard/* — оттуда злоумышленник
   может вытащить ScanHistory, FCM-токены, кэшированные APK и т.п.
 -->
 <data-extraction-rules>

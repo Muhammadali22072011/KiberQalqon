@@ -3,7 +3,7 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 Размер: ~7.8 МБ
 Дата: 08.02.2026
 
@@ -45,7 +45,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 ГЛАВНЫЙ ЭКРАН:
 ┌─────────────────────────────────┐
-│  KIBERQALQON          🌐 📊 ⚙️    │
+│  UZGUARD          🌐 📊 ⚙️    │
 ├─────────────────────────────────┤
 │                                 │
 │  [Фоновая защита] ON            │

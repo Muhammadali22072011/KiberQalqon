@@ -3,7 +3,7 @@
 <resources>
     <!-- ============ Onboarding ============ -->
     <string name="kq4_onb_title_1">Телефон проверяется сам</string>
-    <string name="kq4_onb_body_1">Anor Qalqon сам следит за Telegram, WhatsApp и загруженными файлами. Вам ничего не нужно делать.</string>
+    <string name="kq4_onb_body_1">UzGuard сам следит за Telegram, WhatsApp и загруженными файлами. Вам ничего не нужно делать.</string>
     <string name="kq4_onb_title_2">Находит опасные программы</string>
     <string name="kq4_onb_body_2">Вредоносные файлы, спрятанные под видом фото или видео, будут обнаружены. Они пытаются украсть пароль от банка и SMS-коды.</string>
     <string name="kq4_onb_title_3">Простой язык, сильная защита</string>
@@ -12,6 +12,8 @@
 
     <!-- ============ InitialScan ============ -->
     <string name="kq4_is_title">Идёт проверка телефона</string>
+    <!-- Фаза A: пока ищем файлы (до начала самой проверки) -->
+    <string name="kq4_is_searching">Поиск файлов…</string>
     <string name="kq4_is_found_count">Найдено опасных файлов: %1$d</string>
     <string name="kq4_is_all_deleted">Все опасные файлы удалены</string>
     <string name="kq4_is_none_found">Опасных файлов не найдено</string>

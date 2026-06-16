@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -16,7 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.kiberqalqon.databinding.ActivitySplashBinding
+import com.uzguard.databinding.ActivitySplashBinding
 
 /**
  * Splash Screen с логотипом и запросом разрешений.
@@ -101,7 +101,7 @@ class SplashActivity : AppCompatActivity() {
      * v4 «Milliy Kiber Himoya» kirish xoreografiyasi (screens1.jsx → Splash):
      *   0ms    LogoDisc yumshoq overshoot bilan kiradi (scale .8 → 1)
      *   0ms    pulsar halqa №1 (scale+alpha, cheksiz); №2 +800ms (dizayn: delay .8s)
-     *   250ms  "ANOR QALQON" wordmark pastdan ko'tariladi
+     *   250ms  "UZGUARD" wordmark pastdan ko'tariladi
      *   450ms  mono "MILLIY KIBER HIMOYA" pastdan ko'tariladi
      *   600ms  3 ta load-nuqta (stagger 160ms — dizayn: i*.16s)
      */

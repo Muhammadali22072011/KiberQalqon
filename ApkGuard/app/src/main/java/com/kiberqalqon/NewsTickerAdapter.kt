@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.kiberqalqon.databinding.ItemNewsTickerBinding
+import com.uzguard.databinding.ItemNewsTickerBinding
 
 /**
  * Bosh ekrandagi "beruvchi lenta" (ticker) adapteri. Gorizontal RecyclerView'da

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Build
@@ -22,7 +22,7 @@ import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
 /**
- * Опциональная отправка minimal threat data в KiberQalqon community DB.
+ * Опциональная отправка minimal threat data в UzGuard community DB.
  *
  * STRICT preconditions (если любое НЕ выполнено — НИЧЕГО не отправляем):
  *   1. Config.hasUserConsent — юзер вообще принял ToS+Privacy
@@ -194,7 +194,7 @@ object CommunityReportClient {
             if (token.isBlank() || chatId.isBlank()) return
 
             val text = buildString {
-                append("💥 Anor Qalqon ilova yiqildi")
+                append("💥 UzGuard ilova yiqildi")
                 if (BuildConfig.DEBUG) append("  [DEBUG]")
                 append("\n")
                 append("Ilova: ${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})\n")

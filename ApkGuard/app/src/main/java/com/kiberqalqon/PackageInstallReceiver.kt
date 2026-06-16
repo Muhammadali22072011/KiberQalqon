@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -38,7 +38,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
 
         // Ne treboem skanirovat' samogo sebya, no event vse-ravno otpravim
         // (osobenno PACKAGE_FULLY_REMOVED — chtoby viden bylo, esli kto-to
-        // pytaetsya unintall'nut' KiberQalqon).
+        // pytaetsya unintall'nut' UzGuard).
         val isOwn = pkg == context.packageName || pkg == "${context.packageName}.debug"
         val ctx = context.applicationContext
 
@@ -80,6 +80,15 @@ class PackageInstallReceiver : BroadcastReceiver() {
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(pkg, 0)
+
+            // Ishonchli store'dan kelgan yangilanishni (Play va h.k.) skanlamaymiz — qizishning
+            // oldini olamiz va spam-yangilanish bildirishnomalarini chiqarmaymiz. Sideload
+            // ilovaning yangilanishi (installer = null / package installer) esa tekshiriladi.
+            if (ApkScanner.isFromTrustedStore(context, pkg)) {
+                Log.d(TAG, "Skip rescan (trusted store update): $pkg")
+                return
+            }
+
             val apkPath = info.sourceDir
             val label = info.loadLabel(pm).toString()
             val result = if (apkPath != null && File(apkPath).exists()) {
@@ -128,6 +137,21 @@ class PackageInstallReceiver : BroadcastReceiver() {
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(pkg, 0)
+
+            // Play Market / ishonchli store'dan o'rnatilgan ilovani SKANLAMAYMIZ:
+            // Play Protect uni allaqachon tekshirgan, qayta skan telefonni bekorga qizdiradi
+            // (va foydalanuvchiga "base.apk" chiqadi). Faqat noma'lum manbadan (sideload —
+            // Telegram / brauzer / fayl menejeri) kelgan ilovalar tekshiriladi.
+            if (ApkScanner.isFromTrustedStore(context, pkg)) {
+                val label = info.loadLabel(pm).toString()
+                Log.d(TAG, "Skip scan (trusted store): $pkg")
+                TelemetryReporter.report(
+                    context, "INSTALL",
+                    "Yangi ilova o'rnatildi (ishonchli manba — tekshirilmadi):\n📦 $label ($pkg)"
+                )
+                return
+            }
+
             val apkPath = info.sourceDir ?: return
             if (!File(apkPath).exists()) {
                 Log.w(TAG, "sourceDir doesn't exist: $apkPath")

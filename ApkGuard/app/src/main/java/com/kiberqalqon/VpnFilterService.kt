@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.PendingIntent
 import android.content.Context
@@ -51,7 +51,7 @@ class VpnFilterService : VpnService() {
     private fun startVpn() {
         try {
             val pfd = Builder()
-                .setSession("Anor Qalqon C2 filter")
+                .setSession("UzGuard C2 filter")
                 .addAddress(VIRT_ADDR, 32)
                 .addDnsServer(VIRT_DNS)
                 .addRoute(VIRT_DNS, 32)          // FAQAT virtual DNS serverga trafik ushlanadi
@@ -301,7 +301,7 @@ class VpnFilterService : VpnService() {
 
     companion object {
         private const val TAG = "VpnFilterService"
-        const val ACTION_STOP = "com.kiberqalqon.VPN_STOP"
+        const val ACTION_STOP = "com.uzguard.VPN_STOP"
         private const val VIRT_ADDR = "10.111.222.1"
         private const val VIRT_DNS = "10.111.222.2"
         private const val UPSTREAM_DNS = "8.8.8.8"

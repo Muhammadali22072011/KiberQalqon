@@ -1,9 +1,11 @@
-package com.kiberqalqon
+package com.uzguard
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 
 /**
  * ====== HAVOLANI BRAUZERGA YO'NALTIRISH ======
@@ -15,7 +17,7 @@ import android.net.Uri
  *      yagona brauzer),
  *   3) havolani aynan o'sha paketda ochadi.
  *
- * Foydalanuvchi KiberQalqon'ni STANDART havola ochuvchi qilib tanlagan bo'lsa, tizim
+ * Foydalanuvchi UzGuard'ni STANDART havola ochuvchi qilib tanlagan bo'lsa, tizim
  * default'i o'zimiz bo'lib qoladi — shu sababli [silentTarget] null qaytarsa, chaqiruvchi
  * bir martalik tanlov oynasini ko'rsatib, tanlangan brauzerni [Config.setPreferredBrowser]
  * ga saqlaydi (keyingi safar jim ishlaydi).
@@ -67,7 +69,7 @@ object LinkForwarder {
         browserOptions(context).any { it.pkg == pkg }
 
     /**
-     * KiberQalqon HOZIR tizimning STANDART havola ochuvchisimi (http/https default handler).
+     * UzGuard HOZIR tizimning STANDART havola ochuvchisimi (http/https default handler).
      * Havola qalqoni faqat shunda har bir havolani avtomatik ushlaydi. [ProtectionStatusActivity]
      * chek-listida ✓/✗ ko'rsatish uchun ishlatiladi.
      */
@@ -103,6 +105,40 @@ object LinkForwarder {
             return opts[0].pkg
         }
         return null
+    }
+
+    /**
+     * Oxirgi chora: TIZIM tanlov oynasini ochadi (paket aniqlanmaganda). [browserOptions]
+     * Android 11+ paket ko'rinishi cheklovi yoki noodatiy brauzer (Telegram ichki, WebView…)
+     * sababli BO'SH qaytishi mumkin — bunda «brauzer yo'q» degan noto'g'ri xulosa chiqardi,
+     * Chrome o'rnatilgan bo'lsa ham. Tizim resolveri esa brauzerlarni har doim ko'radi.
+     *
+     * O'ZIMIZNI (LinkGuardActivity / ShareUrlReceiverActivity) tanlovdan chiqaramiz — aks
+     * holda UzGuard standart havola ochuvchi bo'lsa, tanlov yana o'zimizga qaytib cheksiz
+     * halqa hosil bo'lardi. EXTRA_EXCLUDE_COMPONENTS — API 24+ (minSdk 24).
+     */
+    fun openSystemChooser(context: Context, url: String): Boolean {
+        return try {
+            val view = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val chooser = Intent.createChooser(view, null).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    putExtra(
+                        Intent.EXTRA_EXCLUDE_COMPONENTS,
+                        arrayOf(
+                            ComponentName(context, LinkGuardActivity::class.java),
+                            ComponentName(context, ShareUrlReceiverActivity::class.java),
+                        )
+                    )
+                }
+            }
+            context.startActivity(chooser)
+            true
+        } catch (_: Throwable) {
+            false
+        }
     }
 
     /** Havolani aynan berilgan brauzer paketida ochadi. Muvaffaqiyatda true. */

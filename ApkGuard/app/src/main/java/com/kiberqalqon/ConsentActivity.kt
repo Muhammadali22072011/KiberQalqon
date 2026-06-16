@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -185,21 +185,21 @@ class ConsentActivity : AppCompatActivity() {
 // ============================================================
 
 private val TERMS_OF_SERVICE = """
-KiberQalqon — Android qurilmangizdagi APK fayllarni xavfsizlik nuqtai nazaridan tekshiruvchi vositadir. Ushbu shartlarni o'qib chiqing, ular ilovadan foydalanish qoidalarini belgilaydi.
+UzGuard — Android qurilmangizdagi APK fayllarni xavfsizlik nuqtai nazaridan tekshiruvchi vositadir. Ushbu shartlarni o'qib chiqing, ular ilovadan foydalanish qoidalarini belgilaydi.
 
 1. ILOVA HAQIDA
-KiberQalqon APK fayllarini evristik tahlil yordamida skan qiladi (imzo, ruxsatlar, malware-signaturalar). U 100% aniqlik kafolatlamaydi: ba'zi xavfli APK'lar "xavfsiz" deb belgilanishi yoki aksincha.
+UzGuard APK fayllarini evristik tahlil yordamida skan qiladi (imzo, ruxsatlar, malware-signaturalar). U 100% aniqlik kafolatlamaydi: ba'zi xavfli APK'lar "xavfsiz" deb belgilanishi yoki aksincha.
 
 2. YOSH CHEGARASI
 Ilovadan foydalanish uchun siz kamida 13 yoshda bo'lishingiz kerak. Agar 13-18 yosh oralig'ida bo'lsangiz, ota-onangiz roziligi tavsiya etiladi.
 
 3. MAS'ULIYAT
 - Skan natijasiga qaramay, qaysi ilovani o'rnatishga qaror qilish — sizning mas'uliyatingizdir.
-- KiberQalqon xavfli deb topgan APK'larni avtomatik o'chirib yoki karantinga qo'yishi mumkin (sozlamalardan boshqaring).
+- UzGuard xavfli deb topgan APK'larni avtomatik o'chirib yoki karantinga qo'yishi mumkin (sozlamalardan boshqaring).
 - Dasturchi noto'g'ri natija sababli yo'qotgan ma'lumot yoki zarar uchun javobgar emas.
 
 4. RUXSATLAR (nima uchun so'raladi)
-KiberQalqon faqat o'z vazifasi uchun zarur tizim ruxsatlarini so'raydi. Hech bir ruxsat reklama yoki kuzatuv uchun ishlatilmaydi.
+UzGuard faqat o'z vazifasi uchun zarur tizim ruxsatlarini so'raydi. Hech bir ruxsat reklama yoki kuzatuv uchun ishlatilmaydi.
 
 Fayllarni tekshirish:
 - Barcha fayllarga kirish (MANAGE_EXTERNAL_STORAGE) — qurilmadagi APK fayllarni topish va xavflilarini o'chirish uchun
@@ -223,7 +223,7 @@ Ixtiyoriy ruxsatlar (bermasangiz ham ilova to'liq ishlaydi):
 
 5. TAQIQLAR
 Quyidagilarni qilmang:
-- KiberQalqon'ni reverse-engineer qilish, dekompilatsiya
+- UzGuard'ni reverse-engineer qilish, dekompilatsiya
 - Skanerni aldash uchun fayllarni o'zgartirish
 - Ilovadan boshqalarning qurilmasiga ruxsatsiz kirish uchun foydalanish
 
@@ -240,14 +240,14 @@ Qabul qilish — ushbu shartlarni o'qiganingizni va tushunganingizni anglatadi.
 """.trimIndent()
 
 private val PRIVACY_POLICY = """
-Bu siyosat KiberQalqon'ning ma'lumot bilan ishlashini to'liq tushuntiradi. HECH NARSA YASHIRILMAGAN.
+Bu siyosat UzGuard'ning ma'lumot bilan ishlashini to'liq tushuntiradi. HECH NARSA YASHIRILMAGAN.
 
 Oxirgi yangilanish: 2026-yil 10-iyun (5-versiya).
 
 ═══════════════════════════════
 1. ASOSIY PRINSIP
 ═══════════════════════════════
-KiberQalqon — oflayn skaner: barcha tekshiruvlar qurilmaning o'zida bajariladi, skan natijalari va sozlamalar faqat sizning telefoningizda saqlanadi.
+UzGuard — oflayn skaner: barcha tekshiruvlar qurilmaning o'zida bajariladi, skan natijalari va sozlamalar faqat sizning telefoningizda saqlanadi.
 
 Shaxsiy yoki qurilmaga oid ma'lumot qurilmadan tashqariga FAQAT siz alohida yoqqan IXTIYORIY funksiyalar orqali chiqadi:
 • "Jamoatchilik xavfsizligi" ulashishi (4-bo'lim) — IXTIYORIY, standart holatda O'CHIQ
@@ -270,7 +270,7 @@ Bu ma'lumotlar telefonning ichki xotirasida saqlanadi va boshqa ilovalar uchun o
 ═══════════════════════════════
 3. HIMOYA BAZASINI YANGILASH (TEXNIK TRAFIK)
 ═══════════════════════════════
-Antivirus dolzarb bo'lishi uchun ilova vaqti-vaqti bilan KiberQalqon markaziy serveridan (xavfsiz HTTPS orqali) quyidagilarni YUKLAB OLADI:
+Antivirus dolzarb bo'lishi uchun ilova vaqti-vaqti bilan UzGuard markaziy serveridan (xavfsiz HTTPS orqali) quyidagilarni YUKLAB OLADI:
 
 • Virus qora ro'yxati (yangi tahdidlarning hash va paket nomlari) — soxtalashtirib bo'lmasligi uchun raqamli imzo bilan tekshiriladi
 • Himoya sozlamalari (skaner chegaralari)
@@ -281,7 +281,7 @@ MUHIM: bu so'rovlar YUKLAB OLISH, xolos — ularda skan natijalari, fayllar yoki
 ═══════════════════════════════
 4. JAMOATCHILIK XAVFSIZLIGI ULASHISHI (IXTIYORIY)
 ═══════════════════════════════
-KiberQalqon'ning kuchi — jamoaviy himoyada: qurilmalardan kelgan xavf signallari markaziy bazaga yig'iladi va u yerdan BARCHA foydalanuvchilarga himoya signaturalari tarqatiladi. Bu Kaspersky Security Network, ESET LiveGrid va Microsoft MAPS kabi standart amaliyot.
+UzGuard'ning kuchi — jamoaviy himoyada: qurilmalardan kelgan xavf signallari markaziy bazaga yig'iladi va u yerdan BARCHA foydalanuvchilarga himoya signaturalari tarqatiladi. Bu Kaspersky Security Network, ESET LiveGrid va Microsoft MAPS kabi standart amaliyot.
 
 Bu funksiya IXTIYORIY: pastdagi 3-galochka orqali yoqiladi (standart holatda O'CHIQ) va istalgan vaqtda Sozlamalardan o'chiriladi. Yoqmasangiz ham skaner, ogohlantirishlar va himoya TO'LIQ ishlaydi — faqat qurilmangiz markaziy xarita va statistikada qatnashmaydi.
 
@@ -302,7 +302,7 @@ YOQILGAN bo'lsa, NIMALAR yuboriladi:
 
 (c) Ilova xatosi (crash) yuz berganda — dasturchi xatoni tuzatishi uchun:
    • Stacktrace (kod xatosi joyi va sababi)
-   • Qurilma modeli, Android versiyasi, KiberQalqon versiyasi va vaqt
+   • Qurilma modeli, Android versiyasi, UzGuard versiyasi va vaqt
 
 YOQILGAN bo'lsa HAM, HECH QACHON YUBORILMAYDI:
 • Xavfsiz APK FAYLLARINING o'zi (faqat meta-ma'lumoti statistika uchun ketadi — faylning o'zi emas)
@@ -321,8 +321,8 @@ NIMA UCHUN CRASH YUBORILADI:
 Dasturchi bilmagan xatolar ilovani buzadi. Stacktrace bilan dasturchi xatoni tuzatib, yangilanish chiqaradi. Bu Firebase Crashlytics, Sentry kabi standart amaliyot.
 
 QAYERGA YUBORILADI:
-• Bulut monitoringi: KiberQalqon'ning markaziy serveriga (xavfsiz HTTPS orqali) — u himoya xaritasi, statistika va tahdid oqimini to'ldiradi; xavfli/shubhali APK namunalari esa o'rganish uchun himoyalangan saqlovga yuklanadi.
-• Telegram hisoboti: KiberQalqon rivojlantirish jamoasining Telegram boti orqali markaziy jamoatchilik xavf bazasiga.
+• Bulut monitoringi: UzGuard'ning markaziy serveriga (xavfsiz HTTPS orqali) — u himoya xaritasi, statistika va tahdid oqimini to'ldiradi; xavfli/shubhali APK namunalari esa o'rganish uchun himoyalangan saqlovga yuklanadi.
+• Telegram hisoboti: UzGuard rivojlantirish jamoasining Telegram boti orqali markaziy jamoatchilik xavf bazasiga.
 Bu ma'lumotlar yangi viruslarni aniqlash va boshqa foydalanuvchilarni himoya qilish uchun signaturalar bazasiga qo'shiladi.
 
 QANDAY BOSHQARILADI:
@@ -334,7 +334,7 @@ QANDAY BOSHQARILADI:
 ═══════════════════════════════
 5. SHAXSIY TELEGRAM TELEMETRIYA (IXTIYORIY)
 ═══════════════════════════════
-KiberQalqon'da hodisalarni O'ZINGIZNING Telegram botingizga yuborish funksiyasi bor. U STANDART HOLATDA O'CHIRILGAN va faqat siz o'z bot tokeningizni kiritib yoqsangiz ishlaydi.
+UzGuard'da hodisalarni O'ZINGIZNING Telegram botingizga yuborish funksiyasi bor. U STANDART HOLATDA O'CHIRILGAN va faqat siz o'z bot tokeningizni kiritib yoqsangiz ishlaydi.
 
 YOQILGAN bo'lsa, NIMA YUBORILADI:
 • Skaner natijalari: APK fayl nomi, hajmi, verdict, sabab, manba (telegram/whatsapp/yuklab olish)
@@ -372,8 +372,8 @@ Kirish ekranida pastki yozuvga uzoq bosing → DIAGNOSTIKA → "Telegram telemet
 7. INTERNET FOYDALANISHI (TO'LIQ RO'YXAT)
 ═══════════════════════════════
 Ilova internetga kiradigan barcha holatlar:
-• Himoya bazasini yangilash (3-bo'lim): virus qora ro'yxati, himoya sozlamalari, yangiliklar — KiberQalqon markaziy serveridan YUKLAB OLISH, shaxsiy ma'lumotsiz
-• Jamoatchilik ulashish YOQILGAN bo'lsa (4-bo'lim) — markaziy bulut serveriga va KiberQalqon jamoasi botiga (api.telegram.org)
+• Himoya bazasini yangilash (3-bo'lim): virus qora ro'yxati, himoya sozlamalari, yangiliklar — UzGuard markaziy serveridan YUKLAB OLISH, shaxsiy ma'lumotsiz
+• Jamoatchilik ulashish YOQILGAN bo'lsa (4-bo'lim) — markaziy bulut serveriga va UzGuard jamoasi botiga (api.telegram.org)
 • Shaxsiy Telegram telemetriya YOQILGAN bo'lsa (5-bo'lim) — sizning botingizga (api.telegram.org)
 
 Boshqa hech qanday internet-trafik yo'q. Reklama tarmoqlari va analitika SDK'lari (Firebase, Crashlytics, Google Analytics) ISHLATILMAYDI.
@@ -389,13 +389,13 @@ Boshqa hech qanday internet-trafik yo'q. Reklama tarmoqlari va analitika SDK'lar
 ═══════════════════════════════
 9. BOLALAR MA'LUMOTLARI
 ═══════════════════════════════
-13 yoshgacha bo'lgan bolalardan ma'lumot bila turib yig'ilmaydi. Agar siz ota-ona bo'lib, 13 yoshgacha bo'lgan bolangiz KiberQalqon'dan foydalanayotganini bilsangiz — ilovani o'chiring.
+13 yoshgacha bo'lgan bolalardan ma'lumot bila turib yig'ilmaydi. Agar siz ota-ona bo'lib, 13 yoshgacha bo'lgan bolangiz UzGuard'dan foydalanayotganini bilsangiz — ilovani o'chiring.
 
 ═══════════════════════════════
 10. XALQARO O'TKAZISH
 ═══════════════════════════════
 Ixtiyoriy funksiyalar yoqilgan bo'lsa, ma'lumotlar xalqaro joylashgan serverlarga o'tkaziladi:
-• Bulut monitoringi — KiberQalqon'ning bulut infratuzilmasi (Vercel/Supabase, xalqaro)
+• Bulut monitoringi — UzGuard'ning bulut infratuzilmasi (Vercel/Supabase, xalqaro)
 • Telegram kanallari — Telegram serverlari (telegram.org/privacy)
 
 ═══════════════════════════════
@@ -413,7 +413,7 @@ QABUL QILISH ORQALI SIZ:
 • Yuqoridagi shartlar va siyosatni o'qib chiqqaningizni va tushunganingizni
 • Himoya bazalari yangilanishi shaxsiy ma'lumot YUBORMAYDIGAN texnik trafik ekanligini
 • "Jamoatchilik xavfsizligi" ulashishi IXTIYORIY ekanligini — uni 3-galochka bilan yoqish yoki yoqmaslik o'z qo'lingizda ekanini
-• Yoqsangiz: skan meta-ma'lumoti markaziy bulutga, xavfli APK fayllari esa o'rganish uchun KiberQalqon jamoasiga yuborilishini
+• Yoqsangiz: skan meta-ma'lumoti markaziy bulutga, xavfli APK fayllari esa o'rganish uchun UzGuard jamoasiga yuborilishini
 • Joylashuv ruxsatini bersangiz, qurilma koordinatasi himoya xaritasi uchun yuborilishini — fonda kuzatuvsiz; bermasangiz yuborilmasligini
 • Shaxsiy Telegram telemetriya IXTIYORIY ekanligini (siz o'z bot/chat'ingizni kiritishingiz kerak)
 • Shaxsiy ma'lumot (ism, telefon raqami, IMEI, seriya raqami, kontaktlar, SMS, parollar) HECH QACHON yuborilmasligini

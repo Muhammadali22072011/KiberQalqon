@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -16,8 +16,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
-import com.kiberqalqon.databinding.ActivityDashboardNewBinding
-import com.kiberqalqon.databinding.IncKq4NewsCardBinding
+import com.uzguard.databinding.ActivityDashboardNewBinding
+import com.uzguard.databinding.IncKq4NewsCardBinding
 import kotlinx.coroutines.*
 
 class DashboardNewActivity : AppCompatActivity() {
@@ -284,7 +284,7 @@ class DashboardNewActivity : AppCompatActivity() {
     /**
      * `appList` ichiga barcha user-app'larni (system'sis) ro'yxat sifatida joylaydi.
      * Har bir satr: real ikonka + ilova nomi + paket · manba + verdict-tag.
-     * Verdict `kiberqalqon_rescan` SharedPreferences'dan o'qiladi
+     * Verdict `uzguard_rescan` SharedPreferences'dan o'qiladi
      * (InstalledAppsRescanWorker har 24 soatda yangilaydi).
      * Skan qilinmagan ilova uchun tag — kulrang "Tekshirilmagan".
      *
@@ -309,7 +309,7 @@ class DashboardNewActivity : AppCompatActivity() {
                 }
 
                 // Faqat user-apps (system'larni o'tkazamiz, lekin updated-system'larni qoldiramiz —
-                // u yerda ham sideload-attack apdeytlari uchraydi). KiberQalqon o'zini o'tkazadi.
+                // u yerda ham sideload-attack apdeytlari uchraydi). UzGuard o'zini o'tkazadi.
                 val userApps = packages.filter { p ->
                     val app = p.applicationInfo ?: return@filter false
                     val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
@@ -318,12 +318,22 @@ class DashboardNewActivity : AppCompatActivity() {
                     (!isSystem || updatedSystem) && !isSelf
                 }
 
-                val rescanPrefs = getSharedPreferences("kiberqalqon_rescan", Context.MODE_PRIVATE)
+                val rescanPrefs = getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
                 userApps.mapNotNull { p ->
                     val app = p.applicationInfo ?: return@mapNotNull null
                     val label = try { app.loadLabel(pm).toString() } catch (_: Throwable) { p.packageName }
                     val icon = try { app.loadIcon(pm) } catch (_: Throwable) { null }
+                    val sourceDir = try { app.sourceDir } catch (_: Throwable) { null }
                     var verdict = rescanPrefs.getString("verdict_${p.packageName}", null)
+
+                    // Rescan-prefs hali bo'sh bo'lsa (kunlik worker hali yurmagan) — skan
+                    // keshidan (ScanCache, sourceDir bo'yicha) oxirgi natijani olamiz. Shunda
+                    // avval skan qilingan ilovalar "Tekshirilmagan" bo'lib qolmaydi.
+                    if (verdict == null && sourceDir != null) {
+                        verdict = try {
+                            ScanCache.get(applicationContext, sourceDir)?.verdict?.name
+                        } catch (_: Throwable) { null }
+                    }
 
                     // Ma'lum virus paketlari ro'yxati — InstalledAppsRescanWorker'dan oldin
                     // yana bir himoya qatlami. Foydalanuvchi ilovani 1 sekund oldin o'rnatgan
@@ -334,15 +344,42 @@ class DashboardNewActivity : AppCompatActivity() {
                     if (knownBad != null) verdict = "DANGER"
 
                     val source = detectInstallSource(pm, p.packageName)
-                    AppRowData(label, p.packageName, icon, verdict, source)
+                    AppRowData(label, p.packageName, icon, verdict, source, sourceDir)
                 }.sortedBy { it.label.lowercase() }
             }
 
             val inflater = layoutInflater
+            val rowByPkg = HashMap<String, View>(rows.size)
             for (data in rows) {
                 val row = inflater.inflate(R.layout.inc_dashboard_app_row, container, false)
                 bindAppRow(row, data)
                 container.addView(row)
+                rowByPkg[data.pkgName] = row
+            }
+
+            // Skan qilinmagan ("Tekshirilmagan") ilovalarni ekran ochiqligida DARHOL
+            // tekshiramiz — endi foydalanuvchi serdagi "Tekshirilmagan" tegida abadiy qotib
+            // qolmaydi. Ilgari verdiktni faqat kunlik InstalledAppsRescanWorker to'ldirardi
+            // (u esa +2 soat kechikib ishga tushib, 50 ta bilan cheklanib, OEM tomonidan
+            // o'ldirilishi mumkin edi) — yangi o'rnatishda hamma ilova "Tekshirilmagan" turardi.
+            // Natija uzguard_rescan'ga + ScanCache'ga tushadi, shuning uchun keyingi
+            // ochilishlarda qayta skan bo'lmaydi (bir necha ochilishda to'liq konvergensiya).
+            // Skan xato/timeout bersa — teg "Tekshirilmagan" bo'lib qoladi (hech qachon yolg'on XAVFSIZ).
+            val rescanPrefs = getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
+            var scannedNow = 0
+            for (data in rows) {
+                if (scannedNow >= 40) break          // bitta ochilishda ko'pi bilan 40 ta — qizib ketmasin
+                if (data.verdict != null) continue   // allaqachon verdikti bor — o'tkazamiz
+                val sourceDir = data.sourceDir ?: continue
+                val scanned = withContext(Dispatchers.IO) {
+                    try { withTimeoutOrNull(8000) { ApkScanner.scan(applicationContext, sourceDir) } }
+                    catch (_: Throwable) { null }
+                } ?: continue
+                scannedNow++
+                rescanPrefs.edit().putString("verdict_${data.pkgName}", scanned.verdict.name).apply()
+                // Tegni jonli yangilaymiz — foydalanuvchi tekshiruv ketayotganini ko'radi.
+                rowByPkg[data.pkgName]?.let { applyAppTag(it, scanned.verdict.name) }
+                yield()
             }
         }
     }
@@ -353,6 +390,7 @@ class DashboardNewActivity : AppCompatActivity() {
         val icon: android.graphics.drawable.Drawable?,
         val verdict: String?,
         val source: InstallSource,
+        val sourceDir: String?,
     )
 
     private enum class InstallSource {
@@ -567,10 +605,18 @@ class DashboardNewActivity : AppCompatActivity() {
         )
 
         // Verdict-tag: yashil=safe, sariq=shubhali, qizil=xavfli, kulrang=skan qilinmagan.
+        applyAppTag(root, data.verdict)
+
+        // Ilovaga bosilsa — uning ruxsatlarini batafsil ko'rsatamiz (+ tap = real tekshiruv).
+        root.setOnClickListener { openAppDetails(data, root) }
+    }
+
+    /** Satrning verdict-yorlig'ini (rang+matn) o'rnatadi. Skan tugagach jonli yangilash uchun ham. */
+    private fun applyAppTag(root: View, verdict: String?) {
         val tag = root.findViewById<View>(R.id.tagApp)
         val tagDot = root.findViewById<View>(R.id.tagAppDot)
         val tagText = root.findViewById<TextView>(R.id.tvAppTag)
-        val (bgRes, inkColor, textRes) = when (data.verdict) {
+        val (bgRes, inkColor, textRes) = when (verdict) {
             "DANGER" -> Triple(R.drawable.kq4_tag_danger, R.color.kq_danger_ink, R.string.kq4_danger)
             "SUSPICIOUS" -> Triple(R.drawable.kq4_tag_warn, R.color.kq_warn_ink, R.string.kq4_suspicious)
             "SAFE" -> Triple(R.drawable.kq4_tag_safe, R.color.kq_safe_ink, R.string.kq4_safe)
@@ -580,9 +626,6 @@ class DashboardNewActivity : AppCompatActivity() {
         tagDot.backgroundTintList = ColorStateList.valueOf(getColor(inkColor))
         tagText.setText(textRes)
         tagText.setTextColor(getColor(inkColor))
-
-        // Ilovaga bosilsa — uning ruxsatlarini batafsil ko'rsatamiz.
-        root.setOnClickListener { openAppDetails(data) }
     }
 
     /**
@@ -591,31 +634,41 @@ class DashboardNewActivity : AppCompatActivity() {
      * skan cho'zilib ketsa yoki xato bersa — saqlangan verdict (yo'q bo'lsa SHUBHALI,
      * hech qachon yolg'on XAVFSIZ emas). Ruxsatlar baribir paket orqali o'qiladi.
      */
-    private fun openAppDetails(data: AppRowData) {
+    private fun openAppDetails(data: AppRowData, row: View) {
         Toast.makeText(this, getString(R.string.autoscan_scanning), Toast.LENGTH_SHORT).show()
         scope.launch {
-            val sourceDir = withContext(Dispatchers.IO) {
+            val sourceDir = data.sourceDir ?: withContext(Dispatchers.IO) {
                 try { packageManager.getApplicationInfo(data.pkgName, 0).sourceDir }
                 catch (_: Throwable) { null }
             }
-            val result = withContext(Dispatchers.IO) {
-                val scanned = if (sourceDir != null) {
+            val scanned = withContext(Dispatchers.IO) {
+                if (sourceDir != null) {
                     try { withTimeoutOrNull(8000) { ApkScanner.scan(applicationContext, sourceDir) } }
                     catch (_: Throwable) { null }
                 } else null
-                scanned ?: ScanResult(
-                    verdict = when (data.verdict) {
-                        "DANGER" -> ScanResult.Verdict.DANGER
-                        "SUSPICIOUS" -> ScanResult.Verdict.SUSPICIOUS
-                        "SAFE" -> ScanResult.Verdict.SAFE
-                        else -> ScanResult.Verdict.SUSPICIOUS
-                    },
-                    reason = "",
-                    details = emptyList(),
-                    dangerousPermissions = emptyList(),
-                    malwareSignatures = emptyList()
-                )
             }
+            val result = scanned ?: ScanResult(
+                verdict = when (data.verdict) {
+                    "DANGER" -> ScanResult.Verdict.DANGER
+                    "SUSPICIOUS" -> ScanResult.Verdict.SUSPICIOUS
+                    "SAFE" -> ScanResult.Verdict.SAFE
+                    else -> ScanResult.Verdict.SUSPICIOUS
+                },
+                reason = "",
+                details = emptyList(),
+                dangerousPermissions = emptyList(),
+                malwareSignatures = emptyList()
+            )
+
+            // Tap = HAQIQIY tekshiruv. Real skan bo'lgan bo'lsa — verdiktni saqlaymiz, shunda
+            // ilova endi "Tekshirilmagan" bo'lib qolmaydi (keyingi ochilishda ham). Satr
+            // yorlig'ini darhol yangilaymiz — foydalanuvchi tekshiruv bo'lganini ko'radi.
+            if (scanned != null) {
+                getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
+                    .edit().putString("verdict_${data.pkgName}", scanned.verdict.name).apply()
+            }
+            applyAppTag(row, result.verdict.name)
+
             startActivity(
                 ScanResultActivity.intent(
                     this@DashboardNewActivity,
@@ -639,7 +692,7 @@ class DashboardNewActivity : AppCompatActivity() {
     }
 
     private fun getStatistics(): Statistics {
-        val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("uzguard_stats", Context.MODE_PRIVATE)
 
         // UX-06: karantin soni HAQIQIY karantindan (Quarantine.list), statistika emas.
         val quarantineCount = try { Quarantine.list(this).size } catch (_: Throwable) { 0 }

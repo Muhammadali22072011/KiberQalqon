@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Чистая (без Android API) логика "какие APK появились ВНОВЬ с прошлого опроса".

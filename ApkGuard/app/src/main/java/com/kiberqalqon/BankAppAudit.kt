@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -25,7 +25,7 @@ import android.util.Log
  *
  * MUHIM QOIDA — false-positive emas:
  *   - Haqiqiy bank o'z paketi ostida + Play'dan o'rnatilgan → HECH QACHON soxta emas (reasons bo'sh).
- *   - O'ZIMIZNING ilova (com.kiberqalqon[.debug]) — "Anor Qalqon" vs "anorbank" to'qnashuvi —
+ *   - O'ZIMIZNING ilova (com.uzguard[.debug]) — "UzGuard" vs "anorbank" to'qnashuvi —
  *     ALBATTA chiqarib tashlanadi.
  *   - Brendlar BUTUN token bilan solishtiriladi (substring "anor" emas).
  *

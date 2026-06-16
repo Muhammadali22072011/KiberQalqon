@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import androidx.core.content.edit
@@ -27,7 +27,7 @@ import java.security.MessageDigest
  */
 object ScanCache {
 
-    private const val PREFS = "kiberqalqon_scan_cache"
+    private const val PREFS = "uzguard_scan_cache"
     // v2 (2026-05): verdict-mantiqi qayta kalibrlandi (false-positive tuzatildi).
     // Versiya nomi o'zgartirildi → eski (noto'g'ri DANGER) keshlangan natijalar
     // tashlanadi. Aks holda allaqachon skanlangan legit ilovalar (Chrome, GMS...)

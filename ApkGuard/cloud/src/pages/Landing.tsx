@@ -67,7 +67,7 @@ export default function Landing() {
       <div className="lwrap">
         <nav className="lnav">
           <div className="logo">🛡</div>
-          <div className="brand"><b>Anor Qalqon</b><small>Cloud · himoya markazi</small></div>
+          <div className="brand"><b>UzGuard</b><small>Cloud · himoya markazi</small></div>
           <div className="spacer" />
           <Link to="/login" className="btn ghost">Panelga kirish</Link>
         </nav>
@@ -78,7 +78,7 @@ export default function Landing() {
             Android tahdidlarni <span className="accent">real vaqtda</span> ko‘rib turing
           </h1>
           <p>
-            Anor Qalqon — O‘zbekiston foydalanuvchilariga qaratilgan bank troyanlari, dropperlar va
+            UzGuard — O‘zbekiston foydalanuvchilariga qaratilgan bank troyanlari, dropperlar va
             josus ilovalarni aniqlaydigan, ularni xaritada va jonli oqimda kuzatib boruvchi himoya tizimi.
           </p>
           <div className="lcta">
@@ -137,7 +137,7 @@ export default function Landing() {
           <div className="lstat"><b>100%</b><span>o‘zbek tilida</span></div>
         </section>
 
-        <footer className="lfoot">© 2026 · Anor Qalqon · Muhammadali</footer>
+        <footer className="lfoot">© 2026 · UzGuard · Muhammadali</footer>
       </div>
     </div>
   );

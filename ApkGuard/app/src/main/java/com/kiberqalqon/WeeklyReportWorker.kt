@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -88,10 +88,10 @@ class WeeklyReportWorker(
 
     companion object {
         private const val TAG = "WeeklyReportWorker"
-        const val WORK_NAME = "kiberqalqon_weekly_report"
+        const val WORK_NAME = "uzguard_weekly_report"
 
         // weekly_report_last_ts to'g'ridan-to'g'ri shu worker tomonidan o'qiladi/yoziladi.
-        private const val PREFS = "kiberqalqon_prefs"
+        private const val PREFS = "uzguard_prefs"
         private const val KEY_LAST_TS = "weekly_report_last_ts"
         private const val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000L
 

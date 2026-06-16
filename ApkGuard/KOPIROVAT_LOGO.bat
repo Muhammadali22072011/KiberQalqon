@@ -8,7 +8,7 @@ echo.
 REM Проверяем что logo.jpg существует
 if not exist "logo.jpg" (
     echo ❌ Файл logo.jpg не найден!
-    echo Положи logo.jpg в папку KiberQalqon
+    echo Положи logo.jpg в папку UzGuard
     pause
     exit /b 1
 )

@@ -58,7 +58,7 @@
 
 3. АВТОМАТИЧЕСКОЕ СКАНИРОВАНИЕ НОВЫХ:
    ✅ Скачиваешь APK через браузер
-   ✅ ⚡ СРАЗУ выскакивает окно KiberQalqon
+   ✅ ⚡ СРАЗУ выскакивает окно UzGuard
    ✅ Видишь "Tekshirilmoqda..." с анимацией
    ✅ Через 2 секунды результат с цветом
    ✅ Опасные удаляются автоматически
@@ -81,7 +81,7 @@
 7. Отправляет итоговое уведомление
 
 Уведомления:
-- Два канала: "kiberqalqon_danger" и "kiberqalqon_safe"
+- Два канала: "uzguard_danger" и "uzguard_safe"
 - Опасные: HIGH priority + звук + вибрация
 - Безопасные: DEFAULT priority + вибрация
 - BigTextStyle для длинных сообщений
@@ -90,7 +90,7 @@
 
 📱 НОВЫЙ APK ГОТОВ:
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 ═══════════════════════════════════════════════════════════════
 

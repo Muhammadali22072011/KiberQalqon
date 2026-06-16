@@ -1,5 +1,5 @@
 # ============================================================
-# KiberQalqon — native himoya kutubxonasi (libkqguard.so).
+# UzGuard — native himoya kutubxonasi (libkqguard.so).
 #
 # Vazifasi: eng oson "patch qilinadigan" Kotlin tekshiruvlarini (imzo, anti-debug)
 # nativega ko'chirish. .so'ni reverse qilish DEX'dan ancha qiyin, shuning uchun

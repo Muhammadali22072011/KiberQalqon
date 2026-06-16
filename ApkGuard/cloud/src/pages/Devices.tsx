@@ -73,7 +73,7 @@ export default function Devices() {
     <>
       <div className="page-intro">
         <h1>Himoyalangan qurilmalar</h1>
-        <p>Anor Qalqon o‘rnatilgan qurilmalar, ularning xavf darajasi va skan tarixi. Qatorni bosib tafsilotni oching.</p>
+        <p>UzGuard o‘rnatilgan qurilmalar, ularning xavf darajasi va skan tarixi. Qatorni bosib tafsilotni oching.</p>
       </div>
 
       <div className={'grid' + (sel ? ' map-grid' : '')}>

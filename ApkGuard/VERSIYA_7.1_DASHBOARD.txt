@@ -12,12 +12,12 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 🎨 НОВЫЙ DASHBOARD:
 -------------------
 ┌─────────────────────────────────┐
-│  🛡️ KIBERQALQON          [⚙️] [📊]│
+│  🛡️ UZGUARD          [⚙️] [📊]│
 ├─────────────────────────────────┤
 │                                 │
 │   Уровень защиты                │
@@ -40,7 +40,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 🚀 КАК ИСПОЛЬЗОВАТЬ:
 --------------------
-1. Открой KiberQalqon
+1. Открой UzGuard
 2. Нажми кнопку 📊 в правом верхнем углу
 3. Увидишь Dashboard с графиками
 4. Спидометр показывает уровень защиты:

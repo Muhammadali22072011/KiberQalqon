@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -11,7 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityLinkCheckBinding
+import com.uzguard.databinding.ActivityLinkCheckBinding
 
 /**
  * v4 dizayn «Havola tekshirgich» (link checker — eng qimmatli funksiya).

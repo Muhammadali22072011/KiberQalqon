@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.kiberqalqon.databinding.ActivityBankGuardBinding
+import com.uzguard.databinding.ActivityBankGuardBinding
 
 /**
  * «Bank himoyasi» — qurilmaga o'rnatilgan SOXTA bank ilovalarini ([BankAppAudit]) ko'rsatadi.

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Base64
@@ -31,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec
 object CloudBlacklist {
 
     private const val TAG = "CloudBlacklist"
-    private const val PREFS = "kiberqalqon_cloud_bl"
+    private const val PREFS = "uzguard_cloud_bl"
     private const val KEY_V = "cbl_v"      // hash/paket feed versiyasi (threatMaxSeen)
     private const val KEY_DV = "cbl_dv"    // domen feed versiyasi (domainMaxSeen) — MUSTAQIL rollback-guard
     private const val KEY_PAYLOAD = "cbl_payload"
@@ -202,7 +202,7 @@ object CloudBlacklist {
 
     /** Bulut paket-feed'i o'zimizni yoki tizim paketini bloklab qo'ymasligi uchun istisno. */
     private fun isSelfPackage(pkg: String): Boolean =
-        pkg == "com.kiberqalqon" || pkg == "com.kiberqalqon.debug" || pkg.startsWith("com.apkguard")
+        pkg == "com.uzguard" || pkg == "com.uzguard.debug" || pkg.startsWith("com.apkguard")
 
     /** "payloadB64.sigB64" envelopni HMAC-SHA256 bilan tekshiradi, payload JSON'ini qaytaradi. */
     private fun verifyAndDecode(envelope: String, signingKey: String): JSONObject? {

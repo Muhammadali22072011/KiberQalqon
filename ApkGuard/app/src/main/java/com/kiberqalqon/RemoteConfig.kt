@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Base64
@@ -31,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec
 object RemoteConfig {
 
     private const val TAG = "RemoteConfig"
-    private const val PREFS = "kiberqalqon_remote_config"
+    private const val PREFS = "uzguard_remote_config"
     private const val KEY_V = "rc_v"
     private const val KEY_FETCHED_AT = "rc_fetched_at"
 

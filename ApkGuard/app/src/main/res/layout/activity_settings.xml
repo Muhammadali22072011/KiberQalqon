@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Sozlamalar (SettingsActivity) — KiberQalqon §3.7 palette adapted to the
+  Sozlamalar (SettingsActivity) — UzGuard §3.7 palette adapted to the
   legacy field set this Activity actually wires. All IDs preserved:
     btnBack, toolbar (gone),
     rgAutoDelete + rbDelete/rbAsk/rbWarn,

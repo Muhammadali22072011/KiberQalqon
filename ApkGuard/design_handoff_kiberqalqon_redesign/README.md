@@ -1,4 +1,4 @@
-# Handoff: KiberQalqon — Milliy + Cyber Redesign
+# Handoff: UzGuard — Milliy + Cyber Redesign
 
 > **For:** Claude Code working in `APK Virus Analysis/ApkGuard/` (Android Kotlin app)
 > **From:** HTML/React design prototype
@@ -42,7 +42,7 @@ Add or update these in `app/src/main/res/values/colors.xml` (light) and `values-
 
 #### LIGHT theme (`values/colors.xml`)
 ```xml
-<!-- ── KIBERQALQON · Milliy + Friendly (LIGHT) ───────── -->
+<!-- ── UZGUARD · Milliy + Friendly (LIGHT) ───────── -->
 
 <!-- Surface -->
 <color name="kq_bg">#FBF8F3</color>           <!-- warm cream (oklch 0.985 0.012 85) -->
@@ -84,7 +84,7 @@ Add or update these in `app/src/main/res/values/colors.xml` (light) and `values-
 
 #### DARK theme (`values-night/colors.xml`) — cyber-security stil
 ```xml
-<!-- ── KIBERQALQON · Cyber Security (DARK) ───────────── -->
+<!-- ── UZGUARD · Cyber Security (DARK) ───────────── -->
 
 <color name="kq_bg">#0F1820</color>            <!-- deep navy -->
 <color name="kq_bg_elev">#192634</color>
@@ -224,7 +224,7 @@ Center dot: r=4 in kq_primary at (50,50)
   1. Pulse rings — two concentric circles (`kq_pulse_ring.xml`), 160×160 dp, white at 20% alpha, animation `kq_pulse_ring.xml` (already exists), one delayed 0.7s.
   2. Glass disc — 110×110 dp circle, white 15% alpha, 1dp white 30% border, `backdropBlur` if available (else just translucent).
   3. Shield logo (`kq_shield_mark_white.xml`), 68dp.
-- **38dp below disc:** "KiberQalqon" — Space Grotesk 800, 38sp, white, letter-spacing -0.02em.
+- **38dp below disc:** "UzGuard" — Space Grotesk 800, 38sp, white, letter-spacing -0.02em.
 - **10dp below name:** "TELEFON HIMOYASI · v 7.5" — JetBrains Mono 500, 13sp, +0.24em tracking UPPER, white 85% alpha.
 - **Bottom 70dp:** "Zararli APK fayllardan himoyalanish" — Manrope 500, 12sp, white 75% alpha.
 - **Bottom 38dp:** 3 loading dots (use `kq_load_dot.xml`), animated with staggered delays (0, 0.15s, 0.3s).
@@ -271,7 +271,7 @@ Use a `ViewPager2` with 3 pages. Each page is `item_onboarding_page.xml`.
 Vertical scroll. Top bar is part of content, not a separate `Toolbar`.
 
 **Top bar (16dp top padding):**
-- Left: 32dp shield logo + 2-line stack ("KiberQalqon" 700 16sp / "HIMOYA · FAOL" mono 10sp +0.1em).
+- Left: 32dp shield logo + 2-line stack ("UzGuard" 700 16sp / "HIMOYA · FAOL" mono 10sp +0.1em).
 - Right: two 40dp `icon-btn` circles ("UZ" mono 10sp, bell icon).
 
 **Hero card (kq_card with pattern overlay):**
@@ -456,7 +456,7 @@ Standard Activity. Vertical scroll.
 Standard scrolling Activity.
 
 **Profile card** at top (gradient `kq_bg_elev` → `kq_primary_soft` 130%, hairline glow border):
-- Row: 48dp `kq_primary` rounded square (14dp corners) with white shield → "KiberQalqon Pro" (display 15sp 700) + "VERSIYA 7.5 · TASHKENT" (mono 11sp +0.1em) → on right: safe chip "✓ FAOL".
+- Row: 48dp `kq_primary` rounded square (14dp corners) with white shield → "UzGuard Pro" (display 15sp 700) + "VERSIYA 7.5 · TASHKENT" (mono 11sp +0.1em) → on right: safe chip "✓ FAOL".
 
 **Sections** (each = eyebrow heading 8dp above + card list):
 
@@ -469,7 +469,7 @@ Standard scrolling Activity.
 
 2. **SERVER** — 2 rows:
    - Bulutga yuklash (toggle)
-   - Server manzili (chevron) — sub shows `https://api.kiberqalqon.uz` in mono.
+   - Server manzili (chevron) — sub shows `https://api.uzguard.uz` in mono.
 
 3. **KO'RINISH** — single card, padding 14dp:
    - **Tema** row: title + sub + segmented switch (Kun / Tun, 2 segments with sun/moon icons, active = `kq_primary` bg). Use `tweaks_panel.jsx`'s segmented look.
@@ -484,7 +484,7 @@ Standard scrolling Activity.
 
 5. **HAQIDA** — 3 chevron rows: "Loyiha haqida", "Yordam markazi", "Maxfiylik siyosati".
 
-6. **Footer:** centered mono caption 10.5sp 500 +0.08em "KIBERQALQON v7.5 · BUILD 9995 / © 2026 · Made in Tashkent".
+6. **Footer:** centered mono caption 10.5sp 500 +0.08em "UZGUARD v7.5 · BUILD 9995 / © 2026 · Made in Tashkent".
 
 ### 3.8 Statistics (`ScanHistoryActivity` or new `StatsActivity` / `activity_scan_history.xml`)
 
@@ -624,7 +624,7 @@ Duration scale: short 150ms · medium 300ms · long 500ms.
 
 Add or update these keys (sample — extend as needed):
 ```xml
-<string name="kq_brand">KiberQalqon</string>
+<string name="kq_brand">UzGuard</string>
 <string name="kq_tagline">Telefon himoyasi</string>
 <string name="kq_eyebrow_status">SIZNING TELEFONINGIZ</string>
 <string name="kq_status_safe">Himoyalangan</string>
@@ -668,7 +668,7 @@ Mirror everything in `values-ru/strings.xml` for Russian.
 ## 9. Files in this bundle
 
 ```
-design_handoff_kiberqalqon_redesign/
+design_handoff_uzguard_redesign/
 ├── README.md                              ← this file
 ├── screenshots/                           ← target visual for every screen
 │   ├── 01-splash.png
@@ -682,7 +682,7 @@ design_handoff_kiberqalqon_redesign/
 │   ├── 09-dashboard-dark.png
 │   └── 10-scan-result-dropper.png
 └── design_html_reference/                 ← HTML prototype (open in a browser to interact)
-    ├── KiberQalqon.html                   ← entry point — open this
+    ├── UzGuard.html                   ← entry point — open this
     ├── styles.css                         ← all design tokens, source of truth for values
     ├── app.jsx                            ← router + tweaks panel wiring
     ├── ornaments.jsx                      ← shield, star tile, icons, ProtectionMeter
@@ -697,7 +697,7 @@ design_handoff_kiberqalqon_redesign/
 ```bash
 cd design_html_reference
 python3 -m http.server 8000
-# open http://localhost:8000/KiberQalqon.html
+# open http://localhost:8000/UzGuard.html
 ```
 
 In the top-right corner of the prototype there's a "Tweaks" button — open it to switch theme, accent color, and jump between any of the 8 screens.
@@ -722,4 +722,4 @@ These should be hard-coded into a `MaliciousHashes.kt` / `MaliciousCerts.kt` / C
 
 ---
 
-**Questions?** Open `KiberQalqon.html` in the browser, click the "Tweaks" button in the top-right, jump to any screen. The HTML prototype is the spec.
+**Questions?** Open `UzGuard.html` in the browser, click the "Tweaks" button in the top-right, jump to any screen. The HTML prototype is the spec.

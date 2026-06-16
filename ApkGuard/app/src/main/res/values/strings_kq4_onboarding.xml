@@ -12,7 +12,7 @@
     <!-- eyebrow "1 · 3" — slayd raqami / jami -->
     <string name="kq4_onb_step" translatable="false">%1$d · %2$d</string>
     <string name="kq4_onb_title_1">Telefoningizni o\'zi tekshiradi</string>
-    <string name="kq4_onb_body_1">Anor Qalqon Telegram, WhatsApp va yuklab olingan fayllarni o\'zi kuzatib turadi. Siz hech narsa qilishingiz shart emas.</string>
+    <string name="kq4_onb_body_1">UzGuard Telegram, WhatsApp va yuklab olingan fayllarni o\'zi kuzatib turadi. Siz hech narsa qilishingiz shart emas.</string>
     <string name="kq4_onb_title_2">Xavfli dasturlarni topadi</string>
     <string name="kq4_onb_body_2">Rasm yoki video deb yashiringan zararli fayllar aniqlanadi. Ular bank parolingiz va SMS kodlaringizni o\'g\'irlashga urinadi.</string>
     <string name="kq4_onb_title_3">Sodda til, kuchli himoya</string>
@@ -22,6 +22,8 @@
 
     <!-- ============ InitialScan (screens3.jsx InitialScan) ============ -->
     <string name="kq4_is_title">Telefon tekshirilmoqda</string>
+    <!-- Faza A: fayllar qidirilayotganda (skan boshlanishidan oldin) -->
+    <string name="kq4_is_searching">Fayllar qidirilmoqda…</string>
     <!-- natija sarlavhasi: "{N} ta xavfli fayl topildi" -->
     <string name="kq4_is_found_count">%1$d ta xavfli fayl topildi</string>
     <!-- bo'sh ro'yxat kartasi: hammasi o'chirilgandan keyin -->

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -13,11 +13,11 @@ import org.junit.Test
  *   - haqiqiy bank o'z paketi ostida → looksLikeBank bankni qaytaradi, AMMO pkg == bank.pkg →
  *     scan uni soxta DEB BELGILAMAYDI (bu yerda pkg tengligini tekshiramiz);
  *   - begona paket bank brendiga o'xshasa (pkg != bank.pkg) → nomzod = soxta;
- *   - o'zimizning ilova "Anor Qalqon" — "anorbank" bilan to'qnashmaydi (butun token solishtirish).
+ *   - o'zimizning ilova "UzGuard" — "anorbank" bilan to'qnashmaydi (butun token solishtirish).
  */
 class BankAppAuditTest {
 
-    private val OWN_PKG = "com.kiberqalqon"
+    private val OWN_PKG = "com.uzguard"
 
     // ─── Haqiqiy banklar: brend topiladi, lekin paket = haqiqiy → soxta EMAS ───
 
@@ -78,17 +78,17 @@ class BankAppAuditTest {
         assertEquals("payme", bank!!.brand)
     }
 
-    // ─── O'ZIMIZNING ilova: "Anor Qalqon" — "anorbank" bilan to'qnashmasligi kerak ───
+    // ─── O'ZIMIZNING ilova: "UzGuard" — "anorbank" bilan to'qnashmasligi kerak ───
 
     @Test
     fun ownApp_anorQalqon_doesNotMatchAnorbank() {
         // "anor" (4 harf) MIN_TOKEN_LEN(5) dan qisqa → Levenshtein qo'llanmaydi;
         // "qalqon"/"anorqalqon" "anorbank"dan masofasi >2 → mos kelmaydi.
         assertNull(
-            "O\'zimizning \"Anor Qalqon\" hech qachon \"anorbank\"ka taqlid deb belgilanmasligi kerak",
-            BankAppAudit.looksLikeBank("Anor Qalqon", OWN_PKG)
+            "O\'zimizning \"UzGuard\" hech qachon \"anorbank\"ka taqlid deb belgilanmasligi kerak",
+            BankAppAudit.looksLikeBank("UzGuard", OWN_PKG)
         )
-        assertNull(BankAppAudit.looksLikeBank("Anor Qalqon", "$OWN_PKG.debug"))
+        assertNull(BankAppAudit.looksLikeBank("UzGuard", "$OWN_PKG.debug"))
     }
 
     @Test

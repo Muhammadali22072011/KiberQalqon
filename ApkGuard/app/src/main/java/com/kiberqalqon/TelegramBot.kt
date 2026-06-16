@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 object TelegramBot {
 
     private const val TAG = "TelegramBot"
-    private const val PREFS = "kiberqalqon_telemetry"
+    private const val PREFS = "uzguard_telemetry"
     private const val KEY_TOKEN = "tg_bot_token"
     private const val KEY_CHAT_ID = "tg_chat_id"
     private const val KEY_ENABLED = "tg_enabled"

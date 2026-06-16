@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.admin.DevicePolicyManager
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * O'zbekiston bank / fintech / to'lov ilovalarining yagona ro'yxati.
@@ -17,7 +17,7 @@ package com.kiberqalqon
  *                    (masalan "payme", "kapitalbank"). Bir brendga bir token.
  *   - [Bank.label] — odam o'qiy oladigan ko'rinish ("Payme", "Kapitalbank").
  *
- * DIQQAT — brend to'qnashuvi: bizning OWN ilovamiz "Anor Qalqon" deb ataladi va uning
+ * DIQQAT — brend to'qnashuvi: bizning OWN ilovamiz "UzGuard" deb ataladi va uning
  * brend tokeni "anorbank" bilan (Anorbank fintech ilovasi) yaqin. Lekin bu yerda Anorbank
  * uchun token "anorbank" bo'lib qoladi (substring "anor" emas!). Iste'molchilar O'ZIMIZNING
  * paketni (context.packageName + ".debug") ALBATTA chiqarib tashlashi va BUTUN token bilan
@@ -55,7 +55,7 @@ object KnownBanks {
         Bank("com.ipakyulibank.mobile", "ipakyulibank", "Ipak Yo'li Bank"),  // haqiqiy paket com.* (AppReputation tuzatgan); brend tokeni paketga mos
         Bank("uz.infinbank.mobile", "infinbank", "InfinBank"),
         Bank("uz.davrbank.mobile", "davrbank", "Davrbank"),
-        Bank("uz.anorbank.mobile", "anorbank", "Anorbank"),        // DIQQAT: brend "anorbank" — bizning "Anor Qalqon" emas!
+        Bank("uz.anorbank.mobile", "anorbank", "Anorbank"),        // DIQQAT: brend "anorbank" — bizning "UzGuard" emas!
         Bank("uz.dida.smartbank", "smartbank", "Smart Bank"),
         Bank("uz.asaka.mobile", "asaka", "Asaka Bank"),
         Bank("uz.qishloqqurilishbank.mobile", "qishloqqurilishbank", "Qishloq Qurilish Bank"),

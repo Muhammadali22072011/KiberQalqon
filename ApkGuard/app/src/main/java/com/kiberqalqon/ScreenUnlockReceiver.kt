@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -38,7 +38,7 @@ class ScreenUnlockReceiver : BroadcastReceiver() {
         // Troттling: unlock skanlar orasida kamida MIN_INTERVAL. Tez-tez yoqib-o'chirilganda
         // (yoki tez qulflab-ochilganda) takroriy og'ir storage-walk'ni oldini olamiz.
         try {
-            val sp = context.getSharedPreferences("kiberqalqon_lifecycle", Context.MODE_PRIVATE)
+            val sp = context.getSharedPreferences("uzguard_lifecycle", Context.MODE_PRIVATE)
             val last = sp.getLong("last_unlock_scan", 0L)
             val now = System.currentTimeMillis()
             if (now - last < MIN_SCAN_INTERVAL_MS) {

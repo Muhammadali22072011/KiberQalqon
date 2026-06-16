@@ -7,7 +7,7 @@
   #    #### #### #  #      #  #### ####
 
   FUCK YOU. APK'ni ochib ko'rdingmi? / Решил распаковать?
-  Bu KiberQalqon. Muallifi — Muhammadali.
+  Bu UzGuard. Muallifi — Muhammadali.
   Omad, "tadqiqotchi". Vaqtingni behuda sarflama. :)
 
 ╚══════════════════════════════════════════════════════════╝

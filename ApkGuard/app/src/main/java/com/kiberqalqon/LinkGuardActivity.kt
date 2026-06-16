@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -10,7 +10,7 @@ import android.widget.Toast
 /**
  * ====== HAVOLA QALQONI (link interceptor) ======
  *
- * Foydalanuvchi KiberQalqon'ni STANDART havola ochuvchi qilib tanlasa, har bir tashqi
+ * Foydalanuvchi UzGuard'ni STANDART havola ochuvchi qilib tanlasa, har bir tashqi
  * http(s) havola (SMS, brauzer, ilovalar — Telegram ichki brauzeri BUNDAN mustasno, uni
  * Android ushlatmaydi) AVVAL shu ko'rinmas Activity'ga keladi. Bu yerda:
  *

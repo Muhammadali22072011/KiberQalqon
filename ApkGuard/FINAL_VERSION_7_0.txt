@@ -17,7 +17,7 @@
 XML ошибка в values-uz/strings.xml строка 166
 
 Нужно исправить ВРУЧНУЮ:
-1. Открой KiberQalqon/app/src/main/res/values-uz/strings.xml
+1. Открой UzGuard/app/src/main/res/values-uz/strings.xml
 2. Найди строку 166
 3. Удали лишний </resources> (должен быть только ОДИН в конце)
 4. Пересобери: ZAPUSK_S_JAVA21.bat
@@ -27,7 +27,7 @@ XML ошибка в values-uz/strings.xml строка 166
 📱 ТЕКУЩИЙ APK (версия 6.1):
 ═══════════════════════════════════════════════════════════════
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 (Работает, но без WorkManager и диалога)
 
@@ -65,7 +65,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 Сделано ОГРОМНОЕ количество работы!
 
-KiberQalqon теперь:
+UzGuard теперь:
 ✅ Перехватывает все APK
 ✅ Сканирует весь телефон
 ✅ Удаляет опасные файлы

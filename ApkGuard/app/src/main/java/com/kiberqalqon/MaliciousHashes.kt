@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Blacklist SHA-256 hashes faylov samih APK (ne sertifikatov — dlya togo est' [MaliciousCerts]).
@@ -11,7 +11,7 @@ package com.kiberqalqon
  *
  * ШИФРОВАНИЕ ([Shield]):
  *   Сами хэши и метки семейств хранятся в hex-шифре, а не открытым текстом —
- *   чтобы `strings kiberqalqon.apk | grep` не выдал наш blacklist и атакующий
+ *   чтобы `strings uzguard.apk | grep` не выдал наш blacklist и атакующий
  *   не узнал, какие именно образцы мы детектим. Открытый текст — только в
  *   комментариях (они НЕ попадают в скомпилированный APK).
  *

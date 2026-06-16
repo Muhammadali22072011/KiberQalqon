@@ -34,7 +34,7 @@
 
 📱 НОВЫЙ APK ГОТОВ:
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 ═══════════════════════════════════════════════════════════════
 
@@ -94,7 +94,7 @@ adb logcat | grep ImprovedApkObserver
 SpeedometerView готов к использованию!
 Добавь в layout:
 
-<com.kiberqalqon.SpeedometerView
+<com.uzguard.SpeedometerView
     android:id="@+id/speedometer"
     android:layout_width="200dp"
     android:layout_height="200dp" />

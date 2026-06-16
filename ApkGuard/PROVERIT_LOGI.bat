@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 echo ═══════════════════════════════════════════════════════════
-echo   ПРОСМОТР ЛОГОВ KIBERQALQON
+echo   ПРОСМОТР ЛОГОВ UZGUARD
 echo ═══════════════════════════════════════════════════════════
 echo.
 
@@ -14,11 +14,11 @@ adb logcat -c
 
 echo.
 echo Запуск приложения...
-adb shell am start -n com.kiberqalqon/.MainActivity
+adb shell am start -n com.uzguard/.MainActivity
 
 echo.
 echo Логи (нажмите Ctrl+C для остановки):
 echo.
-adb logcat | findstr /i "kiberqalqon AndroidRuntime FATAL"
+adb logcat | findstr /i "uzguard AndroidRuntime FATAL"
 
 pause

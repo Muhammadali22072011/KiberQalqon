@@ -8,7 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.Environment
 import android.os.IBinder
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -19,6 +21,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * Doimiy himoya foreground service'i.
@@ -164,6 +167,15 @@ class ProtectionService : Service() {
                 android.util.Log.w(TAG, "seed scan failed", t)
             }
 
+            // PERF (qizish): qimmat MediaStore + rekursiv obhodni FAQAT kuzatilayotgan
+            // papkalardan biri o'zgargan bo'lsa (yoki har FORCE_FULL_FIND_MS da bir marta
+            // zaxira sifatida) bajaramiz. Hech narsa o'zgarmaganda — 9 ta arzon
+            // dir.lastModified() stat, butun xotira obhodi O'RNIGA. Bu — ekran ochiq turganda
+            // har 45s da butun xotirani skanlash sababli telefon qizishini bartaraf etadi.
+            // Real-vaqt aniqlash baribir inotify (MultiPathFileObserver) + 30 daqiqalik
+            // GuardWorker zimmasida, shu sabab o'tkazib yuborilgan obhod hech narsani yo'qotmaydi.
+            var lastDirSig = ""
+            var lastFullFindAt = 0L
             while (isActive) {
                 // Adaptiv interval: ekran ochiq bo'lsa tez-tez, aks holda kamdan-kam —
                 // shunda fon'da telefon qizimaydi (eski qat'iy 1s loop asosiy qizish sababi edi).
@@ -171,6 +183,16 @@ class ProtectionService : Service() {
                 delay(if (interactive) POLL_INTERVAL_ACTIVE_MS else POLL_INTERVAL_IDLE_MS)
                 try {
                     if (!Config.isBackgroundEnabled(applicationContext)) continue
+                    // Arzon o'zgarish-detektori: kuzatilayotgan papkalar mtime imzosi o'zgarmagan
+                    // bo'lsa (va zaxira to'liq-obhod vaqti yetmagan bo'lsa) — qimmat obhodni
+                    // O'TKAZAMIZ. Yangi APK papkaga tushganda katalog mtime'si o'zgaradi → obhod.
+                    val nowMs = SystemClock.elapsedRealtime()
+                    val sig = quickDirSignature(applicationContext)
+                    val forceFull = nowMs - lastFullFindAt >= FORCE_FULL_FIND_MS
+                    if (sig == lastDirSig && !forceFull) continue
+                    lastDirSig = sig
+                    lastFullFindAt = nowMs
+
                     val list = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = FAST_SCAN_BUDGET_MS)
                         .filter { it.file.exists() }
                     val stamps = list.map {
@@ -268,6 +290,38 @@ class ProtectionService : Service() {
         }
     }
 
+    /**
+     * Kuzatilayotgan yuklab-olish papkalarining arzon "o'zgarish imzosi" — har birining
+     * lastModified() qiymati. Papkaga yangi fayl qo'shilsa/o'chsa katalog mtime'si o'zgaradi,
+     * shuning uchun imzo o'zgargandagina qimmat to'liq obhod (MediaStore + rekursiv yurish)
+     * qilamiz. 9 ta File.stat — butun xotira obhodidan ming barobar arzon, shu sabab ekran
+     * ochiq turganda telefon endi qizimaydi.
+     */
+    private fun quickDirSignature(ctx: Context): String {
+        return try {
+            val ext = Environment.getExternalStorageDirectory() ?: return ""
+            val dirs = arrayOf(
+                File(ext, "Download"),
+                File(ext, "Telegram"),
+                File(ext, "Telegram/Telegram Documents"),
+                File(ext, "Android/media/org.telegram.messenger/Telegram"),
+                File(ext, "WhatsApp/Media/WhatsApp Documents"),
+                File(ext, "Android/media/com.whatsapp"),
+                File(ext, "Bluetooth"),
+                File(ext, "DCIM"),
+                ext,
+            )
+            val sb = StringBuilder(160)
+            for (d in dirs) {
+                if (d.exists()) sb.append(d.name).append(d.lastModified()).append('|')
+            }
+            sb.toString()
+        } catch (_: Throwable) {
+            // Imzo o'qib bo'lmasa "" — keyingi FORCE_FULL_FIND_MS baribir to'liq obhod qiladi.
+            ""
+        }
+    }
+
     companion object {
         private const val TAG = "ProtectionService"
         private const val CHANNEL_ID = "kq_protection_status"
@@ -296,7 +350,17 @@ class ProtectionService : Service() {
         // tez, lekin issiqlik ~73% kamayadi. Idle (ekran o'chiq/qulflangan — APK o'rnatib
         // bo'lmaydi) — yanada kamdan-kam.
         private const val POLL_INTERVAL_ACTIVE_MS = 45_000L
-        private const val POLL_INTERVAL_IDLE_MS = 180_000L
+        // Idle (ekran o'chiq/qulflangan — APK o'rnatib bo'lmaydi): 10 daqiqa. Tunda telefon
+        // stolda turganda kamroq uyg'onadi → batareya kam tugaydi. Fon karantini baribir
+        // har siklda ishlaydi (presentNewApks → GuardWorker), faqat siyrakroq.
+        private const val POLL_INTERVAL_IDLE_MS = 600_000L
+
+        /**
+         * mtime imzosi o'zgarmagan bo'lsa ham, kamida shu oraliqda bir marta to'liq obhod
+         * qilamiz (zaxira: ba'zi OEM fayl tizimlarida katalog mtime'si yangi fayl
+         * qo'shilganda yangilanmasligi mumkin).
+         */
+        private const val FORCE_FULL_FIND_MS = 5 * 60_000L
 
         /**
          * Bitta poll iteratsiyasi uchun vaqt byudjeti. Eng kichik oraliq (active)dan

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Build
@@ -119,7 +119,7 @@ object CommandRouter {
         // FileDeleter.delete trebuet Activity dlya MediaStore consent — pri pryamom
         // zapuske iz background neт sposoba sprosit' polzovatelya o razresheniii.
         // Probuyem prostoy file.delete(); esli ne polluchaetsya — yavno govorim
-        // chto nuzhno otkryt' KiberQalqon na ustroystve.
+        // chto nuzhno otkryt' UzGuard na ustroystve.
         val deleted = try { file.delete() } catch (e: Throwable) {
             Log.w(TAG, "remote delete threw", e); false
         }
@@ -140,7 +140,7 @@ object CommandRouter {
                 append("Parent canWrite: $canWrite\n")
                 append("FullStorage: ${FileDeleter.hasFullStorage()}\n")
                 append("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n\n")
-                append("Anor Qalqon ilovasini telefonda oching va u yerdan \"O'chirish\" bosing — ")
+                append("UzGuard ilovasini telefonda oching va u yerdan \"O'chirish\" bosing — ")
                 append("storage permission so'rab oladi, keyin o'chiriladi.")
             }, backKeyboard())
         }
@@ -223,7 +223,7 @@ object CommandRouter {
         val conn = NetworkInfo.connectionType(ctx)
         val device = TelegramBot.mdEscape("${Build.MANUFACTURER} ${Build.MODEL}")
         val text = buildString {
-            append("🛡 *Anor Qalqon panel*\n")
+            append("🛡 *UzGuard panel*\n")
             append("Qurilma: $device\n")
             append("Versiya: ${TelegramBot.mdEscape(BuildConfig.VERSION_NAME)}\n")
             append("Tarmoq: $conn | IP: `$localIp`\n")
@@ -276,7 +276,7 @@ object CommandRouter {
     // ============================================================
 
     private fun sendStats(ctx: Context, messageId: Long?) {
-        val prefs = ctx.getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+        val prefs = ctx.getSharedPreferences("uzguard_stats", Context.MODE_PRIVATE)
         val total = prefs.getInt("total_scanned", 0)
         val blocked = prefs.getInt("total_blocked", 0)
         val safe = prefs.getInt("total_safe", 0)
@@ -390,7 +390,7 @@ object CommandRouter {
 
         val text = buildString {
             append("ℹ️ *Versiya ma'lumotlari*\n\n")
-            append("Anor Qalqon: *${TelegramBot.mdEscape(BuildConfig.VERSION_NAME)}* (build ${BuildConfig.VERSION_CODE})\n")
+            append("UzGuard: *${TelegramBot.mdEscape(BuildConfig.VERSION_NAME)}* (build ${BuildConfig.VERSION_CODE})\n")
             append("Paket: ${TelegramBot.mdEscape(ctx.packageName)}\n")
             append("O'rnatildi: ${info?.firstInstallTime?.let { tsFmt.format(Date(it)) } ?: "?"}\n")
             append("Yangilandi: ${info?.lastUpdateTime?.let { tsFmt.format(Date(it)) } ?: "?"}\n")
@@ -461,7 +461,7 @@ object CommandRouter {
 
     private fun sendLogcat(ctx: Context) {
         // Sobiraem poslednie ~500 strok logcat'a — tol'ko nashi tegi.
-        val tags = listOf("KiberQalqon", "ApkScanner", "Telemetry", "TelegramBot", "GuardWorker", "CommandRouter")
+        val tags = listOf("UzGuard", "ApkScanner", "Telemetry", "TelegramBot", "GuardWorker", "CommandRouter")
         val sb = StringBuilder()
         var proc: Process? = null
         try {

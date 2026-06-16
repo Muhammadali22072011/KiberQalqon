@@ -61,7 +61,7 @@
                 android:layout_width="190dp"
                 android:layout_height="190dp">
 
-                <com.kiberqalqon.KqRingView
+                <com.uzguard.KqRingView
                     android:id="@+id/scanRing"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />

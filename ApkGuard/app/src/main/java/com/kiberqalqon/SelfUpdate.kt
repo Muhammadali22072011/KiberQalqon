@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  * 1. Metadata HMAC-imzolangan config'dan (rollback-guard bilan) — URL/hash'ni MITM
  *    almashtira olmaydi.
  * 2. Yuklangan faylning SHA-256'i imzolangan qiymatga AYNAN mos kelishi shart.
- * 3. Yuklangan APK'ning IMZO SERTIFIKATI o'rnatilgan KiberQalqon'nikiga AYNAN mos
+ * 3. Yuklangan APK'ning IMZO SERTIFIKATI o'rnatilgan UzGuard'nikiga AYNAN mos
  *    kelishi shart ([CertUtil]) — hatto config kaliti o'g'irlansa ham, buzg'unchi
  *    bizning keystore'siz yangilanish bera olmaydi. (Android'ning o'zi ham boshqa
  *    imzoli update'ni rad etadi — bu undan OLDINGI qatlam.)
@@ -42,7 +42,7 @@ object SelfUpdate {
     private const val TAG = "SelfUpdate"
     private const val CHANNEL_ID = "kq_self_update"
     private const val NOTIF_ID = 7781
-    private const val PREFS = "kiberqalqon_self_update"
+    private const val PREFS = "uzguard_self_update"
     private const val KEY_NOTIFIED_VC = "notified_vc"
 
     /** Imzolangan config'dan kelgan yangilanish metadata'si. */

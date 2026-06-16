@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -42,24 +42,30 @@ class InstalledAppsRescanWorker(
             return Result.success()
         }
 
-        val prefs = ctx.getSharedPreferences("kiberqalqon_rescan", Context.MODE_PRIVATE)
+        val prefs = ctx.getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
         val rescanned = mutableListOf<Pair<String, String>>()  // (pkg, verdict)
         var newThreats = 0
 
         // Фильтруем системные приложения, чтобы не молотить впустую.
         // FLAG_SYSTEM или приложения, которые обновлены поверх системных — НЕ скипаем (там
         // как раз бывают атакующие апдейты sideload-нутые поверх системного).
+        //
+        // Приложения из Play Market / доверенных сторов НЕ пере-сканируем: Play Protect их уже
+        // проверил, а ежедневный re-scan установленных base.apk зря греет телефон. Сканируем
+        // ТОЛЬКО приложения из неизвестных источников (sideload). Фильтр стоит ДО take(50),
+        // чтобы бюджет в 50 пакетов тратился именно на sideload-приложения.
         val userApps = packages.filter { p ->
             val app = p.applicationInfo ?: return@filter false
             val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
             val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
-            !isSystem || updatedSystem
+            if (isSystem && !updatedSystem) return@filter false
+            !ApkScanner.isFromTrustedStore(ctx, p.packageName)
         }
 
         for (pkg in userApps.take(50)) {
             try {
                 val name = pkg.packageName ?: continue
-                // Skip самого KiberQalqon — для self-skip есть SelfGuard, но дешевле сразу пропустить.
+                // Skip самого UzGuard — для self-skip есть SelfGuard, но дешевле сразу пропустить.
                 if (name == ctx.packageName || name == "${ctx.packageName}.debug") continue
 
                 val app = pkg.applicationInfo ?: continue
@@ -110,7 +116,7 @@ class InstalledAppsRescanWorker(
 
     companion object {
         private const val TAG = "RescanWorker"
-        private const val WORK_NAME = "kiberqalqon_rescan_installed"
+        private const val WORK_NAME = "uzguard_rescan_installed"
 
         fun schedule(ctx: Context) {
             val req = PeriodicWorkRequestBuilder<InstalledAppsRescanWorker>(

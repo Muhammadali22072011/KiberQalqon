@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -9,15 +9,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityScanHistoryBinding
-import com.kiberqalqon.databinding.ItemScanHistoryBinding
+import com.uzguard.databinding.ActivityScanHistoryBinding
+import com.uzguard.databinding.ItemScanHistoryBinding
 
 /**
  * Stats — «Statistika» vkladkasi, v4 dizayn (screens2.jsx → Stats).
  *
  * Jonli ma'lumotlar (hech narsa hardkod emas):
  *  - 2 stat-karta (Tekshirilgan fayl / Topildi va o'chirildi) →
- *    SharedPreferences "kiberqalqon_stats" (total_scanned / total_blocked)
+ *    SharedPreferences "uzguard_stats" (total_scanned / total_blocked)
  *  - 7 kunlik grafik → day_0..day_6 + day_N_epochday (staleness bilan) +
  *    ScanHistory timestamp'laridan kunlik tahdid bejjlari
  *  - «Qanday xavflar topildi» → ScanHistory'dagi haqiqiy tahdidlar kategoriya
@@ -68,9 +68,9 @@ class ScanHistoryActivity : AppCompatActivity() {
     private fun refreshAll() {
         val history = ScanHistory.all(this)
         val threats = history.filter { it.verdict != ScanResult.Verdict.SAFE }
-        // Kanonik hisoblagichlar (kiberqalqon_stats) — Dashboard ham shulardan o'qiydi.
+        // Kanonik hisoblagichlar (uzguard_stats) — Dashboard ham shulardan o'qiydi.
         // history.size ishlatib bo'lmaydi: u 200 LRU bilan cheklangan.
-        val statsPrefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+        val statsPrefs = getSharedPreferences("uzguard_stats", Context.MODE_PRIVATE)
         bindTotals(statsPrefs.getInt("total_scanned", 0), statsPrefs.getInt("total_blocked", 0))
         bindWeekChart(threats)
         bindCategoryBars(threats)
@@ -93,7 +93,7 @@ class ScanHistoryActivity : AppCompatActivity() {
      * Mapping bar1..bar7 → Du..Ya (Mon..Sun) → day_1..day_6, day_0.
      */
     private fun bindWeekChart(threats: List<ScanHistory.Entry>) {
-        val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("uzguard_stats", Context.MODE_PRIVATE)
         val today = java.util.Calendar.getInstance().let {
             (it.timeInMillis + it.get(java.util.Calendar.ZONE_OFFSET) +
                 it.get(java.util.Calendar.DST_OFFSET)) / 86_400_000L

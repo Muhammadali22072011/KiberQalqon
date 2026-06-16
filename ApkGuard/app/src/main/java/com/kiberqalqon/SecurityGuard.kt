@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -28,7 +28,7 @@ object SecurityGuard {
 
     /**
      * SHA-256 fingerprint'lar НАБОР разрешённых сертификатов подписи (SD-01, аудит 2026-06-10).
-     * Получить sideload-ключ: keytool -list -v -keystore release.keystore -alias kiberqalqon | findstr SHA256
+     * Получить sideload-ключ: keytool -list -v -keystore release.keystore -alias uzguard | findstr SHA256
      * → убрать двоеточия, вставить заглавными.
      *
      * ⚠️ PLAY APP SIGNING: Google ПЕРЕ-подпишет APK своим ключом — на устройстве будет
@@ -127,7 +127,7 @@ object SecurityGuard {
         // Дополнительная проверка: класс App должен реально существовать в classpath
         // (если перепаковщик отрезал кусок DEX — отвалится).
         try {
-            Class.forName("com.kiberqalqon.App")
+            Class.forName("com.uzguard.App")
         } catch (_: ClassNotFoundException) {
             Log.w(TAG, "Core class missing — DEX tampered")
             return true

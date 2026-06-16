@@ -1,4 +1,4 @@
-# KiberQalqon — qora ro'yxatdagi APK fayl SHA-256 hash'lari
+# UzGuard — qora ro'yxatdagi APK fayl SHA-256 hash'lari
 # Format: sha256(apk_file_bytes),oila_nomi
 # Manba: MalwareBazaar (abuse.ch) to'liq dump'idan Android (file_type=apk) namunalar.
 # Yuklanadi: ThreatDb.init() orqali ish vaqtida (App.onCreate).

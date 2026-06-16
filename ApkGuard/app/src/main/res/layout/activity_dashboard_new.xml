@@ -91,7 +91,7 @@
                                 android:layout_width="158dp"
                                 android:layout_height="158dp">
 
-                                <com.kiberqalqon.KqRingView
+                                <com.uzguard.KqRingView
                                     android:id="@+id/kq4DashRing"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent" />

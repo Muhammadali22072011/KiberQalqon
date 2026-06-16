@@ -31,7 +31,7 @@
 
         <!-- Markaziy skan ramkasi — shaffof oyna + anor burchak qavslar (kamerani yopmaydi).
              Avval kq4_card_selected (to'liq fon) edi → kamera ko'rinmasdi. -->
-        <com.kiberqalqon.QrScanFrameView
+        <com.uzguard.QrScanFrameView
             android:id="@+id/scanFrame"
             android:layout_width="248dp"
             android:layout_height="248dp"

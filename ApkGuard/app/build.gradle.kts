@@ -79,7 +79,7 @@ fun shieldEnc(plain: String): String {
 }
 
 android {
-    namespace = "com.kiberqalqon"
+    namespace = "com.uzguard"
     compileSdk = 34
     // Native himoya kutubxonasi (libkqguard.so) NDK versiyasi. D: da, C:\Android\ndk\... junction.
     ndkVersion = "26.1.10909125"

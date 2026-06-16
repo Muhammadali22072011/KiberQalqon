@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ANOR QALQON splash — v4 «Milliy Kiber Himoya» dizayni (screens1.jsx → Splash):
+  UZGUARD splash — v4 «Milliy Kiber Himoya» dizayni (screens1.jsx → Splash):
     · to'liq ekran anor-gradient fon (@drawable/kq4_splashlanguage_bg — kq4_splash_bg'dagi
       noqonuniy angle=255 [45 ga karrali emas → inflate'da XmlPullParserException] tufayli
       guruhning o'z drawable'i bilan almashtirildi, angle=270)
     · 3 ta dekorativ 8 qirrali yulduz (oq tint, alpha ~0.12)
     · markazda LogoDisc: oq doira 116dp + haqiqiy anor-qalqon logotipi (~96dp)
     · LogoDisc atrofida 2 ta pulsar halqa (scale+alpha, ikkinchisi +800ms)
-    · "ANOR QALQON" 34sp ExtraBold, ls -0.03 · mono "MILLIY KIBER HIMOYA" 12sp ls 0.22
+    · "UZGUARD" 34sp ExtraBold, ls -0.03 · mono "MILLIY KIBER HIMOYA" 12sp ls 0.22
     · pastda 3 ta oq load-nuqta (stagger)
   Barqaror ID'lar saqlangan (SplashActivity ularga bog'liq):
     splashRoot, starsBox, contentColumn, heroBox, pulseRing1/2, logoDisc, ivLogo,

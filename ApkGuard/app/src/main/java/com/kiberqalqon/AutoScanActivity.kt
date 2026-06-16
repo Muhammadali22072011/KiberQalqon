@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.animation.ValueAnimator
@@ -31,7 +31,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
-import com.kiberqalqon.databinding.ActivityAutoScanBinding
+import com.uzguard.databinding.ActivityAutoScanBinding
 import java.io.File
 
 /**
@@ -1173,7 +1173,7 @@ class AutoScanActivity : AppCompatActivity() {
                 return
             }
 
-            val channelId = "kiberqalqon_scan"
+            val channelId = "uzguard_scan"
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 try {
@@ -1190,7 +1190,7 @@ class AutoScanActivity : AppCompatActivity() {
 
             // Статистика — bildirishnoma uchun ko'rinish qiymatlari (kanonik kalitlardan).
             try {
-                val prefs = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+                val prefs = getSharedPreferences("uzguard_stats", Context.MODE_PRIVATE)
                 val scanned = prefs.getInt("total_scanned", 0)
                 val blocked = prefs.getInt("total_blocked", 0)
 

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.Activity
 import android.content.Context
@@ -18,8 +18,8 @@ import java.io.File
 /**
  * Принимает APK из других приложений через ACTION_SEND / ACTION_VIEW.
  *
- * Пример: пользователь в Telegram нажимает на APK → "Поделиться" → KiberQalqon.
- * Или в файловом менеджере → "Открыть с помощью" → KiberQalqon.
+ * Пример: пользователь в Telegram нажимает на APK → "Поделиться" → UzGuard.
+ * Или в файловом менеджере → "Открыть с помощью" → UzGuard.
  *
  * Эта Activity exported=true, но НЕ показывает UI напрямую — только копирует APK
  * во внутренний кэш и запускает AutoScanActivity (которая exported=false).

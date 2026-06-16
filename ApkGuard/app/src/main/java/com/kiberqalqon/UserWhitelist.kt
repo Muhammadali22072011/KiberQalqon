@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -28,11 +28,11 @@ import org.json.JSONObject
  *    verdiktlar darhol qayta hisoblanadi (aks holda qo'shilgan ishonch keyingi mtime
  *    o'zgarishigacha ko'rinmasdi).
  *
- * Hammasi SharedPreferences'da JSON ko'rinishida (boshqa kiberqalqon_* lar kabi).
+ * Hammasi SharedPreferences'da JSON ko'rinishida (boshqa uzguard_* lar kabi).
  */
 object UserWhitelist {
 
-    private const val PREFS = "kiberqalqon_user_whitelist"
+    private const val PREFS = "uzguard_user_whitelist"
     private const val KEY_ENTRIES = "entries_v1"
     private const val MAX_ENTRIES = 200
 

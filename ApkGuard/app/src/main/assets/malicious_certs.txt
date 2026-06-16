@@ -1,4 +1,4 @@
-# KiberQalqon — qora ro'yxatdagi sertifikat imzolari (SHA-256)
+# UzGuard — qora ro'yxatdagi sertifikat imzolari (SHA-256)
 # Format: sha256(cert.getEncoded())  yoki  sha256,oila_nomi
 # Manba: tashqi threat-intelligence feed (CyberHimoya 1.5.1 bazasidan import, soxta pleysxolderlar olib tashlangan)
 # Yuklanadi: ThreatDb.init() orqali ish vaqtida (App.onCreate).

@@ -7,7 +7,7 @@
 
 **Дизайн:**
 - Полноэкранный градиентный фон (голубой → зеленый)
-- Логотип KiberQalqon (120dp)
+- Логотип UzGuard (120dp)
 - Название приложения (36sp, bold, белый)
 - Слоган: "Telefoningizni himoya qiling"
 - Белая карточка с формой (24dp radius, 12dp elevation)

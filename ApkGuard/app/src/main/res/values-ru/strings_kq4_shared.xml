@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="kq4_brand">Anor Qalqon</string>
+    <string name="kq4_brand">UzGuard</string>
     <string name="kq4_milliy">НАЦИОНАЛЬНАЯ КИБЕРЗАЩИТА</string>
     <string name="kq4_protection_on">Защита включена</string>
     <string name="kq4_protection_off">Защита выключена</string>

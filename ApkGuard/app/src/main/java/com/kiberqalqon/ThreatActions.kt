@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import androidx.core.content.edit
@@ -22,7 +22,7 @@ import java.security.MessageDigest
  */
 object ThreatActions {
 
-    private const val PREFS = "kiberqalqon_threat_actions"
+    private const val PREFS = "uzguard_threat_actions"
     private const val KEY_ENTRIES = "entries_v1"
     private const val TTL_MS = 7L * 24 * 60 * 60 * 1000  // 7 дней
 

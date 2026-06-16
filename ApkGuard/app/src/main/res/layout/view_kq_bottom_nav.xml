@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Единая нижняя навигация KiberQalqon. Включается через <include layout="@layout/view_kq_bottom_nav"/>
+  Единая нижняя навигация UzGuard. Включается через <include layout="@layout/view_kq_bottom_nav"/>
   на каждом из 4 главных экранов (Dashboard/Main/Stats/Settings).
 
   Активная вкладка обозначается pill-фоном через программный setBackgroundResource +

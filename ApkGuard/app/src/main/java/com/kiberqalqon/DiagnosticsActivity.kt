@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -22,7 +22,7 @@ import java.io.File
 /**
  * Диагностический экран — собирает в один большой текст:
  *  - Версию Android и устройство
- *  - Статус ВСЕХ разрешений KiberQalqon
+ *  - Статус ВСЕХ разрешений UzGuard
  *  - Последний крэш (если есть)
  *  - Кнопку "Скопировать всё" → юзер шлёт скрин/текст разработчику.
  *
@@ -132,7 +132,7 @@ class DiagnosticsActivity : AppCompatActivity() {
 
     private fun buildDiagnostics(): String {
         val sb = StringBuilder()
-        sb.appendLine("=== Anor Qalqon DIAGNOSTIKA ===")
+        sb.appendLine("=== UzGuard DIAGNOSTIKA ===")
         sb.appendLine("Vaqt: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date())}")
         sb.appendLine()
         sb.appendLine("[Qurilma]")
@@ -141,7 +141,7 @@ class DiagnosticsActivity : AppCompatActivity() {
         sb.appendLine("  Build:        ${Build.DISPLAY}")
         try {
             val info = packageManager.getPackageInfo(packageName, 0)
-            sb.appendLine("  Anor Qalqon:     ${info.versionName} (${info.versionCode})")
+            sb.appendLine("  UzGuard:     ${info.versionName} (${info.versionCode})")
         } catch (_: Exception) {}
         sb.appendLine("  Package:      $packageName")
         sb.appendLine()
@@ -170,7 +170,7 @@ class DiagnosticsActivity : AppCompatActivity() {
 
         sb.appendLine("[Statistika]")
         try {
-            val stats = getSharedPreferences("kiberqalqon_stats", Context.MODE_PRIVATE)
+            val stats = getSharedPreferences("uzguard_stats", Context.MODE_PRIVATE)
             sb.appendLine("  scanned:    ${stats.getInt("total_scanned", 0)}")
             sb.appendLine("  blocked:    ${stats.getInt("total_blocked", 0)}")
             sb.appendLine("  total_safe: ${stats.getInt("total_safe", 0)}")
@@ -213,7 +213,7 @@ class DiagnosticsActivity : AppCompatActivity() {
             val downloads = android.os.Environment.getExternalStoragePublicDirectory(
                 android.os.Environment.DIRECTORY_DOWNLOADS
             )
-            val external = File(downloads, "kiberqalqon_crash.txt")
+            val external = File(downloads, "uzguard_crash.txt")
             if (external.exists()) external.readText().takeLast(4000)
             else "Yoq (hech qachon crash bo'lmagan yoki log o'chirilgan)."
         } catch (e: Exception) {
@@ -223,7 +223,7 @@ class DiagnosticsActivity : AppCompatActivity() {
 
     private fun copyToClipboard() {
         val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        cm.setPrimaryClip(ClipData.newPlainText("Anor Qalqon diagnostics", output.text))
+        cm.setPrimaryClip(ClipData.newPlainText("UzGuard diagnostics", output.text))
         Toast.makeText(this, getString(R.string.kq4_misc_toast_copied), Toast.LENGTH_SHORT).show()
     }
 

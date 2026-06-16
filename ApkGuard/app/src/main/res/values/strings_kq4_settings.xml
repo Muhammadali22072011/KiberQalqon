@@ -35,11 +35,11 @@
     <string name="kq4_set_row_protection">Himoya holati va ruxsatlar</string>
     <string name="kq4_set_row_admin">Boshqaruv paneli</string>
 
-    <string name="kq4_set_footer">ANOR QALQON v%1$s · BUILD %2$d\n© 2026 · Muhammadali · Navoiy</string>
+    <string name="kq4_set_footer">UZGUARD v%1$s · BUILD %2$d\n© 2026 · Muhammadali · Navoiy</string>
 
     <!-- ── Loyiha haqida ── -->
     <string name="kq4_about_eyebrow">Loyiha haqida</string>
-    <string name="kq4_about_desc">Anor Qalqon — O\'zbekiston uchun yaratilgan zamonaviy himoya ilovasi. Telefoningizni zararli APK fayllar va aldamchi hujumlardan asraydi. Hamma narsa oddiy o\'zbek tilida tushuntiriladi.</string>
+    <string name="kq4_about_desc">UzGuard — O\'zbekiston uchun yaratilgan zamonaviy himoya ilovasi. Telefoningizni zararli APK fayllar va aldamchi hujumlardan asraydi. Hamma narsa oddiy o\'zbek tilida tushuntiriladi.</string>
     <string name="kq4_about_sec_features">Imkoniyatlar</string>
     <string name="kq4_about_f1_title">Avtomatik tekshirish</string>
     <string name="kq4_about_f1_sub">Har 15 daqiqada yangi fayllarni tekshiradi</string>
@@ -52,5 +52,5 @@
     <string name="kq4_about_sec_author">Muallif</string>
     <string name="kq4_about_author_name" translatable="false">Muhammadali</string>
     <string name="kq4_about_author_sub">Navoiy · O\'zbekiston</string>
-    <string name="kq4_about_footer">© 2026 · ANOR QALQON · v%1$s</string>
+    <string name="kq4_about_footer">© 2026 · UZGUARD · v%1$s</string>
 </resources>

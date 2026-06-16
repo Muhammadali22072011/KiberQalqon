@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -7,7 +7,7 @@ import android.util.Log
  * Himoyani FAQAT u haqiqatan ishlay olganda yoqadi.
  *
  * MUAMMO (foydalanuvchi shikoyati): birinchi ochilishda, hali HECH QANDAY ruxsat berilmasdan
- * oldin ham "Himoyangiz yoqildi" va "KIBER QALQON faol · Telefoningiz himoyalangan · 24/7"
+ * oldin ham "Himoyangiz yoqildi" va "UZGUARD faol · Telefoningiz himoyalangan · 24/7"
  * bildirishnomalari chiqardi — bu YOLG'ON, chunki fayl ruxsati yo'q ekan, skaner Telegram/Downloads
  * papkalarini ko'ra olmaydi. To'g'ri oqim (O'zbekistondagi oddiy/byudjet Android uchun):
  *   o'rnatish → ochish → RUXSAT berish → chiqish → endi fonda o'zi ishlaydi.

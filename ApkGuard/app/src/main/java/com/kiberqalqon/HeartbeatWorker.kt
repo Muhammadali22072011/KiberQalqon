@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -23,11 +23,11 @@ import java.util.concurrent.TimeUnit
  * Raz v 6 chasov shlet "tirikman" v Telegram. Cherez heartbeat my vidim,
  * chto:
  *   - telefon zazhzhen i v seti
- *   - process KiberQalqon ne ubit OS'om
+ *   - process UzGuard ne ubit OS'om
  *   - batareya/storage ne v kritichnom sostoyanii
  *
  * Esli heartbeat ne pridet 12+ chasov — eto sam po sebe signal (telefon vyklyuchen
- * ili KiberQalqon ubit). Bonusom: razbudim GuardWorker zaodno.
+ * ili UzGuard ubit). Bonusom: razbudim GuardWorker zaodno.
  */
 class HeartbeatWorker(
     context: Context,
@@ -145,8 +145,8 @@ class HeartbeatWorker(
 
     companion object {
         private const val TAG = "HeartbeatWorker"
-        private const val WORK_NAME = "kiberqalqon_heartbeat"
-        private const val PREFS_STATE = "kiberqalqon_state_diff"
+        private const val WORK_NAME = "uzguard_heartbeat"
+        private const val PREFS_STATE = "uzguard_state_diff"
         private const val KEY_UNKNOWN_SOURCES = "unknown_sources"
         private const val KEY_BATTERY_WHITELIST = "battery_whitelist"
 

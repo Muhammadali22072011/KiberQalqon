@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,7 +7,7 @@ import android.util.Log
 
 /**
  * Manifest-registered receiver. BOOT_COMPLETED dlya nego — edinstvennoe sobytie,
- * kotoroe gosudarstvenno garantirovano dostavlyaetsya dazhe esli process KiberQalqon
+ * kotoroe gosudarstvenno garantirovano dostavlyaetsya dazhe esli process UzGuard
  * ne podnyat. My ispol'zuem ego dlya:
  *  1) Otpravit' event v Telegram chto telefon perezagruzilsya.
  *  2) Razbudit' WorkManager — chtoby HeartbeatWorker/GuardWorker prishli v dvizhenie

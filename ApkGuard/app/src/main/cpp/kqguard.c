@@ -87,7 +87,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     (void) reserved;
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_6) != JNI_OK) return -1;
-    jclass cls = (*env)->FindClass(env, "com/kiberqalqon/NativeBridge");
+    jclass cls = (*env)->FindClass(env, "com/uzguard/NativeBridge");
     if (!cls) return -1;
     static const JNINativeMethod methods[] = {
         {"nPing",       "()Z",                   (void *) nPing},

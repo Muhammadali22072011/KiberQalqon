@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * ====== HAVOLA TEKSHIRGICH (LINK CHECKER) — eng qimmatli funksiya ======

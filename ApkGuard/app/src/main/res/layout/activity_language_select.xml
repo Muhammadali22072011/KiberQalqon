@@ -2,7 +2,7 @@
 <!--
   Til tanlash ekrani — v4 «Milliy Kiber Himoya» dizayni (screens1.jsx → Language).
   Matn ataylab ikki tilda — foydalanuvchi hali tilni tanlamagan.
-  Markaz: LogoDisc 104dp + "ANOR QALQON" 30sp + mono tagline.
+  Markaz: LogoDisc 104dp + "UZGUARD" 30sp + mono tagline.
   Past: sarlavha + 2 ta tanlov kartasi (UZ/RU) + "Davom etish" (h58).
   IDs: btnUzbek, btnRussian (karta), ivCheckUz, ivCheckRu, btnContinue
   (LanguageSelectActivity.kt tanlov holatini shu id'lar orqali chizadi).

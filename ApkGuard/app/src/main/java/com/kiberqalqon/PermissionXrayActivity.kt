@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.kiberqalqon.databinding.ActivityPermissionXrayBinding
+import com.uzguard.databinding.ActivityPermissionXrayBinding
 
 /**
  * «Ruxsat rentgeni» — o'rnatilgan ilovalarni ruxsat-KOMBINATSIYASI xavfi bo'yicha tartiblaydi

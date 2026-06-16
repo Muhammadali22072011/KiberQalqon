@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
-import com.kiberqalqon.databinding.ActivityLanguageSelectBinding
+import com.uzguard.databinding.ActivityLanguageSelectBinding
 
 /**
  * Til tanlash ekrani — eng birinchi ochilishda ko'rsatiladi (LAUNCHER).

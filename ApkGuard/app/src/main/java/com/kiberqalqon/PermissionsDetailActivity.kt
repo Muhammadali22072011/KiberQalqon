@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityPermissionsDetailBinding
+import com.uzguard.databinding.ActivityPermissionsDetailBinding
 
 /**
  * v4 dizayn «Ruxsatlar» ekrani (design_v4_extracted/screens3.jsx → Permissions):

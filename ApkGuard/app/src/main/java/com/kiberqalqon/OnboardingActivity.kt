@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.kiberqalqon.databinding.ActivityOnboardingBinding
+import com.uzguard.databinding.ActivityOnboardingBinding
 import kotlin.math.abs
 
 /**
@@ -85,7 +85,7 @@ class OnboardingActivity : AppCompatActivity() {
     private fun finishOnboarding() {
         Config.setFirstRunComplete(this)
         // Posle Onboarding zapuskaem pervichnyy poiskj opasnykh APK na ustroystve —
-        // chtoby user srazu uvidel chto KiberQalqon real'no rabotayet i chto na ego
+        // chtoby user srazu uvidel chto UzGuard real'no rabotayet i chto na ego
         // telefone est' opasnogo. Posle InitialScan flag stavitsya, bol'she ne pokazyvayetsya.
         val target = if (!Config.isInitialScanDone(this)) {
             InitialScanActivity::class.java

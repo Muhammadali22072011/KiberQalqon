@@ -1,6 +1,6 @@
-package com.kiberqalqon
+package com.uzguard
 
-import com.kiberqalqon.ScanResult.Verdict
+import com.uzguard.ScanResult.Verdict
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

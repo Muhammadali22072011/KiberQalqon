@@ -1,9 +1,9 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Tarmoq sirlari (cloud qurilma kaliti, dev Telegram bot token/chat id) APK ichida
  * OCHIQ yotmasligi uchun [Shield] (keystream-XOR) shifrida BuildConfig'da saqlanadi.
- * `strings kiberqalqon.apk | grep` sirni KO'RSATMAYDI — DEX'da faqat hex-"axlat".
+ * `strings uzguard.apk | grep` sirni KO'RSATMAYDI — DEX'da faqat hex-"axlat".
  *
  * Build vaqtida app/build.gradle.kts local.properties'dagi qiymatni Shield bilan
  * shifrlab `*_ENC` BuildConfig maydoniga yozadi (algoritm bayt-ma-bayt [Shield] va

@@ -1,19 +1,26 @@
-package com.kiberqalqon
+package com.uzguard
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityScanResultBinding
+import androidx.core.content.ContextCompat
+import com.uzguard.databinding.ActivityScanResultBinding
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -35,6 +42,35 @@ class ScanResultActivity : AppCompatActivity() {
     private var installedPackage: String? = null
     private var scanResult: ScanResult? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    // Foydalanuvchi "Barcha fayllarga ruxsat" ekranidan qaytishini kutmoqdamizmi —
+    // qaytgach (onResume) o'chirishni avtomatik qayta urinamiz.
+    private var waitingForStoragePermission = false
+
+    // Tizimning "shu faylni o'chirishga ruxsatmi?" dialogi (MediaStore, Android 11+).
+    // RESULT_OK = tasdiqlandi, fayl o'chirildi.
+    private val deleteConsentLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            showDeletedSuccess()
+        } else {
+            Toast.makeText(this, getString(R.string.autoscan_delete_cancelled), Toast.LENGTH_SHORT).show()
+            binding.btnDelete.isEnabled = true
+        }
+    }
+
+    // API ≤ 28: WRITE_EXTERNAL_STORAGE bo'lmasa file.delete() jim false qaytaradi.
+    private val writePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            deleteApk()
+        } else {
+            Toast.makeText(this, getString(R.string.not_deleted), Toast.LENGTH_SHORT).show()
+            binding.btnDelete.isEnabled = true
+        }
+    }
 
     private enum class SourceKind { TELEGRAM, WHATSAPP, WEB, FOLDER, INSTALLED }
 
@@ -93,6 +129,16 @@ class ScanResultActivity : AppCompatActivity() {
                 { AnimationHelper.shake(binding.imgVerdictIcon) },
                 620
             )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // "Barcha fayllarga ruxsat" ekranidan qaytdik — ruxsat berilgan bo'lsa, o'chirishni
+        // avtomatik qayta uramiz (foydalanuvchi tugmani yana bosishi shart emas).
+        if (waitingForStoragePermission) {
+            waitingForStoragePermission = false
+            if (FileDeleter.hasFullStorage()) deleteApk()
         }
     }
 
@@ -479,21 +525,108 @@ class ScanResultActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Faylni o'chirish — to'liq versiyaga-mos lestnitsa orqali (FileDeleter), oddiy
+     * File.delete() EMAS.
+     *
+     * MUHIM (tuzatish): ilgari bu yerda `File(apkPath).delete()` chaqirilardi. Android 11+
+     * (scoped storage) da bu Download/Telegram/WhatsApp papkalaridagi fayl uchun JIM `false`
+     * qaytaradi — virus diskda QOLARDI, foydalanuvchi esa "o'chmadi" toastini ko'rardi.
+     * Endi AutoScanActivity bilan bir xil yo'l: MANAGE_EXTERNAL_STORAGE → MediaStore tasdiq
+     * dialogi → sandbox-egasi yo'riqnomasi. SelfGuard himoyasi FileDeleter ichida saqlanadi
+     * (UzGuardning o'zini hech qachon o'chirmaymiz).
+     */
     private fun deleteApk() {
-        try {
-            val deleted = File(apkPath).delete()
-            if (deleted) {
-                Toast.makeText(this, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
-                setResult(RESULT_OK)
-                // Dizayn: ekranda qolamiz — "Fayl o'chirildi. Telefoningiz xavfsiz." kartasi.
-                binding.btnDelete.visibility = View.GONE
-                binding.cardDeleted.visibility = View.VISIBLE
-                AnimationHelper.fadeIn(binding.cardDeleted, duration = 320)
-            } else {
-                Toast.makeText(this, getString(R.string.not_deleted), Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
+        val path = apkPath
+        if (path.isBlank()) {
             Toast.makeText(this, getString(R.string.not_deleted), Toast.LENGTH_SHORT).show()
+            return
+        }
+        binding.btnDelete.isEnabled = false
+
+        // API ≤ 28: avval runtime WRITE_EXTERNAL_STORAGE — usiz file.delete() jim false qaytaradi.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val hasWrite = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasWrite) {
+                writePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                return
+            }
+        }
+
+        try {
+            when (val result = FileDeleter.delete(this, path)) {
+                FileDeleter.Result.Deleted -> showDeletedSuccess()
+
+                is FileDeleter.Result.NeedsUserConsent -> {
+                    Toast.makeText(
+                        this, getString(R.string.autoscan_confirm_in_system_dialog), Toast.LENGTH_SHORT
+                    ).show()
+                    deleteConsentLauncher.launch(IntentSenderRequest.Builder(result.sender).build())
+                }
+
+                FileDeleter.Result.NeedsManageStorage -> {
+                    // "Barcha fayllarga ruxsat" yo'q — tugmani "RUXSAT BERISH"ga aylantiramiz.
+                    Toast.makeText(this, getString(R.string.autoscan_need_all_files), Toast.LENGTH_LONG).show()
+                    binding.btnDelete.text = getString(R.string.autoscan_grant_btn)
+                    binding.btnDelete.isEnabled = true
+                    binding.btnDelete.setOnClickListener { openManageStorageSettings() }
+                }
+
+                is FileDeleter.Result.SandboxedByOwner -> {
+                    AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.autoscan_sandboxed_owner, result.ownerPackage))
+                        .setPositiveButton(getString(R.string.btn_ok), null)
+                        .show()
+                    binding.btnDelete.isEnabled = true
+                }
+
+                is FileDeleter.Result.Failed -> {
+                    Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
+                    binding.btnDelete.isEnabled = true
+                }
+            }
+        } catch (e: Throwable) {
+            android.util.Log.e("ScanResult", "deleteApk crashed", e)
+            Toast.makeText(this, getString(R.string.not_deleted), Toast.LENGTH_SHORT).show()
+            binding.btnDelete.isEnabled = true
+        }
+    }
+
+    /** O'chirish muvaffaqiyatli — "Fayl o'chirildi. Telefoningiz xavfsiz." kartasi. */
+    private fun showDeletedSuccess() {
+        Toast.makeText(this, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
+        setResult(RESULT_OK)
+        binding.btnDelete.visibility = View.GONE
+        binding.cardDeleted.visibility = View.VISIBLE
+        AnimationHelper.fadeIn(binding.cardDeleted, duration = 320)
+    }
+
+    /**
+     * "Barcha fayllarga kirish" tizim ekranini ochadi. Foydalanuvchi ruxsat berib qaytsa,
+     * onResume o'chirishni avtomatik qayta uradi.
+     */
+    private fun openManageStorageSettings() {
+        waitingForStoragePermission = true
+        try {
+            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Intent(
+                    android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+            } else {
+                Intent(
+                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:$packageName")
+                )
+            }.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+            startActivity(intent)
+            // Tugmani asl holatiga qaytaramiz, qaytgach yana o'chira olishi uchun.
+            binding.btnDelete.text = getString(R.string.delete_apk)
+            binding.btnDelete.setOnClickListener { deleteApk() }
+        } catch (e: Exception) {
+            android.util.Log.e("ScanResult", "openManageStorageSettings failed", e)
         }
     }
 

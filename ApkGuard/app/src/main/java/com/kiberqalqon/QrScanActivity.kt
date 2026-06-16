@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -22,7 +22,7 @@ import com.google.zxing.DecodeHintType
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
-import com.kiberqalqon.databinding.ActivityQrScanBinding
+import com.uzguard.databinding.ActivityQrScanBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 

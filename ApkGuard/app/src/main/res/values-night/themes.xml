@@ -2,7 +2,7 @@
 <resources>
     <!-- Dark base theme — Anor brand on mockup ink surfaces (brand/mockup.html:
          bg #141319, cards #26262E, line #33333D, anor #E11D48). -->
-    <style name="Theme.KiberQalqon" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.UzGuard" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/kq_anor</item>
         <item name="colorPrimaryDark">@color/kq_bg_sunken</item>
         <item name="colorAccent">@color/kq_anor</item>

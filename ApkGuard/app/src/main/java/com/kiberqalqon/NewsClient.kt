@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

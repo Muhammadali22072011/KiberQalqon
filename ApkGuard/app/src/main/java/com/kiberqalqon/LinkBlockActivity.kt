@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -9,13 +9,13 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityLinkBlockBinding
+import com.uzguard.databinding.ActivityLinkBlockBinding
 
 /**
  * ====== HAVOLA BLOK EKRANI ======
  *
  * [LinkGuardActivity] havolani SHUBHALI yoki XAVFLI deb topganda saytni OCHMASDAN shu to'liq
- * ekran ogohlantirishini ko'rsatadi: KiberQalqon logosi + «Bu shubhali/xavfli sayt» + domen +
+ * ekran ogohlantirishini ko'rsatadi: UzGuard logosi + «Bu shubhali/xavfli sayt» + domen +
  * sabablar ro'yxati + tugmalar.
  *
  * Tugmalar (foydalanuvchi tanlovi: «vердиктga qarab»):
@@ -159,7 +159,20 @@ class LinkBlockActivity : AppCompatActivity() {
         }
         val options = LinkForwarder.browserOptions(this)
         if (options.isEmpty()) {
-            android.widget.Toast.makeText(this, R.string.kq4_link_no_browser, android.widget.Toast.LENGTH_LONG).show()
+            // Ro'yxat bo'sh — tizim tanlov oynasiga tushamiz (Chrome bor bo'lsa shu yerda chiqadi).
+            if (LinkForwarder.openSystemChooser(this, url)) {
+                finish()
+            } else {
+                android.widget.Toast.makeText(this, R.string.kq4_link_no_browser, android.widget.Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+        if (options.size == 1) {
+            // Yagona brauzer — to'g'ridan-to'g'ri ochamiz, ortiqcha dialogsiz.
+            Config.setPreferredBrowser(this, options[0].pkg)
+            if (LinkForwarder.open(this, url, options[0].pkg) || LinkForwarder.openSystemChooser(this, url)) {
+                finish()
+            }
             return
         }
         val labels = options.map { it.label }.toTypedArray()

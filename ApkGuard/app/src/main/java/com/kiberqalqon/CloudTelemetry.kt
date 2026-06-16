@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -24,7 +24,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * KiberQalqon Cloud telemetriyasi — markaziy monitoring paneli/xaritasi uchun.
+ * UzGuard Cloud telemetriyasi — markaziy monitoring paneli/xaritasi uchun.
  *
  * Bu CommunityReportClient (Telegram) dan ALOHIDA modul. Farqi:
  *   - CommunityReportClient: faqat DANGER/SUSPICIOUS ni dev Telegram'iga MATN qilib yuboradi.
@@ -55,7 +55,7 @@ import javax.crypto.spec.SecretKeySpec
 object CloudTelemetry {
 
     private const val TAG = "CloudTelemetry"
-    private const val PREFS = "kiberqalqon_cloud"
+    private const val PREFS = "uzguard_cloud"
     private const val KEY_DEVICE_TOKEN = "device_token"
     // Per-device imzo tokeni — register javobida server beradi, yozuvlarni HMAC bilan
     // imzolash uchun. Bo'lmasa (hali register bo'lmagan / server kalitsiz) — faqat

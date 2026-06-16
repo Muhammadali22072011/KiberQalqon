@@ -6,9 +6,9 @@
  *  #    #### #### #  #      #  #### ####
  *
  *  Kodni dekompilyatsiya qilyapsanmi? / Решил поковырять чужой код?
- *  Bu KiberQalqon. Muallifi — Muhammadali. Omad, "tadqiqotchi". :)
+ *  Bu UzGuard. Muallifi — Muhammadali. Omad, "tadqiqotchi". :)
  */
-package com.kiberqalqon
+package com.uzguard
 
 import android.util.Log
 
@@ -29,7 +29,7 @@ object EasterEgg {
           #    #### #### #  #      #  #### ####
 
           FUCK YOU. Kodni dekompilyatsiya qilyapsanmi?
-          Bu KiberQalqon. Muallifi — Muhammadali.
+          Bu UzGuard. Muallifi — Muhammadali.
           Omad, "tadqiqotchi". Vaqtingni behuda sarflama. :)
 
         ╚══════════════════════════════════════════════════════════╝
@@ -37,6 +37,6 @@ object EasterEgg {
 
     /** App ishga tushganda logcat'ga bir marta bosib qo'yamiz (DEX'da saqlanishini kafolatlaydi). */
     fun stamp() {
-        Log.i("KiberQalqon", ART)
+        Log.i("UzGuard", ART)
     }
 }

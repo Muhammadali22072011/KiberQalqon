@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.Activity
 import android.content.Context
@@ -31,9 +31,9 @@ object ThemeHelper {
      */
     fun applyAccent(activity: Activity) {
         val themeRes = when (Config.getAccent(activity)) {
-            "feruz", "turkuaz" -> R.style.Theme_KiberQalqon_Feruz
-            "zafaron", "saffron" -> R.style.Theme_KiberQalqon_Zafaron
-            else -> R.style.Theme_KiberQalqon_Anor   // default = anor (brand)
+            "feruz", "turkuaz" -> R.style.Theme_UzGuard_Feruz
+            "zafaron", "saffron" -> R.style.Theme_UzGuard_Zafaron
+            else -> R.style.Theme_UzGuard_Anor   // default = anor (brand)
         }
         activity.setTheme(themeRes)
     }

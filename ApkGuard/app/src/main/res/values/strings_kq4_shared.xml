@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- v4 dizayn — umumiy (shared) satrlar. Ekranga xos satrlar strings_kq4_<ekran>.xml ichida. -->
 <resources>
-    <string name="kq4_brand">Anor Qalqon</string>
+    <string name="kq4_brand">UzGuard</string>
     <string name="kq4_milliy">MILLIY KIBER HIMOYA</string>
     <string name="kq4_protection_on">Himoya yoqilgan</string>
     <string name="kq4_protection_off">Himoya o\'chiq</string>

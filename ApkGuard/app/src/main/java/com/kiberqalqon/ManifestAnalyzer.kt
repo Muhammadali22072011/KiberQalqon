@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo

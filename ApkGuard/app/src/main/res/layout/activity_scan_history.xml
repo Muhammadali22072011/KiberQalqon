@@ -9,7 +9,7 @@
   tozalash» → pastki navigatsiya.
 
   Hamma raqam/balandlik/ro'yxat JONLI bog'lanadi (ScanHistoryActivity):
-  kiberqalqon_stats prefs (total_scanned / total_blocked / day_0..6+epochday,
+  uzguard_stats prefs (total_scanned / total_blocked / day_0..6+epochday,
   staleness bilan) va ScanHistory.all(). Ustun balandliklari LayoutParams orqali
   kodda qo'yiladi (dizayn: 12% minimal + 78% proporsional).
 -->

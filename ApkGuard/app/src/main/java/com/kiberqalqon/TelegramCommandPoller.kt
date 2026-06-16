@@ -80,8 +80,12 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
         // Long-poll davomiyligi (sekund). getUpdates ANCHA tezroq qaytsa va bo'sh bo'lsa — xato.
         private const val LONG_POLL_SEC = 25
         private const val FAST_RETURN_MARGIN_MS = 5_000L
-        // Muvaffaqiyatdan keyin keyingi siklgacha (kichik bufer — Android hot-loop deb urishmasin).
-        private const val NORMAL_RESCHEDULE_SEC = 1L
+        // Muvaffaqiyatdan keyin keyingi siklgacha. PERF (batareya): ilgari 1s edi — har 26s
+        // (25s long-poll + 1s) da WorkManager + tarmoq uyg'onishi, ya'ni ~138 marta/soat, 24/7.
+        // 8s'ga uzaytirildi → ~108s sikl, ~33 marta/soat (≈4× kam). Buyruq kechikishi bir
+        // necha soniya ortadi (masofadan boshqaruvchi odam sezmaydi); skan/aniqlash o'zgarmaydi.
+        // FAQAT "listen" opt-in YOQQAN foydalanuvchilarga tegishli (default O'CHIQ).
+        private const val NORMAL_RESCHEDULE_SEC = 8L
         // Xato backoff'ining yuqori chegarasi.
         private const val MAX_BACKOFF_SEC = 300L
         private const val POLL_PREFS = "uzguard_tg_poll"

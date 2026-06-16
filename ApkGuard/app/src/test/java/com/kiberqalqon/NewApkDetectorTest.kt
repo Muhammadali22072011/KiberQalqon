@@ -1,6 +1,6 @@
-package com.kiberqalqon
+package com.uzguard
 
-import com.kiberqalqon.NewApkDetector.PathStamp
+import com.uzguard.NewApkDetector.PathStamp
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -1,17 +1,17 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
 import java.io.File
 
 /**
- * Защита от самоуничтожения: KiberQalqon НИКОГДА не должен сканировать/удалять собственный APK.
+ * Защита от самоуничтожения: UzGuard НИКОГДА не должен сканировать/удалять собственный APK.
  *
  * Проверки (любая срабатывает — это наш APK):
- *  1) Совпадение пакета (com.kiberqalqon или com.kiberqalqon.debug)
- *  2) Файл расположен в /data/app/com.kiberqalqon... (системная папка установленного APK)
- *  3) Подпись APK совпадает с подписью установленного KiberQalqon (release/debug keystore)
- *  4) Имя файла начинается с "kiberqalqon" ИЛИ "apkguard" — fallback,
+ *  1) Совпадение пакета (com.uzguard или com.uzguard.debug)
+ *  2) Файл расположен в /data/app/com.uzguard... (системная папка установленного APK)
+ *  3) Подпись APK совпадает с подписью установленного UzGuard (release/debug keystore)
+ *  4) Имя файла начинается с "uzguard" ИЛИ "apkguard" — fallback,
  *     срабатывает только если PackageManager не смог распарсить APK
  *     (corrupted, scoped storage, etc.). Без сигнатурной проверки сюда
  *     полагаться нельзя, но в комбинации с (3) безопасно.
@@ -24,13 +24,13 @@ import java.io.File
 object SelfGuard {
 
     private const val TAG = "SelfGuard"
-    // com.apkguard* — eski paket nomi (kiberqalqon'ga qayta nomlashdan oldin). Eski
+    // com.apkguard* — eski paket nomi (uzguard'ga qayta nomlashdan oldin). Eski
     // build'lar ham "o'ziniki" deb tan olinadi (OWN_FILENAME_PREFIXES'da "apkguard" allaqachon bor).
     private val OWN_PACKAGES = setOf(
-        "com.kiberqalqon", "com.kiberqalqon.debug",
+        "com.uzguard", "com.uzguard.debug",
         "com.apkguard", "com.apkguard.debug",
     )
-    private val OWN_FILENAME_PREFIXES = listOf("kiberqalqon", "apkguard")
+    private val OWN_FILENAME_PREFIXES = listOf("uzguard", "apkguard")
 
     // Self-signature kesh: PackageManager chaqiruvi sekin (~10ms per call), o'z
     // imzomiz hech qachon o'zgarmaydi. Birinchi chaqirikda hisoblab, qoldirib turamiz.
@@ -59,9 +59,9 @@ object SelfGuard {
             //    MUHIM (kritik bug-fix): avval bu yerda `path.contains("/$pkg/")`
             //    ham bor edi. Bu HALOKATLI false-positive berardi: ShareReceiver
             //    har bir kelgan APK'ni o'z cache'iga ko'chiradi
-            //    (/data/data/com.kiberqalqon.debug/cache/shared/... yoki
-            //     /sdcard/Android/data/com.kiberqalqon.debug/cache/...). Bu yo'lda
-            //    ham "/com.kiberqalqon.debug/" bor → HAR QANDAY skanlangan virus
+            //    (/data/data/com.uzguard.debug/cache/shared/... yoki
+            //     /sdcard/Android/data/com.uzguard.debug/cache/...). Bu yo'lda
+            //    ham "/com.uzguard.debug/" bor → HAR QANDAY skanlangan virus
             //    "o'zimiznikidir" deb SAFE qaytarilardi (ZipEncryption/Dropper
             //    tekshiruvlari umuman ishga tushmasdan). Endi faqat HAQIQIY
             //    o'rnatilgan joy — /data/app/ ostidagi APK — "o'ziniki" deb
@@ -111,16 +111,16 @@ object SelfGuard {
             }
 
             // 5) Filename heuristic — OLIB TASHLANDI "o'ziniki=SAFE" sifatida (#6 false-safe).
-            //    Avval: info==null va nom "kiberqalqon"/"apkguard" bilan boshlansa true qaytarardi.
+            //    Avval: info==null va nom "uzguard"/"apkguard" bilan boshlansa true qaytarardi.
             //    Lekin bu HUJUMCHI NAZORATIDAGI nom bilan boshqariladigan ягона shart edi:
-            //    "kiberqalqon_update.apk" deb nomlangan va PackageManager parse qila olmaydigan
+            //    "uzguard_update.apk" deb nomlangan va PackageManager parse qila olmaydigan
             //    qilib yasalgan dropper SAFE bo'lib, umuman skanlanmasdan o'tib ketardi.
             //    Bizning HAQIQIY APK valid ZIP — uni PM doim parse qiladi (info != null) va
             //    paket nomi (2) tutadi; demak bu fallback faqat "parse failed" holatda, ya'ni
             //    aynan hujumchi yasagan buzuq faylda ishlardi. Endi bunday faylni SAFE deb
             //    o'tkazmaymiz — uni odatdagidek skanlaymiz (zararli bo'lsa SUSPICIOUS/DANGER).
             //
-            //    Eslatma: o'zimizning haqiqiy build artefakti (com.kiberqalqon[.debug]) baribir
+            //    Eslatma: o'zimizning haqiqiy build artefakti (com.uzguard[.debug]) baribir
             //    (2) paket / (3) sourceDir / (4) imzo orqali tanaladi.
         } catch (e: Exception) {
             Log.w(TAG, "isOwnApk check failed", e)

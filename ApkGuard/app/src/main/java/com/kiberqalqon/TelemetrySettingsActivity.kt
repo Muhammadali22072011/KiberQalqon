@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -40,7 +40,7 @@ class TelemetrySettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ThemeHelper.applyAccent(this)
 
-        val prefs = getSharedPreferences("kiberqalqon_telemetry", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("uzguard_telemetry", Context.MODE_PRIVATE)
 
         // v4 «Milliy Kiber Himoya» reskin — fon kq_bg, eyebrow + h-title sarlavha,
         // kq4_input maydonlar, pill tugmalar. Logika o'zgarmagan.
@@ -141,7 +141,7 @@ class TelemetrySettingsActivity : AppCompatActivity() {
         // offset'dan kichik bo'lib komandalar abadiy yutiladi; (b) egasi gate fail-closed bo'lgani uchun
         // boshqa akkaunt/guruhga o'tilganда butun panel jim bloklanardi (faqat app-data tozalash qutqarardi).
         run {
-            val p = getSharedPreferences("kiberqalqon_telemetry", MODE_PRIVATE)
+            val p = getSharedPreferences("uzguard_telemetry", MODE_PRIVATE)
             val oldToken = p.getString("tg_bot_token", "").orEmpty()
             val oldChat = p.getString("tg_chat_id", "").orEmpty()
             if (oldToken != token || oldChat != chatId) {
@@ -259,7 +259,7 @@ class TelemetrySettingsActivity : AppCompatActivity() {
             return
         }
         TelemetryReporter.report(this, "TEST",
-            "Test xabar — Anor Qalqon telemetriya ishlayapti!\n" +
+            "Test xabar — UzGuard telemetriya ishlayapti!\n" +
             "Vaqt: ${java.text.SimpleDateFormat("HH:mm:ss").format(java.util.Date())}"
         )
         Toast.makeText(this, getString(R.string.kq4_misc_tg_toast_test_sent), Toast.LENGTH_LONG).show()

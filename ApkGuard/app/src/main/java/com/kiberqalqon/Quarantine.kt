@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -10,7 +10,7 @@ import java.security.MessageDigest
 
 /**
  * Карантин: вместо прямого `file.delete()` мы переносим подозрительный APK в
- * внутреннюю папку KiberQalqon, переименовываем (расширение .apk → .quar),
+ * внутреннюю папку UzGuard, переименовываем (расширение .apk → .quar),
  * и храним 7 дней. Юзер может восстановить файл из истории, если verdict
  * был ложным.
  *
@@ -37,7 +37,7 @@ import java.security.MessageDigest
 object Quarantine {
 
     private const val TAG = "Quarantine"
-    private const val PREFS = "kiberqalqon_quarantine"
+    private const val PREFS = "uzguard_quarantine"
     private const val KEY_ENTRIES = "entries_v1"
     private const val KEY_ENC_KEY = "enc_key_v1"
     private const val TTL_MS = 7L * 24 * 60 * 60 * 1000
@@ -76,9 +76,9 @@ object Quarantine {
             return Result.Failed("Asl fayl yo'q yoki o'qib bo'lmaydi")
         }
 
-        // Самозащита: KiberQalqon в карантин не идёт.
+        // Самозащита: UzGuard в карантин не идёт.
         if (SelfGuard.isOwnApk(context, originalFile.absolutePath)) {
-            return Result.Failed("Anor Qalqon o'zini karantinga qo'ya olmaydi")
+            return Result.Failed("UzGuard o'zini karantinga qo'ya olmaydi")
         }
 
         purgeExpired(context)

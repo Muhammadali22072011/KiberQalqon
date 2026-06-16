@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Bundle
@@ -7,8 +7,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityQuarantineV4Binding
-import com.kiberqalqon.databinding.ItemKq4QuarantineEntryBinding
+import com.uzguard.databinding.ActivityQuarantineV4Binding
+import com.uzguard.databinding.ItemKq4QuarantineEntryBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

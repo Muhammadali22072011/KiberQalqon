@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.provider.Settings
@@ -94,10 +94,10 @@ class AccessibilityWatcher(
 
     companion object {
         private const val TAG = "AccessibilityWatcher"
-        private const val PREFS = "kiberqalqon_a11y"
+        private const val PREFS = "uzguard_a11y"
         private const val KEY_PREV = "prev_services"
-        private const val WORK_NAME = "kiberqalqon_a11y_watch"
-        private const val WORK_NOW = "kiberqalqon_a11y_check_now"
+        private const val WORK_NAME = "uzguard_a11y_watch"
+        private const val WORK_NOW = "uzguard_a11y_check_now"
 
         private val WHITELIST_PACKAGES = setOf(
             "com.google.android.marvin.talkback",

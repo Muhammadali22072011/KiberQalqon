@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -18,15 +18,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.kiberqalqon.databinding.ActivityInitialScanBinding
+import com.uzguard.databinding.ActivityInitialScanBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 /**
  * Birinchi to'liq telefon tekshiruvi — v4 «Milliy Kiber Himoya» dizayni
@@ -153,10 +153,25 @@ class InitialScanActivity : AppCompatActivity() {
     private fun startScan() {
         if (scanStarted) return
         scanStarted = true
+        // Faza A boshlanishi: "fayllar qidirilmoqda" — uzun qidiruvda (ko'p faylli telefon)
+        // ekran "qotib qolgandek" ko'rinmasin. Ilgari bu yerda hech narsa yangilanmasdi va
+        // butun fayl tizimi obhod qilinguncha ekran 0% da turardi.
+        binding.tvCurrentFile.text = getString(R.string.kq4_is_searching)
+        binding.tvScanProgress.text = ""
         scope.launch {
             try {
                 val apks = withContext(Dispatchers.IO) {
-                    FullPhoneScan.findAllApkFiles(this@InitialScanActivity)
+                    // Tez yo'l: MediaStore indeksidan (yangi/katta telefonlarda ham darhol
+                    // topadi) + to'liq rekursiv yurish (endi vaqt byudjeti bilan — hech qachon
+                    // cheksiz osilmaydi). Yo'l bo'yicha dedup qilamiz.
+                    val fast = try {
+                        ApkScanner.findApkFiles(this@InitialScanActivity)
+                    } catch (_: Throwable) { emptyList<ApkItem>() }
+                    val deep = try {
+                        FullPhoneScan.findAllApkFiles(this@InitialScanActivity)
+                    } catch (_: Throwable) { emptyList<ApkItem>() }
+                    val seen = HashSet<String>(fast.size + deep.size)
+                    (fast + deep).filter { seen.add(it.path) }
                 }
                 if (apks.isEmpty()) {
                     presentResults()
@@ -196,8 +211,10 @@ class InitialScanActivity : AppCompatActivity() {
                     // raz zdes' ne nuzhno, inache kazhdyy fayl uchityvayetsya dvazhdy
                     // (i Dashboard pokazyvayet udvoyennye chisla).
 
-                    // Yield UI thread so the progress animation breathes.
-                    delay(20)
+                    // Skan IO'da bo'lgani uchun UI thread oraliqda allaqachon bo'sh qoladi —
+                    // har faylda 20ms kutish shart emas edi (100+ APK'da skanni sekinlashtirar
+                    // edi). Faqat vaqti-vaqti bilan yield qilamiz (animatsiya nafas olsin).
+                    if (i % 8 == 7) yield()
                 }
                 presentResults()
             } catch (e: Throwable) {
