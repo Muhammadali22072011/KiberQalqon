@@ -116,10 +116,18 @@ object ObfuscatedSignatures {
     private val HEX = "0123456789ABCDEF".toCharArray()
 
     /** SHA-256 → first 16 hex chars (uppercase). */
-    fun hash(s: String): String {
+    fun hash(s: String): String = hashLower(s.lowercase())
+
+    /**
+     * hash() ning ichki yo'li: argument ALLAQACHON lowercase bo'lishi SHART.
+     * matchTokenHashes() har tokenni bir marta lowercase qiladi, shuning uchun bu yerda
+     * qayta lowercase QILMAYMIZ — har token uchun ortiqcha String allokatsiyasini
+     * (va CPU/GC bosimini) tejaymiz. Natija hash(s) bilan bayt-aynan bir xil.
+     */
+    private fun hashLower(lower: String): String {
         val md = sha256Local.get()!!
         md.reset()
-        val digest = md.digest(s.lowercase().toByteArray(Charsets.UTF_8))
+        val digest = md.digest(lower.toByteArray(Charsets.UTF_8))
         val sb = StringBuilder(16)
         for (i in 0 until 8) {
             val b = digest[i].toInt() and 0xFF
@@ -133,19 +141,24 @@ object ObfuscatedSignatures {
      * Текстовая токен-сверка: вычленяем "значащие" токены (8+ chars без пробелов),
      * хэшируем, проверяем. Только exact match — никаких regex/word-boundary,
      * чтобы случайный кусок шифра не дал false positive.
+     *
+     * PERF (qizish — 2026-06-18, qurilmada o'lchangan): bitta DEX matni o'n minglab token
+     * beradi, lekin ularning aksariyati TAKRORIY (bir xil tip/metod/string nomlari). Avval
+     * HAR uchrash uchun SHA-256 hisoblanardi → ApkScanner.scan profilida eng issiq joy shu edi
+     * (telefon qizib, protsessor 3+ yadroda band bo'lardi). Endi har UNIKAL token FAQAT BIR
+     * marta hash qilinadi (seen to'plami) va lowercase ham bir marta (hashLower qayta
+     * lowercase qilmaydi). Aniqlash BAYT-AYNAN o'sha: token to'plami va exact-match o'zgarmaydi.
      */
     fun matchTokenHashes(text: String): List<String> {
         val found = mutableSetOf<String>()
+        val seen = HashSet<String>(2048)
         // Извлекаем кандидаты: alnum + дефис/подчёркивание/точка/слэш, длина 4+
         val tokenRegex = Regex("[A-Za-z0-9._/\\-]{4,128}")
         for (m in tokenRegex.findAll(text)) {
             val tok = m.value.lowercase()
-            val h = hash(tok)
-            MALICIOUS_TOKEN_HASHES[h]?.let { family ->
-                if (found.add(family)) {
-                    // first match per family — достаточно
-                }
-            }
+            if (!seen.add(tok)) continue   // bu token allaqachon hash qilingan — qayta hisoblamaymiz
+            val h = hashLower(tok)
+            MALICIOUS_TOKEN_HASHES[h]?.let { family -> found.add(family) }
         }
         return found.toList()
     }
