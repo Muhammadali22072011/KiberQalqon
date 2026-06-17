@@ -133,7 +133,12 @@ object NewsNotifier {
     // kechiktiriladi. YagonaFCMsiz ishonchli yo'l — AlarmManager.setAndAllowWhileIdle:
     // u Doze'da ham ishlaydi (OS ~9 daqiqada birga cheklaydi) va qisqa tarmoq+wakelock
     // oynasi beradi. Inexact — SCHEDULE_EXACT_ALARM ruxsati SHART EMAS.
-    private const val ALARM_INTERVAL_MS = 12L * 60 * 1000   // ~12 daq (Doze poli ~9 daq)
+    // ~40 daq: ekran O'CHIQ / Doze paytida YANGILIKNI yetkazishning yagona yo'li. Avval 12 daq
+    // edi — telefon stolda yotganda soatiga ~5 marta Doze'dan uyg'onib (RTC_WAKEUP + tarmoq)
+    // qizirdi va batareya yerardi. 40 daq'ga uzaytirdik: idle uyg'onish ~3 barobar kamayadi
+    // (kamroq qizish/batareya), e'lon esa ekran o'chiq bo'lganda eng kechi ~40 daqiqada keladi.
+    // Ekran OCHIQ bo'lsa ProtectionService loop'i baribir ~3 daqiqada yetkazadi (deyarli real-vaqt).
+    private const val ALARM_INTERVAL_MS = 40L * 60 * 1000   // ~40 daq (idle/Doze yetkazish)
     private const val ALARM_REQUEST = 7311
     private const val ALARM_ACTION = "com.uzguard.NEWS_CHECK"
 

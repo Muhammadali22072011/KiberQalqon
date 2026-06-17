@@ -183,12 +183,17 @@ class ProtectionService : Service() {
                 delay(if (interactive) POLL_INTERVAL_ACTIVE_MS else POLL_INTERVAL_IDLE_MS)
 
                 // Yangiliklar (panel e'lonlari) — fon-SKANDAN MUSTAQIL, alohida coroutine'da
-                // (NewsNotifier ichida 3 daqiqalik throttle + dedup). Foreground service tirik
-                // ekan, yangi e'lon ~3 daqiqada qurilmaga keladi — FCM/Google'siz "deyarli
-                // real-vaqt". Alohida launch: sekin tarmoq skan zaxira-loop'ini bloklamaydi;
-                // isBackgroundEnabled gate'idan OLDIN — yangiliklar fon-skan o'chiq bo'lsa ham keladi.
-                serviceScope.launch {
-                    try { NewsNotifier.checkAndNotify(applicationContext) } catch (_: Throwable) {}
+                // (NewsNotifier ichida 3 daqiqalik throttle + dedup). FAQAT ekran OCHIQ bo'lganda
+                // shu yerdan tekshiramiz: foydalanuvchi telefonni ishlatyapti → yangi e'lon
+                // ~3 daqiqada keladi (FCM/Google'siz "deyarli real-vaqt"). Ekran O'CHIQ bo'lsa
+                // BU YERDA TEKSHIRMAYMIZ — Doze'da yetkazish NewsAlarmReceiver (siyrak, ~40 daq)
+                // zimmasida; shunda telefon stolda yotganda behuda uyg'onmaydi va qizimaydi
+                // (idle nagrev/batareya sababi shu takror tekshiruv edi). isBackgroundEnabled
+                // gate'idan OLDIN — yangiliklar fon-skan o'chiq bo'lsa ham keladi.
+                if (interactive) {
+                    serviceScope.launch {
+                        try { NewsNotifier.checkAndNotify(applicationContext) } catch (_: Throwable) {}
+                    }
                 }
 
                 try {
