@@ -47,7 +47,6 @@ object FileDeleter {
      */
     fun delete(activity: Activity, filePath: String): Result {
         val file = File(filePath)
-        if (!file.exists()) return Result.Deleted
 
         // ЗАЩИТА ОТ СУИЦИДА: никогда не удаляем сам UzGuard.
         if (SelfGuard.isOwnApk(activity, filePath)) {
@@ -57,10 +56,19 @@ object FileDeleter {
 
         // Файл в /Android/data/<pkg>/ — особая зона, в неё нельзя пробиться никаким разрешением.
         // Единственный пользовательский способ — удалить через само приложение-владельца.
+        //
+        // ВАЖНО (#delete-false-success): эта проверка ДОЛЖНА быть ВЫШЕ `!file.exists()`.
+        // На Android 11+ мы не можем даже stat'нуть чужую песочницу, поэтому
+        // file.exists()==false здесь НЕ значит «файл удалён» — вредонос всё ещё лежит
+        // в хранилище приложения-владельца (Telegram и т.п.), просто невидим нам.
+        // Раньше ранний `return Deleted` врал «o'chirildi» на выжившем вирусе.
         sandboxOwner(file)?.let { owner ->
             Log.w(TAG, "File belongs to sandboxed dir of $owner: $filePath")
             return Result.SandboxedByOwner(owner)
         }
+
+        // Путь, который мы реально видим, и его уже нет → действительно удалён.
+        if (!file.exists()) return Result.Deleted
 
         // 1) Если есть MANAGE_EXTERNAL_STORAGE / WRITE_EXTERNAL_STORAGE — пробуем сразу прямое удаление.
         if (hasFullStorage()) {

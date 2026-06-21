@@ -496,6 +496,12 @@ object ApkScanner {
                 val pkg = try {
                     context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName ?: "?"
                 } catch (_: Throwable) { "?" }
+                // Jonli o'rnatish qalqoni (InstallShieldService) uchun bu paketni/yorliqni
+                // DANGER deb belgilaymiz — foydalanuvchi keyin uni o'rnatmoqchi bo'lsa,
+                // tizim o'rnatish oynasi avtomatik bekor qilinadi.
+                try {
+                    InstallApproval.flagDanger(context, pkg.takeIf { it != "?" }, f.name)
+                } catch (_: Throwable) { }
                 TelemetryReporter.reportThreat(
                     context,
                     pkg = pkg,

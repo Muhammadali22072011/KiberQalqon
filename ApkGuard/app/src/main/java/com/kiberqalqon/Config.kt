@@ -20,6 +20,15 @@ private const val KEY_WEEKLY_REPORT = "weekly_report_enabled"
 // Yangilik (e'lon) bildirishnomalari — panel yangi e'lon joylasa, qurilmada push.
 private const val KEY_NEWS_NOTIFY = "news_notify_enabled"
 private const val KEY_VPN_FILTER = "vpn_filter_enabled"
+// O'rnatish himoyasi (proxodnaya): UzGuard APK fayllar uchun standart ilova bo'lib,
+// har bir APK avval tekshiriladi. Faqat YO'RIQNOMA/PROMPT'ni boshqaradi (standart
+// ilovani majburan o'rnatib bo'lmaydi). Default YOQILGAN.
+private const val KEY_INSTALL_PROTECTION = "install_protection_enabled"
+// Jonli o'rnatish qalqoni (Accessibility): tizim "O'rnatasizmi?" oynasi chiqqanda,
+// agar APK UzGuard tomonidan TASDIQLANMAGAN/DANGER bo'lsa — avtomatik "Bekor" bosadi.
+// Bu bayroq faqat biz PROMPT/harakat qilamizmi shuni boshqaradi; haqiqiy a11y xizmati
+// foydalanuvchi tizimda yoqmaguncha o'chiq turadi. Default YOQILGAN.
+private const val KEY_INSTALL_SHIELD = "install_shield_enabled"
 // Havola qalqoni (link interceptor): tashqi http(s) havolalar ochilishidan oldin
 // avtomatik [LinkScanner] orqali tekshiriladi. Default YOQILGAN — lekin u faqat
 // foydalanuvchi UzGuard'ni standart havola ochuvchi qilib tanlasagina ishlaydi.
@@ -196,6 +205,24 @@ object Config {
         prefs(context).edit { putBoolean(KEY_VPN_FILTER, enabled) }
     }
 
+    // O'rnatish himoyasi (UzGuard'ni APK uchun standart qilish + xavfsizni o'tkazish).
+    // Default YOQILGAN — faqat prompt/yo'riqnomani boshqaradi.
+    fun isInstallProtectionEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_INSTALL_PROTECTION, true)
+
+    fun setInstallProtectionEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_INSTALL_PROTECTION, enabled) }
+    }
+
+    // Jonli o'rnatish qalqoni (Accessibility xizmati orqali avtomatik "Bekor").
+    // Default YOQILGAN, lekin xizmat foydalanuvchi tizimda yoqmaguncha ishlamaydi.
+    fun isInstallShieldEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_INSTALL_SHIELD, true)
+
+    fun setInstallShieldEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_INSTALL_SHIELD, enabled) }
+    }
+
     // Havola qalqoni — default YOQILGAN (interceptor faqat foydalanuvchi bizni standart
     // havola ochuvchi qilib tanlasagina ishga tushadi, shuning uchun default-on xavfsiz).
     fun isLinkGuardEnabled(context: Context): Boolean =
@@ -359,6 +386,8 @@ object Config {
             putBoolean(KEY_AUTO_UPDATE, true)
             putString(KEY_SENSITIVITY, "medium")
             putString(KEY_AUTO_DELETE, "delete")
+            putBoolean(KEY_INSTALL_PROTECTION, true)
+            putBoolean(KEY_INSTALL_SHIELD, true)
             putBoolean(KEY_DEFAULTS_BAKED, true)
         }
         return true

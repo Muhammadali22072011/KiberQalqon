@@ -571,6 +571,32 @@
     <string name="autoscan_sandboxed_owner">Этот файл в личной папке приложения %1$s.\n\nЕго можно удалить только через приложение \"%1$s\" (например: Telegram → Настройки → Очистить данные).</string>
     <string name="autoscan_delete_btn">УДАЛИТЬ</string>
     <string name="autoscan_delete_hint_done">Удаление не даст установить этот APK на ваш телефон</string>
+    <string name="autoscan_copy_deleted_original_remains">⚠️ Удалена только проверенная КОПИЯ. Оригинал остался в приложении, откуда вы его прислали (например, Telegram) — Android не разрешает другим приложениям удалять его. Удалите его вручную там.\n\nФайл НЕ опасен, пока не установлен, а UzGuard не даст его установить.</string>
+
+    <!-- Живой щит установки (Accessibility) -->
+    <string name="install_shield_label">Живой щит установки</string>
+    <string name="install_shield_a11y_desc">Автоматически останавливает установку вредоносных приложений. UzGuard следит за системным окном «Установить?» и отменяет установку неподтверждённого опасного APK.</string>
+    <string name="install_blocked_notif_title">Установка заблокирована</string>
+    <string name="install_blocked_notif_body">«%1$s» признан опасным — UzGuard остановил его установку.</string>
+    <string name="install_blocked_notif_body_generic">Установка опасного приложения остановлена UzGuard.</string>
+    <string name="install_default_t">Приложение по умолчанию для APK</string>
+    <string name="install_default_s">Каждый APK сначала проверяется в UzGuard</string>
+    <string name="install_shield_t">Живой щит установки</string>
+    <string name="install_shield_s">Автоматически отменяет установку вредоносных APK</string>
+    <string name="unknown_sources_t">Отключить неизвестные источники</string>
+    <string name="unknown_sources_s">Запретите Telegram/браузеру ставить APK</string>
+    <string name="unknown_sources_none">Опасные приложения-источники не найдены</string>
+    <string name="unknown_sources_dialog_title">Какому приложению запретить?</string>
+    <string name="open_source_app_t">Открыть приложение-источник</string>
+    <string name="set_default_apk_prompt_title">Сделать UzGuard приложением по умолчанию для APK</string>
+    <string name="set_default_apk_prompt_msg">Сейчас появится окно «Открыть с помощью».\n\nВыберите «UzGuard» и нажмите «Всегда» — тогда каждый APK сначала проверяется в UzGuard. Искать APK-файл не нужно.</string>
+    <string name="set_default_apk_btn">Открыть окно выбора</string>
+    <string name="set_default_apk_done">✓ Готово! Теперь каждый APK сначала проверяется в UzGuard.</string>
+    <string name="set_default_apk_tip">В следующий раз выберите «Всегда» — тогда каждый APK будет открываться в UzGuard автоматически.</string>
+    <string name="devadmin_block_title">Вирус получил права «администратора»</string>
+    <string name="devadmin_block_msg">Это вредоносное приложение получило права «Администратор устройства» — поэтому Android не даёт удалить его сразу.\n\nВ открывшемся списке найдите это приложение и нажмите «Выключить» / «Деактивировать», затем вернитесь и удалите его.</string>
+    <string name="install_shield_guide_title">Включить живой щит установки</string>
+    <string name="install_shield_guide_msg">Этот щит автоматически останавливает установку вредоносных приложений.\n\nЧтобы включить: в открывшемся списке «Спец. возможности» найдите «UzGuard» и включите.\n\nНа Android 13+ сначала может потребоваться «О приложении» → ⋮ вверху справа → «Разрешить ограниченные настройки».</string>
 
     <!-- Localization pass: InitialScanActivity hardcoded UI -->
     <string name="is_header_safe">Ваш телефон в безопасности</string>

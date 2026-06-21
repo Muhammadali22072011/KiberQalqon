@@ -43,6 +43,11 @@ class ScanResultActivity : AppCompatActivity() {
     private var scanResult: ScanResult? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
+    // apkPath — bu keshdagi NUSXAmi (share/content URI orqali kelgan)? Shunday bo'lsa,
+    // nusxani o'chirib "xavfsiz" deyish yolg'on — asl fayl manba ilovasida qoladi.
+    private var apkIsCopy: Boolean = false
+    private var originUri: String? = null
+
     // Foydalanuvchi "Barcha fayllarga ruxsat" ekranidan qaytishini kutmoqdamizmi —
     // qaytgach (onResume) o'chirishni avtomatik qayta urinamiz.
     private var waitingForStoragePermission = false
@@ -52,6 +57,7 @@ class ScanResultActivity : AppCompatActivity() {
     private val deleteConsentLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
+        if (isFinishing || isDestroyed) return@registerForActivityResult
         if (result.resultCode == Activity.RESULT_OK) {
             showDeletedSuccess()
         } else {
@@ -64,6 +70,7 @@ class ScanResultActivity : AppCompatActivity() {
     private val writePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
+        if (isFinishing || isDestroyed) return@registerForActivityResult
         if (granted) {
             deleteApk()
         } else {
@@ -94,6 +101,8 @@ class ScanResultActivity : AppCompatActivity() {
 
         apkPath = intent.getStringExtra(EXTRA_APK_PATH) ?: ""
         installedPackage = intent.getStringExtra(EXTRA_PACKAGE)
+        apkIsCopy = intent.getBooleanExtra(EXTRA_IS_COPY, false)
+        originUri = intent.getStringExtra(EXTRA_ORIGIN_URI)
         val verdict = intent.getSerializableExtra(EXTRA_VERDICT) as? ScanResult.Verdict
         val res = ScanResult(
             verdict = verdict ?: ScanResult.Verdict.SAFE,
@@ -308,6 +317,18 @@ class ScanResultActivity : AppCompatActivity() {
     }
 
     private fun uninstall(pkg: String) {
+        // Virus «Qurilma administratori» huquqini olgan bo'lsa — avval uni o'chirishga yo'naltiramiz.
+        if (DeviceAdminUtil.isActiveAdmin(this, pkg)) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.devadmin_block_title)
+                .setMessage(R.string.devadmin_block_msg)
+                .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
+                    DeviceAdminUtil.openDeviceAdminSettings(this)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+            return
+        }
         try {
             startActivity(Intent(Intent.ACTION_DELETE, android.net.Uri.parse("package:$pkg")))
         } catch (e: Throwable) {
@@ -604,11 +625,48 @@ class ScanResultActivity : AppCompatActivity() {
 
     /** O'chirish muvaffaqiyatli — "Fayl o'chirildi. Telefoningiz xavfsiz." kartasi. */
     private fun showDeletedSuccess() {
+        // Faqat keshdagi NUSXAni o'chirgan bo'lsak — asl fayl manba ilovasida qolishi mumkin.
+        // Avval uni ham o'chirishga urinamiz; bo'lmasa "xavfsiz" deb soxta xabar bermaymiz.
+        if (isScratchCopy() && !tryDeleteOrigin()) {
+            Toast.makeText(
+                this,
+                getString(R.string.autoscan_copy_deleted_original_remains),
+                Toast.LENGTH_LONG
+            ).show()
+            binding.btnDelete.visibility = View.GONE
+            return
+        }
         Toast.makeText(this, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
         setResult(RESULT_OK)
         binding.btnDelete.visibility = View.GONE
         binding.cardDeleted.visibility = View.VISIBLE
         AnimationHelper.fadeIn(binding.cardDeleted, duration = 320)
+    }
+
+    /** Skanlangan fayl bizning kesh ichidagi vaqtinchalik NUSXAmi (share/content URI)? */
+    private fun isScratchCopy(): Boolean {
+        if (apkIsCopy) return true
+        return try {
+            apkPath.startsWith(cacheDir.absolutePath) || apkPath.contains("/cache/")
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    /** Asl manba faylini content URI orqali o'chirishga urinish (best-effort, hech qachon qulamaydi). */
+    private fun tryDeleteOrigin(): Boolean {
+        val raw = originUri ?: return false
+        return try {
+            val u = Uri.parse(raw)
+            if (android.provider.DocumentsContract.isDocumentUri(this, u)) {
+                android.provider.DocumentsContract.deleteDocument(contentResolver, u)
+            } else {
+                contentResolver.delete(u, null, null) > 0
+            }
+        } catch (e: Throwable) {
+            android.util.Log.w("ScanResult", "tryDeleteOrigin failed", e)
+            false
+        }
     }
 
     /**
@@ -675,12 +733,16 @@ class ScanResultActivity : AppCompatActivity() {
         private const val EXTRA_PERMS = "perms"
         private const val EXTRA_SIGS = "sigs"
         private const val EXTRA_PACKAGE = "package"
+        private const val EXTRA_IS_COPY = "is_copy"
+        private const val EXTRA_ORIGIN_URI = "origin_uri"
 
         fun intent(
             context: android.content.Context,
             path: String,
             result: ScanResult,
-            packageName: String? = null
+            packageName: String? = null,
+            isCopy: Boolean = false,
+            originUri: String? = null
         ): Intent {
             return Intent(context, ScanResultActivity::class.java).apply {
                 putExtra(EXTRA_APK_PATH, path)
@@ -690,6 +752,8 @@ class ScanResultActivity : AppCompatActivity() {
                 putStringArrayListExtra(EXTRA_PERMS, ArrayList(result.dangerousPermissions))
                 putStringArrayListExtra(EXTRA_SIGS, ArrayList(result.malwareSignatures))
                 if (!packageName.isNullOrBlank()) putExtra(EXTRA_PACKAGE, packageName)
+                if (isCopy) putExtra(EXTRA_IS_COPY, true)
+                if (!originUri.isNullOrBlank()) putExtra(EXTRA_ORIGIN_URI, originUri)
             }
         }
     }

@@ -50,18 +50,24 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 }
                 if (isOwn) return
                 Log.d(TAG, "Package installed: $pkg")
+                // O'rnatish tugadi — bir martalik tasdiqni olib tashlaymiz (qayta ishlatilmasin).
+                try { InstallApproval.clearApproval(ctx, pkg) } catch (_: Throwable) {}
                 scope.launch { scanInstalledPackage(ctx, pkg) }
                 // Yangi ilova darhol accessibility / bildirishnoma kirish so'rashi mumkin —
-                // ikkalasini ham real vaqtda kuzatamiz.
-                AccessibilityWatcher.checkNow(ctx)
-                NotificationAccessWatcher.checkNow(ctx)
+                // ikkalasini ham real vaqtda kuzatamiz. Receiver HECH QACHON qulamasin.
+                try {
+                    AccessibilityWatcher.checkNow(ctx)
+                    NotificationAccessWatcher.checkNow(ctx)
+                } catch (e: Throwable) { Log.w(TAG, "watcher checkNow failed", e) }
             }
             Intent.ACTION_PACKAGE_REPLACED -> {
                 if (isOwn) return
                 Log.d(TAG, "Package replaced: $pkg")
                 scope.launch { rescanReplacedPackage(ctx, pkg) }
-                AccessibilityWatcher.checkNow(ctx)
-                NotificationAccessWatcher.checkNow(ctx)
+                try {
+                    AccessibilityWatcher.checkNow(ctx)
+                    NotificationAccessWatcher.checkNow(ctx)
+                } catch (e: Throwable) { Log.w(TAG, "watcher checkNow failed", e) }
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED, Intent.ACTION_PACKAGE_REMOVED -> {
                 // REMOVED prikhodit s EXTRA_REPLACING=true vo vremya update — skipaem.
@@ -102,6 +108,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 when (result.verdict) {
                     ScanResult.Verdict.DANGER -> {
                         Log.w(TAG, "Replaced DANGER package: $pkg — $result")
+                        try { InstallApproval.flagDanger(context, pkg, label) } catch (_: Throwable) {}
                         if (ImprovedApkFileObserver.canLaunchActivityFromBackground(context)) {
                             try {
                                 val intent = Intent(context, AutoScanActivity::class.java).apply {
@@ -171,6 +178,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
             when (result.verdict) {
                 ScanResult.Verdict.DANGER -> {
                     Log.w(TAG, "Installed DANGER package: $pkg — $result")
+                    try { InstallApproval.flagDanger(context, pkg, label) } catch (_: Throwable) {}
                     // Avval popup ochishga urinamiz (faqat oldingi planda yoki overlay ruxsati bo'lsa).
                     // Notification full-screen-intent bilan har holda chiqadi — fon'da bo'lsa lock
                     // screen ustida ko'rinadi va telefon ochilsa avtomatik uninstall dialogiga olib boradi.

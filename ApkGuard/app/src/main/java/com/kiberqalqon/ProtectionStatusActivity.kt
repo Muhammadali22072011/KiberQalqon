@@ -302,6 +302,45 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 ) { openDefaultApps() },
             )
         }
+        // O'rnatish himoyasi — UzGuard APK fayllar uchun standart ochuvchi (proxodnaya):
+        // har bir APK avval tekshiriladi. TAVSIYA (gate'ni bloklamaydi).
+        if (Config.isInstallProtectionEnabled(this)) {
+            out.add(
+                Row(
+                    R.drawable.ic4_folder,
+                    getString(R.string.install_default_t),
+                    getString(R.string.install_default_s),
+                    InstallProtectionGuide.isDefaultApkHandler(this), false,
+                ) { showDefaultApkGuide() },
+            )
+        }
+        // Jonli o'rnatish qalqoni (Accessibility) — zararli o'rnatishni avtomatik bekor qiladi.
+        // TAVSIYA: Android 13+ "cheklangan sozlamalar" tufayli ba'zi ROM'da yoqish ko'p qadamli.
+        if (Config.isInstallShieldEnabled(this)) {
+            out.add(
+                Row(
+                    R.drawable.ic4_shield,
+                    getString(R.string.install_shield_t),
+                    getString(R.string.install_shield_s),
+                    InstallProtectionGuide.isShieldServiceEnabled(this), false,
+                ) { showInstallShieldGuide() },
+            )
+        }
+        // Noma'lum manbalar — Telegram/WhatsApp/brauzer "noma'lum ilovalarni o'rnatish"i
+        // o'chirilsa, o'sha ilovadan APK umuman o'rnatib bo'lmaydi. Tizim holatni bermaydi
+        // (boshqa ilova appop'i) → state=null, yo'l-yo'riq qatori.
+        if (Config.isInstallProtectionEnabled(this) &&
+            InstallProtectionGuide.unknownSourceCandidates(this).isNotEmpty()
+        ) {
+            out.add(
+                Row(
+                    R.drawable.ic4_lock,
+                    getString(R.string.unknown_sources_t),
+                    getString(R.string.unknown_sources_s),
+                    null, false,
+                ) { showUnknownSourcesGuide() },
+            )
+        }
         // Internet himoyasi (DNS C2-filtri) — bir marta tasdiqlangach App.onCreate doim o'zi
         // ko'taradi. TAVSIYA (majburiy emas): VPN tasdiqsiz ham asosiy himoya to'liq ishlaydi.
         out.add(
@@ -470,7 +509,19 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 toastStep(R.string.kq4_prot_row_linkguard_t); openDefaultApps(); WizKind.SETTINGS
             })
         }
-        // 8) Internet himoyasi (VPN C2-filtri) — ruxsat bo'lsa darhol, bo'lmasa tasdiq oynasi.
+        // 8) O'rnatish himoyasi — UzGuard'ni APK uchun standart qilish (tizim ekrani).
+        if (Config.isInstallProtectionEnabled(this)) {
+            s.add(WizStep("installdefault", { !InstallProtectionGuide.isDefaultApkHandler(this) }) {
+                toastStep(R.string.install_default_t); InstallProtectionGuide.promptSetDefaultApk(this); WizKind.SETTINGS
+            })
+        }
+        // 9) Jonli o'rnatish qalqoni — Accessibility sozlamalari (tizim ekrani).
+        if (Config.isInstallShieldEnabled(this)) {
+            s.add(WizStep("installshield", { !InstallProtectionGuide.isShieldServiceEnabled(this) }) {
+                toastStep(R.string.install_shield_t); InstallProtectionGuide.openAccessibilitySettings(this); WizKind.SETTINGS
+            })
+        }
+        // 10) Internet himoyasi (VPN C2-filtri) — ruxsat bo'lsa darhol, bo'lmasa tasdiq oynasi.
         s.add(WizStep("vpn", { !isVpnReady() }) {
             val prep = try { VpnFilterService.prepareIntent(this) } catch (_: Throwable) { null }
             if (prep == null) {
@@ -655,6 +706,82 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 .show()
         } catch (e: Throwable) {
             android.util.Log.w("ProtStatus", "oem popup guide failed", e)
+        }
+    }
+
+    /**
+     * Jonli o'rnatish qalqonini yoqish yo'riqnomasi. Avval nima uchun kerakligini va
+     * Android 13+ "cheklangan sozlamalar" qadamini tushuntiramiz, so'ng Maxsus imkoniyatlar
+     * (Accessibility) ekranini ochamiz (u yerda foydalanuvchi UzGuard'ni yoqadi).
+     */
+    private fun showInstallShieldGuide() {
+        try {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.install_shield_guide_title)
+                .setMessage(R.string.install_shield_guide_msg)
+                .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
+                    InstallProtectionGuide.openAccessibilitySettings(this)
+                }
+                .setNegativeButton(R.string.kq4_prot_autostart_close, null)
+                .show()
+        } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "install shield guide failed", e)
+            InstallProtectionGuide.openAccessibilitySettings(this)
+        }
+    }
+
+    /**
+     * "Noma'lum manbalarni o'chirish" — qurilmada o'rnatilgan xavfli manbalar (Telegram,
+     * WhatsApp, brauzer) ro'yxatini ko'rsatadi; tanlansa — o'sha ilovaning "Noma'lum
+     * ilovalarni o'rnatish" toggle ekranini ochamiz (foydalanuvchi o'chiradi).
+     */
+    /**
+     * UzGuard'ni APK uchun standart ilova qilish — ENG QULAY yo'l. Tushuntirib, bitta tugma
+     * bilan tizimning "Qaysi ilova bilan ochish?" oynasini ochamiz (APK qidirish shart emas).
+     * U yerda foydalanuvchi «UzGuard» + «Doimo»ni bossa — har bir APK avval bizda tekshiriladi.
+     */
+    private fun showDefaultApkGuide() {
+        if (InstallProtectionGuide.isDefaultApkHandler(this)) {
+            try { Toast.makeText(this, R.string.set_default_apk_done, Toast.LENGTH_SHORT).show() } catch (_: Throwable) {}
+            renderRows()
+            return
+        }
+        try {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.set_default_apk_prompt_title)
+                .setMessage(R.string.set_default_apk_prompt_msg)
+                .setPositiveButton(R.string.set_default_apk_btn) { _, _ ->
+                    if (!InstallProtectionGuide.triggerSetDefaultApk(this)) {
+                        InstallProtectionGuide.promptSetDefaultApk(this)
+                    }
+                }
+                .setNegativeButton(R.string.kq4_prot_autostart_close, null)
+                .show()
+        } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "default apk guide failed", e)
+            InstallProtectionGuide.triggerSetDefaultApk(this)
+        }
+    }
+
+    private fun showUnknownSourcesGuide() {
+        val apps = try {
+            InstallProtectionGuide.unknownSourceCandidates(this)
+        } catch (_: Throwable) { emptyList() }
+        if (apps.isEmpty()) {
+            try { Toast.makeText(this, R.string.unknown_sources_none, Toast.LENGTH_SHORT).show() } catch (_: Throwable) {}
+            return
+        }
+        try {
+            val labels = apps.map { it.label }.toTypedArray()
+            AlertDialog.Builder(this)
+                .setTitle(R.string.unknown_sources_dialog_title)
+                .setItems(labels) { _, which ->
+                    InstallProtectionGuide.openUnknownSourceFor(this, apps[which].pkg)
+                }
+                .setNegativeButton(R.string.kq4_prot_autostart_close, null)
+                .show()
+        } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "unknown sources guide failed", e)
         }
     }
 

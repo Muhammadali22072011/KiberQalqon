@@ -23,7 +23,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -181,40 +184,45 @@ class InitialScanActivity : AppCompatActivity() {
                 val total = apks.size
                 binding.tvFoundCount.text = total.toString()
 
-                for ((i, apk) in apks.withIndex()) {
-                    binding.tvCurrentFile.text = apk.name
-                    val pct = (i + 1) * 100 / total
-                    binding.tvScanProgress.text = "$pct%"
-                    // Halqa real skan jarayoniga mos suriladi (animatsiyasiz — sinxron).
-                    binding.scanRing.setValue(pct.toFloat(), animate = false)
-
-                    val result = withContext(Dispatchers.IO) {
-                        try {
-                            ApkScanner.scan(this@InitialScanActivity, apk.path)
-                        } catch (e: Throwable) {
-                            android.util.Log.w("InitialScan", "scan failed: ${apk.path}", e)
-                            null
+                // OPTIMIZATSIYA: ilgari APK'lar BIRMA-BIR (ketma-ket) skanlanardi — ko'p faylli
+                // telefonda sekin va uzoq. Endi cheklangan PARALLEL (SCAN_CONCURRENCY ta bir
+                // vaqtda) — ~bir necha barobar tez. Cheksiz EMAS — loyihada qizish tarixi bor,
+                // shuning uchun bir vaqtda atigi 3 ta (qizishni nazoratda ushlaymiz).
+                var done = 0
+                for (chunk in apks.chunked(SCAN_CONCURRENCY)) {
+                    if (!isActive) break
+                    val scanned = withContext(Dispatchers.IO) {
+                        chunk.map { apk ->
+                            async {
+                                apk to try {
+                                    ApkScanner.scan(this@InitialScanActivity, apk.path)
+                                } catch (e: Throwable) {
+                                    android.util.Log.w("InitialScan", "scan failed: ${apk.path}", e)
+                                    null
+                                }
+                            }
+                        }.awaitAll()
+                    }
+                    for ((apk, result) in scanned) {
+                        done++
+                        binding.tvCurrentFile.text = apk.name
+                        val pct = done * 100 / total
+                        binding.tvScanProgress.text = "$pct%"
+                        binding.scanRing.setValue(pct.toFloat(), animate = false)
+                        val isThreat = result != null && result.verdict != ScanResult.Verdict.SAFE
+                        if (isThreat) {
+                            dangerous += DangerEntry(
+                                path = apk.path,
+                                filename = apk.name,
+                                sizeBytes = apk.sizeBytes,
+                                verdict = result!!.verdict,
+                                reason = result.reason,
+                            )
+                            binding.tvDangerCount.text = dangerous.size.toString()
                         }
+                        // Statistika ApkScanner.scan() ICHIDA sanaladi — bu yerda qayta emas.
                     }
-                    val isThreat = result != null && result.verdict != ScanResult.Verdict.SAFE
-                    if (isThreat) {
-                        dangerous += DangerEntry(
-                            path = apk.path,
-                            filename = apk.name,
-                            sizeBytes = apk.sizeBytes,
-                            verdict = result!!.verdict,
-                            reason = result.reason,
-                        )
-                        binding.tvDangerCount.text = dangerous.size.toString()
-                    }
-                    // Statistika UZHE inkrementiruyetsya vnutri ApkScanner.scan() — vtoroy
-                    // raz zdes' ne nuzhno, inache kazhdyy fayl uchityvayetsya dvazhdy
-                    // (i Dashboard pokazyvayet udvoyennye chisla).
-
-                    // Skan IO'da bo'lgani uchun UI thread oraliqda allaqachon bo'sh qoladi —
-                    // har faylda 20ms kutish shart emas edi (100+ APK'da skanni sekinlashtirar
-                    // edi). Faqat vaqti-vaqti bilan yield qilamiz (animatsiya nafas olsin).
-                    if (i % 8 == 7) yield()
+                    yield() // animatsiya/UI nafas olsin
                 }
                 presentResults()
             } catch (e: Throwable) {
@@ -563,5 +571,11 @@ class InitialScanActivity : AppCompatActivity() {
     private fun humanSize(bytes: Long): String {
         val kb = bytes / 1024
         return if (kb < 1024) "$kb KB" else "%.1f MB".format(kb / 1024.0)
+    }
+
+    companion object {
+        // Bir vaqtda parallel skanlanadigan APK soni. 3 — sekvensialdan sezilarli tez,
+        // lekin cheklangan (qizishni nazoratda ushlaydi; loyihada qizish tarixi bor).
+        private const val SCAN_CONCURRENCY = 3
     }
 }

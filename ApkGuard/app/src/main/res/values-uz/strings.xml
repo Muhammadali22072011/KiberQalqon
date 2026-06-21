@@ -547,6 +547,32 @@
     <string name="autoscan_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida.\n\nFaylni faqat \"%1$s\" ilovasi orqali o\'chirish mumkin (masalan: Telegram → Sozlamalar → Ma\'lumotlarni tozalash).</string>
     <string name="autoscan_delete_btn">O\'CHIRISH</string>
     <string name="autoscan_delete_hint_done">O\'chirish bu APK ni telefoningizga o\'rnatishga imkon bermaydi</string>
+    <string name="autoscan_copy_deleted_original_remains">⚠️ Faqat tekshirilgan NUSXA o\'chirildi. Asl fayl uni yuborgan ilovada (masalan, Telegram) qoldi — Android boshqa ilovaga uni o\'chirishga ruxsat bermaydi. Iltimos, uni o\'sha ilovada qo\'lda o\'chiring.\n\nFayl O\'RNATILMAGUNCHA zarar yetkazmaydi, UzGuard esa uni o\'rnatishga yo\'l qo\'ymaydi.</string>
+
+    <!-- Jonli o'rnatish qalqoni (Accessibility) -->
+    <string name="install_shield_label">Jonli o\'rnatish qalqoni</string>
+    <string name="install_shield_a11y_desc">Zararli ilova o\'rnatilishini avtomatik to\'xtatadi. UzGuard tizimning «O\'rnatasizmi?» oynasini kuzatadi va tasdiqlanmagan xavfli APK o\'rnatilishini bekor qiladi.</string>
+    <string name="install_blocked_notif_title">O\'rnatish bloklandi</string>
+    <string name="install_blocked_notif_body">«%1$s» xavfli deb topildi — UzGuard uning o\'rnatilishini to\'xtatdi.</string>
+    <string name="install_blocked_notif_body_generic">Xavfli ilova o\'rnatilishi UzGuard tomonidan to\'xtatildi.</string>
+    <string name="install_default_t">APK fayllar uchun standart ilova</string>
+    <string name="install_default_s">Har bir APK avval UzGuard\'da tekshiriladi</string>
+    <string name="install_shield_t">Jonli o\'rnatish qalqoni</string>
+    <string name="install_shield_s">Zararli APK o\'rnatilishini avtomatik bekor qiladi</string>
+    <string name="unknown_sources_t">Noma\'lum manbalarni o\'chirish</string>
+    <string name="unknown_sources_s">Telegram/brauzer\'ga APK o\'rnatishni taqiqlang</string>
+    <string name="unknown_sources_none">Xavfli manba ilovasi topilmadi</string>
+    <string name="unknown_sources_dialog_title">Qaysi ilovaga taqiqlaymiz?</string>
+    <string name="open_source_app_t">Manba ilovasini ochish</string>
+    <string name="set_default_apk_prompt_title">UzGuard\'ni APK uchun standart qilish</string>
+    <string name="set_default_apk_prompt_msg">Hozir «Qaysi ilova bilan ochish?» oynasi chiqadi.\n\n«UzGuard»ni tanlang va «Doimo» (Always) bosing — shunda har bir APK avval UzGuard\'da tekshiriladi. APK qidirish shart emas.</string>
+    <string name="set_default_apk_btn">Tanlash oynasini ochish</string>
+    <string name="set_default_apk_done">✓ Tayyor! Endi har bir APK avval UzGuard\'da tekshiriladi.</string>
+    <string name="set_default_apk_tip">Keyingi safar «Doimo»ni tanlang — shunda har APK avtomatik UzGuard\'da ochiladi.</string>
+    <string name="devadmin_block_title">Virus «administrator» huquqini olgan</string>
+    <string name="devadmin_block_msg">Bu zararli ilova «Qurilma administratori» huquqini olgan — shuning uchun Android uni darhol o\'chirishga ruxsat bermaydi.\n\nOchilgan ro\'yxatda shu ilovani toping va «O\'chirish» / «Faolsizlantirish»ni bosing, so\'ng qaytib uni telefondan o\'chiring.</string>
+    <string name="install_shield_guide_title">Jonli o\'rnatish qalqonini yoqish</string>
+    <string name="install_shield_guide_msg">Bu qalqon zararli ilova o\'rnatilishini avtomatik to\'xtatadi.\n\nYoqish uchun: ochilgan «Maxsus imkoniyatlar» ro\'yxatidan «UzGuard»ni toping va yoqing.\n\nAndroid 13+ da avval «Ilova haqida» → yuqori o\'ngdagi ⋮ → «Cheklangan sozlamalarga ruxsat»ni bosish kerak bo\'lishi mumkin.</string>
 
     <!-- Localization pass: InitialScanActivity hardcoded UI -->
     <string name="is_header_safe">Telefoningiz xavfsiz</string>

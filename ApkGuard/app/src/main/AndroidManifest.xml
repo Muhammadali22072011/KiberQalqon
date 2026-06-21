@@ -425,6 +425,23 @@
             </intent-filter>
         </service>
 
+        <!-- Jonli o'rnatish qalqoni (3-rubej): tizim o'rnatuvchisi "O'rnatasizmi?" oynasini
+             kuzatadi va tasdiqlanmagan/DANGER APK uchun avtomatik "Bekor" bosadi. Config
+             faqat o'rnatuvchi paketlar bilan cheklangan (maxfiylik+batareya). Foydalanuvchi
+             tizimda yoqmaguncha ishlamaydi (Android 13+ "cheklangan sozlamalar"). -->
+        <service
+            android:name=".InstallShieldService"
+            android:exported="true"
+            android:label="@string/install_shield_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
         <!-- Bosh ekran widget'i — UzGuard himoyasi holatini ko'rsatadi.
              updatePeriodMillis=0 (xml/kq_widget_info.xml): periodic update yo'q,
              biz scan tugagach KqWidgetProvider.refreshAll() chaqiramiz. -->

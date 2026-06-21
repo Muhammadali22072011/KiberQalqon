@@ -70,11 +70,35 @@ class ShareReceiverActivity : Activity() {
                 return@launch
             }
 
+            // "Standart qilish" oqimi: foydalanuvchi UzGuard'ning O'Z APK'sini ochish orqali
+            // bizni standart tanladi. O'zimizni skanlamaymiz/o'rnatmaymiz — faqat natijani aytamiz.
+            val parsedPkg = try {
+                packageManager.getPackageArchiveInfo(copied.absolutePath, 0)?.packageName
+            } catch (_: Throwable) { null }
+            if (InstallProtectionGuide.isOwnPackage(parsedPkg)) {
+                val done = try { InstallProtectionGuide.isDefaultApkHandler(this@ShareReceiverActivity) } catch (_: Throwable) { false }
+                Toast.makeText(
+                    this@ShareReceiverActivity,
+                    if (done) R.string.set_default_apk_done else R.string.set_default_apk_tip,
+                    Toast.LENGTH_LONG
+                ).show()
+                try { copied.delete() } catch (_: Throwable) {}
+                finish()
+                return@launch
+            }
+
             val launch = Intent(this@ShareReceiverActivity, AutoScanActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra("apk_path", copied.absolutePath)
                 putExtra("apk_name", copied.name)
                 putExtra("apk_source", "share")
+                // apk_path — bu bizning kesh ichidagi NUSXA, asl fayl emas. Skan oynasi buni
+                // bilishi shart: nusxani o'chirib "o'chirildi" deyish — yolg'on muvaffaqiyat.
+                // Asl manba URI'sini ham uzatamiz — ehtimol uni ContentResolver orqali
+                // o'chira olamiz (fayl-menejer ulashgan MediaStore fayli). Telegram singari
+                // faqat-o'qish grant bersa — o'chmaydi, shunda halol ogohlantirish chiqaramiz.
+                putExtra("apk_is_copy", true)
+                putExtra("apk_origin_uri", uri.toString())
             }
             startActivity(launch)
             finish()

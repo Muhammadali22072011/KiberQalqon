@@ -55,6 +55,16 @@ class AutoScanActivity : AppCompatActivity() {
      */
     private var installedPkg: String? = null
 
+    /**
+     * Skanlangan fayl bizning kesh ichidagi NUSXAmi (ShareReceiver content URI'ni
+     * cacheDir/shared ga ko'chirib bergan). Bunda nusxani o'chirib "o'chirildi" deyish
+     * yolg'on bo'ladi — asl fayl manba ilovasida (Telegram va h.k.) qoladi.
+     */
+    private var apkIsCopy: Boolean = false
+
+    /** Asl manba content URI (nusxa bo'lsa) — uni ham o'chirishga urinib ko'ramiz. */
+    private var originUri: String? = null
+
     // Один общий Handler с очисткой в onDestroy — иначе postDelayed-колбэки выстреливают
     // после finish() и крашат app на binding.* (Activity destroyed but view accessed).
     private val handler = Handler(Looper.getMainLooper())
@@ -159,6 +169,8 @@ class AutoScanActivity : AppCompatActivity() {
         apkPath = incomingPath
         apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
         installedPkg = intent.getStringExtra("installed_pkg")?.takeIf { it.isNotBlank() }
+        apkIsCopy = intent.getBooleanExtra("apk_is_copy", false)
+        originUri = intent.getStringExtra("apk_origin_uri")
 
         setupUI()
         // "already_handled" — fayl fonida (GuardWorker) allaqachon karantinga olingan/o'chirilgan.
@@ -197,6 +209,8 @@ class AutoScanActivity : AppCompatActivity() {
         apkPath = incomingPath
         apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
         installedPkg = intent.getStringExtra("installed_pkg")?.takeIf { it.isNotBlank() }
+        apkIsCopy = intent.getBooleanExtra("apk_is_copy", false)
+        originUri = intent.getStringExtra("apk_origin_uri")
 
         setupUI()
         if (intent.getBooleanExtra("already_handled", false)) {
@@ -472,7 +486,9 @@ class AutoScanActivity : AppCompatActivity() {
         val res = lastResult ?: return
         val path = apkPath ?: return
         try {
-            startActivity(ScanResultActivity.intent(this, path, res, installedPkg))
+            startActivity(
+                ScanResultActivity.intent(this, path, res, installedPkg, apkIsCopy, originUri)
+            )
         } catch (e: Throwable) {
             android.util.Log.e("AutoScanActivity", "openDetails failed", e)
         }
@@ -955,6 +971,13 @@ class AutoScanActivity : AppCompatActivity() {
             return
         }
         try {
+            // Bu fayl XAVFSIZ deb topildi va foydalanuvchi o'rnatishni o'zi tanladi —
+            // jonli qalqon (InstallShieldService) shu paketni o'tkazishi uchun TASDIQ yozamiz.
+            try {
+                val pkg = packageManager.getPackageArchiveInfo(path, 0)?.packageName
+                InstallApproval.approve(this, pkg)
+            } catch (_: Throwable) { /* tasdiqsiz ham o'rnatishni davom ettiramiz */ }
+
             val uri: Uri = FileProvider.getUriForFile(
                 this,
                 "$packageName.fileprovider",
@@ -979,6 +1002,24 @@ class AutoScanActivity : AppCompatActivity() {
      * (ACTION_DELETE + package: URI). Foydalanuvchi bitta "OK" bilan virusni o'chiradi.
      */
     private fun uninstallInstalledApp(pkg: String) {
+        // Virus «Qurilma administratori» huquqini olgan bo'lsa — Android uni o'chirtirmaydi.
+        // Avval foydalanuvchini admin huquqini o'chirishga yo'naltiramiz, so'ng o'chiradi.
+        if (DeviceAdminUtil.isActiveAdmin(this, pkg)) {
+            try {
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.devadmin_block_title)
+                    .setMessage(R.string.devadmin_block_msg)
+                    .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
+                        DeviceAdminUtil.openDeviceAdminSettings(this)
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            } catch (_: Throwable) {
+                DeviceAdminUtil.openDeviceAdminSettings(this)
+            }
+            binding.btnDelete.isEnabled = true
+            return
+        }
         try {
             val intent = android.content.Intent(
                 android.content.Intent.ACTION_DELETE,
@@ -1172,6 +1213,36 @@ class AutoScanActivity : AppCompatActivity() {
 
     /** Вызывается из всех точек, где удаление подтверждено (как сразу, так и после consent). */
     private fun onFileSuccessfullyDeleted() {
+        // Agar biz faqat keshdagi NUSXAni o'chirgan bo'lsak (share/content URI orqali kelgan),
+        // asl fayl hali manba ilovasida turishi mumkin. Avval uni ham o'chirishga urinamiz;
+        // bo'lmasa — "o'chirildi / xavfsiz" deb YOLG'ON aytmaymiz, balki halol ogohlantirish
+        // ko'rsatamiz (asl faylni o'sha ilovada qo'lda o'chirish kerak). Bu — antivirusning
+        // eng muhim qoidasi: hech qachon soxta muvaffaqiyat ko'rsatmaslik.
+        if (isScratchCopy() && !tryDeleteOrigin()) {
+            binding.tvResultMessage.text = getString(R.string.autoscan_copy_deleted_original_remains)
+            binding.rowAutoDelete.visibility = View.GONE
+            binding.btnDelete.visibility = View.VISIBLE
+            binding.btnDelete.isEnabled = true
+            binding.btnDelete.icon = null
+            // Manba ilovasi aniqlansa (Telegram/WhatsApp) — bir tap bilan o'sha ilovani ochamiz,
+            // foydalanuvchi asl faylni/keshni o'sha yerda o'chiradi. Aniqlanmasa — oddiy "OK".
+            val srcPkg = originSourcePkg()
+            if (srcPkg != null) {
+                binding.btnDelete.text = getString(R.string.open_source_app_t)
+                binding.btnDelete.setOnClickListener { InstallProtectionGuide.openClearCache(this, srcPkg); finish() }
+            } else {
+                binding.btnDelete.text = getString(R.string.btn_ok)
+                binding.btnDelete.setOnClickListener { finish() }
+            }
+            binding.tvDeleteHint.visibility = View.VISIBLE
+            binding.tvDeleteHint.text = getString(R.string.share_result)
+            binding.tvDeleteHint.setOnClickListener {
+                shareScanResult(lastResult?.verdict ?: ScanResult.Verdict.DANGER)
+            }
+            reportDelete("Nusxa o'chirildi, asl fayl manba ilovasida qoldi", apkPath, extra = originUri)
+            return
+        }
+
         binding.tvResultMessage.text = getString(R.string.delete_success)
         binding.btnDelete.visibility = View.GONE
         binding.rowAutoDelete.visibility = View.GONE
@@ -1181,6 +1252,60 @@ class AutoScanActivity : AppCompatActivity() {
         // bu yerda qayta oshirmaymiz, aks holda bitta tahdid ikki marta sanalardi.
 
         handler.postDelayed({ if (!isFinishing) finish() }, 2000)
+    }
+
+    /**
+     * Skanlangan fayl bizning kesh ichidagi vaqtinchalik NUSXAmi? ShareReceiver content
+     * URI'ni cacheDir/shared ga ko'chirib beradi — bunda asl fayl boshqa joyda (Telegram
+     * va h.k.) bo'ladi, biz esa faqat nusxani o'chira olamiz.
+     */
+    private fun isScratchCopy(): Boolean {
+        if (apkIsCopy) return true
+        val p = apkPath ?: return false
+        return try {
+            p.startsWith(cacheDir.absolutePath) || p.contains("/cache/")
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    /**
+     * Asl manba faylini content URI orqali o'chirishga urinish (eng yaxshi imkoniyat).
+     * Fayl-menejer ulashgan MediaStore fayli uchun ishlashi mumkin; Telegram singari
+     * faqat-o'qish grant berganda — ishlamaydi va false qaytaradi (shunda halol
+     * ogohlantirish chiqaramiz). HECH QACHON istisno bilan qulamaydi.
+     */
+    private fun tryDeleteOrigin(): Boolean {
+        val raw = originUri ?: return false
+        return try {
+            val u = Uri.parse(raw)
+            val ok = if (android.provider.DocumentsContract.isDocumentUri(this, u)) {
+                android.provider.DocumentsContract.deleteDocument(contentResolver, u)
+            } else {
+                contentResolver.delete(u, null, null) > 0
+            }
+            if (ok) reportDelete("Asl manba URI orqali o'chirildi", apkPath, extra = raw)
+            ok
+        } catch (e: Throwable) {
+            android.util.Log.w("AutoScanActivity", "tryDeleteOrigin failed", e)
+            false
+        }
+    }
+
+    /**
+     * Asl manba ilovasini (Telegram/WhatsApp) content URI authority'sidan aniqlaydi —
+     * "asl faylni o'sha yerda o'ching" tugmasi o'sha ilovani ochishi uchun. Aniqlanmasa null.
+     */
+    private fun originSourcePkg(): String? {
+        val auth = try { Uri.parse(originUri ?: return null).authority } catch (_: Throwable) { null }
+            ?: return null
+        val a = auth.lowercase()
+        return when {
+            a.contains("telegram") && a.contains("plus") -> "org.telegram.plus"
+            a.contains("telegram") -> "org.telegram.messenger"
+            a.contains("whatsapp") -> "com.whatsapp"
+            else -> null
+        }
     }
 
     /**
