@@ -75,6 +75,11 @@ class ShareReceiverActivity : Activity() {
                 putExtra("apk_path", copied.absolutePath)
                 putExtra("apk_name", copied.name)
                 putExtra("apk_source", "share")
+                // ASL faylning manbasi. Biz skan uchun cacheDir'ga NUSXA olamiz, lekin
+                // "O'chirish" bosilganda foydalanuvchi ASL faylni (Telegram/Downloads'dagi
+                // virusni) o'chirishni kutadi — faqat ichki nusxani emas. Shu URI orqali
+                // AutoScanActivity asl faylni topib o'chiradi (qarang: deleteSharedOriginal).
+                putExtra("apk_origin_uri", uri.toString())
             }
             startActivity(launch)
             finish()
