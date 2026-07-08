@@ -90,8 +90,8 @@ android {
         applicationId = "com.kiberqalqon"
         minSdk = 24
         targetSdk = 34
-        versionCode = 82
-        versionName = "8.2"
+        versionCode = 83
+        versionName = "8.3"
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"\"")
 
         // OPT-IN community threat sharing (dev's Telegram). Sirlar APK'da OCHIQ EMAS —
@@ -244,6 +244,12 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.4")
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
+
+    // Shizuku — единственный способ удалить файл из чужой /Android/data песочницы
+    // без root (запускает rm под uid=shell). api = клиент, provider = ContentProvider
+    // для приёма биндера от сервиса Shizuku.
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
 
     testImplementation("junit:junit:4.13.2")
 }

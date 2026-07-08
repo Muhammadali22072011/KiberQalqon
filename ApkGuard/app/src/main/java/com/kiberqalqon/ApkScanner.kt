@@ -185,6 +185,31 @@ object ApkScanner {
         }
     }
 
+    private val MEDIA_DIR_BLACKLIST = setOf(
+        "whatsapp voice notes",
+        "whatsapp images",
+        "whatsapp audio",
+        "whatsapp video",
+        "whatsapp animated gifs",
+        "whatsapp profile photos",
+        "telegram images",
+        "telegram video",
+        "telegram audio",
+        "telegram phone images",
+        "telegram stories",
+        ".thumbnails",
+        "lost.dir",
+        "dcim",
+        "pictures",
+        "music",
+        "movies",
+        "alarms",
+        "notifications",
+        "ringtones",
+        "podcasts",
+        "audiobooks"
+    )
+
     private fun buildFoldersToScan(): List<File> {
         val storage = Environment.getExternalStorageDirectory()
         val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -192,10 +217,10 @@ object ApkScanner {
         return listOfNotNull(
             downloads,
             File(storage, "Telegram/Telegram Documents"),
-            File(storage, "Telegram"),
-            File(storage, "WhatsApp/Media"),
-            File(storage, "Android/media/org.telegram.messenger"),
-            File(storage, "Android/media/com.whatsapp/WhatsApp/Media"),
+            File(storage, "WhatsApp/Media/WhatsApp Documents"),
+            File(storage, "Android/media/org.telegram.messenger/cache"),
+            File(storage, "Android/media/org.telegram.messenger/Telegram/Telegram Documents"),
+            File(storage, "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Documents"),
             File(storage, "Bluetooth")
         ).distinctBy { it.absolutePath }
     }
@@ -240,6 +265,9 @@ object ApkScanner {
                     if (f.isDirectory) {
                         val name = f.name.lowercase()
                         if (name == "android" && f.absolutePath == Environment.getExternalStorageDirectory().resolve("Android").absolutePath) {
+                            continue
+                        }
+                        if (name in MEDIA_DIR_BLACKLIST) {
                             continue
                         }
                         queue.add(f)

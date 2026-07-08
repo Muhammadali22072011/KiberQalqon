@@ -1105,7 +1105,30 @@ class AutoScanActivity : AppCompatActivity() {
                     binding.tvResultMessage.text = getString(R.string.sandboxed_inert_msg, owner)
                     binding.btnDelete.text = getString(R.string.sandboxed_open_owner, owner)
                     binding.btnDelete.isEnabled = true
-                    binding.btnDelete.setOnClickListener { openOwnerApp(result.ownerPackage) }
+                    binding.btnDelete.setOnClickListener {
+                        // Ikki yo'l: egasi ilovani ochish YOKI Shizuku bilan haqiqatan o'chirish.
+                        androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle(getString(R.string.sandboxed_dialog_title))
+                            .setMessage(getString(R.string.sandboxed_inert_msg, owner))
+                            .setPositiveButton(getString(R.string.sandboxed_open_owner, owner)) { _, _ ->
+                                openOwnerApp(result.ownerPackage)
+                            }
+                            .setNeutralButton(getString(R.string.shizuku_real_delete)) { _, _ ->
+                                ShizukuSetup.promptRealDelete(this, path) { deleted ->
+                                    if (deleted) {
+                                        reportDelete("Shizuku o'chirdi", path)
+                                        onFileSuccessfullyDeleted()
+                                    } else {
+                                        android.widget.Toast.makeText(
+                                            this, getString(R.string.shizuku_not_deleted),
+                                            android.widget.Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
+                            .setNegativeButton(getString(R.string.cancel), null)
+                            .show()
+                    }
                 }
 
                 is FileDeleter.Result.Failed -> {

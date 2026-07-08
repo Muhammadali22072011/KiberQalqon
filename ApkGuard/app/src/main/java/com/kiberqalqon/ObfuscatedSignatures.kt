@@ -152,15 +152,44 @@ object ObfuscatedSignatures {
     fun matchTokenHashes(text: String): List<String> {
         val found = mutableSetOf<String>()
         val seen = HashSet<String>(2048)
-        // Извлекаем кандидаты: alnum + дефис/подчёркивание/точка/слэш, длина 4+
-        val tokenRegex = Regex("[A-Za-z0-9._/\\-]{4,128}")
-        for (m in tokenRegex.findAll(text)) {
-            val tok = m.value.lowercase()
-            if (!seen.add(tok)) continue   // bu token allaqachon hash qilingan — qayta hisoblamaymiz
-            val h = hashLower(tok)
-            MALICIOUS_TOKEN_HASHES[h]?.let { family -> found.add(family) }
+        // Кандидаты: alnum + дефис/подчёркивание/точка/слэш, длина 4..128 (длинный run
+        // режется на куски по 128, как это делал жадный {4,128}; хвост <4 отбрасывается).
+        // PERF (qizish — 2026-07-09, qurilmada am profile bilan o'lchangan): avval bu yerda
+        // Regex.findAll ishlatilardi. Har chaqiruvda ICU MatcherNative.setInput BUTUN matnni
+        // (DEX uchun 8MB gacha) native buferga NUSXALAB olardi, va bu har entry uchun
+        // takrorlanardi (APK'da 260 tagacha entry) — skan profilining ~70% shu edi.
+        // Qo'lda yozilgan belgi-sinf skaneri nusxasiz ishlaydi; token to'plami BAYT-AYNAN o'sha.
+        forEachToken(text) { tok ->
+            if (seen.add(tok)) {   // bu token allaqachon hash qilingan — qayta hisoblamaymiz
+                MALICIOUS_TOKEN_HASHES[hashLower(tok)]?.let { family -> found.add(family) }
+            }
         }
         return found.toList()
+    }
+
+    /** Har topilgan token (allaqachon lowercase) uchun [action] chaqiriladi. */
+    private inline fun forEachToken(text: String, action: (String) -> Unit) {
+        var i = 0
+        val n = text.length
+        while (i < n) {
+            if (!isTokenChar(text[i])) { i++; continue }
+            var j = i + 1
+            while (j < n && j - i < 128 && isTokenChar(text[j])) j++
+            if (j - i >= 4) action(text.substring(i, j).lowercase())
+            i = j
+        }
+    }
+
+    private fun isTokenChar(c: Char): Boolean =
+        (c in 'a'..'z') || (c in 'A'..'Z') || (c in '0'..'9') ||
+            c == '.' || c == '_' || c == '/' || c == '-'
+
+    /** Faqat test uchun: tokenizator chiqishini regex-referens bilan solishtirish imkoni. */
+    @androidx.annotation.VisibleForTesting
+    internal fun tokensOf(text: String): List<String> {
+        val out = ArrayList<String>()
+        forEachToken(text) { out.add(it) }
+        return out
     }
 
     /** Декодированные XOR-сигнатуры с лейблами. Декодируется один раз, кэшируется. */

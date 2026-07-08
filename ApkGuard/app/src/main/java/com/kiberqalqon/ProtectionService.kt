@@ -315,24 +315,37 @@ class ProtectionService : Service() {
     private fun quickDirSignature(ctx: Context): String {
         return try {
             val ext = Environment.getExternalStorageDirectory() ?: return ""
-            val dirs = arrayOf(
-                File(ext, "Download"),
-                File(ext, "Telegram"),
-                File(ext, "Telegram/Telegram Documents"),
-                File(ext, "Android/media/org.telegram.messenger/Telegram"),
-                File(ext, "WhatsApp/Media/WhatsApp Documents"),
-                File(ext, "Android/media/com.whatsapp"),
-                File(ext, "Bluetooth"),
-                File(ext, "DCIM"),
-                ext,
-            )
+            val dirs = mutableListOf<File>()
+            val downloadDir = File(ext, "Download")
+            dirs.add(downloadDir)
+            if (downloadDir.exists()) {
+                val subs = downloadDir.listFiles()
+                if (subs != null) {
+                    for (sub in subs) {
+                        if (sub.isDirectory) {
+                            dirs.add(sub)
+                        }
+                    }
+                }
+            }
+            dirs.add(File(ext, "Telegram/Telegram Documents"))
+            dirs.add(File(ext, "WhatsApp/Media/WhatsApp Documents"))
+            dirs.add(File(ext, "Android/media/org.telegram.messenger/cache"))
+            dirs.add(File(ext, "Android/media/org.telegram.messenger/Telegram/Telegram Documents"))
+            dirs.add(File(ext, "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Documents"))
+            dirs.add(File(ext, "Bluetooth"))
+            // DCIM va xotira-ildizi — bu yerga ham APK saqlanishi mumkin. Bu faqat mtime
+            // o'qish (stat), papkani OBHOD QILMAYDI — arzon, lekin poll shu joydagi yangi
+            // APK'ni ~45s ichida ilg'aydi (5 daq FORCE_FULL kutmasdan).
+            dirs.add(File(ext, "DCIM"))
+            dirs.add(ext)
+
             val sb = StringBuilder(160)
             for (d in dirs) {
                 if (d.exists()) sb.append(d.name).append(d.lastModified()).append('|')
             }
             sb.toString()
         } catch (_: Throwable) {
-            // Imzo o'qib bo'lmasa "" — keyingi FORCE_FULL_FIND_MS baribir to'liq obhod qiladi.
             ""
         }
     }

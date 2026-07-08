@@ -140,8 +140,13 @@ class GuardWorker(
                             suspiciousAsPopup = recentlyDownloaded
                         )
                     }
-                    // Ro'yxat cheksiz o'smasligi uchun cheklaymiz.
-                    val capped = if (checked.size > 5000) checked.take(5000).toHashSet() else checked
+                    // Ro'yxat cheksiz o'smasligi uchun faqat mavjud fayllarni saqlab qolamiz.
+                    val stillExists = checked.filter { key ->
+                        try {
+                            File(pathOfKey(key)).exists()
+                        } catch (_: Throwable) { false }
+                    }
+                    val capped = if (stillExists.size > 2000) stillExists.take(2000).toHashSet() else stillExists.toHashSet()
                     prefs.edit().putStringSet("checked_paths", capped).apply()
 
                     // BG-04: bu yerda Config.markDatabaseUpdated() ATAYIN CHAQIRILMAYDI. Avval har 15
@@ -191,7 +196,13 @@ class GuardWorker(
                             suppressAlerts = alreadyWarned
                         )
                     }
-                    val capped = if (warned.size > 5000) warned.take(5000).toHashSet() else warned
+                    // Faqat mavjud fayllarni saqlab qolamiz.
+                    val stillExistsWarned = warned.filter { key ->
+                        try {
+                            File(pathOfKey(key)).exists()
+                        } catch (_: Throwable) { false }
+                    }
+                    val capped = if (stillExistsWarned.size > 2000) stillExistsWarned.take(2000).toHashSet() else stillExistsWarned.toHashSet()
                     prefs.edit().putStringSet("unlock_warned", capped).apply()
                     Log.d(TAG, "Quick scan: ${list.size} found, uploaded=$uploaded")
                     Result.success(workDataOf("scanned" to list.size, "uploaded" to uploaded))
@@ -212,6 +223,16 @@ class GuardWorker(
      * SUSPICIOUS — hech qachon avto-o'chirilmaydi, faqat popup. SAFE — faqat
      * [allowSafeNotification] (yangi yuklab olingan) bo'lsa bildirishnoma.
      */
+    /**
+     * checked_paths / unlock_warned kaliti "path|mtime|size" ko'rinishida. Fayl yo'li o'zida
+     * '|' belgisini saqlashi mumkin (ext4/f2fs'da ruxsat etilgan), shuning uchun oddiy
+     * substringBefore('|') yo'lni kesib yuborardi → mavjud fayl noto'g'ri "yo'q" deb chiqarilardi
+     * (BG-03 takror ogohlantirish qaytadi). Oxirgi ikki bo'lakni (size va mtime) tashlab yo'lni
+     * tiklaymiz — yo'lda '|' bo'lsa ham to'g'ri ishlaydi.
+     */
+    private fun pathOfKey(key: String): String =
+        key.substringBeforeLast('|').substringBeforeLast('|')
+
     private fun handleResult(
         item: ApkItem,
         result: ScanResult,

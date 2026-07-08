@@ -438,11 +438,20 @@ class InitialScanActivity : AppCompatActivity() {
                         .show()
                 }
                 is FileDeleter.Result.SandboxedByOwner -> {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.is_sandboxed_owner, r.ownerPackage),
-                        Toast.LENGTH_LONG,
-                    ).show()
+                    // Tupik emas: Shizuku bilan haqiqatan o'chirishni taklif qilamiz.
+                    AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.sandboxed_dialog_title))
+                        .setMessage(getString(R.string.is_sandboxed_owner, r.ownerPackage))
+                        .setPositiveButton(getString(R.string.shizuku_real_delete)) { _, _ ->
+                            ShizukuSetup.promptRealDelete(this, entry.path) { deleted ->
+                                if (deleted) onItemDeleted(entry)
+                                else Toast.makeText(
+                                    this, getString(R.string.shizuku_not_deleted), Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                        .setNegativeButton(R.string.cancel, null)
+                        .show()
                 }
                 is FileDeleter.Result.Failed -> {
                     Toast.makeText(this, "❌ ${r.message}", Toast.LENGTH_LONG).show()

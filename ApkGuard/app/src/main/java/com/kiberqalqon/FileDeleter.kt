@@ -64,6 +64,14 @@ object FileDeleter {
         // Раньше ранний `return Deleted` врал «o'chirildi» на выжившем вирусе.
         sandboxOwner(file)?.let { owner ->
             Log.w(TAG, "File belongs to sandboxed dir of $owner: $filePath")
+            // Настоящий обход песочницы /Android/data: если пользователь настроил
+            // Shizuku (uid=shell в группе ext_data_rw) — удаляем файл под ним.
+            // Это ЕДИНСТВЕННЫЙ способ реально стереть файл владельца без root.
+            // Не настроен → возвращаем SandboxedByOwner (UI предложит включить Shizuku).
+            if (ShizukuDeleter.deleteViaShizuku(filePath)) {
+                Log.d(TAG, "Deleted sandboxed file via Shizuku: $filePath")
+                return Result.Deleted
+            }
             return Result.SandboxedByOwner(owner)
         }
 

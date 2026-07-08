@@ -15,6 +15,10 @@
          Запрашивается явно в SplashActivity → откроется системный экран "Доступ ко всем файлам". -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
+    <!-- Shizuku: разрешение на использование API Shizuku (v23+). Даёт возможность
+         удалять файлы из чужой /Android/data песочницы под uid=shell (без root). -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+
     <!-- Android 13+ (API 33+): гранулированные media-разрешения. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
@@ -389,6 +393,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+
+        <!-- Shizuku ContentProvider — принимает биндер от сервиса Shizuku.
+             Обязателен для работы shizuku-api. -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <!-- Doimiy himoya foreground service'i — App.onCreate'da ishga tushadi
              va to'xtatilmaguncha status bar'da "UZGUARD faol" yozuvini

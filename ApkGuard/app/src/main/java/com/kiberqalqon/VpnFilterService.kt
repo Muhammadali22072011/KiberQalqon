@@ -21,11 +21,26 @@ import java.net.InetAddress
  * bilan bloklanadi (troyan allaqachon o'rnatilgan bo'lsa ham C2 bilan aloqasi uziladi —
  * defense-in-depth). Qolgan domenlar real resolverga ([UPSTREAM_DNS]) uzatiladi.
  *
+ * MUHIM — BANK ILOVALARI VPN'DAN CHIQARIB TASHLANADI ([addDisallowedApplication],
+ * [KnownBanks.ALL]). Sabab: ko'p bank ilovalari anti-frod SDK'lari qurilmada FAOL VpnService
+ * borligini aniqlaydi (TRANSPORT_VPN / tun0 interfeysi) va kirishni bloklaydi — VPN qanday
+ * ishlashidan qat'i nazar. Bu "VPN yoqilsa ko'p bank ochilmaydi, brauzer ishlaydi" alomatining
+ * eng ehtimolli sababi. Bank paketlarini disallow qilsak — ular trafigi TUN'ga UMUMAN kirmaydi,
+ * VPN'ni sezmaydi va odatdagidek ochiladi. C2 filtri qolgan barcha ilovalar uchun ishlashda
+ * davom etadi (banklarga baribir sinkhole kerak emas — ular ishonchli).
+ *
+ * Qo'shimcha himoya: [ALLOW_SUFFIXES] (O'zbekiston bank/fintech domenlari) HECH QACHON
+ * bloklanmaydi — brauzerda bank saytiga kirilganda bulut feed'iga xato domen tushib qolsa ham
+ * uzilmaydi. (Umumiy bulut zonalari — amazonaws/cloudfront/firebaseio — allowlist'ga
+ * QO'SHILMAYDI: malware ko'pincha o'sha yerda C2 saqlaydi, ularni ozod qilish filtrni buzardi.)
+ *
  * Avtomatik YOQILMAYDI: foydalanuvchi sozlamalardan yoqadi, tizim VpnService ruxsat
  * oynasini tasdiqlaydi ([prepareIntent] → startActivityForResult → [start]).
  *
  * ⚠️ Bu modulni REAL QURILMADA sinash kerak. Kamchilik bo'lsa eng yomon holatda DNS
  * ishlamaydi (VPN'ni o'chirish kifoya) — boshqa trafik buzilmaydi.
+ * ⚠️ Ma'lum cheklovlar (opt-in, tajribaviy): DNS-over-TCP (TC=1 dan keyingi qayta so'rov) va
+ * DoT/DoH/QUIC ushlanmaydi — u holatlarda filtr o'tkazib yuboradi (blok emas, bypass).
  */
 class VpnFilterService : VpnService() {
 
@@ -50,11 +65,12 @@ class VpnFilterService : VpnService() {
 
     private fun startVpn() {
         try {
-            val pfd = Builder()
+            val builder = Builder()
                 .setSession("UzGuard C2 filter")
                 .addAddress(VIRT_ADDR, 32)
                 .addDnsServer(VIRT_DNS)
                 .addRoute(VIRT_DNS, 32)          // FAQAT virtual DNS serverga trafik ushlanadi
+                .setMtu(VIRT_MTU)                // katta EDNS0 javob (4096) TUN'ga sig'sin
                 .setBlocking(true)
                 .setConfigureIntent(
                     PendingIntent.getActivity(
@@ -62,10 +78,20 @@ class VpnFilterService : VpnService() {
                         PendingIntent.FLAG_IMMUTABLE
                     )
                 )
-                .establish()
+            // Bank/fintech/to'lov ilovalarini VPN'dan CHIQARIB tashlaymiz — ular VPN'ni
+            // sezmasin va anti-frod bloklamasin. addDisallowedApplication o'rnatilmagan paketda
+            // NameNotFoundException tashlaydi → har birini alohida try/catch bilan o'tkazamiz.
+            var excluded = 0
+            for (bank in KnownBanks.ALL) {
+                try { builder.addDisallowedApplication(bank.pkg); excluded++ }
+                catch (_: Throwable) { /* o'rnatilmagan — o'tkazamiz */ }
+            }
+            Log.i(TAG, "VPN: $excluded ta bank ilovasi filtrdan chiqarildi")
+
+            val pfd = builder.establish()
             if (pfd == null) {
                 Log.w(TAG, "establish() null — VPN ruxsati berilmagan?")
-                stopSelf()
+                stopVpn()
                 return
             }
             vpnInterface = pfd
@@ -135,7 +161,9 @@ class VpnFilterService : VpnService() {
         System.arraycopy(buf, dnsStart, dns, 0, dnsLen)
 
         val domain = parseDnsQName(dns)
-        if (domain != null && isBlockedC2(domain)) {
+        // Bank/fintech domenlari HECH QACHON bloklanmaydi (allowlist) — faqat uzatiladi.
+        // Bulut feed'iga xato yozuv tushsa ham (brauzerda) bank saytini buzmaydi.
+        if (domain != null && !isAllowed(domain) && isBlockedC2(domain)) {
             Log.w(TAG, "C2 DNS bloklandi: $domain")
             val resp = buildNxdomain(dns) ?: return
             writeUdpResponse(out, dstIp, srcIp, dstPort, srcPort, resp)  // src=DNS, dst=ilova
@@ -182,28 +210,42 @@ class VpnFilterService : VpnService() {
         return r
     }
 
+    /**
+     * So'rovni ochiq resolverlarga ([UPSTREAM_DNS]) uzatadi. Birinchi javob bergani ishlatiladi;
+     * biri o'lik/sekin bo'lsa keyingisi sinab ko'riladi (bitta flaky resolver so'rovni yo'qotmasin).
+     * Soketlar protect()'lanadi — asosiy tarmoqdan chiqadi (real O'zbekiston IP'i bilan, EDNS
+     * Client Subnet saqlanadi → CDN/geo javoblar VPN'siz holat bilan bir xil).
+     */
     private fun forwardDns(query: ByteArray): ByteArray? {
         if (query.size < 2) return null
+        for (server in UPSTREAM_DNS) {
+            val reply = queryOne(query, server)
+            if (reply != null) {
+                consecutiveUpstreamFailures.set(0)
+                return reply
+            }
+        }
+        onUpstreamFailure()
+        return null
+    }
+
+    /** Bitta upstream serverga bitta so'rov (alohida protected soket). */
+    private fun queryOne(query: ByteArray, server: String): ByteArray? {
         var sock: DatagramSocket? = null
         return try {
             // Har so'rovga ALOHIDA soket: bitta umumiy soketda boshqa so'rov javobi aralashib
             // ketmaydi, va bitta sekin so'rov boshqalarni bloklamaydi.
             sock = DatagramSocket().also { protect(it); it.soTimeout = UPSTREAM_TIMEOUT_MS }
-            val server = InetAddress.getByName(UPSTREAM_DNS)
-            sock.send(DatagramPacket(query, query.size, server, 53))
-            val resp = ByteArray(2048)
+            val addr = InetAddress.getByName(server)        // server = IP literal → DNS chaqirilmaydi
+            sock.send(DatagramPacket(query, query.size, addr, 53))
+            // 4096: EDNS0 katta javob (ko'p A-yozuv / DNSSEC) qirqilmasin (setMtu ham 4096).
+            val resp = ByteArray(4096)
             val dp = DatagramPacket(resp, resp.size)
             sock.receive(dp)
             // DNS transaction-ID javobda so'rov bilan mos kelishi shart (xato javobni qaytarmaslik uchun).
-            if (dp.length < 12 || resp[0] != query[0] || resp[1] != query[1]) {
-                onUpstreamFailure()
-                null
-            } else {
-                consecutiveUpstreamFailures.set(0)
-                resp.copyOf(dp.length)
-            }
+            if (dp.length < 12 || resp[0] != query[0] || resp[1] != query[1]) null
+            else resp.copyOf(dp.length)
         } catch (_: Throwable) {
-            onUpstreamFailure()
             null
         } finally {
             try { sock?.close() } catch (_: Throwable) {}
@@ -269,6 +311,14 @@ class VpnFilterService : VpnService() {
         return (sum.inv() and 0xFFFF).toInt()
     }
 
+    /** O'zbekiston bank/fintech domenlari — bloklashdan OZOD (allowlist). Feed xatosidan himoya.
+     *  DIQQAT: bu yerga umumiy bulut zonalari (amazonaws.com, cloudfront.net, firebaseio.com...)
+     *  QO'SHILMAYDI — malware o'sha yerda C2 saqlaydi, ozod qilinsa filtr ko'r bo'lib qolardi. */
+    private fun isAllowed(domain: String): Boolean {
+        val d = domain.trimEnd('.').lowercase()
+        return ALLOW_SUFFIXES.any { d == it || d.endsWith(".$it") }
+    }
+
     private fun isBlockedC2(domain: String): Boolean {
         val d = domain.trimEnd('.').lowercase()
         if (C2_DOMAINS.any { d == it || d.endsWith(".$it") }) return true
@@ -304,7 +354,10 @@ class VpnFilterService : VpnService() {
         const val ACTION_STOP = "com.uzguard.VPN_STOP"
         private const val VIRT_ADDR = "10.111.222.1"
         private const val VIRT_DNS = "10.111.222.2"
-        private const val UPSTREAM_DNS = "8.8.8.8"
+        private const val VIRT_MTU = 4096
+        // Ochiq resolverlar — ketma-ket sinaladi (biri bloklangan/sekin bo'lsa keyingisi).
+        // protect() bilan asosiy tarmoqdan chiqadi (real IP + EDNS Client Subnet saqlanadi).
+        private val UPSTREAM_DNS = listOf("8.8.8.8", "1.1.1.1", "8.8.4.4")
         // Sekin upstream'da TUN stopor bo'lmasin — qisqa timeout (eski 4000ms juda uzoq edi).
         private const val UPSTREAM_TIMEOUT_MS = 1500
         // Upstream shuncha marta KETMA-KET ishlamasa — VPN o'chadi (fail-open kill-switch).
@@ -317,6 +370,21 @@ class VpnFilterService : VpnService() {
             "ydbllnjd.com",
             "ilovekkksfm.com",
             "dashapp-v2.org",
+        )
+
+        // ALLOWLIST — bloklashdan OZOD domenlar (faqat O'zbekiston bank/fintech/to'lov saytlari).
+        // Maqsad: bulut feed'iga xato domen tushib qolsa ham (brauzerda bank saytiga kirilganda)
+        // uzilmasin. Bank ILOVALARI'ning o'zi allaqachon addDisallowedApplication bilan VPN'dan
+        // chiqarilgan — bu ro'yxat brauzer/veb yo'li uchun qo'shimcha to'r. Umumiy bulut zonalari
+        // ATAYIN yo'q (C2 ko'r-nuqtasi bo'lmasin).
+        private val ALLOW_SUFFIXES = setOf(
+            "payme.uz", "click.uz", "uzcard.uz", "humocard.uz", "humo.uz",
+            "apelsin.uz", "oson.uz", "paynet.uz", "upay.uz",
+            "kapitalbank.uz", "uzumbank.uz", "uzum.uz", "tbcbank.uz",
+            "hamkorbank.uz", "agrobank.uz", "ipakyulibank.uz", "ipotekabank.uz",
+            "infinbank.uz", "davrbank.uz", "anorbank.uz", "asakabank.uz",
+            "sqb.uz", "aloqabank.uz", "turonbank.uz", "nbu.uz", "xb.uz",
+            "mkbank.uz", "trustbank.uz", "orientfinans.uz", "ziraatbank.uz",
         )
 
         /** VPN ruxsati kerakmi? null → ruxsat bor, darhol [start] qilsa bo'ladi.

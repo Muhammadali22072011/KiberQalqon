@@ -574,7 +574,7 @@
     <string name="autoscan_copy_deleted_original_remains">⚠️ Удалена только проверенная КОПИЯ. Оригинал остался в приложении, откуда вы его прислали (например, Telegram) — Android не разрешает другим приложениям удалять его. Удалите его вручную там.\n\nФайл НЕ опасен, пока не установлен, а UzGuard не даст его установить.</string>
 
     <!-- Живой щит установки (Accessibility) -->
-    <string name="install_shield_label">Живой щит установки</string>
+    <string name="install_shield_label">UzGuard</string>
     <string name="install_shield_a11y_desc">Автоматически останавливает установку вредоносных приложений. UzGuard следит за системным окном «Установить?» и отменяет установку неподтверждённого опасного APK.</string>
     <string name="install_blocked_notif_title">Установка заблокирована</string>
     <string name="install_blocked_notif_body">«%1$s» признан опасным — UzGuard остановил его установку.</string>

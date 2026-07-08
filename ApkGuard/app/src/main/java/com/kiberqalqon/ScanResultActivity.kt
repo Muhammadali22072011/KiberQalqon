@@ -606,6 +606,19 @@ class ScanResultActivity : AppCompatActivity() {
                         .setPositiveButton(getString(R.string.sandboxed_open_owner, owner)) { _, _ ->
                             openOwnerApp(result.ownerPackage)
                         }
+                        // Настоящее удаление файла из песочницы — через Shizuku.
+                        .setNeutralButton(getString(R.string.shizuku_real_delete)) { _, _ ->
+                            ShizukuSetup.promptRealDelete(this, path) { deleted ->
+                                if (deleted) {
+                                    showDeletedSuccess()
+                                } else {
+                                    Toast.makeText(
+                                        this, getString(R.string.shizuku_not_deleted), Toast.LENGTH_LONG
+                                    ).show()
+                                    binding.btnDelete.isEnabled = true
+                                }
+                            }
+                        }
                         .setNegativeButton(getString(R.string.cancel), null)
                         .show()
                     binding.btnDelete.isEnabled = true

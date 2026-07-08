@@ -550,7 +550,7 @@
     <string name="autoscan_copy_deleted_original_remains">⚠️ Faqat tekshirilgan NUSXA o\'chirildi. Asl fayl uni yuborgan ilovada (masalan, Telegram) qoldi — Android boshqa ilovaga uni o\'chirishga ruxsat bermaydi. Iltimos, uni o\'sha ilovada qo\'lda o\'chiring.\n\nFayl O\'RNATILMAGUNCHA zarar yetkazmaydi, UzGuard esa uni o\'rnatishga yo\'l qo\'ymaydi.</string>
 
     <!-- Jonli o'rnatish qalqoni (Accessibility) -->
-    <string name="install_shield_label">Jonli o\'rnatish qalqoni</string>
+    <string name="install_shield_label">UzGuard</string>
     <string name="install_shield_a11y_desc">Zararli ilova o\'rnatilishini avtomatik to\'xtatadi. UzGuard tizimning «O\'rnatasizmi?» oynasini kuzatadi va tasdiqlanmagan xavfli APK o\'rnatilishini bekor qiladi.</string>
     <string name="install_blocked_notif_title">O\'rnatish bloklandi</string>
     <string name="install_blocked_notif_body">«%1$s» xavfli deb topildi — UzGuard uning o\'rnatilishini to\'xtatdi.</string>
@@ -572,7 +572,7 @@
     <string name="devadmin_block_title">Virus «administrator» huquqini olgan</string>
     <string name="devadmin_block_msg">Bu zararli ilova «Qurilma administratori» huquqini olgan — shuning uchun Android uni darhol o\'chirishga ruxsat bermaydi.\n\nOchilgan ro\'yxatda shu ilovani toping va «O\'chirish» / «Faolsizlantirish»ni bosing, so\'ng qaytib uni telefondan o\'chiring.</string>
     <string name="install_shield_guide_title">Jonli o\'rnatish qalqonini yoqish</string>
-    <string name="install_shield_guide_msg">Bu qalqon zararli ilova o\'rnatilishini avtomatik to\'xtatadi.\n\nYoqish uchun: ochilgan «Maxsus imkoniyatlar» ro\'yxatidan «UzGuard»ni toping va yoqing.\n\nAndroid 13+ da avval «Ilova haqida» → yuqori o\'ngdagi ⋮ → «Cheklangan sozlamalarga ruxsat»ni bosish kerak bo\'lishi mumkin.</string>
+    <string name="install_shield_guide_msg">Bu qalqon zararli ilova o\'rnatilishini avtomatik to\'xtatadi.\n\nYoqish:\n1. Ochilgan «Maxsus imkoniyatlar» ekranida pastga tushing → «O\'rnatilgan ilovalar» (Samsung: «Установленные приложения») ni bosing.\n2. Ro\'yxatdan «UzGuard»ni tanlang → tugmani yoqing.\n\nAgar «Cheklangan sozlama» yozuvi chiqsa (ilova Play\'dan emas, APK orqali o\'rnatilgani uchun):\nSozlamalar → Ilovalar → «UzGuard» → o\'ng-tepada ⋮ → «Cheklangan sozlamalarga ruxsat» → PIN. So\'ng yuqoridagi 1–2 ni qayta bajaring.\n\nGalaxy A56/yangi telefonlarda: Xavfsizlik va maxfiylik → «Auto Blocker» yoqiq bo\'lsa, uni o\'chiring (u sideload ilovalarni butunlay bloklaydi).</string>
 
     <!-- Localization pass: InitialScanActivity hardcoded UI -->
     <string name="is_header_safe">Telefoningiz xavfsiz</string>
