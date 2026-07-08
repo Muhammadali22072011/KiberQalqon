@@ -83,7 +83,23 @@ class LinkGuardActivity : Activity() {
 
         val options = LinkForwarder.browserOptions(this)
         if (options.isEmpty()) {
-            Toast.makeText(this, R.string.kq4_link_no_browser, Toast.LENGTH_LONG).show()
+            // Ro'yxat BO'SH — «brauzer yo'q» DEMAYMIZ: queryIntentActivities Android 11+ paket
+            // ko'rinishi cheklovi / WebView-only / o'zimiz standart bo'lganda BO'SH qaytishi mumkin
+            // (Chrome o'rnatilgan bo'lsa ham). Tizim resolveri brauzerlarni HAR DOIM ko'radi —
+            // shu sabab avval tizim tanlov oynasiga tushamiz (LinkBlockActivity bilan bir xil).
+            if (!LinkForwarder.openSystemChooser(this, url)) {
+                Toast.makeText(this, R.string.kq4_link_no_browser, Toast.LENGTH_LONG).show()
+            }
+            finish()
+            return
+        }
+
+        if (options.size == 1) {
+            // Yagona brauzer — to'g'ridan-to'g'ri ochamiz (ochilmasa tizim tanloviga tushamiz).
+            Config.setPreferredBrowser(this, options[0].pkg)
+            if (!LinkForwarder.open(this, url, options[0].pkg)) {
+                LinkForwarder.openSystemChooser(this, url)
+            }
             finish()
             return
         }
