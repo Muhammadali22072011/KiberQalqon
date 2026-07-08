@@ -577,9 +577,9 @@
     <string name="autoscan_grant_btn">RUXSAT BERISH</string>
     <string name="autoscan_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida.\n\nFaylni faqat \"%1$s\" ilovasi orqali o\'chirish mumkin (masalan: Telegram → Sozlamalar → Ma\'lumotlarni tozalash).</string>
     <!-- Sandbox (/Android/data/<owner>/) faylini hech kim o'chira olmaydi — lekin u xavfsiz: o'rnatilmaguncha zarar yetkazmaydi, UzGuard o'rnatishni bloklaydi. Bir tugma bilan egasi ilovani ochamiz. -->
-    <string name="sandboxed_inert_msg">Bu fayl «%1$s» ilovasining ichki papkasida. Android uni boshqa ilovaga (UzGuardga ham) o\'chirishga ruxsat bermaydi — bu tizim cheklovi, xato emas.\n\nMUHIM: bu fayl O\'RNATILMAGUNCHA zarar yetkazmaydi, UzGuard esa uni o\'rnatishga yo\'l qo\'ymaydi. Telefon xotirasidan butunlay olib tashlash uchun «%1$s»ni oching va keshni/yuklamalarni tozalang.</string>
+    <string name="sandboxed_inert_msg">✅ Siz xavfsizsiz — bu virus telefoningizga ZARAR BERA OLMAYDI.\n\nBu fayl «%1$s» ilovasining himoyalangan ichki papkasida (Android /Android/data). Android bu papkani boshqa ilovaga — UzGuardga ham — ochmaydi, shuning uchun uni to\'g\'ridan-to\'g\'ri o\'chirib bo\'lmaydi. Bu Android tizimining cheklovi, xato emas.\n\nLEKIN xavf yo\'q: virus faqat O\'RNATILGANDA ishga tushadi, UzGuard esa uni o\'rnatishga YO\'L QO\'YMAYDI — o\'rnatishni avtomatik bloklaydi.\n\nAgar baribir faylni yo\'q qilmoqchi bo\'lsangiz: «%1$s»ni oching va keshni/yuklamalarni tozalang, yoki «Haqiqatan o\'chirish (Shizuku)» tugmasini bosing.</string>
     <string name="sandboxed_open_owner">«%1$s»ni ochish</string>
-    <string name="sandboxed_dialog_title">Fayl boshqa ilova papkasida</string>
+    <string name="sandboxed_dialog_title">🛡 Bloklandi: bu virusni o\'rnatib bo\'lmaydi</string>
 
     <!-- Shizuku — /Android/data ichidagi virusni HAQIQATAN o'chirish (root'siz) -->
     <string name="shizuku_real_delete">Haqiqatan o\'chirish (Shizuku)</string>
@@ -632,7 +632,7 @@
     <string name="is_dangerous_found_count">%1$d ta xavfli APK topildi</string>
     <string name="is_recommend_delete">Quyidagi fayllarni o\'chirish tavsiya etiladi.</string>
     <string name="is_need_all_files">Faylni o\'chirish uchun \"Barcha fayllarga kirish\" ruxsati kerak.</string>
-    <string name="is_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida. Faqat o\'sha ilova orqali o\'chirish mumkin.</string>
+    <string name="is_sandboxed_owner">✅ Xavfsizsiz. Bu fayl %1$s ilovasining himoyalangan papkasida — Android uni o\'chirtirmaydi (tizim cheklovi). LEKIN virus faqat O\'RNATILGANDA zarar beradi, UzGuard esa o\'rnatishni bloklaydi. Haqiqatan o\'chirish uchun — Shizuku.</string>
     <string name="is_dangerous_remaining_count">%1$d ta xavfli APK qoldi</string>
     <string name="is_all_deleted">Barcha xavfli fayllar o\'chirildi.</string>
     <string name="is_delete_n_files_title">%1$d ta faylni o\'chirish?</string>
