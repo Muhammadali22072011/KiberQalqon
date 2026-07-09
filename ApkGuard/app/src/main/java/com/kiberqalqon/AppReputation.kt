@@ -127,6 +127,45 @@ object AppReputation {
         "com.kundalik.uz",                   // Kundalik (maktab e-kundaligi)
         "uz.mib.center.phoenix",             // ProfInspector (davlat)
         "uz.lawapp.uzcodes",                 // UzCodes (qonun hujjatlari)
+        // 2026-07: Play Store'da tekshirilgan HAQIQIY bank/fintech paketlari (yuqoridagi
+        // ba'zilari 404 edi — eski o'rnatmalar uchun ular ham qoldirildi). Imzo tekshiruvi
+        // (evaluate) baribir soxta nusxani DANGER qiladi — bu "backdoor" emas.
+        "air.com.ssdsoftwaresolutions.clickuz", // Click (joriy)
+        "uz.uzcardpay.android",              // Uzcard Pay
+        "mobile.uzcard.uz.uzcard",           // Uzcard Plum
+        "com.oson",                          // OSON (joriy)
+        "uz.paynet.app",                     // Paynet (joriy)
+        "com.olsoft.mats.prod",              // Beepul
+        "uz.octagram.paylov",                // Paylov
+        "uz.owl.multicard",                  // Multicard / Rahmat
+        "uz.kapitalbank.kbonline",           // Kapitalbank (retail)
+        "ge.space.app.uzbekistan",           // TBC Bank UZ
+        "com.hamkorbank.mobile",             // Hamkorbank (joriy)
+        "uz.agrobank.mobile.mbank",          // Agrobank (2-ilova)
+        "uz.xsoft.myinfin",                  // InfinBank (joriy)
+        "uz.anormobile.retail",              // Anorbank (joriy)
+        "uz.smartbank",                      // Openbank UZ (ex-Smart Bank)
+        "uz.asakabank.myasaka",              // Asakabank
+        "com.qqb.quant",                     // BRB (ex-QQB)
+        "uz.mobiuz.mobiservice",             // Mobiuz (joriy)
+        "com.tune.milliy",                   // NBU Milliy
+        "uz.tune.xazna",                     // Xalq banki (Xazna)
+        "uz.aloqabank.zoomrad",              // Aloqabank (Zoomrad)
+        "com.colvir.turon.mobile",           // Turonbank
+        "com.bss.ipotekabank.retail.lite",   // Ipoteka Bank
+        "uz.fido_biznes.mobile.client.mkb_newrelease", // Mikrokreditbank
+        "trastpay.uz",                       // Trustbank (Trastpay)
+        "uz.tune.juicer",                    // Asia Alliance (Alliance Pay)
+        "uz.ofbmobile.android",              // Orient Finans (OFB)
+        "com.ofss.ziraat",                   // Ziraat Bank Uzbekistan
+        "uz.tune.tenge",                     // Tenge Bank (Tenge24)
+        "com.ravnaqbank.rbkmobile",          // Octobank
+        "uz.fido.universaldigital",          // Universal Bank
+        "fido.poytaxtmobile",                // Poytaxt Bank
+        "com.uzpsb.olam",                    // SQB (Joyda)
+        "tj.alif.mobi",                      // Alif
+        "com.zoodel.kz",                     // Zood / ZoodPay
+        "udevs.iman_invest",                 // Iman Invest
     )
 
     /**
