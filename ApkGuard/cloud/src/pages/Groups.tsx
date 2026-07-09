@@ -18,24 +18,68 @@ const PALETTE = [
 // uzguard://join intent-filter GroupJoinActivity'ga bog'langan.)
 const joinUrl = (code: string) => `uzguard://join?code=${encodeURIComponent(code)}`;
 
-// Modul matritsasidan to'liq SVG (quiet-zone 4 modul). Ko'rsatish va chop etish uchun bir xil.
-function buildQrSvg(text: string, px = 240): string {
-  const mods = qrModules(text, 'M');
+// Rangni quyultirish — QR "ko'z"lari va logotipi oq fonda yaxshi kontrast bersin (guruh rangi
+// och bo'lsa ham skanlanadi). f=0.82 → ~18% to'qroq, lekin brend tusi saqlanadi.
+function darken(hex: string, f: number): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const v = parseInt(m[1], 16);
+  const r = Math.round(((v >> 16) & 255) * f);
+  const g = Math.round(((v >> 8) & 255) * f);
+  const b = Math.round((v & 255) * f);
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+}
+
+const QR_DARK = '#17100F'; // modul rangi — chuqur siyoh (OQ fonda yuqori kontrast → ishonchli skan)
+
+// Brendlangan QR: yumaloq modullar + rangli "ko'z"lar (finder pattern) + markazda qalqon
+// logotipi. Fon HAR DOIM oq (kamera to'q-oq fon kutadi) → skanlanishi kafolatlangan. ECC 'H'
+// (30% tiklash) markaziy logotip yopgan modullarni ham o'qiydi. accent — guruh rangi (to'qlashtirilgan).
+function buildQrSvg(text: string, px: number, accentRaw: string): string {
+  const mods = qrModules(text, 'H');
   const n = mods.length;
   const quiet = 4;
   const dim = n + quiet * 2;
-  let rects = '';
+  const accent = darken(accentRaw, 0.82);
+
+  // Finder "ko'z"lari alohida (stilizatsiya bilan) chiziladi → data-modullardan chiqarib tashlaymiz.
+  const inFinder = (x: number, y: number) =>
+    (x < 7 && y < 7) || (x >= n - 7 && y < 7) || (x < 7 && y >= n - 7);
+
+  let dots = '';
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
-      if (mods[y][x]) rects += `<rect x="${x + quiet}" y="${y + quiet}" width="1.02" height="1.02"/>`;
+      if (mods[y][x] && !inFinder(x, y)) {
+        dots += `<rect x="${(x + quiet + 0.04).toFixed(2)}" y="${(y + quiet + 0.04).toFixed(2)}" width="0.92" height="0.92" rx="0.32"/>`;
+      }
     }
   }
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${dim} ${dim}" shape-rendering="crispEdges"><rect width="${dim}" height="${dim}" fill="#fff"/><g fill="#000">${rects}</g></svg>`;
+
+  const eye = (ox: number, oy: number) =>
+    `<rect x="${ox + 0.5}" y="${oy + 0.5}" width="6" height="6" rx="2" fill="none" stroke="${accent}" stroke-width="1"/>` +
+    `<rect x="${ox + 2}" y="${oy + 2}" width="3" height="3" rx="1" fill="${accent}"/>`;
+  const eyes = eye(quiet, quiet) + eye(quiet + n - 7, quiet) + eye(quiet, quiet + n - 7);
+
+  // Markaziy qalqon logotipi: oq halo + accent qalqon + oq "✓". Modullar ustiga chiziladi
+  // (oq halo ularni yopadi); ECC 'H' yo'qolgan modullarni tiklaydi.
+  const L = 7.2;
+  const cx = dim / 2, cy = dim / 2;
+  const s = (L * 0.78) / 24;
+  const logo =
+    `<rect x="${(cx - L / 2).toFixed(2)}" y="${(cy - L / 2).toFixed(2)}" width="${L}" height="${L}" rx="${(L * 0.3).toFixed(2)}" fill="#fff"/>` +
+    `<g transform="translate(${(cx - (L * 0.78) / 2).toFixed(2)} ${(cy - (L * 0.78) / 2).toFixed(2)}) scale(${s.toFixed(4)})">` +
+    `<path d="M12 1 L22 4.6 V12 C22 18.4 12 23 12 23 C12 23 2 18.4 2 12 V4.6 Z" fill="${accent}"/>` +
+    `<path d="M8.8 12.3 l2.4 2.4 l4.2-4.8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `</g>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${dim} ${dim}" shape-rendering="geometricPrecision" role="img">` +
+    `<rect width="${dim}" height="${dim}" rx="3" fill="#fff"/>` +
+    `<g fill="${QR_DARK}">${dots}</g>${eyes}${logo}</svg>`;
 }
 
 function QrModal({ group, onClose }: { group: GroupRow; onClose: () => void }) {
   const url = joinUrl(group.join_code);
-  const svg = useMemo(() => buildQrSvg(url, 260), [url]);
+  const svg = useMemo(() => buildQrSvg(url, 260, group.color), [url, group.color]);
 
   // Chop etish — o'zimizning blank oyna (bir xil origin), faqat QR + kod + guruh nomi.
   const doPrint = () => {
@@ -44,10 +88,10 @@ function QrModal({ group, onClose }: { group: GroupRow; onClose: () => void }) {
     w.document.write(
       `<!doctype html><html><head><meta charset="utf-8"><title>${group.name}</title>` +
       `<style>body{font-family:system-ui,Arial,sans-serif;text-align:center;padding:32px;margin:0}` +
-      `h1{font-size:20px;margin:0 0 4px}.code{font:700 34px/1.1 monospace;letter-spacing:4px;margin:16px 0}` +
+      `h1{font-size:20px;margin:0 0 4px;color:${group.color}}.code{font:700 34px/1.1 monospace;letter-spacing:4px;margin:16px 0}` +
       `.hint{color:#555;font-size:13px;margin-top:8px}svg{width:300px;height:300px}</style></head><body>` +
       `<h1>${group.name}</h1><div class="hint">UzGuard → «Guruhga qo‘shilish» → skanerlang</div>` +
-      `${buildQrSvg(url, 300)}<div class="code">${group.join_code}</div>` +
+      `${buildQrSvg(url, 300, group.color)}<div class="code">${group.join_code}</div>` +
       `<div class="hint">yoki shu kodni kiriting</div></body></html>`,
     );
     w.document.close();
@@ -58,27 +102,16 @@ function QrModal({ group, onClose }: { group: GroupRow; onClose: () => void }) {
   return (
     <>
       <div className="scrim" onClick={onClose} style={{ zIndex: 209 }} />
-      <div
-        style={{
-          position: 'fixed', zIndex: 210, top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-          background: 'var(--surface, #fff)', color: 'var(--ink, #111)', borderRadius: 16, padding: 24,
-          width: 'min(360px, 92vw)', boxShadow: '0 24px 60px rgba(0,0,0,.35)', textAlign: 'center',
-        }}
-      >
+      <div className="qr-modal" style={{ ['--g' as string]: group.color }}>
         <button className="btn ghost" onClick={onClose} style={{ position: 'absolute', top: 10, right: 10 }}>✕</button>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
-          <span style={{ width: 12, height: 12, borderRadius: 3, background: group.color, display: 'inline-block' }} />
-          <b style={{ fontSize: 18 }}>{group.name}</b>
+        <div className="qr-title">
+          <span className="qr-dot" />
+          <b>{group.name}</b>
         </div>
-        <div style={{ color: 'var(--ink-3)', fontSize: 12, marginBottom: 14 }}>
-          Telefonda: «Guruhga qo‘shilish» → skanerlang yoki kodni kiriting
-        </div>
-        <div
-          style={{ display: 'inline-block', background: '#fff', padding: 10, borderRadius: 12 }}
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
-        <div style={{ font: '700 28px/1 monospace', letterSpacing: 4, margin: '16px 0 6px' }}>{group.join_code}</div>
-        <button className="btn" onClick={doPrint} style={{ marginTop: 8 }}>🖨 Chop etish</button>
+        <div className="qr-hint">Telefonda: «Guruhga qo‘shilish» → skanerlang yoki kodni kiriting</div>
+        <div className="qr-tile" dangerouslySetInnerHTML={{ __html: svg }} />
+        <div className="qr-code">{group.join_code}</div>
+        <button className="btn" onClick={doPrint} style={{ marginTop: 12 }}>🖨 Chop etish</button>
       </div>
     </>
   );

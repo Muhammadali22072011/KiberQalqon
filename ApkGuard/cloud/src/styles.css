@@ -633,3 +633,20 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 
 /* ── #10 Xarita issiqlik tugmasi (yoniq holat) ── */
 .btn.ghost.sm.on{background:var(--danger-bg);color:var(--danger-ink);border-color:rgba(226,90,74,.4)}
+
+/* ── Guruh QR modali (brend, --g = guruh rangi) ── */
+.qr-modal{position:fixed;z-index:210;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(360px,92vw);padding:26px 24px 24px;text-align:center;border-radius:20px;
+  background:var(--card,#0a181c);color:var(--ink,#eff6f7);
+  border:1px solid var(--hair-2);border-top:3px solid var(--g,#C2143D);
+  box-shadow:0 28px 70px rgba(0,0,0,.55)}
+.qr-title{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:5px}
+.qr-title b{font-size:19px}
+.qr-dot{width:13px;height:13px;border-radius:4px;background:var(--g,#C2143D);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--g,#C2143D) 22%,transparent)}
+.qr-hint{color:var(--ink-3);font-size:12px;margin-bottom:16px;line-height:1.5}
+.qr-tile{display:inline-block;background:#fff;padding:14px;border-radius:18px;line-height:0;
+  box-shadow:0 10px 30px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.04)}
+.qr-tile svg{display:block;border-radius:6px}
+.qr-code{font:800 30px/1 var(--mono,monospace);letter-spacing:6px;margin:18px 0 4px;
+  color:var(--g,#C2143D)}
