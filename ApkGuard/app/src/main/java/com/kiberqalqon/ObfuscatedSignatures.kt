@@ -200,11 +200,28 @@ object ObfuscatedSignatures {
         return list
     }
 
+    // PERF (qizish — 2026-07-09, qurilmada am profile bilan o'lchangan): avval har sig uchun
+    // text.contains(sig, ignoreCase=true) chaqirilardi — bu HAR BELGI uchun
+    // Character.toUpperCase/toLowerCase qiladi va 8MB matnni 10+ marta aylanib chiqadi
+    // (profilda regionMatches+to*Case eng issiq joy edi). Endi matn BIR marta lowercase
+    // qilinadi, sig'lar oldindan lowercase keshlanadi → oddiy (case-siz) indexOf.
+    // Sig'lar ASCII — amaliy detektsiya o'zgarmaydi (farq faqat ekzotik Unicode
+    // case-fold burchaklarida: masalan Kelvin U+212A, dotted İ — DEX IoC uchun ahamiyatsiz).
+    @Volatile private var loweredSigCache: List<Pair<String, String>>? = null
+
+    private fun loweredSignatures(): List<Pair<String, String>> {
+        loweredSigCache?.let { return it }
+        val list = decryptedSignatures().map { (sig, label) -> sig.lowercase() to label }
+        loweredSigCache = list
+        return list
+    }
+
     /** Поиск декодированных сигнатур в строке. Возвращает найденные family-метки. */
     fun matchDecrypted(text: String): List<String> {
         val found = mutableSetOf<String>()
-        for ((sig, label) in decryptedSignatures()) {
-            if (text.contains(sig, ignoreCase = true)) {
+        val lowered = text.lowercase()
+        for ((sigLower, label) in loweredSignatures()) {
+            if (lowered.contains(sigLower)) {
                 found.add(label)
             }
         }
