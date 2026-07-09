@@ -24,7 +24,10 @@ create index if not exists idx_threats_review on threats(review_status);
 create index if not exists idx_threats_family on threats(family) where family is not null;
 
 -- ── #6/#5: feed RPC yangilanishi — family qaytaradi + 'dismissed' ni chiqaradi.
---    (11_feed_corroboration.sql ning ustiga — create or replace idempotent.) ──
+--    MUHIM: migratsiya 11'dagi RPC 5 ustun qaytaradi; biz `family` qo'shib 6 ustunga
+--    o'zgartiramiz. Postgres `create or replace` FUNKSIYA QAYTARISH TIPINI o'zgartira
+--    OLMAYDI (ERROR: cannot change return type of existing function) → avval DROP shart. ──
+drop function if exists corroborated_threats(int);
 create or replace function corroborated_threats(min_devices int default 2)
 returns table (apk_hash text, package_name text, category text, family text, severity text, last_seen timestamptz)
 language sql
