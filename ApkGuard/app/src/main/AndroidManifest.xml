@@ -282,6 +282,23 @@
             android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait" />
 
+        <!-- «Guruhga qo'shilish» — kod/QR bilan guruhga kiradi. exported=true: guruh QR'i
+             uzguard://join?code=XXXX chuqur havolasi bilan tashqi kameradan ham ochilsin.
+             singleTop — takroriy havola yangi nusxa yaratmaydi (onNewIntent kodni to'ldiradi). -->
+        <activity
+            android:name=".GroupJoinActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait">
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="uzguard" android:host="join" />
+            </intent-filter>
+        </activity>
+
         <!-- Soxta bank ilovalari auditi — bank brendiga taqlid qiluvchi ilovalarni topadi. -->
         <activity
             android:name=".BankGuardActivity"

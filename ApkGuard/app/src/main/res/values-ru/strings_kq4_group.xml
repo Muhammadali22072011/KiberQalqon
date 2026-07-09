@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- «Присоединиться к группе» (GroupJoinActivity) + карточка группы на главной. -->
+<resources>
+    <!-- Карточка на главной -->
+    <string name="kq4_group_join_title">Присоединиться к группе</string>
+    <string name="kq4_group_join_sub">Войдите по коду или QR</string>
+    <string name="kq4_group_joined_sub">✓ Вы в группе</string>
+
+    <!-- Заголовок экрана -->
+    <string name="kq4_group_eyebrow">ГРУППА</string>
+    <string name="kq4_group_title">Присоединиться к группе</string>
+
+    <!-- Текущая группа -->
+    <string name="kq4_group_current">Вы в группе</string>
+    <string name="kq4_group_current_fmt">Вы в группе: %1$s</string>
+
+    <!-- Код / QR -->
+    <string name="kq4_group_code_label">Код группы</string>
+    <string name="kq4_group_code_hint">Например: NAVOIY7</string>
+    <string name="kq4_group_scan">Сканировать</string>
+
+    <!-- Данные -->
+    <string name="kq4_group_you_label">Ваши данные</string>
+    <string name="kq4_group_first_hint">Имя</string>
+    <string name="kq4_group_last_hint">Фамилия</string>
+    <string name="kq4_group_phone_hint">Телефон (+998…)</string>
+    <string name="kq4_group_privacy">Эти данные видит только владелец группы.</string>
+    <string name="kq4_group_join_btn">Присоединиться</string>
+
+    <!-- Статус / результат -->
+    <string name="kq4_group_sending">Отправка…</string>
+    <string name="kq4_group_ok">Вы вступили в группу «%1$s»</string>
+    <string name="kq4_group_err_code">Неверный код или не найден</string>
+    <string name="kq4_group_err_fields">Заполните все поля</string>
+    <string name="kq4_group_err_net">Нет интернета — повторите</string>
+    <string name="kq4_group_err_generic">Не удалось присоединиться</string>
+    <string name="kq4_group_err_unconfigured">Облако не настроено</string>
+</resources>

@@ -59,6 +59,13 @@ class QrScanActivity : AppCompatActivity() {
     private var hasCameraHardware = false
 
     /**
+     * "Guruh kodini qaytar" rejimi — GroupJoinActivity shu ekranni kod olish uchun ochadi.
+     * Yoqilgan bo'lsa: QR ichidan guruh kodini ajratib, natija sifatida qaytaramiz (havola
+     * tekshiruviga o'tmaymiz).
+     */
+    private val returnJoinCode by lazy { intent.getBooleanExtra(EXTRA_RETURN_JOIN_CODE, false) }
+
+    /**
      * ZXing reader — FAQAT QR_CODE formati. Reader thread-safe emas, shuning uchun
      * faqat analysisExecutor ipida (analyzeFrame ichida) ishlatiladi.
      */
@@ -326,6 +333,19 @@ class QrScanActivity : AppCompatActivity() {
      * va shu ekranni yopamiz; aks holda — neytral matn ko'rinishi (kq4_qr_not_url).
      */
     private fun onQrDecoded(text: String) {
+        // Guruh rejimi: QR ichidan kodni ajratib qaytaramiz (GroupJoinActivity oladi).
+        if (returnJoinCode) {
+            val code = extractJoinCode(text)
+            releaseCamera()
+            if (code != null) {
+                setResult(RESULT_OK, Intent().putExtra(RESULT_JOIN_CODE, code))
+                finish()
+            } else {
+                // Guruh QR emas — o'qilgan matnni ko'rsatamiz (foydalanuvchi yopib qayta urinadi).
+                showDecodedTextState(text)
+            }
+            return
+        }
         // Kamerani darhol bo'shatamiz — natija ko'rsatilmoqda, skan to'xtadi.
         releaseCamera()
         if (looksLikeUrl(text)) {
@@ -366,6 +386,25 @@ class QrScanActivity : AppCompatActivity() {
         return tld.length >= 2 && tld.all { it.isLetter() }
     }
 
+    /**
+     * QR matnidan guruh KODini ajratadi. Ikki shakl:
+     *   • "uzguard://join?code=NAVOIY7" (chuqur havola) → code parametri
+     *   • yalang'och kod "NAVOIY7" (harf+raqam, 4..16) → o'zi
+     * Aks holda null (bu guruh QR emas).
+     */
+    private fun extractJoinCode(text: String): String? {
+        val t = text.trim()
+        val lower = t.lowercase()
+        if (lower.startsWith("uzguard://join")) {
+            val c = try { Uri.parse(t).getQueryParameter("code") } catch (e: Throwable) { null }
+            val code = c?.trim()?.uppercase()
+            if (code != null && code.matches(Regex("^[A-Z0-9]{4,16}$"))) return code
+            return null
+        }
+        val up = t.uppercase()
+        return if (up.matches(Regex("^[A-Z0-9]{4,16}$"))) up else null
+    }
+
     // ───────────────────────── Hayotiy sikl ─────────────────────────
 
     private fun releaseCamera() {
@@ -392,5 +431,10 @@ class QrScanActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "QrScanActivity"
         private const val TAG_OPEN_SETTINGS = "open_settings"
+
+        /** GroupJoinActivity beradi: QR'ni guruh kodi sifatida qaytar (havolaga o'tma). */
+        const val EXTRA_RETURN_JOIN_CODE = "return_join_code"
+        /** Natija Intent'idagi kod kaliti (setResult). */
+        const val RESULT_JOIN_CODE = "join_code"
     }
 }

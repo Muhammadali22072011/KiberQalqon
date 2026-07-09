@@ -3,6 +3,8 @@ package com.uzguard
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -96,6 +98,11 @@ class DashboardNewActivity : AppCompatActivity() {
         // "Bank himoyasi" katagi → soxta bank ilovalari auditi.
         binding.kq4GuardBankCell.setOnClickListener {
             startActivity(Intent(this, BankGuardActivity::class.java))
+        }
+
+        // Guruh kartasi → guruhga qo'shilish / holat. refreshGroupCard() onResume'da yangilaydi.
+        binding.cardGroup.setOnClickListener {
+            startActivity(Intent(this, GroupJoinActivity::class.java))
         }
 
         // "Hammasi" → to'liq skaner ro'yxati.
@@ -233,6 +240,7 @@ class DashboardNewActivity : AppCompatActivity() {
         populateInstalledApps()
         updateProtectionStatusBar()
         updateGuardDots()
+        refreshGroupCard()
         // Hero (halqa, %, sarlavha, rang) va hisoblagichlar ham qaytishda yangilanishi shart —
         // aks holda topbar yashil "Himoya yoqilgan", hero esa eski sariq holatda qoladi
         // (masalan, ProtectionStatusActivity'da himoya yoqilgandan keyin). Yengil ish:
@@ -240,6 +248,29 @@ class DashboardNewActivity : AppCompatActivity() {
         // miltillamaydi, ring.setValue animatsiyalanadi.
         loadStatistics()
     }
+
+    /**
+     * Guruh kartasi: qurilma guruhga qo'shilgan bo'lsa — rang + guruh nomi + "✓ Guruhdasiz";
+     * aks holda — "Guruhga qo'shilish" taklifi (primary rangli nuqta). CloudTelemetry.savedGroup
+     * mahalliy holatdan o'qiydi (tarmoq so'rovi yo'q).
+     */
+    private fun refreshGroupCard() {
+        val g = CloudTelemetry.savedGroup(this)
+        if (g == null) {
+            binding.groupTitle.text = getString(R.string.kq4_group_join_title)
+            binding.groupSub.text = getString(R.string.kq4_group_join_sub)
+            binding.groupDot.background = groupDot(getColor(R.color.kq_primary))
+        } else {
+            binding.groupTitle.text = g.name
+            binding.groupSub.text = getString(R.string.kq4_group_joined_sub)
+            val color = try { Color.parseColor(g.color) } catch (e: Throwable) { getColor(R.color.kq_primary) }
+            binding.groupDot.background = groupDot(color)
+        }
+    }
+
+    /** Guruh nuqtasi uchun doira drawable. */
+    private fun groupDot(color: Int): GradientDrawable =
+        GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color) }
 
     /** TopBar: real himoya holati — matn (yoqilgan/o'chiq) + nuqta rangi (safe/warn). */
     private fun updateProtectionStatusBar() {
@@ -366,16 +397,32 @@ class DashboardNewActivity : AppCompatActivity() {
             // ochilishlarda qayta skan bo'lmaydi (bir necha ochilishda to'liq konvergensiya).
             // Skan xato/timeout bersa — teg "Tekshirilmagan" bo'lib qoladi (hech qachon yolg'on XAVFSIZ).
             val rescanPrefs = getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
-            var scannedNow = 0
+            // QIZISH-FIKSI (2026-07-09, qurilmada am profile bilan isbotlangan): avval timeout
+            // bo'lgan skan `?: continue` bilan scannedNow'ni OSHIRMAY o'tib ketardi. Katta ilova
+            // (Telegram, 50MB) 8s ichida ulgurmaydi → natija tashlanadi → verdikt saqlanmaydi →
+            // HAR onResume'da o'sha ilovalar QAYTA skanlanadi (hech qachon konvergensiya yo'q).
+            // Ustiga withTimeoutOrNull bloklovchi ApkScanner.scan'ni TO'XTATA OLMAYDI (kooperativ
+            // bekor qilish) — skan oxirigacha ishlab, natijasi bekorga tashlanardi. Telefon shu
+            // tsiklda qizirdi. Endi: (1) HAR urinish limitga sanaladi; (2) timeout bo'lgan ilova
+            // 24 soat backoff oladi (kunlik InstalledAppsRescanWorker baribir tekshiradi).
+            var attempted = 0
+            val nowMs = System.currentTimeMillis()
             for (data in rows) {
-                if (scannedNow >= 40) break          // bitta ochilishda ko'pi bilan 40 ta — qizib ketmasin
+                if (attempted >= 40) break           // bitta ochilishda ko'pi bilan 40 urinish — qizib ketmasin
                 if (data.verdict != null) continue   // allaqachon verdikti bor — o'tkazamiz
                 val sourceDir = data.sourceDir ?: continue
+                if (nowMs < rescanPrefs.getLong("slow_until_${data.pkgName}", 0L)) continue
+                attempted++
                 val scanned = withContext(Dispatchers.IO) {
                     try { withTimeoutOrNull(8000) { ApkScanner.scan(applicationContext, sourceDir) } }
                     catch (_: Throwable) { null }
-                } ?: continue
-                scannedNow++
+                }
+                if (scanned == null) {
+                    rescanPrefs.edit()
+                        .putLong("slow_until_${data.pkgName}", nowMs + 24L * 60 * 60 * 1000)
+                        .apply()
+                    continue
+                }
                 rescanPrefs.edit().putString("verdict_${data.pkgName}", scanned.verdict.name).apply()
                 // Tegni jonli yangilaymiz — foydalanuvchi tekshiruv ketayotganini ko'radi.
                 rowByPkg[data.pkgName]?.let { applyAppTag(it, scanned.verdict.name) }

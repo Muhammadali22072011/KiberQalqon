@@ -71,6 +71,9 @@ object CloudTelemetry {
     private const val GEO_MOVE_THRESHOLD_M = 500.0
     // Bulutga allaqachon yuklangan APK namuna hash'lari — qayta yuklamaslik uchun.
     private const val KEY_UPLOADED_SAMPLES = "uploaded_samples"
+    // Qurilma qo'shilgan guruh (dashboard bejasi + GroupJoinActivity holati uchun).
+    private const val KEY_GROUP_NAME = "group_name"
+    private const val KEY_GROUP_COLOR = "group_color"
     // Storage'ga yuklanadigan eng katta APK (ConsentActivity 4(a) va'dasi bilan bir xil).
     private const val MAX_SAMPLE_BYTES = 50L * 1024 * 1024
 
@@ -294,6 +297,70 @@ object CloudTelemetry {
             dst
         } catch (e: Throwable) {
             Log.w(TAG, "snapshotForUpload failed", e); null
+        }
+    }
+
+    // ---- Guruhga qo'shilish (GroupJoinActivity) ---------------------------
+
+    /** Guruhga qo'shilish natijasi. ok=false bo'lsa `error` sababi (code/fields/net/...). */
+    data class JoinResult(val ok: Boolean, val error: String?, val groupName: String?, val groupColor: String?)
+
+    /** Saqlangan guruh (mahalliy) — dashboard bejasi/holat uchun. Yo'q bo'lsa null. */
+    data class GroupInfo(val name: String, val color: String)
+
+    fun savedGroup(ctx: Context): GroupInfo? {
+        val sp = prefs(ctx)
+        val name = sp.getString(KEY_GROUP_NAME, null)?.takeIf { it.isNotBlank() } ?: return null
+        val color = sp.getString(KEY_GROUP_COLOR, null)?.takeIf { it.isNotBlank() } ?: "#C2143D"
+        return GroupInfo(name, color)
+    }
+
+    /**
+     * Qurilmani KOD bilan guruhga qo'shadi (foydalanuvchi ochiq amal — GroupJoinActivity).
+     * Register'dan FARQLI: bu community-share consent'ini talab QILMAYDI (foydalanuvchi
+     * o'zi ism/familiya/telefonini kiritib qo'shilishga rozi bo'ladi), faqat ToS (hasUserConsent)
+     * + bulut sozlangan bo'lishi kerak. `cb` FON ipida chaqiriladi — chaqiruvchi UI'ga
+     * runOnUiThread bilan o'tkazadi.
+     */
+    fun joinGroup(ctx: Context, code: String, first: String, last: String, phone: String, cb: (JoinResult) -> Unit) {
+        val base = baseUrl()
+        val secret = deviceSecret()
+        if (base == null || secret == null || !Config.hasUserConsent(ctx)) {
+            cb(JoinResult(false, "unconfigured", null, null)); return
+        }
+        val token = deviceToken(ctx)
+        scope.launch {
+            val result = try {
+                val body = JSONObject().apply {
+                    put("device_token", token)
+                    put("code", code.trim().uppercase())
+                    put("first", first.trim())
+                    put("last", last.trim())
+                    put("phone", phone.trim())
+                }
+                val resp = postJsonForResult(ctx, "$base/api/device/join", secret, "device/join", body)
+                if (resp == null) {
+                    JoinResult(false, "net", null, null)
+                } else {
+                    val j = JSONObject(resp)
+                    if (j.optBoolean("ok", false)) {
+                        val g = j.optJSONObject("group")
+                        val name = g?.optString("name")?.takeIf { it.isNotBlank() } ?: code.trim().uppercase()
+                        val color = g?.optString("color")?.takeIf { it.isNotBlank() } ?: "#C2143D"
+                        prefs(ctx).edit()
+                            .putString(KEY_GROUP_NAME, name)
+                            .putString(KEY_GROUP_COLOR, color)
+                            .apply()
+                        JoinResult(true, null, name, color)
+                    } else {
+                        JoinResult(false, j.optString("error", "generic").ifBlank { "generic" }, null, null)
+                    }
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "joinGroup failed", e)
+                JoinResult(false, "net", null, null)
+            }
+            cb(result)
         }
     }
 

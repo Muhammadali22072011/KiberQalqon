@@ -66,6 +66,18 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
         ) : (
           <>
             <div className="pp-rows" style={{ borderTop: 'none' }}>
+              {dev.group_id && (
+                <div><span>Guruh</span><b style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: 3, background: dev.group_color || '#888', display: 'inline-block' }} />
+                  {dev.group_name || '—'}
+                </b></div>
+              )}
+              {(dev.member_first || dev.member_last) && (
+                <div><span>A‘zo</span><b>{[dev.member_first, dev.member_last].filter(Boolean).join(' ')}</b></div>
+              )}
+              {dev.member_phone && (
+                <div><span>Telefon</span><b className="mono">{dev.member_phone}</b></div>
+              )}
               <div><span>Joylashuv</span><b>{((nearestCity(dev.lat, dev.lng) || dev.city) || '—') + ', ' + (dev.country || 'UZ')}</b></div>
               <div><span>IP manzil</span><b className="mono">{dev.ip || '—'}</b></div>
               <div><span>Android</span><b>{dev.android_ver || '—'}</b></div>
@@ -128,17 +140,30 @@ export default function Devices() {
   const [sel, setSel] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [vf, setVf] = useState('');
+  const [gf, setGf] = useState(''); // '' = barchasi, 'none' = guruhsiz, aks holda group_id
 
-  // Qidiruv (nom/shahar/IP) + holat filtri — mijoz tomonida (ro'yxat kichik, poll bilan yangilanadi).
+  // Guruhlar ro'yxatini qurilmalardan yig'amiz (alohida so'rovsiz) — filtr uchun.
+  const groupOpts = useMemo(() => {
+    const m = new Map<string, { name: string; color: string }>();
+    for (const d of devices) {
+      if (d.group_id && !m.has(d.group_id)) m.set(d.group_id, { name: d.group_name || 'Guruh', color: d.group_color || '#888' });
+    }
+    return [...m.entries()].map(([id, v]) => ({ id, ...v }));
+  }, [devices]);
+
+  // Qidiruv (nom/shahar/IP/a'zo) + holat + guruh filtri — mijoz tomonida (ro'yxat kichik).
   const shown = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return devices.filter((d) => {
       if (vf && d.last_verdict !== vf) return false;
+      if (gf === 'none' && d.group_id) return false;
+      if (gf && gf !== 'none' && d.group_id !== gf) return false;
       if (!needle) return true;
-      const hay = [d.name, nearestCity(d.lat, d.lng), d.city, d.ip].filter(Boolean).join(' ').toLowerCase();
+      const hay = [d.name, nearestCity(d.lat, d.lng), d.city, d.ip,
+        d.member_first, d.member_last, d.member_phone, d.group_name].filter(Boolean).join(' ').toLowerCase();
       return hay.includes(needle);
     });
-  }, [devices, q, vf]);
+  }, [devices, q, vf, gf]);
 
   // Ilova versiyalari taqsimoti (park bo'ylab) — raskatka nazorati uchun (eng ko'p 6 ta).
   const versions = useMemo(() => {
@@ -169,10 +194,17 @@ export default function Devices() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
               />
-              <select value={vf} onChange={(e) => setVf(e.target.value)} style={{ width: 140 }}>
+              <select value={vf} onChange={(e) => setVf(e.target.value)} style={{ width: 130 }}>
                 {VERDICT_FILTERS.map((f) => <option key={f.k} value={f.k}>{f.label}</option>)}
               </select>
-              {(q || vf) && <span className="lf-count">{shown.length} / {devices.length}</span>}
+              {groupOpts.length > 0 && (
+                <select value={gf} onChange={(e) => setGf(e.target.value)} style={{ width: 150 }}>
+                  <option value="">Barcha guruh</option>
+                  {groupOpts.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                  <option value="none">Guruhsiz</option>
+                </select>
+              )}
+              {(q || vf || gf) && <span className="lf-count">{shown.length} / {devices.length}</span>}
             </div>
           </div>
           <div style={{ overflowX: 'auto' }}>
@@ -180,6 +212,7 @@ export default function Devices() {
               <thead>
                 <tr>
                   <th>Qurilma</th>
+                  <th>Guruh</th>
                   <th>Joy</th>
                   <th className="num">Skan</th>
                   <th className="num">Xavfli</th>
@@ -190,19 +223,31 @@ export default function Devices() {
               </thead>
               <tbody>
                 {loading && !devices.length ? (
-                  <tr><td colSpan={7}><Spinner label="Yuklanmoqda…" /></td></tr>
+                  <tr><td colSpan={8}><Spinner label="Yuklanmoqda…" /></td></tr>
                 ) : error && !devices.length ? (
-                  <tr><td colSpan={7}><Empty>Ma‘lumotni yuklab bo‘lmadi — qayta urinilmoqda…</Empty></td></tr>
+                  <tr><td colSpan={8}><Empty>Ma‘lumotni yuklab bo‘lmadi — qayta urinilmoqda…</Empty></td></tr>
                 ) : !devices.length ? (
-                  <tr><td colSpan={7}><Empty>Hozircha qurilma yo‘q</Empty></td></tr>
+                  <tr><td colSpan={8}><Empty>Hozircha qurilma yo‘q</Empty></td></tr>
                 ) : !shown.length ? (
-                  <tr><td colSpan={7}><Empty>Filtrga mos qurilma topilmadi</Empty></td></tr>
+                  <tr><td colSpan={8}><Empty>Filtrga mos qurilma topilmadi</Empty></td></tr>
                 ) : (
                   shown.map((d) => {
                     const risk = Math.round(d.risk_score || 0);
                     return (
                       <tr key={d.id} className="click" onClick={() => setSel(d.id)}>
-                        <td><b>{d.name || 'Qurilma'}</b></td>
+                        <td>
+                          {(d.member_first || d.member_last)
+                            ? <><b>{[d.member_first, d.member_last].filter(Boolean).join(' ')}</b><br /><span style={{ color: 'var(--ink-3)', fontSize: 12 }}>{d.name || 'Qurilma'}</span></>
+                            : <b>{d.name || 'Qurilma'}</b>}
+                        </td>
+                        <td>
+                          {d.group_id
+                            ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                <span style={{ width: 10, height: 10, borderRadius: 3, background: d.group_color || '#888', display: 'inline-block', flex: '0 0 auto' }} />
+                                <span style={{ fontSize: 13 }}>{d.group_name || '—'}</span>
+                              </span>
+                            : <span style={{ color: 'var(--ink-3)' }}>—</span>}
+                        </td>
                         <td style={{ color: 'var(--ink-2)' }}>{nearestCity(d.lat, d.lng) || d.city || '—'}</td>
                         <td className="num">{d.scan_count || 0}</td>
                         <td className={'num' + ((d.danger_count || 0) > 0 ? ' dgr' : '')}>{d.danger_count || 0}</td>

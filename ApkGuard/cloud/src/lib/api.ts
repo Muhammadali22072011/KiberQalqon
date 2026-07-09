@@ -143,6 +143,22 @@ export interface DeviceRow {
   created_at?: string; last_seen?: string; country?: string | null; city?: string | null; ip?: string | null;
   lat?: number | null; lng?: number | null; risk_score?: number; last_verdict?: string | null;
   last_scan_at?: string | null; scan_count?: number; danger_count?: number;
+  // Guruh (16_groups): null = guruhsiz. member_* — foydalanuvchi qo'shilishda o'zi kiritgan.
+  group_id?: string | null; group_name?: string | null; group_color?: string | null;
+  member_first?: string | null; member_last?: string | null; member_phone?: string | null;
+}
+// Qurilma guruhi (rang-yorliq segment). join_code — ilovada kiritiladigan/QR kod.
+export interface GroupRow {
+  id: string; name: string; color: string; join_code: string;
+  created_at?: string; device_count?: number;
+}
+// Guruh a'zosi (v_group_members) — panel rostri + Excel eksport uchun.
+export interface GroupMember {
+  device_id: string; group_id: string; group_name?: string | null; group_color?: string | null;
+  member_first?: string | null; member_last?: string | null; member_phone?: string | null;
+  device_name?: string | null; android_ver?: string | null; app_ver?: string | null;
+  city?: string | null; risk_score?: number; last_verdict?: string | null; last_seen?: string | null;
+  scan_count?: number; danger_count?: number;
 }
 export interface ScanRow {
   id: number; apk_hash?: string; package_name?: string | null; app_label?: string | null;
