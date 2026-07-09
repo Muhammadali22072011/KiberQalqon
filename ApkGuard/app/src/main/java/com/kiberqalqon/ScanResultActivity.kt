@@ -719,6 +719,12 @@ class ScanResultActivity : AppCompatActivity() {
      * Ishga tushirish intent'i bo'lmasa — ilova sozlamalari (Xotira → Tozalash) ekraniga.
      */
     private fun openOwnerApp(pkg: String) {
+        // Foydalanuvchi ilovaga o'tib qanday o'chirishni bilishi uchun ko'rsatma.
+        Toast.makeText(
+            this,
+            getString(R.string.sandboxed_open_owner_hint, ownerAppLabel(pkg)),
+            Toast.LENGTH_LONG,
+        ).show()
         try {
             val launch = packageManager.getLaunchIntentForPackage(pkg)
             if (launch != null) {

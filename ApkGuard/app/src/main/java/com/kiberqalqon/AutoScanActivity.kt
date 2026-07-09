@@ -1214,6 +1214,12 @@ class AutoScanActivity : AppCompatActivity() {
      * intent'i bo'lmasa — ilova sozlamalari (Xotira → Tozalash) ekraniga o'tamiz.
      */
     private fun openOwnerApp(pkg: String) {
+        // Ilovaga o'tishdan oldin qanday o'chirishni ko'rsatamiz.
+        android.widget.Toast.makeText(
+            this,
+            getString(R.string.sandboxed_open_owner_hint, ownerAppLabel(pkg)),
+            android.widget.Toast.LENGTH_LONG,
+        ).show()
         try {
             val launch = packageManager.getLaunchIntentForPackage(pkg)
             if (launch != null) {
