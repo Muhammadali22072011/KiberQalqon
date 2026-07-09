@@ -178,6 +178,15 @@ object FilenameHeuristic {
         "drive" to "com.google.android.apps.docs",
     )
 
+    /**
+     * O'z brendimiz (va tarixiy rebrand nomlari). Bu tokenlar soxta-brend (typosquat)
+     * tekshiruvidan chetlab o'tiladi — o'zimizning o'rnatgich/faylimiz boshqa brendning
+     * taqlidi deb belgilanmasin. Masalan "uzguard" ⟵Levenshtein-2⟶ "uzcard".
+     */
+    private val OWN_BRANDS: Set<String> = setOf(
+        "uzguard", "anorqalqon", "anor", "kiberqalqon", "qalqon",
+    )
+
     fun analyze(apkPath: String, packageName: String?, appLabel: String? = null): Findings {
         val filename = File(apkPath).name
         val flags = mutableListOf<String>()
@@ -220,6 +229,10 @@ object FilenameHeuristic {
         var brandHit: HardDanger.BrandImpersonation? = null
         for ((brand, expected) in KNOWN_BRANDS) {
             val (kind, matchedToken) = matchBrand(brand, tokens, rawName) ?: continue
+            // O'z brendimiz taqlid EMAS: "uzguard" tokeni "uzcard"dan Levenshtein-2 uzoqlikda →
+            // aks holda o'zimizning "uzguard-setup.apk" o'rnatgichimiz uzcard typosquat'i deb
+            // noto'g'ri belgilanardi (2026-07-09 panelda kuzatilgan). Rebrand nomlari ham kiritilgan.
+            if (matchedToken.lowercase() in OWN_BRANDS) continue
 
             val pkgOk = packageName?.lowercase()?.startsWith(expected.lowercase()) == true
             if (!pkgOk) {

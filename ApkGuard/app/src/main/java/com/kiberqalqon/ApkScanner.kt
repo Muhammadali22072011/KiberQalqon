@@ -1153,8 +1153,9 @@ object ApkScanner {
             val rc = RemoteConfig.get(context)
 
             // Anti-analysis (evasion) belgilari soni — Anti-Frida/Anti-Magisk/TracerPid/tmp-probe
-            // /Anti-debug. Real ilovalar bunday hech qachon qilmaydi. 2+ ta birga
-            // bo'lsa — bu sof virus, score'dan qat'iy nazar DANGER.
+            // /Anti-debug. 2+ ta birga bo'lsa ISHONCHSIZ ilovada score'dan qat'iy nazar DANGER
+            // (TIER-2, decideVerdict). Eslatma: bank/o'yin/DRM ilovalari root/frida'ni QONUNIY
+            // tekshiradi — shuning uchun VERIFIED/ishonchli ilovada bu DANGER bermaydi (reputatsiya qalqoni).
             val evasionLabels = setOf(
                 "Anti-debug check",
                 "TracerPid /proc anti-debug",
@@ -1225,7 +1226,11 @@ object ApkScanner {
                             (dropperFindings.soOutsideLib.isNotEmpty() || randomPkg),
                     deviceAdminWithCombo = manifestFindings.declaresDeviceAdmin &&
                             comboScoreIndependentOfDeviceAdmin >= 30,
-                    obfuscatedSignature = signaturesFound.isNotEmpty(),
+                    // Faqat QAT'IY IoC (aniq C2 domen/kalit/bot hash yoki bot-endpoint) yakka o'zi
+                    // DANGER beradi. Generik API markerlari (overlay.*/anti.*/jetski — halol ilovalarda
+                    // ham bor) obfuscatedSignature'ni YOQMAYDI (ObfuscatedSignatures.SOFT_FAMILIES);
+                    // ular details'da qoladi, lekin VERIFIED/ishonchli ilovani "virus" qilib qo'ymaydi.
+                    obfuscatedSignature = signaturesFound.any { ObfuscatedSignatures.isHardFamily(it) },
                     strongCombo = strongCombo,
                     evasionCount = evasionCount,
                     verifiedTrusted = verifiedTrusted,
@@ -1440,25 +1445,36 @@ internal data class VerdictSignals(
 
 /**
  * Signal-to'plamidan yakuniy verdikt. INVARIANTLAR (test bilan qo'riqlanadi):
- *  • Qat'iy signallar (icon-impersonation, hidden APK/DEX/ELF dropper, shifrlangan payload+signal,
- *    device-admin+combo, obfuscated IoC, kuchli combo, 2+ evaziya) reputatsiyadan QAT'IY NAZAR DANGER.
- *  • VERIFIED faqat qat'iy signal YO'Q bo'lsa SAFE qiladi (yumshoq signallarni bosadi).
- *  • Tartib MUHIM — qat'iy bloklar verifiedTrusted'dan OLDIN. [ApkScanner.scan] ichidagi `when` shu yerga
- *    AYNAN ko'chirildi (xulq o'zgarmagan).
+ *  • TIER-1 QAT'IY signallar (icon-impersonation, hidden APK/DEX/ELF dropper, shifrlangan
+ *    payload+signal, aniq malware IoC = obfuscatedSignature) reputatsiyadan QAT'IY NAZAR DANGER.
+ *  • Reputatsiya qalqoni (VERIFIED / o'rnatilgan-ishonchli) TIER-1 dan KEYIN turadi: qat'iy signal
+ *    yo'q bo'lsa SAFE qiladi.
+ *  • TIER-2 O'RTA signallar (device-admin+combo, kuchli permission-combo, 2+ anti-analiz evaziya)
+ *    qalqondan KEYIN — ular halol super-app/bank/xavfsizlik ilovalarida ham uchraydi, shuning uchun
+ *    ISHONCHLI ilovada DANGER bermaydi; ISHONCHSIZ (sideload) ilovada baribir DANGER.
+ *  • Tartib MUHIM — bloklarning joyi verdiktni belgilaydi. obfuscatedSignature ENDI faqat QAT'IY IoC
+ *    uchun yoqiladi (generik API markerlari [ObfuscatedSignatures.SOFT_FAMILIES] uni yoqmaydi).
  */
 internal fun decideVerdict(s: VerdictSignals): ScanResult.Verdict = when {
+    // ── TIER-1: QAT'IY (hard) signallar — reputatsiyani (VERIFIED/ishonchli) ham BOSADI.
+    // Bular halol ilovada deyarli hech qachon bo'lmaydi: yashirin APK/DEX/ELF dropper, ikonka
+    // taqlidi, shifrlangan payload+signal, aniq malware IoC (domen/kalit/bot hash).
     s.iconImpersonation -> ScanResult.Verdict.DANGER
     s.hiddenApkOrDex -> ScanResult.Verdict.DANGER
     s.hiddenElfOrDroppedSo -> ScanResult.Verdict.DANGER
     s.encryptedPayloadWithSignal -> ScanResult.Verdict.DANGER
-    s.deviceAdminWithCombo -> ScanResult.Verdict.DANGER
     s.obfuscatedSignature -> ScanResult.Verdict.DANGER
+    // ── REPUTATSIYA QALQONI: cert bilan tasdiqlangan (VERIFIED) yoki o'rnatilgan-ishonchli
+    // ilova. Quyidagi TIER-2 (o'rta) signallar HALOL super-app/bank/xavfsizlik ilovalarida ham
+    // uchraydi (kuchli permission-combo, anti-analiz/root-check, MDM device-admin), shuning uchun
+    // ular ISHONCHLI ilovada DANGER BERMAYDI (2026-07-09 ommaviy false-positive fix). Sideload
+    // malware ishonchli EMAS → TIER-2 bloklari unga baribir ishlaydi.
+    s.verifiedTrusted -> ScanResult.Verdict.SAFE
+    s.trustedInstalledApp -> ScanResult.Verdict.SAFE
+    // ── TIER-2: O'RTA signallar — faqat ISHONCHSIZ ilovada DANGER (yuqoridagi qalqondan keyin).
+    s.deviceAdminWithCombo -> ScanResult.Verdict.DANGER
     s.strongCombo -> ScanResult.Verdict.DANGER
     s.evasionCount >= 2 -> ScanResult.Verdict.DANGER
-    s.verifiedTrusted -> ScanResult.Verdict.SAFE
-    // O'rnatilgan + ishonchli stor/tizim + qat'iy signal yo'q → SAFE (yuqoridagi barcha QAT'IY
-    // bloklardan KEYIN — dropper/ikonka/blacklist/ZIP-shifr ham bunday ilovada baribir DANGER).
-    s.trustedInstalledApp -> ScanResult.Verdict.SAFE
     s.totalScore >= s.dangerThreshold -> ScanResult.Verdict.DANGER
     s.randomPkg && s.filenameScore >= s.randomPkgFilenameMin -> ScanResult.Verdict.DANGER
     s.randomPkg && s.dangerousPermCount >= s.randomPkgDangerousPermsMin -> ScanResult.Verdict.DANGER

@@ -92,6 +92,35 @@ class ApkScannerVerdictTest {
         assertEquals(SUSPICIOUS, decideVerdict(base(evasionCount = 1)))
     }
 
+    // ── TIER-2 (o'rta) signallar ISHONCHLI ilovada bosiladi (2026-07-09 ommaviy FP fix).
+    // Halol super-app/bank/xavfsizlik ilovalari kuchli combo / root-check / device-admin qiladi.
+    @Test fun verifiedTrusted_suppressesStrongCombo_isSafe() {
+        assertEquals(SAFE, decideVerdict(base(verifiedTrusted = true, strongCombo = true)))
+    }
+
+    @Test fun verifiedTrusted_suppressesTwoEvasions_isSafe() {
+        assertEquals(SAFE, decideVerdict(base(verifiedTrusted = true, evasionCount = 3)))
+    }
+
+    @Test fun verifiedTrusted_suppressesDeviceAdminCombo_isSafe() {
+        assertEquals(SAFE, decideVerdict(base(verifiedTrusted = true, deviceAdminWithCombo = true)))
+    }
+
+    @Test fun trustedInstalledApp_suppressesTier2Mediums_isSafe() {
+        assertEquals(SAFE, decideVerdict(base(trustedInstalledApp = true, strongCombo = true)))
+        assertEquals(SAFE, decideVerdict(base(trustedInstalledApp = true, evasionCount = 2)))
+        assertEquals(SAFE, decideVerdict(base(trustedInstalledApp = true, deviceAdminWithCombo = true)))
+    }
+
+    // ...lekin ISHONCHSIZ (sideload) ilovada TIER-2 signallar baribir DANGER beradi.
+    @Test fun untrusted_strongCombo_isDanger() {
+        assertEquals(DANGER, decideVerdict(base(strongCombo = true)))
+    }
+
+    @Test fun untrusted_deviceAdminCombo_isDanger() {
+        assertEquals(DANGER, decideVerdict(base(deviceAdminWithCombo = true)))
+    }
+
     @Test fun scoreThresholds_mapToBands() {
         assertEquals(DANGER, decideVerdict(base(totalScore = 55)))      // == dangerThreshold
         assertEquals(SUSPICIOUS, decideVerdict(base(totalScore = 28)))  // == suspiciousThreshold

@@ -103,6 +103,34 @@ object ObfuscatedSignatures {
         "Gzk5PykpMzgzNjMuIx8sPzQudA4DCh8FDBMfDQUOHwIOBRkSGxQdHx4=" to "overlay.text_grab" // encode("AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED")
     )
 
+    /**
+     * "YUMSHOQ" family teglari — bular YAKKA O'ZI DANGER BERMAYDI (obfuscatedSignature ni
+     * yoqmaydi). Sabab (2026-07-09 panelda kuzatilgan ommaviy false-positive):
+     * bu teglar generik Android API/xulq identifikatorlari bo'lib, MILLIONLAB HALOL ilovada
+     * uchraydi:
+     *   • overlay.windowmgr / overlay.type — har qanday overlay ishlatadigan ilovada
+     *     (WindowManager.LayoutParams / TYPE_APPLICATION_OVERLAY) bor.
+     *   • overlay.text_grab — accessibility ishlatadigan ilovalarda.
+     *   • anti.magisk / anti.vpn / anti.frida — bank/o'yin/DRM ilovalari root/frida/VPN'ni
+     *     QONUNIY tekshiradi (Facebook, Instagram, ELSA... shu tufayli "virus" bo'lib qolardi).
+     *   • jetski_family — 6 belgili substring, DEX'ni ISO-8859-1 o'qiganda tasodifan mos keladi.
+     * Ular baribir SCORE'ga hissa qo'shishi va detali sifatida ko'rsatilishi mumkin, lekin
+     * yakuniy DANGER faqat QAT'IY IoC (domen/kalit/bot-nomi hash yoki bot-endpoint) bilan chiqadi.
+     * Sideload malware baribir hard-IoC / dropper / permission-combo / random-pkg bilan ushlanadi.
+     */
+    val SOFT_FAMILIES: Set<String> = setOf(
+        "overlay.windowmgr", "overlay.type", "overlay.text_grab",
+        "anti.magisk", "anti.vpn", "anti.frida",
+        "jetski_family",
+    )
+
+    /**
+     * Family tegi QAT'IY (yakka o'zi DANGER beradigan) IoC'mi? Faqat malware'ga XOS bo'lgan
+     * indikatorlar (aniq C2 domen/kalit hash'lari, bot-nomlar, "/commends" bot-endpoint kabi)
+     * hard hisoblanadi; [SOFT_FAMILIES] generik API markerlaridir.
+     */
+    fun isHardFamily(family: String): Boolean = family !in SOFT_FAMILIES
+
     @Volatile private var decryptedCache: List<Pair<String, String>>? = null
 
     // PERF: matchTokenHashes() bitta DEX uchun o'n minglab token'ni hash qiladi. Avval HAR token

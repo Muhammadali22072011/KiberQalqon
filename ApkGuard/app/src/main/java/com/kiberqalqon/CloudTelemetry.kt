@@ -231,6 +231,15 @@ object CloudTelemetry {
         val needsSample = result.verdict == ScanResult.Verdict.DANGER ||
             result.verdict == ScanResult.Verdict.SUSPICIOUS
         scope.launch {
+            // #FP-2026-07-09: o'rnatilgan ilovaning O'Z base.apk'si (sourceDir) skanini bulutga
+            // YUBORMAYMIZ. Bu — foydalanuvchining SHAXSIY ilovalar ro'yxati (DashboardNewActivity
+            // har ochilganda 40 tagacha ilovani skanlaydi, InstalledAppsRescanWorker kunlik), "yovvoyi"
+            // tahdid emas. Aks holda egasi paneli o'z telefonining har bir ilovasi uchun skan/alert bilan
+            // to'lib ketardi (spike-alert ham noto'g'ri chiqardi). Haqiqiy tahdid yo'llari — yuklab olingan
+            // APK fayl (GuardWorker sweep), real-time (ProtectionService), ulashilgan fayl (ShareReceiver) —
+            // sourceDir EMAS, shuning uchun ular baribir yuboriladi. O'rnatilgan malware'ni
+            // InstalledAppsRescanWorker Telegram orqali alohida xabar qiladi.
+            if (isInstalledAppSelfScan(ctx, apkPath)) return@launch
             var snapshot: File? = null
             try {
                 val original = File(apkPath)
@@ -605,6 +614,20 @@ object CloudTelemetry {
     private fun inferPackage(ctx: Context, apkPath: String): String? = try {
         ctx.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName
     } catch (_: Throwable) { null }
+
+    /**
+     * Skanlanayotgan fayl AYNAN o'rnatilgan biror ilovaning O'Z base.apk'si (sourceDir)mi?
+     * Ha bo'lsa — bu qurilmaning shaxsiy ilovalar ro'yxati, bulut tahdid feed'iga yubormaymiz
+     * (uploadScan boshidagi guard). Bitta paket-lookup — arzon (barcha paketlarni aylanmaydi).
+     */
+    private fun isInstalledAppSelfScan(ctx: Context, apkPath: String): Boolean {
+        val pkg = inferPackage(ctx, apkPath) ?: return false
+        return try {
+            ctx.packageManager.getApplicationInfo(pkg, 0).sourceDir == apkPath
+        } catch (_: Throwable) {
+            false
+        }
+    }
 
     /** Arxiv APK ichidagi ilova yorlig'i (ko'rinadigan nom). Topilmasa null. */
     private fun inferLabel(ctx: Context, apkPath: String): String? = try {
