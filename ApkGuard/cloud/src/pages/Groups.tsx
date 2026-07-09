@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, apiPost, type GroupRow } from '../lib/api';
+import { apiGet, apiPost, type GroupRow, type GroupMember } from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner } from '../components/ui';
 import { agoSafe } from '../lib/format';
 import { useAuth } from '../context/AuthContext';
@@ -117,6 +117,82 @@ function QrModal({ group, onClose }: { group: GroupRow; onClose: () => void }) {
   );
 }
 
+// Guruh a'zolari rostri: kim qo'shilgan (ism/familiya/telefon + qurilma). /api/devices?members=1
+// (v_group_members) dan oladi va shu guruh bo'yicha filtrlaydi. Egasi bu yerda odamlarni ko'radi.
+function MembersModal({ group, onClose }: { group: GroupRow; onClose: () => void }) {
+  const [rows, setRows] = useState<GroupMember[] | null>(null);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    setRows(null); setErr('');
+    apiGet<{ members: GroupMember[] }>('/api/devices?members=1')
+      .then((r) => { if (alive) setRows((r.members || []).filter((m) => m.group_id === group.id)); })
+      .catch((e) => { if (alive) setErr((e as Error).message || 'xato'); });
+    return () => { alive = false; };
+  }, [group.id]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <>
+      <div className="scrim" onClick={onClose} style={{ zIndex: 209 }} />
+      <div
+        style={{
+          position: 'fixed', zIndex: 210, top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+          background: 'var(--surface, #fff)', color: 'var(--ink, #111)', borderRadius: 16, padding: 20,
+          width: 'min(620px, 94vw)', maxHeight: '82vh', overflow: 'auto',
+          boxShadow: '0 24px 60px rgba(0,0,0,.35)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: group.color, display: 'inline-block' }} />
+          <b style={{ fontSize: 17, flex: 1 }}>{group.name} · a‘zolar</b>
+          <button className="btn ghost" onClick={onClose}>✕</button>
+        </div>
+        {err ? (
+          <Empty>{err}</Empty>
+        ) : !rows ? (
+          <Spinner label="Yuklanmoqda…" />
+        ) : !rows.length ? (
+          <Empty>Bu guruhda hali a‘zo yo‘q. Kod {group.join_code} bilan qo‘shilishadi.</Empty>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th className="num">#</th>
+                  <th>Ism</th>
+                  <th>Familiya</th>
+                  <th>Telefon</th>
+                  <th>Qurilma</th>
+                  <th>Faollik</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((m, i) => (
+                  <tr key={m.device_id}>
+                    <td className="num" style={{ color: 'var(--ink-3)' }}>{i + 1}</td>
+                    <td><b>{m.member_first || '—'}</b></td>
+                    <td>{m.member_last || '—'}</td>
+                    <td className="mono">{m.member_phone || '—'}</td>
+                    <td style={{ color: 'var(--ink-2)', fontSize: 12 }}>{m.device_name || '—'}</td>
+                    <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{agoSafe(m.last_seen)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 export default function Groups() {
   const { isOwner } = useAuth();
   const { show } = useToast();
@@ -130,6 +206,7 @@ export default function Groups() {
   const [color, setColor] = useState(PALETTE[0]);
   const [busy, setBusy] = useState(false);
   const [qr, setQr] = useState<GroupRow | null>(null);
+  const [mem, setMem] = useState<GroupRow | null>(null);   // a'zolar rostri ochiq guruh
   const totalDevices = useMemo(() => groups.reduce((s, g) => s + (g.device_count || 0), 0), [groups]);
 
   const create = async () => {
@@ -241,10 +318,11 @@ export default function Groups() {
                       </span>
                     </td>
                     <td className="mono"><b style={{ letterSpacing: 1 }}>{g.join_code}</b></td>
-                    <td className="num">{g.device_count || 0}</td>
+                    <td className="num click" onClick={() => setMem(g)} title="A‘zolarni ko‘rish" style={{ cursor: 'pointer', color: 'var(--primary)', fontWeight: 700 }}>{g.device_count || 0}</td>
                     <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{agoSafe(g.created_at)}</td>
                     <td>
                       <span style={{ display: 'inline-flex', gap: 6 }}>
+                        <button className="btn sm" onClick={() => setMem(g)}>👥 A‘zolar</button>
                         <button className="btn sm" onClick={() => setQr(g)}>QR / kod</button>
                         {isOwner && <button className="btn sm danger" onClick={() => del(g)} disabled={busy}>O‘chirish</button>}
                       </span>
@@ -258,6 +336,7 @@ export default function Groups() {
       </Panel>
 
       {qr && <QrModal group={qr} onClose={() => setQr(null)} />}
+      {mem && <MembersModal group={mem} onClose={() => setMem(null)} />}
     </>
   );
 }
