@@ -98,7 +98,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Alohida funksiya emas (Vercel Hobby 12-funksiya limiti) — stats?audit=1 uslubida branch.
   if (req.method === 'POST') {
     if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
-    const body = (req.body ?? {}) as { action?: string; domain?: unknown; category?: string; severity?: string };
+    const body = (req.body ?? {}) as {
+      action?: string; domain?: unknown; category?: string; severity?: string;
+      apk_hash?: unknown; family?: unknown; review_status?: unknown;
+    };
+
+    // ── #6: tahdid oilasi/kampaniya yorlig'ini belgilash (egasi). Bo'sh → tozalash. ──
+    if (body.action === 'set_family') {
+      const hash = typeof body.apk_hash === 'string' ? body.apk_hash.toLowerCase() : '';
+      if (!/^[a-f0-9]{64}$/.test(hash)) return res.status(400).json({ ok: false, error: 'bad hash' });
+      const family = typeof body.family === 'string' ? body.family.trim().slice(0, 60) : '';
+      const { error } = await db().from('threats').update({ family: family || null }).eq('apk_hash', hash);
+      if (error) { console.error(`[threats] set_family: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'threat_family', `${hash.slice(0, 12)}… → ${family || '(tozalandi)'}`);
+      return res.status(200).json({ ok: true });
+    }
+
+    // ── #5: namuna vardikti — 'confirmed' (feed'da qoladi) / 'dismissed' (feed'dan chiqadi). ──
+    if (body.action === 'set_review') {
+      const hash = typeof body.apk_hash === 'string' ? body.apk_hash.toLowerCase() : '';
+      if (!/^[a-f0-9]{64}$/.test(hash)) return res.status(400).json({ ok: false, error: 'bad hash' });
+      const status = String(body.review_status || '');
+      if (!['pending', 'confirmed', 'dismissed'].includes(status)) return res.status(400).json({ ok: false, error: 'bad status' });
+      const { error } = await db().from('threats').update({ review_status: status }).eq('apk_hash', hash);
+      if (error) { console.error(`[threats] set_review: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'threat_review', `${hash.slice(0, 12)}… → ${status}`);
+      return res.status(200).json({ ok: true });
+    }
+
     const domain = normalizeDomain(body.domain);
     if (!domain) return res.status(400).json({ ok: false, error: 'domen noto\'g\'ri' });
 
@@ -167,7 +194,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Korroboratsiya: kamida MIN_FEED_DEVICES ta HAR XIL qurilmada tasdiqlangan tahdidlar
     // (supabase/11_feed_corroboration.sql dagi RPC). seen_count YARAMAYDI — u har yuklamada
     // oshadi va soxtalashtirilishi mumkin; distinct device_id esa haqiqiy korroboratsiya.
-    type FeedRow = { apk_hash?: string | null; package_name?: string | null; category?: string | null; last_seen?: string | null };
+    // `family` (kampaniya/oila yorlig'i) bo'lsa `f` uchun undan foydalanamiz — mijozda
+    // detektsiya sababi "Ajina.Banker" kabi aniqroq ko'rinadi (yo'q bo'lsa kategoriya).
+    type FeedRow = { apk_hash?: string | null; package_name?: string | null; category?: string | null; family?: string | null; last_seen?: string | null };
     let rows: FeedRow[] = [];
     const rpc = await sb.rpc('corroborated_threats', { min_devices: MIN_FEED_DEVICES });
     if (!rpc.error) {
@@ -178,8 +207,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error(`[threats] corroborated_threats RPC failed, degraded fallback: ${rpc.error.message}`);
       const fb = await sb
         .from('threats')
-        .select('apk_hash, package_name, category, severity, seen_count, last_seen')
+        .select('apk_hash, package_name, category, family, severity, seen_count, review_status, last_seen')
         .in('severity', ['high', 'critical'])
+        .neq('review_status', 'dismissed')   // egasi rad etgan tahdid feed'ga tushmaydi
         .gte('seen_count', MIN_FEED_DEVICES)
         .order('last_seen', { ascending: false })
         .limit(2000);
@@ -187,14 +217,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       rows = (fb.data ?? []) as FeedRow[];
     }
 
+    const feedLabel = (t: FeedRow) => t.family || t.category || 'Cloud.feed';
     const hashes = rows
       .filter((t) => t.apk_hash)
-      .map((t) => ({ h: String(t.apk_hash).toLowerCase(), f: t.category || 'Cloud.feed' }));
+      .map((t) => ({ h: String(t.apk_hash).toLowerCase(), f: feedLabel(t) }));
     // Paketlar: mashhur/o'zimiznikidir paketlarni HECH QACHON feed orqali bloklamaymiz
     // (korroboratsiyalangan zararli hash tasodifan benign paket nomini olib yursa ham).
     const packages = rows
       .filter((t) => t.package_name && !isNeverBlockPackage(String(t.package_name)))
-      .map((t) => ({ p: String(t.package_name).toLowerCase(), f: t.category || 'Cloud.feed' }));
+      .map((t) => ({ p: String(t.package_name).toLowerCase(), f: feedLabel(t) }));
 
     // B1 — domen feed'i (URL/link checker uchun). threat_domains jadvalidan high/critical
     // yozuvlar. Allowlist (gov.uz/bank) chiqarib tashlanadi. FAIL-SOFT: jadval yo'q bo'lsa
@@ -255,7 +286,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ===== Panel uchun to'liq ko'rinish (avvalgidek) =====
   const { data, error } = await sb
     .from('threats')
-    .select('apk_hash, package_name, app_label, category, severity, seen_count, first_seen, last_seen, notes')
+    .select('apk_hash, package_name, app_label, category, family, review_status, severity, seen_count, first_seen, last_seen, notes')
     .order('last_seen', { ascending: false })
     .limit(100);
 

@@ -130,7 +130,13 @@ export interface ThreatFamily {
   apk_hash: string; package_name?: string | null; app_label?: string | null;
   category?: string | null; severity?: string | null; seen_count?: number;
   first_seen?: string; last_seen?: string;
+  family?: string | null;        // #6: egasi qo'ygan kampaniya/oila yorlig'i
+  review_status?: string | null; // #5: 'pending' | 'confirmed' | 'dismissed'
   sample_url?: string | null; // APK namunasini yuklab olish uchun imzolangan URL (bor bo'lsa)
+}
+// #3: paneldan qurilmaga yuborilgan buyruq (device drilldown holati uchun).
+export interface DeviceCommand {
+  id: number; type: string; status: string; created_at?: string; delivered_at?: string | null;
 }
 export interface DeviceRow {
   id: string; name?: string | null; android_ver?: string | null; app_ver?: string | null;
@@ -156,4 +162,12 @@ export interface ThreatDomain {
 }
 export interface AppUpdateInfo {
   versionCode: number; apkUrl: string; apkSha256: string;
+}
+// Kunlik trend (stats?series=1) — Overview grafiklari uchun.
+export interface DayPoint {
+  day: string; total: number; danger: number; suspicious: number; safe: number;
+}
+// Tizim salomatligi kartasi (stats?series=1 bilan birga keladi).
+export interface SystemHealth {
+  db_ok: boolean; last_scan_at: string | null; last_device_seen: string | null;
 }

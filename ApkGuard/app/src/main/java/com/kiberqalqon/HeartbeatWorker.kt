@@ -45,6 +45,10 @@ class HeartbeatWorker(
             val uptimeMin = SystemClock.elapsedRealtime() / 1000 / 60
             TelemetryReporter.reportHeartbeat(ctx, battery, freeMb, uptimeMin)
 
+            // #3: fon yo'lida masofaviy buyruqlarni (paneldan "qayta skan") tekshiramiz.
+            // Ilova ochilganda ham tekshiriladi (App.onCreate) — bu passiv, ~6 soatlik yo'l.
+            try { CloudTelemetry.pollCommands(ctx) } catch (e: Throwable) { Log.w(TAG, "pollCommands", e) }
+
             // Pri kriticheski malen'kom storage — otdel'nyj warn.
             if (freeMb in 1..500) {
                 TelemetryReporter.reportStorageWarn(ctx, freeMb)

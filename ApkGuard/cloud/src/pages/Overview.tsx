@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, type FeedItem, type ScanPerf, type Stats, type ThreatFamily } from '../lib/api';
+import { apiGet, type DayPoint, type FeedItem, type ScanPerf, type Stats, type SystemHealth, type ThreatFamily } from '../lib/api';
 import { Empty, Kpi, LivePill, Panel, PanelHead, ScannerAnatomy, Spinner, VerdictBadge } from '../components/ui';
 import NewsCarousel from '../components/NewsCarousel';
 import { agoSafe, catUz, SEV_COLOR, VERDICT_DOT } from '../lib/format';
@@ -12,13 +12,72 @@ import { agoSafe, catUz, SEV_COLOR, VERDICT_DOT } from '../lib/format';
 const VT_UPLOAD_KBPS = 500;   // taxminiy yuklash tezligi (KB/s)
 const VT_QUEUE_MS = 8000;     // VirusTotal navbat + tahlil (taxminiy, ms)
 
+// ── 14 kunlik trend grafigi (SVG, panel uslubida — chart-kutubxonasiz) ──────────
+// Jami skanlar (to'ldirilgan chiziq) ustiga xavfli/shubhali chiziqlari. Chart-libga
+// bog'lanmaymiz (bundle + CSP): qo'lda SVG, mavjud gauge/EKG uslubiga mos.
+function niceMax(m: number): number {
+  if (m <= 1) return 1;
+  const pow = Math.pow(10, Math.floor(Math.log10(m)));
+  return Math.ceil(m / pow) * pow || 1;
+}
+function TrendChart({ days }: { days: DayPoint[] }) {
+  const W = 700, H = 190, padL = 34, padR = 12, padT = 14, padB = 26;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  const top = niceMax(Math.max(1, ...days.map((d) => d.total)));
+  const x = (i: number) => padL + (days.length <= 1 ? iw / 2 : (i / (days.length - 1)) * iw);
+  const y = (v: number) => padT + ih - (v / top) * ih;
+  const poly = (sel: (d: DayPoint) => number) =>
+    days.map((d, i) => `${x(i).toFixed(1)},${y(sel(d)).toFixed(1)}`).join(' ');
+  const baseY = (padT + ih).toFixed(1);
+  const area = `${x(0).toFixed(1)},${baseY} ${poly((d) => d.total)} ${x(days.length - 1).toFixed(1)},${baseY}`;
+  const grid = [0, 0.5, 1].map((f) => ({ v: Math.round(top * f), yy: padT + ih - f * ih }));
+  const every = Math.max(1, Math.ceil(days.length / 7));
+  return (
+    <svg className="trend-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="14 kunlik skan trendi">
+      <defs>
+        <linearGradient id="tg-area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--primary)" stopOpacity="0.26" />
+          <stop offset="1" stopColor="var(--primary)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {grid.map((g, i) => (
+        <g key={i}>
+          <line x1={padL} y1={g.yy} x2={W - padR} y2={g.yy} stroke="var(--hair)" strokeWidth="1" />
+          <text x={padL - 6} y={g.yy + 3} textAnchor="end" className="trend-tick">{g.v}</text>
+        </g>
+      ))}
+      <polygon points={area} fill="url(#tg-area)" />
+      <polyline points={poly((d) => d.total)} fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+      <polyline points={poly((d) => d.suspicious)} fill="none" stroke="#DF8A18" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
+      <polyline points={poly((d) => d.danger)} fill="none" stroke="#E0432F" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" />
+      {days.map((d, i) => (i % every === 0 || i === days.length - 1) ? (
+        <text key={i} x={x(i)} y={H - 8} textAnchor="middle" className="trend-tick">{d.day.slice(5)}</text>
+      ) : null)}
+    </svg>
+  );
+}
+
+function HealthStrip({ h }: { h?: SystemHealth }) {
+  return (
+    <div className="health-strip">
+      <span className={'hz' + (h?.db_ok ? ' ok' : ' bad')}><i />Baza {h ? (h.db_ok ? 'ulangan' : 'uzuq') : '…'}</span>
+      <span className="hz"><small>Oxirgi skan</small>{agoSafe(h?.last_scan_at)}</span>
+      <span className="hz"><small>Oxirgi aloqa</small>{agoSafe(h?.last_device_seen)}</span>
+    </div>
+  );
+}
+
 export default function Overview() {
   const stats = usePoll(() => apiGet<{ stats: Stats }>('/api/stats'), 15000);
   const feed = usePoll(() => apiGet<{ feed: FeedItem[] }>('/api/feed'), 8000);
   const threats = usePoll(() => apiGet<{ threats: ThreatFamily[] }>('/api/threats'), 30000);
   const perf = usePoll(() => apiGet<{ perf: ScanPerf }>('/api/stats?perf=1'), 15000);
+  const trend = usePoll(() => apiGet<{ series: DayPoint[]; health: SystemHealth }>('/api/stats?series=1'), 60000);
 
   const [selectedScan, setSelectedScan] = useState<FeedItem | null>(null);
+
+  const days = trend.data?.series || [];
+  const hasTrend = days.some((d) => d.total > 0);
 
   const s = stats.data?.stats || {};
   const p = perf.data?.perf;
@@ -186,6 +245,29 @@ export default function Overview() {
           <div className="gauge-sub">{noHealthData ? "Ma‘lumot yetarli emas" : 'Himoyalanganlik darajasi'}</div>
         </Panel>
       </div>
+
+      {/* ── 14 kunlik trend: skanlar/kun · xavfli · shubhali + tizim salomatligi ── */}
+      <Panel className="gap-top">
+        <PanelHead sub="So‘nggi 14 kun" title="Skan trendi" right={<HealthStrip h={trend.data?.health} />} />
+        <div className="body-pad">
+          {trend.loading && !days.length ? (
+            <Spinner label="Yuklanmoqda…" />
+          ) : trend.error && !days.length ? (
+            <Empty>Trend yuklanmadi — qayta urinilmoqda…</Empty>
+          ) : !hasTrend ? (
+            <Empty>So‘nggi 14 kunda skan qayd etilmagan</Empty>
+          ) : (
+            <>
+              <TrendChart days={days} />
+              <div className="trend-legend">
+                <span><i style={{ background: 'var(--primary)' }} />Jami skanlar</span>
+                <span><i style={{ background: '#DF8A18' }} />Shubhali</span>
+                <span><i style={{ background: '#E0432F' }} />Xavfli</span>
+              </div>
+            </>
+          )}
+        </div>
+      </Panel>
 
       <div className="grid cols-2 gap-top">
         <Panel>

@@ -572,3 +572,64 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
   70%{opacity:.45}
   100%{width:130px;height:130px;opacity:0;box-shadow:0 0 0 0 rgba(224,67,47,0)}
 }
+
+/* ── 14 kunlik trend grafigi (Overview) ── */
+.trend-svg{width:100%;height:auto;display:block;overflow:visible}
+.trend-tick{font-family:var(--mono);font-size:10px;fill:var(--ink-3)}
+.trend-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--ink-2)}
+.trend-legend span{display:inline-flex;align-items:center;gap:7px}
+.trend-legend i{width:12px;height:3px;border-radius:2px;display:inline-block}
+
+/* ── Tizim salomatligi qatori (panel sarlavhasida) ── */
+.health-strip{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.health-strip .hz{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);white-space:nowrap}
+.health-strip .hz small{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.health-strip .hz i{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.health-strip .hz.ok i{background:var(--ok);box-shadow:0 0 0 3px var(--ok-dim)}
+.health-strip .hz.bad i{background:var(--danger);box-shadow:0 0 0 3px var(--danger-bg)}
+@media(max-width:640px){.health-strip{gap:10px}.health-strip .hz small{display:none}}
+
+/* ── Ro'yxat filtri qatori (Qurilmalar / Tahdidlar qidiruv+filtr) ── */
+.list-filter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.list-filter input,.list-filter select{height:36px}
+.list-filter input.search{flex:1 1 220px;min-width:160px}
+.list-filter .lf-count{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+@media(max-width:640px){.list-filter .lf-count{margin-left:0}}
+
+/* ── Versiyalar taqsimoti (Qurilmalar) ── */
+.ver-row{display:grid;grid-template-columns:96px 1fr 48px;align-items:center;gap:10px;padding:5px 0}
+.ver-row .vr-name{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.ver-row .vr-cnt{font-family:var(--mono);font-size:12px;color:var(--ink-3);text-align:right}
+
+/* ── Ko'p domen import (Tahdidlar → domen qora ro'yxati) ── */
+.bulk-import{margin-top:6px;border-top:1px solid var(--hair);padding-top:10px}
+.bulk-import summary{cursor:pointer;font-size:12px;color:var(--primary);font-weight:600;user-select:none}
+.bulk-import summary:hover{text-decoration:underline}
+.bulk-hint{font-size:12px;color:var(--ink-3);margin:8px 0}
+.bulk-ta{width:100%;resize:vertical;font-family:var(--mono);font-size:12px;line-height:1.6}
+
+/* ── Qurilma tafsiloti: verdict taqsimoti ── */
+.dd-verdicts{display:flex;gap:16px;flex-wrap:wrap;padding:10px 0 2px}
+.dd-verdicts .ddv{font-size:12px;color:var(--ink-2)}
+.dd-verdicts .ddv b{font-family:var(--mono);font-size:15px;margin-right:4px}
+
+/* ── #3 Masofaviy boshqaruv: buyruqlar tarixi (qurilma tafsiloti) ── */
+.dd-cmds{display:flex;flex-direction:column;gap:5px;margin:2px 0 8px}
+.dd-cmd{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-2)}
+.dd-cmd .cmd-st{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid var(--hair)}
+.dd-cmd .cmd-pending{color:var(--warn-ink);border-color:rgba(224,160,64,.3)}
+.dd-cmd .cmd-done{color:var(--ok-ink);border-color:rgba(91,203,138,.3)}
+.dd-cmd .cmd-failed{color:var(--danger-ink);border-color:rgba(226,90,74,.3)}
+
+/* ── #5 Namuna navbati (Tahdidlar → ko'rib chiqish) ── */
+.rq-row{display:grid;grid-template-columns:1fr 180px auto;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--hair)}
+.rq-row:first-of-type{border-top:none}
+.rq-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rq-main b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rq-main .mono{font-size:11px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rq-fam{height:32px;font-size:12px}
+.rq-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:720px){.rq-row{grid-template-columns:1fr}.rq-btns{justify-content:flex-start}}
+
+/* ── #10 Xarita issiqlik tugmasi (yoniq holat) ── */
+.btn.ghost.sm.on{background:var(--danger-bg);color:var(--danger-ink);border-color:rgba(226,90,74,.4)}

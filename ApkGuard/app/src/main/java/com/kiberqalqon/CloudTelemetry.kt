@@ -166,6 +166,56 @@ object CloudTelemetry {
     }
 
     /**
+     * #3: Paneldan (EGASI) yuborilgan masofaviy buyruqlarni oladi va bajaradi.
+     * At-most-once: server poll paytida buyruqni 'done' ga o'tkazadi (qayta kelmaydi →
+     * masofaviy "rescan" cheksiz sikl yaratmaydi). Chaqiriladi: App.onCreate (ilova
+     * ochilganda DARHOL) + HeartbeatWorker (fon, ~6 soatgacha). ALOHIDA tez-tez tsikl
+     * QO'SHILMAYDI — batareya/isish regressi bo'lmasin (loyiha isish tarixiga sezgir).
+     * Hozircha yagona tur: "rescan" (to'liq qayta skan → GuardWorker).
+     */
+    fun pollCommands(ctx: Context) {
+        if (!enabled(ctx)) return
+        val base = baseUrl() ?: return
+        val secret = deviceSecret() ?: return
+        val token = deviceToken(ctx)
+        scope.launch {
+            try {
+                val req = Request.Builder()
+                    .url("$base/api/device/poll")
+                    .header("x-device-secret", secret)
+                    .header("x-device-token", token)
+                    .get()
+                    .build()
+                val body = client.newCall(req).execute().use { resp ->
+                    if (!resp.isSuccessful) return@launch
+                    resp.body?.string().orEmpty()
+                }
+                val root = try { JSONObject(body) } catch (_: Throwable) { return@launch }
+                if (!root.optBoolean("ok", false)) return@launch
+                val arr = root.optJSONArray("commands") ?: return@launch
+                var rescan = false
+                for (i in 0 until arr.length()) {
+                    when (arr.optJSONObject(i)?.optString("type")) {
+                        "rescan" -> rescan = true
+                        else -> { /* noma'lum tur — e'tiborsiz (kelajakdagi turlar) */ }
+                    }
+                }
+                if (rescan) {
+                    // Unique work — bir nechta rescan buyrug'i kelsa ham bitta skan navbatga tushadi.
+                    androidx.work.WorkManager.getInstance(ctx).enqueueUniqueWork(
+                        "remote_rescan",
+                        androidx.work.ExistingWorkPolicy.KEEP,
+                        androidx.work.OneTimeWorkRequestBuilder<GuardWorker>().build(),
+                    )
+                    Log.i(TAG, "masofaviy qayta skan navbatga qo'yildi")
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "pollCommands failed", e)
+            }
+        }
+    }
+
+    /**
      * Skan natijasini cloudga yuboradi. finalizeResult ichidan HAR BIR skan uchun
      * chaqiriladi (SAFE ham!) — panel "jami skan"ni va xaritadagi yashil nuqtalarni
      * shundan biladi. Tarmoq ishi fonda (IO), skan oqimini bloklamaydi.

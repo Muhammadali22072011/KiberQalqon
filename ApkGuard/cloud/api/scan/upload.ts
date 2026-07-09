@@ -211,6 +211,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
   }
 
+  // #9: DANGER "to'lqini" — qisqa oynada ko'p xavfli topilsa, egaga per-threat alertdan
+  // TASHQARI alohida agregat ogohlantirish (kampaniya boshlanganini bir qarashda ko'rsatadi).
+  // alert_state (migratsiya 16) bilan throttle qilinadi — spam bo'lmaydi. Fail-soft: xato →
+  // faqat log, yuklash natijasiga ta'sir qilmaydi.
+  if (b.verdict === 'danger') {
+    try {
+      const WIN_MIN = Number(process.env.SPIKE_WINDOW_MIN) || 15;
+      const MIN_CNT = Number(process.env.SPIKE_MIN) || 5;
+      const THROTTLE_MIN = Number(process.env.SPIKE_THROTTLE_MIN) || 30;
+      const since = new Date(Date.now() - WIN_MIN * 60000).toISOString();
+      const { count } = await sb
+        .from('scans')
+        .select('*', { count: 'exact', head: true })
+        .eq('verdict', 'danger')
+        .gte('scanned_at', since);
+      const n = count ?? 0;
+      if (n >= MIN_CNT) {
+        const { data: st } = await sb.from('alert_state').select('last_at').eq('key', 'danger_spike').maybeSingle();
+        const lastMs = st?.last_at ? new Date(st.last_at).getTime() : 0;
+        if (Date.now() - lastMs > THROTTLE_MIN * 60000) {
+          // Avval throttle'ni yangilaymiz (yuborish sekin bo'lsa ham ikkinchi so'rov spam qilmasin).
+          await sb.from('alert_state').upsert({ key: 'danger_spike', last_at: new Date().toISOString() }, { onConflict: 'key' });
+          const text = `🚨 *Tahdid to'lqini*\nOxirgi ${WIN_MIN} daqiqada *${n} ta* xavfli aniqlandi — odatdagidan ko'p.\nPanel orqali tekshiring.`;
+          const admins = adminChatIds();
+          await Promise.all(admins.map((chatId) => sendMessage(chatId, text, { parseMode: 'Markdown' })));
+        }
+      }
+    } catch (e) {
+      console.error(`[upload] spike check failed: ${(e as Error).message}`);
+    }
+  }
+
   return res.status(200).json({ ok: true, scan_id: scan?.id, sample_upload: sampleUpload });
 }
 

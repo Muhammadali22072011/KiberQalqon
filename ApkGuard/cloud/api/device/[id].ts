@@ -1,9 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
-import { canRead } from '../../lib/auth.js';
+import { canRead, checkAdminSecret, checkDeviceSecret } from '../../lib/auth.js';
 import { verifyDeviceWrite, issueDeviceToken } from '../../lib/devauth.js';
 import { readRaw } from '../../lib/rawbody.js';
 import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
+import { audit } from '../../lib/audit.js';
+
+const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+// Panelddan qurilmaga yuboriladigan buyruq turlari (hozircha faqat masofadan qayta skan).
+const ALLOWED_CMD_TYPES = ['rescan'];
 
 // register XOM tanani o'qiydi (imzo tekshiruvi uchun). GET'da tana yo'q — ta'sir qilmaydi.
 export const config = { api: { bodyParser: false } };
@@ -15,6 +20,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const id = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
 
   if (id === 'register') return handleRegister(req, res);
+  if (id === 'join') return handleJoin(req, res);          // qurilma guruhga qo'shiladi (device auth)
+  if (id === 'poll') return handlePoll(req, res);          // #3: qurilma o'z buyruqlarini oladi (device auth)
+
+  // #3: paneldan buyruq qo'yish — POST /api/device/<uuid> {type,payload} (FAQAT EGASI).
+  if (req.method === 'POST') return handleEnqueue(req, res, id);
 
   // --- /api/device/<uuid> — bitta qurilma + oxirgi skanlari (panel foydalanuvchisi) ---
   // Kalit sifatida device id (uuid). device_token (yozuv kaliti) panelga ochilmaydi.
@@ -27,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
   // Kanonik UUID (avval bo'sh `[0-9a-fA-F-]{36}` har qanday 36-belgi-aralashmasini qabul qilardi).
-  if (!id || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id)) {
+  if (!id || !UUID_RE.test(id)) {
     return res.status(400).json({ ok: false, error: 'bad id' });
   }
 
@@ -51,7 +61,156 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .limit(20);
   if (sErr) { console.error(`[device] scans db error: ${sErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
 
-  return res.status(200).json({ ok: true, device, scans: scans ?? [] });
+  // #3: shu qurilmaga yuborilgan oxirgi buyruqlar (panel holatini ko'rsatish uchun).
+  const { data: cmds } = await sb
+    .from('device_commands')
+    .select('id, type, status, created_at, delivered_at')
+    .eq('device_id', id)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  return res.status(200).json({ ok: true, device, scans: scans ?? [], commands: cmds ?? [] });
+}
+
+// --- #3: /api/device/poll — qurilma o'z pending buyruqlarini oladi (device auth) ---
+// At-most-once: poll paytida buyruqlar 'done' ga o'tkaziladi (qayta yetkazilmaydi →
+// masofaviy "rescan" cheksiz sikl yaratmaydi). Auth: x-device-secret (o'qish yo'li,
+// config/feed kabi) + x-device-token bilan qaysi qurilma ekani aniqlanadi.
+async function handlePoll(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
+  if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+  const dtok = req.headers['x-device-token'];
+  if (typeof dtok !== 'string' || dtok.length < 16 || dtok.length > 256) {
+    return res.status(400).json({ ok: false, error: 'bad token' });
+  }
+
+  const sb = db();
+  const { data: dev, error: dErr } = await sb.from('devices').select('id').eq('device_token', dtok).maybeSingle();
+  if (dErr) { console.error(`[device] poll device lookup: ${dErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+  res.setHeader('Cache-Control', 'no-store');
+  if (!dev) return res.status(200).json({ ok: true, commands: [] }); // noma'lum token — bo'sh (xato bermaymiz)
+
+  const { data: cmds, error: cErr } = await sb
+    .from('device_commands')
+    .select('id, type, payload')
+    .eq('device_id', dev.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+    .limit(20);
+  if (cErr) { console.error(`[device] poll commands: ${cErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+  const list = (cmds ?? []) as Array<{ id: number; type: string; payload: unknown }>;
+  if (list.length) {
+    const ids = list.map((c) => c.id);
+    const { error: uErr } = await sb
+      .from('device_commands')
+      .update({ status: 'done', delivered_at: new Date().toISOString() })
+      .in('id', ids);
+    if (uErr) console.error(`[device] poll mark done: ${uErr.message}`); // yetkazildi deb belgilay olmadik — keyingi pollda qayta keladi
+  }
+  return res.status(200).json({ ok: true, commands: list.map((c) => ({ id: c.id, type: c.type, payload: c.payload })) });
+}
+
+// --- #3: paneldan buyruq qo'yish (FAQAT EGASI) — POST /api/device/<uuid> {type,payload} ---
+async function handleEnqueue(req: VercelRequest, res: VercelResponse, id?: string) {
+  if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
+  if (!id || !UUID_RE.test(id)) return res.status(400).json({ ok: false, error: 'bad id' });
+  // bodyParser o'chirilgan (config.api.bodyParser=false) → xom tanani o'zimiz o'qiymiz.
+  const raw = await readRaw(req);
+  let b: { type?: string; payload?: unknown };
+  try { b = JSON.parse(raw || '{}'); } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
+  const type = String(b.type || '');
+  if (!ALLOWED_CMD_TYPES.includes(type)) return res.status(400).json({ ok: false, error: 'bad type' });
+
+  const sb = db();
+  const { data: dev, error: dErr } = await sb.from('devices').select('id').eq('id', id).maybeSingle();
+  if (dErr) { console.error(`[device] enqueue lookup: ${dErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+  if (!dev) return res.status(404).json({ ok: false, error: 'not found' });
+
+  const payload = (b.payload && typeof b.payload === 'object') ? b.payload : {};
+  const { data, error } = await sb
+    .from('device_commands')
+    .insert({ device_id: id, type, payload, created_by: 'owner' })
+    .select('id, type, status, created_at')
+    .single();
+  if (error) { console.error(`[device] enqueue insert: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+  await audit(req, 'device_command', `${type} → ${id.slice(0, 8)}…`);
+  return res.status(200).json({ ok: true, command: data });
+}
+
+// --- /api/device/join — qurilma GURUHga qo'shiladi (x-device-secret + HMAC) ---
+// Body: { device_token, code, first, last, phone }. Kod → device_groups.join_code (katta
+// harfga normallashtiriladi). A'zo ism/familiya/telefon — foydalanuvchi O'ZI kiritadi
+// (ilova formasi "guruh egasiga ko'rinadi" deb ogohlantiradi). Register YO'Q qurilma bo'lsa
+// ham ishlaydi (upsert onConflict device_token — group_id + a'zo maydonlarini yozadi).
+type JoinBody = { device_token?: string; code?: string; first?: string; last?: string; phone?: string };
+
+function trimField(v: unknown, max: number): string {
+  return typeof v === 'string' ? v.trim().replace(/\s+/g, ' ').slice(0, max) : '';
+}
+// Telefon — faqat + (boshida) va raqamlar. Kamida 7 raqam bo'lsin (aks holda yaroqsiz).
+function normPhone(v: unknown): string {
+  if (typeof v !== 'string') return '';
+  let p = v.trim().replace(/[^\d+]/g, '');
+  if (p.indexOf('+') > 0) p = p.replace(/\+/g, '');       // + faqat boshida
+  const digits = p.replace(/\D/g, '');
+  if (digits.length < 7 || digits.length > 15) return '';
+  return p.slice(0, 20);
+}
+
+async function handleJoin(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
+  const rawBody = await readRaw(req);
+  // Register bilan bir xil yozuv-darvozasi: per-device HMAC imzo YOKI (o'tish davri) x-device-secret.
+  if (!(await verifyDeviceWrite(req, rawBody, 'device/join'))) {
+    return res.status(401).json({ ok: false, error: 'auth' });
+  }
+  let b: JoinBody;
+  try { b = JSON.parse(rawBody || '{}') as JoinBody; } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
+
+  const token = typeof b.device_token === 'string' ? b.device_token : '';
+  if (token.length < 16) return res.status(400).json({ ok: false, error: 'bad token' });
+  // Imzolangan yo'lda sarlavha token tanaga mos kelishi shart (register bilan bir xil qoida).
+  const hdrTok = req.headers['x-device-token'];
+  if (typeof hdrTok === 'string' && hdrTok.length > 0 && hdrTok !== token) {
+    return res.status(401).json({ ok: false, error: 'token/body mismatch' });
+  }
+
+  const code = trimField(b.code, 16).toUpperCase();
+  if (!code) return res.status(400).json({ ok: false, error: 'code' });
+
+  const first = trimField(b.first, 40);
+  const last = trimField(b.last, 40);
+  const phone = normPhone(b.phone);
+  if (!first || !last || !phone) return res.status(400).json({ ok: false, error: 'fields' });
+
+  const sb = db();
+  const { data: group, error: gErr } = await sb
+    .from('device_groups')
+    .select('id, name, color')
+    .eq('join_code', code)
+    .maybeSingle();
+  if (gErr) { console.error(`[join] group lookup: ${gErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+  if (!group) return res.status(200).json({ ok: false, error: 'code' });   // kod topilmadi — ilova "Kod noto'g'ri" ko'rsatadi
+
+  // Register bo'lmagan qurilma ham qo'shila olsin — upsert onConflict device_token.
+  // Faqat guruh + a'zo maydonlarini yozamiz (geo/nom register'da yoziladi).
+  const { error: uErr } = await sb
+    .from('devices')
+    .upsert(
+      {
+        device_token: token,
+        group_id: group.id,
+        member_first: first,
+        member_last: last,
+        member_phone: phone,
+        last_seen: new Date().toISOString(),
+      },
+      { onConflict: 'device_token' },
+    );
+  if (uErr) { console.error(`[join] device upsert: ${uErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+  return res.status(200).json({ ok: true, group: { name: group.name, color: group.color } });
 }
 
 // --- /api/device/register — qurilma o'zini ro'yxatdan o'tkazadi (x-device-secret) ---

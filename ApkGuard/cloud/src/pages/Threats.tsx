@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
 import { apiGet, apiPost, type ThreatDomain, type ThreatFamily } from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner, Tag } from '../components/ui';
@@ -25,6 +25,8 @@ function DomainsPanel() {
   const [domain, setDomain] = useState('');
   const [severity, setSeverity] = useState('high');
   const [busy, setBusy] = useState(false);
+  const [bulk, setBulk] = useState('');
+  const [bulkBusy, setBulkBusy] = useState(false);
   const rows = data?.domains || [];
 
   const add = async () => {
@@ -41,6 +43,29 @@ function DomainsPanel() {
     } finally {
       setBusy(false);
     }
+  };
+
+  // Ko'p domenni bir vaqtda import (IOC ro'yxati). Bo'sh joy/vergul/qator bo'yicha ajratamiz,
+  // protokol/yo'lni olib tashlaymiz, dublikatni yig'amiz. Server har birini alohida validatsiya
+  // qiladi (bank/gov allowlist, ommaviy-suffiks gate) — o'tmaganlarni sanaymiz.
+  const importBulk = async () => {
+    if (bulkBusy) return;
+    const uniq = [...new Set(
+      bulk.split(/[\s,;]+/)
+        .map((s) => s.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''))
+        .filter(Boolean),
+    )];
+    if (!uniq.length) { show('Domen topilmadi'); return; }
+    setBulkBusy(true);
+    let ok = 0; let fail = 0;
+    for (const d of uniq) {
+      try { await apiPost('/api/threats', { action: 'add_domain', domain: d, severity }); ok += 1; }
+      catch { fail += 1; }
+    }
+    setBulk('');
+    show(`${ok} ta bloklandi${fail ? `, ${fail} ta o‘tmadi (bank/gov yoki noto‘g‘ri)` : ''} — telefonlarga tarqaladi`);
+    reload();
+    setBulkBusy(false);
   };
 
   const del = async (d: string) => {
@@ -84,6 +109,22 @@ function DomainsPanel() {
               {busy ? <span className="spinner" /> : '+ Bloklash'}
             </button>
           </div>
+        )}
+        {isOwner && (
+          <details className="bulk-import">
+            <summary>Ko‘p domen import (IOC ro‘yxati)</summary>
+            <p className="bulk-hint">Har qatorga bitta domen (yoki vergul/probel bilan). Tanlangan daraja: <b>{severity === 'critical' ? 'Kritik' : 'Yuqori'}</b>. Bank/gov domenlari avtomatik rad etiladi.</p>
+            <textarea
+              className="bulk-ta"
+              placeholder={'payme-bonus.top\nclick-pul.xyz\nuzcard-aksiya.online'}
+              value={bulk}
+              onChange={(e) => setBulk(e.target.value)}
+              rows={5}
+            />
+            <button className="btn" onClick={importBulk} disabled={bulkBusy || !bulk.trim()} style={{ marginTop: 8 }}>
+              {bulkBusy ? <span className="spinner" /> : '⬆ Hammasini bloklash'}
+            </button>
+          </details>
         )}
         {loading && !rows.length ? (
           <Spinner label="Yuklanmoqda…" />
@@ -132,12 +173,77 @@ function DomainsPanel() {
   );
 }
 
+/**
+ * #5 Namuna navbati (egasi): korroboratsiyalangan yuqori/kritik tahdidlarni ko'rib chiqish.
+ * "Tasdiqlash" — feed'da qoladi; "Rad etish" — imzolangan feed'dan chiqariladi (noto'g'ri
+ * topilgan bo'lsa butun parkni bloklab qo'ymaslik uchun). "Oila" — kampaniya yorlig'i (#6).
+ */
+function ReviewQueue({ items, onChanged }: { items: ThreatFamily[]; onChanged: () => void }) {
+  const { show } = useToast();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [fam, setFam] = useState<Record<string, string>>({});
+  const pending = items.filter((t) =>
+    (t.review_status == null || t.review_status === 'pending') &&
+    ['high', 'critical'].includes(t.severity || ''));
+  if (!pending.length) return null;
+
+  const act = async (hash: string, body: Record<string, unknown>, okMsg: string) => {
+    setBusy(hash);
+    try { await apiPost('/api/threats', body); show(okMsg); onChanged(); }
+    catch (e) { show(`Xato: ${(e as Error).message}`); }
+    finally { setBusy(null); }
+  };
+
+  return (
+    <Panel className="gap-top">
+      <PanelHead sub="Ko‘rib chiqish · egasi" title={`Namuna navbati (${pending.length})`} />
+      <div className="body-pad">
+        <p className="bulk-hint">Yangi topilgan yuqori/kritik tahdidlar. <b>Tasdiqlash</b> — feed‘da qoladi; <b>Rad etish</b> — imzolangan feed‘dan chiqariladi.</p>
+        {pending.map((t) => (
+          <div className="rq-row" key={t.apk_hash}>
+            <div className="rq-main">
+              <b>{t.app_label || t.package_name || '—'}</b>
+              <span className="mono">{(t.package_name || t.apk_hash.slice(0, 16)) + ' · ' + (t.seen_count || 0) + '×'}</span>
+            </div>
+            <input
+              className="rq-fam"
+              placeholder="Oila (Ajina.Banker…)"
+              defaultValue={t.family || ''}
+              onChange={(e) => setFam((m) => ({ ...m, [t.apk_hash]: e.target.value }))}
+            />
+            <div className="rq-btns">
+              <button className="btn sm ghost" disabled={busy === t.apk_hash}
+                onClick={() => act(t.apk_hash, { action: 'set_family', apk_hash: t.apk_hash, family: fam[t.apk_hash] ?? t.family ?? '' }, 'Oila belgilandi')}>Oila</button>
+              <button className="btn sm" disabled={busy === t.apk_hash}
+                onClick={() => act(t.apk_hash, { action: 'set_review', apk_hash: t.apk_hash, review_status: 'confirmed' }, 'Tasdiqlandi')}>Tasdiqlash</button>
+              <button className="btn sm danger" disabled={busy === t.apk_hash}
+                onClick={() => act(t.apk_hash, { action: 'set_review', apk_hash: t.apk_hash, review_status: 'dismissed' }, 'Rad etildi — feed‘dan chiqarildi')}>Rad etish</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
 export default function Threats() {
-  const { data, loading, error } = usePoll(() => apiGet<{ threats: ThreatFamily[] }>('/api/threats'), 20000);
+  const { isOwner } = useAuth();
+  const { data, loading, error, reload } = usePoll(() => apiGet<{ threats: ThreatFamily[] }>('/api/threats'), 20000);
   const list = data?.threats || [];
   const sorted = [...list].sort((a, b) => (b.seen_count || 0) - (a.seen_count || 0));
   const top = sorted.slice(0, 8);
   const max = Math.max(1, ...top.map((t) => t.seen_count || 0));
+
+  const [q, setQ] = useState('');
+  const [sev, setSev] = useState('');
+  const shown = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return sorted.filter((t) => {
+      if (sev && (t.severity || 'low') !== sev) return false;
+      if (!needle) return true;
+      return [t.app_label, t.package_name, t.category, t.family].filter(Boolean).join(' ').toLowerCase().includes(needle);
+    });
+  }, [sorted, q, sev]);
 
   return (
     <>
@@ -145,6 +251,8 @@ export default function Threats() {
         <h1>Eng faol tahdidlar</h1>
         <p>Aniqlangan zararli ilovalar oilalari — necha marta uchragani, toifasi va xavf darajasi bo‘yicha.</p>
       </div>
+
+      {isOwner && <ReviewQueue items={list} onChanged={reload} />}
 
       <div className="grid map-grid">
         <Panel>
@@ -206,6 +314,24 @@ export default function Threats() {
 
       <Panel className="gap-top">
         <PanelHead sub="To‘liq ro‘yxat" title={`${list.length} ta tahdid oilasi`} />
+        <div className="body-pad" style={{ paddingBottom: 0 }}>
+          <div className="list-filter">
+            <input
+              className="search"
+              placeholder="Qidirish: ilova yoki paket nomi…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            <select value={sev} onChange={(e) => setSev(e.target.value)} style={{ width: 140 }}>
+              <option value="">Barcha daraja</option>
+              <option value="critical">Kritik</option>
+              <option value="high">Yuqori</option>
+              <option value="medium">O‘rta</option>
+              <option value="low">Past</option>
+            </select>
+            {(q || sev) && <span className="lf-count">{shown.length} / {list.length}</span>}
+          </div>
+        </div>
         <div style={{ overflowX: 'auto' }}>
           <table>
             <thead>
@@ -225,10 +351,16 @@ export default function Threats() {
                 <tr><td colSpan={8}><Empty>Yuklab bo‘lmadi: {error}</Empty></td></tr>
               ) : !sorted.length ? (
                 <tr><td colSpan={8}><Empty /></td></tr>
+              ) : !shown.length ? (
+                <tr><td colSpan={8}><Empty>Filtrga mos tahdid topilmadi</Empty></td></tr>
               ) : (
-                sorted.map((t) => (
+                shown.map((t) => (
                   <tr key={t.apk_hash}>
-                    <td><b>{t.app_label || '—'}</b></td>
+                    <td>
+                      <b>{t.app_label || '—'}</b>
+                      {t.family && <><br /><Tag kind="comp">{t.family}</Tag></>}
+                      {t.review_status === 'dismissed' && <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--ink-3)' }}>· rad etilgan</span>}
+                    </td>
                     <td className="mono" style={{ color: 'var(--ink-3)', fontSize: 12 }}>{t.package_name || '—'}</td>
                     <td><Tag kind="comp">{catUz(t.category)}</Tag></td>
                     <td>

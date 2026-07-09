@@ -185,6 +185,9 @@ class App : android.app.Application() {
             // sozlanmagan/rozilik berilmagan bo'lsa shartsiz no-op.
             try {
                 CloudTelemetry.registerDevice(this@App)
+                // #3: ilova ochilishi = masofaviy buyruqlarni (masofadan qayta skan) DARHOL
+                // olish imkoniyati. Fon yo'li — HeartbeatWorker (~6 soat). Alohida tez tsikl yo'q.
+                CloudTelemetry.pollCommands(this@App)
             } catch (e: Exception) {
                 Log.e("UzGuard", "Cloud register failed", e)
             }

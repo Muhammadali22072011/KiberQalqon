@@ -1,23 +1,55 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, type DeviceRow, type ScanRow } from '../lib/api';
+import { apiGet, apiPost, type DeviceCommand, type DeviceRow, type ScanRow } from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner, VerdictBadge } from '../components/ui';
 import { agoSafe, catUz, riskColor, uzDateSafe } from '../lib/format';
 import { nearestCity } from '../lib/uzRegions';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../components/Toast';
+
+const CMD_STATUS_UZ: Record<string, string> = { pending: 'navbatda', done: 'yetkazildi', failed: 'xato' };
+
+const VERDICT_FILTERS: Array<{ k: string; label: string }> = [
+  { k: '', label: 'Barchasi' },
+  { k: 'danger', label: 'Xavfli' },
+  { k: 'suspicious', label: 'Shubhali' },
+  { k: 'safe', label: 'Xavfsiz' },
+];
 
 function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
+  const { isOwner } = useAuth();
+  const { show } = useToast();
   const [dev, setDev] = useState<DeviceRow | null>(null);
   const [scans, setScans] = useState<ScanRow[] | null>(null);
+  const [cmds, setCmds] = useState<DeviceCommand[]>([]);
   const [err, setErr] = useState('');
+  const [sending, setSending] = useState(false);
+  const [nonce, setNonce] = useState(0); // qayta yuklash uchun
 
   useEffect(() => {
     let alive = true;
     setDev(null); setScans(null); setErr('');
-    apiGet<{ device: DeviceRow; scans: ScanRow[] }>(`/api/device/${id}`)
-      .then((r) => { if (alive) { setDev(r.device); setScans(r.scans || []); } })
+    apiGet<{ device: DeviceRow; scans: ScanRow[]; commands?: DeviceCommand[] }>(`/api/device/${id}`)
+      .then((r) => { if (alive) { setDev(r.device); setScans(r.scans || []); setCmds(r.commands || []); } })
       .catch((e) => { if (alive) setErr((e as Error).message || 'xato'); });
     return () => { alive = false; };
-  }, [id]);
+  }, [id, nonce]);
+
+  // #3: masofadan qayta skan buyrug'ini navbatga qo'yamiz. Qurilma keyingi ulanishida
+  // (ilova ochilganda darhol, yoki fon "tirikman" signalida ~6 soatgacha) bajaradi.
+  const sendRescan = async () => {
+    if (sending) return;
+    setSending(true);
+    try {
+      await apiPost(`/api/device/${id}`, { type: 'rescan' });
+      show('Qayta skan navbatga qo‘yildi — qurilma keyingi ulanishida bajaradi');
+      setNonce((n) => n + 1);
+    } catch (e) {
+      show(`Yuborib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <Panel>
@@ -42,7 +74,33 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
               <div><span>Ro‘yxatdan o‘tgan</span><b>{uzDateSafe(dev.created_at)}</b></div>
               <div><span>Oxirgi faollik</span><b>{agoSafe(dev.last_seen)}</b></div>
             </div>
-            <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>So‘nggi skanlar</div>
+            {isOwner && (
+              <>
+                <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>Masofaviy boshqaruv</div>
+                <button className="btn sm" onClick={sendRescan} disabled={sending} style={{ margin: '4px 0 8px' }}>
+                  {sending ? <span className="spinner" /> : '🔄 Masofadan qayta skan'}
+                </button>
+                {cmds.length > 0 && (
+                  <div className="dd-cmds">
+                    {cmds.map((c) => (
+                      <div className="dd-cmd" key={c.id}>
+                        <span>{c.type === 'rescan' ? 'Qayta skan' : c.type}</span>
+                        <span className={'cmd-st cmd-' + c.status}>{CMD_STATUS_UZ[c.status] || c.status}</span>
+                        <span className="mono" style={{ color: 'var(--ink-3)' }}>{agoSafe(c.created_at)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+            {scans.length > 0 && (
+              <div className="dd-verdicts">
+                <span className="ddv" style={{ color: '#E0432F' }}><b>{scans.filter((s) => s.verdict === 'danger').length}</b> xavfli</span>
+                <span className="ddv" style={{ color: '#DF8A18' }}><b>{scans.filter((s) => s.verdict === 'suspicious').length}</b> shubhali</span>
+                <span className="ddv" style={{ color: '#1A9E54' }}><b>{scans.filter((s) => s.verdict === 'safe').length}</b> xavfsiz</span>
+              </div>
+            )}
+            <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>So‘nggi skanlar (oxirgi {scans.length})</div>
             {!scans.length ? (
               <Empty>Skan tarixi yo‘q</Empty>
             ) : (
@@ -68,6 +126,30 @@ export default function Devices() {
   const devices = data?.devices || [];
   const total = data?.total ?? devices.length;
   const [sel, setSel] = useState<string | null>(null);
+  const [q, setQ] = useState('');
+  const [vf, setVf] = useState('');
+
+  // Qidiruv (nom/shahar/IP) + holat filtri — mijoz tomonida (ro'yxat kichik, poll bilan yangilanadi).
+  const shown = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return devices.filter((d) => {
+      if (vf && d.last_verdict !== vf) return false;
+      if (!needle) return true;
+      const hay = [d.name, nearestCity(d.lat, d.lng), d.city, d.ip].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(needle);
+    });
+  }, [devices, q, vf]);
+
+  // Ilova versiyalari taqsimoti (park bo'ylab) — raskatka nazorati uchun (eng ko'p 6 ta).
+  const versions = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of devices) {
+      const v = (d.app_ver || '').trim() || '—';
+      m.set(v, (m.get(v) || 0) + 1);
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  }, [devices]);
+  const verMax = Math.max(1, ...versions.map(([, n]) => n));
 
   return (
     <>
@@ -79,6 +161,20 @@ export default function Devices() {
       <div className={'grid' + (sel ? ' map-grid' : '')}>
         <Panel>
           <PanelHead sub="Ro‘yxat" title={total > devices.length ? `${devices.length} / ${total} ta qurilma` : `${total} ta qurilma`} />
+          <div className="body-pad" style={{ paddingBottom: 0 }}>
+            <div className="list-filter">
+              <input
+                className="search"
+                placeholder="Qidirish: nom, shahar yoki IP…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+              <select value={vf} onChange={(e) => setVf(e.target.value)} style={{ width: 140 }}>
+                {VERDICT_FILTERS.map((f) => <option key={f.k} value={f.k}>{f.label}</option>)}
+              </select>
+              {(q || vf) && <span className="lf-count">{shown.length} / {devices.length}</span>}
+            </div>
+          </div>
           <div style={{ overflowX: 'auto' }}>
             <table>
               <thead>
@@ -99,8 +195,10 @@ export default function Devices() {
                   <tr><td colSpan={7}><Empty>Ma‘lumotni yuklab bo‘lmadi — qayta urinilmoqda…</Empty></td></tr>
                 ) : !devices.length ? (
                   <tr><td colSpan={7}><Empty>Hozircha qurilma yo‘q</Empty></td></tr>
+                ) : !shown.length ? (
+                  <tr><td colSpan={7}><Empty>Filtrga mos qurilma topilmadi</Empty></td></tr>
                 ) : (
-                  devices.map((d) => {
+                  shown.map((d) => {
                     const risk = Math.round(d.risk_score || 0);
                     return (
                       <tr key={d.id} className="click" onClick={() => setSel(d.id)}>
@@ -125,6 +223,23 @@ export default function Devices() {
 
         {sel && <DeviceDetail id={sel} onClose={() => setSel(null)} />}
       </div>
+
+      {versions.length > 0 && (
+        <Panel className="gap-top">
+          <PanelHead sub="Raskatka" title="Ilova versiyalari (parkda)" />
+          <div className="body-pad">
+            {versions.map(([v, n]) => (
+              <div className="ver-row" key={v}>
+                <span className="vr-name">{v}</span>
+                <span className="track">
+                  <i className="fill" style={{ width: `${Math.round((100 * n) / verMax)}%`, background: 'var(--primary)' }} />
+                </span>
+                <span className="vr-cnt">{n}</span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
     </>
   );
 }
