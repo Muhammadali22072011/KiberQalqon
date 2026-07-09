@@ -144,9 +144,9 @@ function MembersModal({ group, onClose }: { group: GroupRow; onClose: () => void
       <div
         style={{
           position: 'fixed', zIndex: 210, top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-          background: 'var(--surface, #fff)', color: 'var(--ink, #111)', borderRadius: 16, padding: 20,
-          width: 'min(620px, 94vw)', maxHeight: '82vh', overflow: 'auto',
-          boxShadow: '0 24px 60px rgba(0,0,0,.35)',
+          background: 'var(--elev)', color: 'var(--ink)', border: '1px solid var(--hair-2)',
+          borderRadius: 16, padding: 20, width: 'min(620px, 94vw)', maxHeight: '82vh', overflow: 'auto',
+          boxShadow: '0 24px 60px rgba(0,0,0,.5)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
