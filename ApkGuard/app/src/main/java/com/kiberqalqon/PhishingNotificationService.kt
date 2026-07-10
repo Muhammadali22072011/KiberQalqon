@@ -18,11 +18,42 @@ class PhishingNotificationService : NotificationListenerService() {
         // OTP/SMS/o'tkazma bildirishnomalari yashirilib qolardi.
         if (AppReputation.isTrusted(sbn.packageName)) return
         val text = notificationText(sbn)
+        // 1) Bildirishnomadagi havolalarni [LinkScanner] orqali tekshiramiz. Telegram in-app
+        //    brauzeri LinkGuard'ni chetlab o'tadi — bu yo'l shu teshikni yopadi: xabar matnidagi
+        //    URL XAVFLI bo'lsa foydalanuvchini ogohlantiramiz (bildirishnomani O'CHIRMAYMIZ —
+        //    bu qonuniy xabar bo'lishi mumkin, faqat havola xavfli).
+        scanLinks(text)
+        // 2) Klassik fishing shakli (havola + moliyaviy kalit so'z) — bildirishnomani yashiramiz.
         if (isPhishingLike(text)) {
             try {
                 cancelNotification(sbn.key)
             } catch (_: Exception) {}
         }
+    }
+
+    /**
+     * Matndan barcha http(s) havolalarni ajratib, har birini [LinkScanner] bilan tekshiradi.
+     * XAVFLI (DANGER) verdikt bo'lsa — bir marta (URL bo'yicha dedup) ogohlantiradi.
+     */
+    private fun scanLinks(text: String) {
+        try {
+            val matcher = URL_PATTERN.matcher(text)
+            var count = 0
+            while (matcher.find() && count < 5) {
+                count++
+                val url = matcher.group().trimEnd('.', ',', ')', ']', '»', '"', '\'')
+                if (url.length < 8) continue
+                val res = LinkScanner.analyze(url)
+                if (res.verdict != ScanResult.Verdict.DANGER) continue
+                val prefs = getSharedPreferences("uzguard_notif_links", MODE_PRIVATE)
+                val key = "warned_${url.hashCode()}"
+                if (prefs.getBoolean(key, false)) continue
+                prefs.edit().putBoolean(key, true).apply()
+                try {
+                    NotificationHelper.showPhishingLinkNotification(this, res.url, res.host)
+                } catch (_: Throwable) {}
+            }
+        } catch (_: Throwable) {}
     }
 
     private fun notificationText(sbn: StatusBarNotification): String {

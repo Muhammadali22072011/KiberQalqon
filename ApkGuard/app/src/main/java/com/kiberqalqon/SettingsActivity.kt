@@ -157,6 +157,20 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_linkguard_sub),
             icon = R.drawable.ic4_link,
         )
+        // QO'SHIMCHA — Wi-Fi straj (ochiq tarmoq ogohlantirishi).
+        bindRow(
+            binding.rowWifiGuard.root,
+            title = getString(R.string.kq4_set_row_wifiguard),
+            sub = getString(R.string.kq4_set_row_wifiguard_sub),
+            icon = R.drawable.ic4_wifi,
+        )
+        // QO'SHIMCHA — Masofaviy boshqaruv ogohlantirgichi (AnyDesk/TeamViewer).
+        bindRow(
+            binding.rowRemoteAccess.root,
+            title = getString(R.string.kq4_set_row_remote),
+            sub = getString(R.string.kq4_set_row_remote_sub),
+            icon = R.drawable.ic4_alert,
+        )
         // QO'SHIMCHA — Ishonchli ro'yxat (UserWhitelist boshqaruvi).
         bindChevronWithSub(
             binding.rowTrustList.root,
@@ -236,6 +250,19 @@ class SettingsActivity : AppCompatActivity() {
         )
         bindChevron(binding.rowPrivacy.root, getString(R.string.privacy_title), R.drawable.ic4_lock)
         bindChevron(binding.rowAdminPanel.root, getString(R.string.kq4_set_row_admin), R.drawable.ic4_key)
+        // Yangi flagman ekranlar — xavfsizlik balli + sideload audit.
+        bindChevronWithSub(
+            binding.rowSecurityScore.root,
+            getString(R.string.kq4_set_row_score),
+            getString(R.string.kq4_set_row_score_sub),
+            R.drawable.ic4_shield_check,
+        )
+        bindChevronWithSub(
+            binding.rowSideloadAudit.root,
+            getString(R.string.kq4_set_row_sideload),
+            getString(R.string.kq4_set_row_sideload_sub),
+            R.drawable.ic4_layers,
+        )
     }
 
     private fun bindChevron(root: View, title: String, icon: Int) {
@@ -268,6 +295,8 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowNewsNotif.root).isChecked = Config.isNewsNotificationEnabled(this)
         toggleOf(binding.rowVpnFilter.root).isChecked = Config.isVpnFilterEnabled(this)
         toggleOf(binding.rowLinkGuard.root).isChecked = Config.isLinkGuardEnabled(this)
+        toggleOf(binding.rowWifiGuard.root).isChecked = Config.isWifiGuardEnabled(this)
+        toggleOf(binding.rowRemoteAccess.root).isChecked = Config.isRemoteAccessAlertEnabled(this)
 
         // Server URL display
         val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
@@ -413,6 +442,16 @@ class SettingsActivity : AppCompatActivity() {
             // (interceptor faqat shunda ishlaydi).
             if (on) showLinkGuardSetupDialog()
         }
+        toggleOf(binding.rowWifiGuard.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setWifiGuardEnabled(this, on)
+            toastSaved()
+        }
+        toggleOf(binding.rowRemoteAccess.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setRemoteAccessAlertEnabled(this, on)
+            toastSaved()
+        }
 
         // Server URL → edit dialog. Привязываем клик ко ВСЕМУ ряду (rowServerUrl),
         // не только к маленькому TextView c URL — раньше тап на иконку или пустую
@@ -467,6 +506,12 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.rowPermXray.root.setOnClickListener {
             startActivity(Intent(this, PermissionXrayActivity::class.java))
+        }
+        binding.rowSecurityScore.root.setOnClickListener {
+            startActivity(Intent(this, SecurityScoreActivity::class.java))
+        }
+        binding.rowSideloadAudit.root.setOnClickListener {
+            startActivity(Intent(this, SideloadAuditActivity::class.java))
         }
         binding.rowPrivacy.root.setOnClickListener { ConsentActivity.openForReview(this) }
         // Boshqaruv paneli — veb-panel ilova ichida (WebView): admin login+parol bilan

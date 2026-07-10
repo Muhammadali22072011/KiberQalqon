@@ -36,6 +36,11 @@ private const val KEY_LINK_GUARD = "link_guard_enabled"
 // Xavfsiz havola yo'naltiriladigan standart brauzer paketi (o'zimiz EMAS). Bir marta
 // tanlanadi (yoki tizim default'idan aniqlanadi), keyin jim ishlaydi.
 private const val KEY_PREFERRED_BROWSER = "preferred_browser_pkg"
+// Wi-Fi straj: ochiq (parolsiz) jamoat tarmog'iga ulanilganda ogohlantirish. Default YOQILGAN.
+private const val KEY_WIFI_GUARD = "wifi_guard_enabled"
+// Masofaviy boshqaruv ogohlantirgichi: AnyDesk/TeamViewer kabi ilova topilsa ogohlantirish
+// (firibgarlik vektori). Default YOQILGAN.
+private const val KEY_REMOTE_ACCESS_ALERT = "remote_access_alert_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
 private const val KEY_DARK_THEME = "dark_theme"
@@ -230,6 +235,22 @@ object Config {
 
     fun setLinkGuardEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_LINK_GUARD, enabled) }
+    }
+
+    // Wi-Fi straj — ochiq/parolsiz tarmoq ogohlantirgichi. Default YOQILGAN.
+    fun isWifiGuardEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_WIFI_GUARD, true)
+
+    fun setWifiGuardEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_WIFI_GUARD, enabled) }
+    }
+
+    // Masofaviy boshqaruv (AnyDesk/TeamViewer) ogohlantirgichi. Default YOQILGAN.
+    fun isRemoteAccessAlertEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_REMOTE_ACCESS_ALERT, true)
+
+    fun setRemoteAccessAlertEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_REMOTE_ACCESS_ALERT, enabled) }
     }
 
     /** Xavfsiz havola yo'naltiriladigan brauzer paketi (null = hali tanlanmagan). */

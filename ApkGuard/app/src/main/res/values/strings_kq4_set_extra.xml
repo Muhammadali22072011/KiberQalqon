@@ -27,6 +27,22 @@
     <!-- Havola qalqoni toggle (Config.isLinkGuardEnabled → LinkGuardActivity) -->
     <string name="kq4_set_row_linkguard">Havola qalqoni</string>
     <string name="kq4_set_row_linkguard_sub">Xavfli havolalarni ochilishidan oldin avtomatik bloklaydi</string>
+
+    <!-- Wi-Fi straj toggle (Config.isWifiGuardEnabled) -->
+    <string name="kq4_set_row_wifiguard">Wi-Fi straj</string>
+    <string name="kq4_set_row_wifiguard_sub">Ochiq (parolsiz) jamoat tarmog\'ida ogohlantiradi</string>
+
+    <!-- Masofaviy boshqaruv ogohlantirgichi toggle (Config.isRemoteAccessAlertEnabled) -->
+    <string name="kq4_set_row_remote">Masofaviy boshqaruv nazorati</string>
+    <string name="kq4_set_row_remote_sub">AnyDesk/TeamViewer topilsa ogohlantiradi (firibgarlik vektori)</string>
+
+    <!-- Xavfsizlik balli → SecurityScoreActivity -->
+    <string name="kq4_set_row_score">Xavfsizlik balli</string>
+    <string name="kq4_set_row_score_sub">Qurilma himoyasini 0–100 ball bilan baholaydi</string>
+
+    <!-- Play'dan tashqari ilovalar auditi → SideloadAuditActivity -->
+    <string name="kq4_set_row_sideload">Play\'dan tashqari ilovalar</string>
+    <string name="kq4_set_row_sideload_sub">Ishonchli do\'kondan tashqari o\'rnatilganlar ro\'yxati</string>
     <string name="kq4_linkguard_setup_title">Havola qalqonini sozlash</string>
     <string name="kq4_linkguard_setup_msg">Havolalar avtomatik tekshirilishi uchun UzGuard\'ni standart havola ochuvchi (default browser) qilib tanlang. Eslatma: Telegram havolani o\'z ichki brauzerida ochsa — uни Telegram sozlamalaridan «tashqi brauzerda ochish»ga o\'tkazing.</string>
     <string name="kq4_linkguard_setup_open">Sozlamalarni ochish</string>

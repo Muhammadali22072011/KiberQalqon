@@ -14,7 +14,18 @@ const VERDICT_FILTERS: Array<{ k: string; label: string }> = [
   { k: 'danger', label: 'Xavfli' },
   { k: 'suspicious', label: 'Shubhali' },
   { k: 'safe', label: 'Xavfsiz' },
+  { k: 'offline', label: 'Aloqasiz (3+ kun)' },
 ];
+
+// Qurilma "yo'qolgan"mi — oxirgi faollik 3 kundan oshgan bo'lsa (o'g'irlangan/o'chirilgan/
+// himoya to'xtagan bo'lishi mumkin). Mijoz tomonida hisoblanadi (server last_seen'ni qaytaradi).
+const OFFLINE_MS = 3 * 24 * 60 * 60 * 1000;
+function isOffline(lastSeen?: string | null): boolean {
+  if (!lastSeen) return false;
+  const t = Date.parse(lastSeen);
+  if (Number.isNaN(t)) return false;
+  return Date.now() - t > OFFLINE_MS;
+}
 
 function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { isOwner } = useAuth();
@@ -155,7 +166,8 @@ export default function Devices() {
   const shown = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return devices.filter((d) => {
-      if (vf && d.last_verdict !== vf) return false;
+      if (vf === 'offline') { if (!isOffline(d.last_seen)) return false; }
+      else if (vf && d.last_verdict !== vf) return false;
       if (gf === 'none' && d.group_id) return false;
       if (gf && gf !== 'none' && d.group_id !== gf) return false;
       if (!needle) return true;
@@ -256,7 +268,12 @@ export default function Devices() {
                           <span className="mono" style={{ marginLeft: 8, fontSize: 12, color: 'var(--ink-2)' }}>{risk}</span>
                         </td>
                         <td>{d.last_verdict ? <VerdictBadge verdict={d.last_verdict} /> : <span style={{ color: 'var(--ink-3)' }}>—</span>}</td>
-                        <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{agoSafe(d.last_seen)}</td>
+                        <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>
+                          {agoSafe(d.last_seen)}
+                          {isOffline(d.last_seen) && (
+                            <><br /><span style={{ color: 'var(--danger, #E0432F)', fontWeight: 600 }}>⚠ aloqasiz</span></>
+                          )}
+                        </td>
                       </tr>
                     );
                   })

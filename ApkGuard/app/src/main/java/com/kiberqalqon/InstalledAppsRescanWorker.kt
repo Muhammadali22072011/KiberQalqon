@@ -110,6 +110,32 @@ class InstalledAppsRescanWorker(
             }
         }
 
+        // Masofaviy boshqaruv ilovalari (AnyDesk/TeamViewer/RustDesk...) — firibgarlik vektori.
+        // Ular virus EMAS, shuning uchun DANGER qilib belgilamaymiz; faqat YANGI paydo bo'lganini
+        // bir marta ogohlantiramiz (dedup — oldingi ko'rilgan paketlar to'plami bilan solishtirib).
+        try {
+            if (Config.isRemoteAccessAlertEnabled(ctx)) {
+                val found = RemoteAccessDetector.installed(ctx)
+                val seen = prefs.getStringSet(KEY_REMOTE_SEEN, emptySet()) ?: emptySet()
+                val current = found.map { it.pkg }.toSet()
+                val fresh = found.filter { it.pkg !in seen }
+                prefs.edit().putStringSet(KEY_REMOTE_SEEN, current).apply()
+                if (fresh.isNotEmpty()) {
+                    NotificationHelper.showRemoteAccessNotification(ctx, fresh.map { it.brand })
+                    try {
+                        TelemetryReporter.report(
+                            ctx, "REMOTE_ACCESS",
+                            "🖥 Masofaviy boshqaruv ilovasi topildi:\n" +
+                            fresh.joinToString("\n") { "• ${it.brand} (${it.pkg})" } +
+                            "\n(Firibgarlik vektori — foydalanuvchi ogohlantirildi)"
+                        )
+                    } catch (_: Throwable) {}
+                }
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "remote-access check failed", e)
+        }
+
         Log.d(TAG, "Rescanned ${rescanned.size} apps, new threats: $newThreats")
         return Result.success()
     }
@@ -117,6 +143,8 @@ class InstalledAppsRescanWorker(
     companion object {
         private const val TAG = "RescanWorker"
         private const val WORK_NAME = "uzguard_rescan_installed"
+        // Oldin ko'rilgan masofaviy-boshqaruv paketlari (dedup — takror ogohlantirmaslik uchun).
+        private const val KEY_REMOTE_SEEN = "remote_access_seen"
 
         fun schedule(ctx: Context) {
             val req = PeriodicWorkRequestBuilder<InstalledAppsRescanWorker>(

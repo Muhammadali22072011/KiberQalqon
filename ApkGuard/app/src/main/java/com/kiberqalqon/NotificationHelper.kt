@@ -633,4 +633,91 @@ object NotificationHelper {
 
         NotificationManagerCompat.from(context).notify(rc, builder.build())
     }
+
+    /**
+     * Masofaviy boshqaruv ilovasi (AnyDesk/TeamViewer/...) topilganda ogohlantirish.
+     * Tap → SideloadAuditActivity (u masofaviy ilovalarni ham ko'rsatadi va o'chirishga yo'l ochadi).
+     * Bu ilovalarni AVTOMATIK o'chirmaymiz — ular qonuniy bo'lishi mumkin, faqat ogohlantiramiz.
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showRemoteAccessNotification(context: Context, brands: List<String>) {
+        if (brands.isEmpty()) return
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val intent = Intent(context, SideloadAuditActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = PendingIntent.getActivity(
+            context, "remote_access".hashCode(), intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val names = brands.distinct().joinToString(", ")
+        val body = context.getString(R.string.notif_remote_access_body, names)
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_remote_access_title))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(REMOTE_ACCESS_NOTIF_ID, builder.build())
+    }
+
+    /**
+     * Ochiq (parolsiz) Wi-Fi tarmog'iga ulanilganda ogohlantirish (MITM xavfi).
+     * Har SSID uchun bir marta ([WifiGuard] dedublaydi).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showOpenWifiNotification(context: Context, ssid: String) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val body = context.getString(R.string.notif_open_wifi_body, ssid)
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_open_wifi_title))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(
+            ("wifi_$ssid").hashCode() and 0x7FFFFFFF, builder.build()
+        )
+    }
+
+    /**
+     * Bildirishnomadagi (Telegram/SMS) havola [LinkScanner] tomonidan XAVFLI deb topilganda
+     * foydalanuvchini ogohlantirish. Tap → LinkCheckActivity (to'liq sabab + tekshirish).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showPhishingLinkNotification(context: Context, url: String, host: String?) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val intent = LinkCheckActivity.intent(context, url).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val rc = ("phish_$url").hashCode() and 0x7FFFFFFF
+        val pi = PendingIntent.getActivity(
+            context, rc, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val shown = host ?: url
+        val body = context.getString(R.string.notif_phish_link_body, shown)
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_phish_link_title))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
+    }
+
+    private const val REMOTE_ACCESS_NOTIF_ID = 0x0F51
 }

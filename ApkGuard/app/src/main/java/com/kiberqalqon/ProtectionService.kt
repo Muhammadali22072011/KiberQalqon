@@ -58,12 +58,16 @@ class ProtectionService : Service() {
     // Tezkor poll loop bir martagina ishga tushadi (onStartCommand bir necha bor chaqirilsa ham).
     @Volatile private var fastLoopStarted = false
 
+    // Wi-Fi straj: ochiq (parolsiz) tarmoqqa ulanishni kuzatib, MITM xavfidan ogohlantiradi.
+    private var wifiCallback: android.net.ConnectivityManager.NetworkCallback? = null
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         ensureChannel(this)
         startFileWatcher()
         startFastScanLoop()
+        startWifiWatch()
         val notification = buildNotification(this)
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -98,8 +102,44 @@ class ProtectionService : Service() {
             android.util.Log.w(TAG, "stopWatching failed", t)
         }
         fileObserver = null
+        try {
+            wifiCallback?.let {
+                (getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager)
+                    ?.unregisterNetworkCallback(it)
+            }
+        } catch (_: Throwable) {}
+        wifiCallback = null
         try { serviceScope.cancel() } catch (_: Throwable) {}
         // Service o'lgan bo'lsa, OS qayta tiklaydi (START_STICKY tufayli).
+    }
+
+    /**
+     * Wi-Fi tarmoq o'zgarishini kuzatadi: ochiq (parolsiz) tarmoqqa ulanilganda
+     * [WifiGuard] MITM xavfidan bir marta ogohlantiradi. Bir marta ro'yxatga olinadi
+     * (onStartCommand takror chaqirilsa ham — wifiCallback != null bo'lsa o'tkazamiz).
+     */
+    private fun startWifiWatch() {
+        if (wifiCallback != null) return
+        try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+                ?: return
+            val req = android.net.NetworkRequest.Builder()
+                .addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI)
+                .build()
+            val cb = object : android.net.ConnectivityManager.NetworkCallback() {
+                override fun onCapabilitiesChanged(
+                    network: android.net.Network,
+                    caps: android.net.NetworkCapabilities
+                ) {
+                    try { WifiGuard.onWifiCapabilities(applicationContext, caps) } catch (_: Throwable) {}
+                }
+            }
+            cm.registerNetworkCallback(req, cb)
+            wifiCallback = cb
+            android.util.Log.d(TAG, "Wi-Fi guard watcher registered")
+        } catch (t: Throwable) {
+            android.util.Log.w(TAG, "startWifiWatch failed", t)
+        }
     }
 
     /**
