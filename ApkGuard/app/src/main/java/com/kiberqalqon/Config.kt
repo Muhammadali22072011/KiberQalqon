@@ -41,6 +41,9 @@ private const val KEY_WIFI_GUARD = "wifi_guard_enabled"
 // Masofaviy boshqaruv ogohlantirgichi: AnyDesk/TeamViewer kabi ilova topilsa ogohlantirish
 // (firibgarlik vektori). Default YOQILGAN.
 private const val KEY_REMOTE_ACCESS_ALERT = "remote_access_alert_enabled"
+// Uyg'otuvchi signal: xavfli tahdid tunda (ekran o'chiq/qulf) topilsa ALARM oqimida
+// maksimal balandlikda sirena + tebranish (jim rejimda ham). Default YOQILGAN.
+private const val KEY_LOUD_ALARM = "loud_alarm_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
 private const val KEY_DARK_THEME = "dark_theme"
@@ -251,6 +254,14 @@ object Config {
 
     fun setRemoteAccessAlertEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_REMOTE_ACCESS_ALERT, enabled) }
+    }
+
+    // Uyg'otuvchi signal (baland sirena tunda topilgan tahdidda). Default YOQILGAN.
+    fun isLoudAlarmEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_LOUD_ALARM, true)
+
+    fun setLoudAlarmEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_LOUD_ALARM, enabled) }
     }
 
     /** Xavfsiz havola yo'naltiriladigan brauzer paketi (null = hali tanlanmagan). */

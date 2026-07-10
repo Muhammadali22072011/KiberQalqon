@@ -29,6 +29,10 @@ class App : android.app.Application() {
         // САМАЯ ПЕРВАЯ строка: ставим CrashHandler чтобы поймать ВСЁ что упадёт ниже.
         CrashHandler.install(this)
 
+        // Agar sirena chalinayotganda jarayon nobud bo'lgan bo'lsa — o'zgartirilgan ALARM
+        // balandligini tiklaymiz (saqlangan qiymat bo'lsa; aks holda no-op).
+        try { AlarmSiren.recover(this) } catch (_: Throwable) {}
+
         // Native himoya kutubxonasini (libkqguard.so) erta yuklab qo'yamiz, SecurityGuard'gacha.
         // Yuklanmasa (test JVM / ABI mos emas / NDK'siz build) crash BO'LMAYDI — NativeBridge
         // ichida ushlanadi, chaqiruvchilar Kotlin fallback'iga tushadi.

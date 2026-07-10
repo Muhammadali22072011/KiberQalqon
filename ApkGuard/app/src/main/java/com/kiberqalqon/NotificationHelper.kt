@@ -229,6 +229,8 @@ object NotificationHelper {
             .setFullScreenIntent(pi, VersionCompat.canUseFullScreenIntent(context))
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(7100, builder.build())
+        // Tunda (ekran o'chiq/qulf) topilgan tahdid — uyg'otuvchi sirena (o'zi gate qiladi).
+        try { AlarmSiren.blast(context) } catch (_: Throwable) {}
     }
 
     /**
@@ -271,6 +273,8 @@ object NotificationHelper {
             .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), pi)
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(pkg.hashCode() and 0x7FFFFFFF, builder.build())
+        // O'rnatilgan ilova endi xavfli + telefon uxlab yotgan bo'lsa — uyg'otuvchi sirena.
+        try { AlarmSiren.blast(context) } catch (_: Throwable) {}
     }
 
     /**
@@ -321,6 +325,10 @@ object NotificationHelper {
             // ochilib, batch scan paytida bir nechta Activity stack'da to'planadi.
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(rc, builder.build())
+        // Xavfli fayl + telefon uxlab yotgan bo'lsa — uyg'otuvchi sirena (AlarmSiren gate qiladi).
+        if (verdict == ScanResult.Verdict.DANGER) {
+            try { AlarmSiren.blast(context) } catch (_: Throwable) {}
+        }
     }
 
     /**

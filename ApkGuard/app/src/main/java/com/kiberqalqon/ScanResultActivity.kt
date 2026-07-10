@@ -87,6 +87,8 @@ class ScanResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Foydalanuvchi natija oynasini ochdi = uyg'ondi → uyg'otuvchi sirena to'xtaydi.
+        try { AlarmSiren.stop() } catch (_: Throwable) {}
         // Tahdid verdikti maxfiy ekran — skrinshot/ekran yozuvini bloklaymiz (FLAG_SECURE),
         // shunda boshqa ilova yoki overlay tahlilchi natija/IOC'larni ko'chirib ololmaydi.
         try {

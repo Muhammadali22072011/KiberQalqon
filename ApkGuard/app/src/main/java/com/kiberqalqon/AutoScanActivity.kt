@@ -137,6 +137,8 @@ class AutoScanActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Foydalanuvchi natija oynasini ochdi = uyg'ondi → uyg'otuvchi sirena to'xtaydi.
+        try { AlarmSiren.stop() } catch (_: Throwable) {}
 
         // Дедупликация повторных запусков по одному и тому же файлу. Раньше
         // MultiPathFileObserver триггерил CREATE/MOVED_TO/CLOSE_WRITE из нескольких

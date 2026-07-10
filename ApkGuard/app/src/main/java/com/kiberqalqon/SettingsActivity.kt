@@ -171,6 +171,13 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_remote_sub),
             icon = R.drawable.ic4_alert,
         )
+        // QO'SHIMCHA — Uyg'otuvchi signal (baland sirena tunda topilgan tahdidda).
+        bindRow(
+            binding.rowLoudAlarm.root,
+            title = getString(R.string.kq4_set_row_alarm),
+            sub = getString(R.string.kq4_set_row_alarm_sub),
+            icon = R.drawable.ic4_bell,
+        )
         // QO'SHIMCHA — Ishonchli ro'yxat (UserWhitelist boshqaruvi).
         bindChevronWithSub(
             binding.rowTrustList.root,
@@ -297,6 +304,7 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowLinkGuard.root).isChecked = Config.isLinkGuardEnabled(this)
         toggleOf(binding.rowWifiGuard.root).isChecked = Config.isWifiGuardEnabled(this)
         toggleOf(binding.rowRemoteAccess.root).isChecked = Config.isRemoteAccessAlertEnabled(this)
+        toggleOf(binding.rowLoudAlarm.root).isChecked = Config.isLoudAlarmEnabled(this)
 
         // Server URL display
         val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
@@ -450,6 +458,12 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowRemoteAccess.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
             Config.setRemoteAccessAlertEnabled(this, on)
+            toastSaved()
+        }
+        toggleOf(binding.rowLoudAlarm.root).setOnCheckedChangeListener { _, on ->
+            if (!ready) return@setOnCheckedChangeListener
+            Config.setLoudAlarmEnabled(this, on)
+            if (!on) { try { AlarmSiren.stop() } catch (_: Throwable) {} }
             toastSaved()
         }
 

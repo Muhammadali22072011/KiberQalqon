@@ -36,6 +36,10 @@
     <string name="kq4_set_row_remote">Masofaviy boshqaruv nazorati</string>
     <string name="kq4_set_row_remote_sub">AnyDesk/TeamViewer topilsa ogohlantiradi (firibgarlik vektori)</string>
 
+    <!-- Uyg'otuvchi signal toggle (Config.isLoudAlarmEnabled → AlarmSiren) -->
+    <string name="kq4_set_row_alarm">Uyg\'otuvchi signal</string>
+    <string name="kq4_set_row_alarm_sub">Tunda xavfli tahdid topilsa baland sirena bilan uyg\'otadi (jim rejimda ham)</string>
+
     <!-- Xavfsizlik balli → SecurityScoreActivity -->
     <string name="kq4_set_row_score">Xavfsizlik balli</string>
     <string name="kq4_set_row_score_sub">Qurilma himoyasini 0–100 ball bilan baholaydi</string>
