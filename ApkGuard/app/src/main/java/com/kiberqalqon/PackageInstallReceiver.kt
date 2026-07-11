@@ -130,6 +130,14 @@ class PackageInstallReceiver : BroadcastReceiver() {
                     }
                     ScanResult.Verdict.SAFE -> {
                         Log.d(TAG, "Replaced safe package: $pkg")
+                        // Sideload ilova yangilandi va xavfsiz — foydalanuvchiga "tekshirildi ✅"
+                        // informatsion bildirishnoma (jim). Play yangilanishlari bu yergacha
+                        // yetib kelmaydi (yuqorida isFromTrustedStore bilan skip qilingan).
+                        if (Config.isAppUpdateNotifyEnabled(context)) {
+                            try {
+                                NotificationHelper.showAppUpdatedNotification(context, pkg, label)
+                            } catch (_: Throwable) {}
+                        }
                     }
                 }
             }

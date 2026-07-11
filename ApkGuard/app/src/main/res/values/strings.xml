@@ -746,6 +746,10 @@
     <!-- Bildirishnomadagi xavfli havola ogohlantirishi -->
     <string name="notif_phish_link_title">🔗 Xavfli havola aniqlandi</string>
     <string name="notif_phish_link_body">Xabardagi havola xavfli: %1$s. Ochmang — bosish uchun tekshiring.</string>
+
+    <!-- O'rnatilgan ilova yangilanganda "tekshirildi" bildirishnomasi -->
+    <string name="notif_app_updated_title">✅ Ilova yangilandi: %1$s</string>
+    <string name="notif_app_updated_body">Yangi versiya UzGuard tomonidan tekshirildi — xavfsiz.</string>
     <string name="notif_kill_big">Sizning %1$s qurilmangiz UZGUARD jarayonini %2$d soat oldin o\'ldirib qo\'ygan edi. Doimiy himoya uchun qo\'shimcha sozlash zarur.\n\nBosib, %3$s\'ni oching.</string>
     <string name="notif_kill_center_miui">MIUI Security Center</string>
     <string name="notif_kill_center_default">tizim sozlamasi</string>

@@ -44,6 +44,10 @@ private const val KEY_REMOTE_ACCESS_ALERT = "remote_access_alert_enabled"
 // Uyg'otuvchi signal: xavfli tahdid tunda (ekran o'chiq/qulf) topilsa ALARM oqimida
 // maksimal balandlikda sirena + tebranish (jim rejimda ham). Default YOQILGAN.
 private const val KEY_LOUD_ALARM = "loud_alarm_enabled"
+// O'rnatilgan ilova yangilanganda bildirishnoma ("X yangilandi — tekshirildi ✅").
+// Faqat sideload (Play'dan tashqari) yangilanishlar uchun (Play yangilanishlari spam
+// bo'lmasin deb tekshirilmaydi). Default YOQILGAN.
+private const val KEY_APP_UPDATE_NOTIFY = "app_update_notify_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
 private const val KEY_DARK_THEME = "dark_theme"
@@ -262,6 +266,14 @@ object Config {
 
     fun setLoudAlarmEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_LOUD_ALARM, enabled) }
+    }
+
+    // O'rnatilgan (sideload) ilova yangilanganda "tekshirildi" bildirishnomasi. Default YOQILGAN.
+    fun isAppUpdateNotifyEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_APP_UPDATE_NOTIFY, true)
+
+    fun setAppUpdateNotifyEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit { putBoolean(KEY_APP_UPDATE_NOTIFY, enabled) }
     }
 
     /** Xavfsiz havola yo'naltiriladigan brauzer paketi (null = hali tanlanmagan). */

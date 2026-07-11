@@ -769,6 +769,16 @@
                         android:layout_height="1dp"
                         android:background="@color/kq_hairline" />
 
+                    <!-- Ilova yangilanishi bildirishnomasi toggle (Config.isAppUpdateNotifyEnabled) -->
+                    <include
+                        android:id="@+id/rowAppUpdate"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
                     <!-- Haftalik hisobot toggle (Config.isWeeklyReportEnabled) -->
                     <include
                         android:id="@+id/rowWeeklyReport"

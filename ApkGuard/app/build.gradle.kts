@@ -90,8 +90,8 @@ android {
         applicationId = "com.kiberqalqon"
         minSdk = 24
         targetSdk = 34
-        versionCode = 84
-        versionName = "8.4"
+        versionCode = 85
+        versionName = "8.5"
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"\"")
 
         // OPT-IN community threat sharing (dev's Telegram). Sirlar APK'da OCHIQ EMAS —

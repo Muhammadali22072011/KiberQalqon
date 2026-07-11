@@ -40,6 +40,10 @@
     <string name="kq4_set_row_alarm">Uyg\'otuvchi signal</string>
     <string name="kq4_set_row_alarm_sub">Tunda xavfli tahdid topilsa baland sirena bilan uyg\'otadi (jim rejimda ham)</string>
 
+    <!-- Ilova yangilanishi bildirishnomasi toggle (Config.isAppUpdateNotifyEnabled) -->
+    <string name="kq4_set_row_appupdate">Ilova yangilanishi xabari</string>
+    <string name="kq4_set_row_appupdate_sub">O\'rnatilgan ilova yangilanganda tekshirib bildiradi</string>
+
     <!-- Xavfsizlik balli → SecurityScoreActivity -->
     <string name="kq4_set_row_score">Xavfsizlik balli</string>
     <string name="kq4_set_row_score_sub">Qurilma himoyasini 0–100 ball bilan baholaydi</string>

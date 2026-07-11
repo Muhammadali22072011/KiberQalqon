@@ -735,5 +735,32 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(rc, builder.build())
     }
 
+    /**
+     * O'rnatilgan (sideload) ilova YANGILANGANDA — "tekshirildi" informatsion bildirishnoma.
+     * Jim kanal (CH_NEWS, IMPORTANCE_DEFAULT) — heads-up/sirena YO'Q, oddiy xabar. Tap → ilova
+     * ma'lumotlari ekrani. Faqat SAFE yangilanish uchun (DANGER/SUSPICIOUS o'z alertini beradi).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showAppUpdatedNotification(context: Context, pkg: String, appLabel: String) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val infoIntent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = android.net.Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val pi = PendingIntent.getActivity(
+            context, ("upd_$pkg").hashCode() and 0x7FFFFFFF, infoIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, CH_NEWS)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_app_updated_title, appLabel))
+            .setContentText(context.getString(R.string.notif_app_updated_body))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        NotificationManagerCompat.from(context).notify(("upd_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
+    }
+
     private const val REMOTE_ACCESS_NOTIF_ID = 0x0F51
 }
