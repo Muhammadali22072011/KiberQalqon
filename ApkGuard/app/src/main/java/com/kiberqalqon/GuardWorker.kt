@@ -70,6 +70,21 @@ class GuardWorker(
                 } catch (e: Throwable) {
                     Log.w(TAG, "news notify check failed", e)
                 }
+                // Imzolangan config + ilova o'z yangilanishi ham DAVRIY tekshiriladi.
+                // Ilgari faqat App.onCreate'da edi — foreground service tufayli jarayon
+                // kunlab tirik qolsa sovuq start bo'lmaydi va "Yangi versiya chiqdi"
+                // bildirishnomasi hech qachon kelmasdi. RemoteConfig ichida 6 soatlik
+                // attempt-throttle bor; SelfUpdate har versionCode uchun bir marta ogohlantiradi.
+                try {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        RemoteConfig.refreshIfStale(applicationContext)
+                        SelfUpdate.checkAndNotify(applicationContext)
+                    }
+                } catch (ce: kotlinx.coroutines.CancellationException) {
+                    throw ce
+                } catch (e: Throwable) {
+                    Log.w(TAG, "periodic self-update check failed", e)
+                }
             }
 
             if (!Config.isBackgroundEnabled(applicationContext)) {

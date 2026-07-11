@@ -34,6 +34,9 @@ object RemoteConfig {
     private const val PREFS = "uzguard_remote_config"
     private const val KEY_V = "rc_v"
     private const val KEY_FETCHED_AT = "rc_fetched_at"
+    // Davriy (GuardWorker) yangilash uchun oxirgi URINISH vaqti + eskirish oynasi.
+    private const val KEY_LAST_REFRESH_ATTEMPT = "rc_last_refresh_attempt"
+    private const val REFRESH_STALE_MS = 6L * 60 * 60 * 1000  // 6 soat
 
     // ====== BAKED (ichki) standartlar — ApkScanner'dagi joriy qiymatlar bilan AYNAN bir xil ======
     // O'zgartirsangiz, ApkScanner verdikt mantig'i bilan mos bo'lishini tekshiring.
@@ -135,6 +138,24 @@ object RemoteConfig {
      * IO thread'da chaqirilishi shart (chaqiruvchi coroutine/Worker ichida). Bloklaydi.
      * Hamma narsa fail-safe: muvaffaqiyatsizlikda kesh tegmaydi → baked yoki oldingi clamp.
      */
+    /**
+     * Davriy (GuardWorker) yo'li uchun: oxirgi urinishdan 6 soat o'tgan bo'lsagina tarmoqdan
+     * yangilaydi. Sabab: [refresh] faqat App.onCreate'da chaqirilardi — jarayon foreground
+     * service tufayli kunlab tirik qolsa sovuq start bo'lmaydi va yangi config (jumladan
+     * SelfUpdate "update" bloki) HECH QACHON yetib kelmasdi. Attempt-throttle: urinish vaqti
+     * xatoda ham yoziladi (oflaynda har 30 daqiqada tarmoqqa uravermaslik uchun).
+     */
+    fun refreshIfStale(ctx: Context) {
+        try {
+            val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val last = sp.getLong(KEY_LAST_REFRESH_ATTEMPT, 0L)
+            val now = System.currentTimeMillis()
+            if (last in 1..now && now - last < REFRESH_STALE_MS) return
+            sp.edit().putLong(KEY_LAST_REFRESH_ATTEMPT, now).apply()
+            refresh(ctx)
+        } catch (_: Throwable) { /* fail-safe: keyingi oynada qayta uriniladi */ }
+    }
+
     fun refresh(ctx: Context) {
         try {
             val base = BuildConfig.CLOUD_BASE_URL.trim().trimEnd('/')
