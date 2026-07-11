@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
             binding.newsSection.visibility = View.GONE
             return
         }
-        NewsClient.fetch { result ->
+        NewsClient.fetch(CloudTelemetry.savedGroupCode(this)) { result ->
             if (isFinishing || isDestroyed) return@fetch
             when (result) {
                 is NewsClient.Result.Success -> renderNews(result.items)

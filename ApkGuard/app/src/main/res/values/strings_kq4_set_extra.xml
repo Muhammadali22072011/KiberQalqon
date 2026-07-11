@@ -89,4 +89,17 @@
     <string name="kq4_update_already">Sizda eng so\'nggi versiya o\'rnatilgan</string>
     <string name="kq4_update_err_download">Yuklab olib bo\'lmadi — internetni tekshirib qayta urinib ko\'ring</string>
     <string name="kq4_update_err_verify">Yangilanish imzo tekshiruvidan o\'tmadi — o\'rnatilmaydi (xavfsizlik)</string>
+
+    <!-- "Hammasini qo'sh" to'lqini (2026-07-11): yangi ekranlar Sozlamalar qatorlari -->
+    <string name="kq4_set_row_scamcheck">Bu xabar firibgarlikmi?</string>
+    <string name="kq4_set_row_scamcheck_sub">SMS/Telegram xabarini firibgarlik belgilariga tekshiring</string>
+    <string name="kq4_set_row_checkup">Tez tekshiruv (30 soniya)</string>
+    <string name="kq4_set_row_checkup_sub">Barcha himoya tekshiruvlarini bitta ustada o\'tkazing</string>
+    <string name="kq4_set_row_family">Oila qalqoni</string>
+    <string name="kq4_set_row_family_sub">Guruh a\'zolari qurilmalarining himoya holati</string>
+    <string name="kq4_set_row_pin">Himoya qulfi (PIN)</string>
+    <string name="kq4_set_row_pin_sub">Himoyani o\'chirishdan oldin 4 xonali PIN so\'raladi</string>
+    <string name="kq4_set_row_pin_on">PIN yoqilgan — o\'zgartirish uchun bosing</string>
+    <string name="kq4_set_row_limits">Nimadan himoya qila olmaymiz</string>
+    <string name="kq4_set_row_limits_sub">Halol cheklovlar — va ularga qarshi nima qilish kerak</string>
 </resources>

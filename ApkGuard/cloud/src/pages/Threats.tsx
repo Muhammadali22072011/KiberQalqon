@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, apiPost, type ThreatDomain, type ThreatFamily } from '../lib/api';
+import {
+  apiGet, apiPost,
+  type KnownGood, type RuleStat, type ThreatDomain, type ThreatFamily, type ThreatRule,
+} from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner, Tag } from '../components/ui';
 import { agoSafe, catUz, SEV_COLOR, uzDateSafe } from '../lib/format';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +11,9 @@ import { useToast } from '../components/Toast';
 
 const SEV_UZ: Record<string, string> = {
   critical: 'Kritik', high: 'Yuqori', medium: "O'rta", low: 'Past',
+};
+const TARGET_UZ: Record<string, string> = {
+  dex_string: 'DEX satri', manifest: 'Manifest', path: 'Fayl yo‘li',
 };
 
 /**
@@ -226,8 +232,332 @@ function ReviewQueue({ items, onChanged }: { items: ThreatFamily[]; onChanged: (
   );
 }
 
+/**
+ * YARA-lite qoidalar boshqaruvi. Bu yerga qo'shilgan qoida IMZOLANGAN feed orqali barcha
+ * telefonlarga tushadi (DEX satri / manifest / fayl yo'li bo'yicha kalitlar mos kelsa aniqlaydi).
+ * Susaytirilgan (muted) qoida faqat maslahat sifatida qoladi. Qo'shish/o'chirish FAQAT EGADA.
+ */
+function RulesPanel() {
+  const { isOwner } = useAuth();
+  const { show } = useToast();
+  const { data, loading, reload } = usePoll(
+    () => apiGet<{ rules: ThreatRule[] }>('/api/threats?rules=1'),
+    60000,
+  );
+  const rows = data?.rules || [];
+  const [ruleId, setRuleId] = useState('');
+  const [family, setFamily] = useState('');
+  const [severity, setSeverity] = useState('high');
+  const [target, setTarget] = useState('dex_string');
+  const [needles, setNeedles] = useState('');
+  const [minHits, setMinHits] = useState('0');
+  const [busy, setBusy] = useState(false);
+
+  const add = async () => {
+    const rid = ruleId.trim();
+    // Kalitlarni vergul yoki qator bo'yicha ajratamiz, dublikatni yig'amiz.
+    const nlist = [...new Set(needles.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean))];
+    if (!rid || busy) return;
+    if (!nlist.length) { show('Kamida bitta kalit (needle) kiriting'); return; }
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', {
+        action: 'add_rule', rule_id: rid, family: family.trim(), severity, target,
+        needles: nlist, min_hits: Number(minHits) || 0,
+      });
+      setRuleId(''); setFamily(''); setNeedles(''); setMinHits('0');
+      show(`${rid} qoidasi qo‘shildi — telefonlarga tarqaladi`);
+      reload();
+    } catch (e) {
+      show(`Qo‘shib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const del = async (rid: string) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', { action: 'delete_rule', rule_id: rid });
+      show(`${rid} o‘chirildi`);
+      reload();
+    } catch (e) {
+      show(`O‘chirib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const toggleMute = async (r: ThreatRule) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', { action: 'mute_rule', rule_id: r.rule_id, muted: !r.muted });
+      show(r.muted ? `${r.rule_id} faollashtirildi` : `${r.rule_id} susaytirildi (maslahat)`);
+      reload();
+    } catch (e) {
+      show(`O‘zgartirib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Panel className="gap-top">
+      <PanelHead
+        sub="Aniqlash qoidalari · barcha telefonlarga tarqaladi"
+        title={`YARA-lite qoidalar (${rows.length})`}
+      />
+      <div className="body-pad">
+        {isOwner && (
+          <div className="row-inline" style={{ marginBottom: 12, flexWrap: 'wrap' }}>
+            <input placeholder="qoida ID (ajina_sms_v1)" value={ruleId} onChange={(e) => setRuleId(e.target.value)} style={{ flex: '1 1 180px' }} />
+            <input placeholder="Oila (ixtiyoriy)" value={family} onChange={(e) => setFamily(e.target.value)} style={{ flex: '1 1 140px' }} />
+            <select value={severity} onChange={(e) => setSeverity(e.target.value)} style={{ width: 120 }}>
+              <option value="low">Past</option>
+              <option value="medium">O‘rta</option>
+              <option value="high">Yuqori</option>
+              <option value="critical">Kritik</option>
+            </select>
+            <select value={target} onChange={(e) => setTarget(e.target.value)} style={{ width: 140 }}>
+              <option value="dex_string">DEX satri</option>
+              <option value="manifest">Manifest</option>
+              <option value="path">Fayl yo‘li</option>
+            </select>
+            <input type="number" min={0} placeholder="min" value={minHits} onChange={(e) => setMinHits(e.target.value)} style={{ width: 90 }} />
+            <textarea
+              placeholder="Kalitlar — vergul yoki har qatorga bittadan"
+              value={needles}
+              onChange={(e) => setNeedles(e.target.value)}
+              rows={2}
+              style={{ flex: '1 1 100%' }}
+            />
+            <button className="btn" onClick={add} disabled={busy || !ruleId.trim() || !needles.trim()}>
+              {busy ? <span className="spinner" /> : '+ Qoida qo‘shish'}
+            </button>
+          </div>
+        )}
+        {loading && !rows.length ? (
+          <Spinner label="Yuklanmoqda…" />
+        ) : !rows.length ? (
+          <Empty>Qoida yo‘q. Yuqoriga aniqlash qoidasi qo‘shing — barcha telefonlarga tarqaladi.</Empty>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Qoida</th>
+                  <th>Oila</th>
+                  <th>Nishon</th>
+                  <th>Daraja</th>
+                  <th className="num">Kalit</th>
+                  <th className="num">Min</th>
+                  {isOwner && <th />}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.rule_id} style={r.muted ? { opacity: 0.55 } : undefined}>
+                    <td className="mono" style={{ fontSize: 13 }}>
+                      <b>{r.rule_id}</b>
+                      {r.muted && <span style={{ marginLeft: 6 }}><Tag>advisory</Tag></span>}
+                    </td>
+                    <td>{r.family ? <Tag kind="comp">{r.family}</Tag> : <span style={{ color: 'var(--ink-3)' }}>—</span>}</td>
+                    <td style={{ color: 'var(--ink-2)', fontSize: 12 }}>{TARGET_UZ[r.target] || r.target}</td>
+                    <td>
+                      <span style={{ color: SEV_COLOR[r.severity] || 'var(--warn)', fontWeight: 700, fontSize: 12 }}>
+                        {SEV_UZ[r.severity] || r.severity}
+                      </span>
+                    </td>
+                    <td className="num">{(r.needles || []).length}</td>
+                    <td className="num">{r.min_hits}</td>
+                    {isOwner && (
+                      <td>
+                        <div className="row-inline" style={{ justifyContent: 'flex-end', flexWrap: 'wrap', gap: 6 }}>
+                          <button className="btn sm ghost" onClick={() => toggleMute(r)} disabled={busy}>
+                            {r.muted ? 'Faollashtirish' : 'Susaytirish'}
+                          </button>
+                          <button className="btn sm danger" onClick={() => del(r.rule_id)} disabled={busy}>O‘chirish</button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
+/**
+ * Qoida statistikasi (FP paneli): har bir qoida necha marta ishga tushgan, nechta qurilmada,
+ * nechtasi rad etilgan. Rad etish/ishlash nisbati yuqori (>0.3) bo'lsa — noto'g'ri ishlayotgan
+ * bo'lishi mumkin, ogohlantiruvchi rangda ko'rsatamiz.
+ */
+function RuleStatsPanel() {
+  const { data, loading } = usePoll(
+    () => apiGet<{ stats: RuleStat[] }>('/api/threats?rulestats=1'),
+    60000,
+  );
+  const rows = data?.stats || [];
+  return (
+    <Panel className="gap-top">
+      <PanelHead sub="Noto‘g‘ri ishga tushish nazorati" title={`Qoida statistikasi (${rows.length})`} />
+      <div className="body-pad">
+        {loading && !rows.length ? (
+          <Spinner label="Yuklanmoqda…" />
+        ) : !rows.length ? (
+          <Empty>Hali statistika yo‘q</Empty>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Qoida</th>
+                  <th className="num">Ishladi</th>
+                  <th className="num">Qurilma</th>
+                  <th className="num">Rad etildi</th>
+                  <th>Oxirgi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => {
+                  const ratio = r.fires ? r.dismissed / r.fires : 0;
+                  const hot = ratio > 0.3;
+                  return (
+                    <tr key={r.rule_id}>
+                      <td className="mono" style={{ fontSize: 13 }}><b>{r.rule_id}</b></td>
+                      <td className="num">{r.fires}</td>
+                      <td className="num">{r.devices}</td>
+                      <td className="num" style={hot ? { color: 'var(--warn-ink)', fontWeight: 700 } : undefined}>
+                        {r.dismissed}{hot ? ` (${Math.round(ratio * 100)}%)` : ''}
+                      </td>
+                      <td style={{ color: 'var(--ink-3)', fontSize: 12 }}>{agoSafe(r.last_fire)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
+/**
+ * Yaxshi ro'yxat (known_good). Bu yerdagi paket (+ixtiyoriy cert) faqat SUSPICIOUS verdisini
+ * pasaytiradi — DANGER hech qachon pasaymaydi. Qo'shish/o'chirish FAQAT EGADA.
+ */
+function KnownGoodPanel() {
+  const { isOwner } = useAuth();
+  const { show } = useToast();
+  const { data, loading, reload } = usePoll(
+    () => apiGet<{ good: KnownGood[] }>('/api/threats?good=1'),
+    60000,
+  );
+  const rows = data?.good || [];
+  const [pkg, setPkg] = useState('');
+  const [cert, setCert] = useState('');
+  const [label, setLabel] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const add = async () => {
+    const p = pkg.trim();
+    const c = cert.trim().toLowerCase();
+    if (!p || busy) return;
+    if (c && !/^[0-9a-f]{64}$/.test(c)) { show('Sertifikat SHA-256 — 64 ta hex belgidan iborat bo‘lishi kerak'); return; }
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', { action: 'add_good', package_name: p, cert_sha256: c, label: label.trim() });
+      setPkg(''); setCert(''); setLabel('');
+      show(`${p} yaxshi ro‘yxatga qo‘shildi`);
+      reload();
+    } catch (e) {
+      show(`Qo‘shib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const del = async (r: KnownGood) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await apiPost('/api/threats', { action: 'delete_good', package_name: r.package_name, cert_sha256: r.cert_sha256 });
+      show(`${r.package_name} ro‘yxatdan olib tashlandi`);
+      reload();
+    } catch (e) {
+      show(`O‘chirib bo‘lmadi: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Panel className="gap-top">
+      <PanelHead sub="Ishonchli ilovalar" title={`Yaxshi ro‘yxat (${rows.length})`} />
+      <div className="body-pad">
+        <div className="note ok" style={{ marginBottom: 12 }}>
+          <span className="ni">✅</span>
+          <span>Faqat SUSPICIOUS’ni pasaytiradi — DANGER’ni hech qachon emas.</span>
+        </div>
+        {isOwner && (
+          <div className="row-inline" style={{ marginBottom: 12, flexWrap: 'wrap' }}>
+            <input placeholder="paket nomi (com.example.app)" value={pkg} onChange={(e) => setPkg(e.target.value)} style={{ flex: '1 1 200px' }} />
+            <input className="mono" placeholder="cert SHA-256 (ixtiyoriy, 64 hex)" value={cert} onChange={(e) => setCert(e.target.value)} style={{ flex: '1 1 200px' }} />
+            <input placeholder="Yorliq (ixtiyoriy)" value={label} onChange={(e) => setLabel(e.target.value)} style={{ flex: '1 1 140px' }} />
+            <button className="btn" onClick={add} disabled={busy || !pkg.trim()}>
+              {busy ? <span className="spinner" /> : '+ Qo‘shish'}
+            </button>
+          </div>
+        )}
+        {loading && !rows.length ? (
+          <Spinner label="Yuklanmoqda…" />
+        ) : !rows.length ? (
+          <Empty>Ro‘yxat bo‘sh</Empty>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Paket</th>
+                  <th>Sertifikat</th>
+                  <th>Yorliq</th>
+                  <th>Qo‘shilgan</th>
+                  {isOwner && <th />}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.package_name + (r.cert_sha256 || '')}>
+                    <td className="mono" style={{ fontSize: 13 }}><b>{r.package_name}</b></td>
+                    <td className="mono" style={{ fontSize: 11, color: 'var(--ink-3)' }}>{r.cert_sha256 ? r.cert_sha256.slice(0, 16) + '…' : '—'}</td>
+                    <td style={{ fontSize: 13 }}>{r.label || '—'}</td>
+                    <td style={{ color: 'var(--ink-2)', fontSize: 12 }}>{agoSafe(r.created_at)}</td>
+                    {isOwner && (
+                      <td>
+                        <button className="btn sm danger" onClick={() => del(r)} disabled={busy}>O‘chirish</button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
 export default function Threats() {
   const { isOwner } = useAuth();
+  const { show } = useToast();
   const { data, loading, error, reload } = usePoll(() => apiGet<{ threats: ThreatFamily[] }>('/api/threats'), 20000);
   const list = data?.threats || [];
   const sorted = [...list].sort((a, b) => (b.seen_count || 0) - (a.seen_count || 0));
@@ -236,6 +566,8 @@ export default function Threats() {
 
   const [q, setQ] = useState('');
   const [sev, setSev] = useState('');
+  const [outbreakBusy, setOutbreakBusy] = useState<string | null>(null);
+  const cols = isOwner ? 9 : 8; // to'liq ro'yxat jadvali ustunlari (Epidemiya ustuni faqat egada)
   const shown = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return sorted.filter((t) => {
@@ -244,6 +576,51 @@ export default function Threats() {
       return [t.app_label, t.package_name, t.category, t.family].filter(Boolean).join(' ').toLowerCase().includes(needle);
     });
   }, [sorted, q, sev]);
+
+  // "Epidemiya rejimi" (egasi): bir tugma bilan butun parkni ogohlantiramiz. Har bosqich
+  // alohida try/catch — qisman muvaffaqiyat ham nima bo'lgani haqida hisobot beradi.
+  const runOutbreak = async (t: ThreatFamily) => {
+    const name = t.app_label || t.family || 'aniqlangan tahdid';
+    if (!window.confirm(`Epidemiya rejimi: "${name}" bo‘yicha butun parkka ogohlantirish e‘lon qilinadi va zararlangan qurilmalarga qayta-skan yuboriladi. Davom etamizmi?`)) return;
+    setOutbreakBusy(t.apk_hash);
+    let newsOk = false; let sent = 0;
+    try {
+      // (a) qadab qo'yilgan kritik e'lon (auto-shablon)
+      try {
+        const cr = await apiPost<{ id?: string; news?: { id?: string }; item?: { id?: string } }>('/api/news', {
+          action: 'create',
+          title: `⚠️ Xavfli ilova: ${name}`,
+          body: 'Bu ilova zararli deb topildi. Agar o‘rnatgan bo‘lsangiz — darhol o‘chirib tashlang.',
+          level: 'critical',
+        });
+        newsOk = true;
+        const nid = cr.id ?? cr.news?.id ?? cr.item?.id;
+        if (nid) { try { await apiPost('/api/news', { action: 'toggle_pin', id: nid, pinned: true }); } catch { /* pin ixtiyoriy */ } }
+      } catch { /* keyingi bosqichlar baribir ishlasin */ }
+
+      // (b) oila yorlig'i (faqat bo'sh bo'lsa)
+      if (!t.family) {
+        try { await apiPost('/api/threats', { action: 'set_family', apk_hash: t.apk_hash, family: t.app_label || 'Epidemiya' }); }
+        catch { /* ixtiyoriy */ }
+      }
+
+      // (c) zararlangan qurilmalarga qayta-skan (ketma-ket, 100 tagacha)
+      try {
+        const ids = (await apiGet<{ device_ids: string[] }>(`/api/scans?hash=${encodeURIComponent(t.apk_hash)}`)).device_ids || [];
+        for (const did of ids.slice(0, 100)) {
+          try { await apiPost(`/api/device/${did}`, { type: 'rescan' }); sent += 1; } catch { /* alohida xatoni o'tkazamiz */ }
+        }
+      } catch { /* ixtiyoriy */ }
+
+      show(`Epidemiya rejimi: ${newsOk ? 'e‘lon joylandi' : 'e‘lon joylanmadi'}, ${sent} qurilmaga qayta-skan yuborildi.`);
+      reload();
+    } catch (e) {
+      const m = (e as Error).message || '';
+      show(/40[13]|ruxsat|forbidden|egas/i.test(m) ? 'Bu amal faqat egasida' : `Epidemiya rejimi xatosi: ${m}`);
+    } finally {
+      setOutbreakBusy(null);
+    }
+  };
 
   return (
     <>
@@ -344,15 +721,16 @@ export default function Threats() {
                 <th>Birinchi</th>
                 <th>Oxirgi</th>
                 <th>Namuna</th>
+                {isOwner && <th>Epidemiya</th>}
               </tr>
             </thead>
             <tbody>
               {error && !list.length ? (
-                <tr><td colSpan={8}><Empty>Yuklab bo‘lmadi: {error}</Empty></td></tr>
+                <tr><td colSpan={cols}><Empty>Yuklab bo‘lmadi: {error}</Empty></td></tr>
               ) : !sorted.length ? (
-                <tr><td colSpan={8}><Empty /></td></tr>
+                <tr><td colSpan={cols}><Empty /></td></tr>
               ) : !shown.length ? (
-                <tr><td colSpan={8}><Empty>Filtrga mos tahdid topilmadi</Empty></td></tr>
+                <tr><td colSpan={cols}><Empty>Filtrga mos tahdid topilmadi</Empty></td></tr>
               ) : (
                 shown.map((t) => (
                   <tr key={t.apk_hash}>
@@ -386,6 +764,18 @@ export default function Threats() {
                         <span style={{ color: 'var(--ink-3)', fontSize: 12 }}>—</span>
                       )}
                     </td>
+                    {isOwner && (
+                      <td>
+                        <button
+                          className="btn sm danger"
+                          onClick={() => runOutbreak(t)}
+                          disabled={outbreakBusy === t.apk_hash}
+                          title="Butun parkka ogohlantirish e‘lon qilish + zararlangan qurilmalarga qayta-skan"
+                        >
+                          {outbreakBusy === t.apk_hash ? <span className="spinner" /> : '🚨 Epidemiya'}
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -395,6 +785,9 @@ export default function Threats() {
       </Panel>
 
       <DomainsPanel />
+      <RulesPanel />
+      <RuleStatsPanel />
+      <KnownGoodPanel />
     </>
   );
 }

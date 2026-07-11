@@ -277,6 +277,38 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.kq4_set_row_sideload_sub),
             R.drawable.ic4_layers,
         )
+        // "Hammasini qo'sh" to'lqini (2026-07-11): xabar tekshiruvi + tez tekshiruv + oila qalqoni
+        // + himoya qulfi (PIN) + halol cheklovlar.
+        bindChevronWithSub(
+            binding.rowScamCheck.root,
+            getString(R.string.kq4_set_row_scamcheck),
+            getString(R.string.kq4_set_row_scamcheck_sub),
+            R.drawable.ic4_alert,
+        )
+        bindChevronWithSub(
+            binding.rowCheckup.root,
+            getString(R.string.kq4_set_row_checkup),
+            getString(R.string.kq4_set_row_checkup_sub),
+            R.drawable.ic4_shield_check,
+        )
+        bindChevronWithSub(
+            binding.rowFamilyGuard.root,
+            getString(R.string.kq4_set_row_family),
+            getString(R.string.kq4_set_row_family_sub),
+            R.drawable.ic4_shield_check,
+        )
+        bindChevronWithSub(
+            binding.rowPinLock.root,
+            getString(R.string.kq4_set_row_pin),
+            getString(if (PinStore.isSet(this)) R.string.kq4_set_row_pin_on else R.string.kq4_set_row_pin_sub),
+            R.drawable.ic4_lock,
+        )
+        bindChevronWithSub(
+            binding.rowLimits.root,
+            getString(R.string.kq4_set_row_limits),
+            getString(R.string.kq4_set_row_limits_sub),
+            R.drawable.ic4_help,
+        )
     }
 
     private fun bindChevron(root: View, title: String, icon: Int) {
@@ -347,6 +379,38 @@ class SettingsActivity : AppCompatActivity() {
     private fun toggleOf(rowRoot: View): SwitchCompat =
         rowRoot.findViewById(R.id.swRow)
 
+    /** Fon himoyasi tumblerini HAQIQATAN qo'llaydi (Config + ProtectionService start/stop). */
+    private fun applyBackgroundEnabled(on: Boolean) {
+        Config.setBackgroundEnabled(this, on)
+        // BG-02: tumbler xizmatni HAQIQATAN boshqaradi (faqat Config'ga yozib qo'ymaydi).
+        if (on) {
+            ProtectionService.start(this)
+        } else {
+            ProtectionService.stop(this)
+            try {
+                (getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager)
+                    .cancel(ProtectionService.NOTIFICATION_ID)
+            } catch (_: Throwable) {}
+        }
+        toastSaved()
+    }
+
+    /** PIN natijasi — himoyani o'chirish so'rovi tasdiqlanganда qo'llaymiz; aks holda tumblerni qaytaramiz. */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_PIN_PROTECT) {
+            if (resultCode == RESULT_OK) {
+                applyBackgroundEnabled(false)
+            } else {
+                // Bekor qilindi / noto'g'ri PIN — himoya YOQILGAN qoladi, tumblerni qaytaramiz
+                // (ready=false bilan listenerni qayta ishga tushirmasdan).
+                ready = false
+                toggleOf(binding.rowAutoScan.root).isChecked = true
+                ready = true
+            }
+        }
+    }
+
     /**
      * Havola qalqoni yoqilganda — interceptor faqat UzGuard STANDART havola ochuvchi
      * bo'lsagina ishlaydi. Foydalanuvchiga buni tushuntirib, tizim «standart ilovalar»
@@ -383,22 +447,19 @@ class SettingsActivity : AppCompatActivity() {
         // Each HIMOYA toggle → immediate Config save.
         toggleOf(binding.rowAutoScan.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
-            Config.setBackgroundEnabled(this, on)
-            // BG-02: tumbler endi xizmatni HAQIQATAN boshqaradi. Avval faqat Config'ga yozib qo'yardi —
-            // "o'chirdim" deganда ProtectionService va doimiy bildirishnoma turaverardi, "yoqdim" deganда
-            // esa xizmat ishga tushmasdi (real-time himoya qaytmas edi). Endi: yoqilsa start, o'chsa stop.
-            if (on) {
-                ProtectionService.start(this)
-            } else {
-                ProtectionService.stop(this)
-                // Doimiy "faol" bildirishnomasini darhol olib tashlaymiz (xizmat to'xtagach foreground
-                // bildirishnoma odatda o'chadi, lekin refresh() bilan qo'yilgan nusxa qolmasligi uchun).
-                try {
-                    (getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager)
-                        .cancel(ProtectionService.NOTIFICATION_ID)
-                } catch (_: Throwable) {}
+            // Himoya qulfi: himoyani O'CHIRISHdan oldin PIN so'raymiz (agar o'rnatilgan bo'lsa).
+            // Firibgar qo'ng'irog'i skripti aynan "antivirusni o'chiring" bilan boshlanadi — PIN
+            // shu 5 soniyalik qadamni oila a'zosiga qo'ng'iroqqa aylantirib, skriptni buzadi.
+            // Tasdiqlanmaguncha qo'llanmaydi (natija onActivityResult'da) — tumblerni qaytaramiz.
+            if (!on && PinStore.isSet(this)) {
+                startActivityForResult(
+                    Intent(this, PinLockActivity::class.java)
+                        .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_VERIFY),
+                    RC_PIN_PROTECT,
+                )
+                return@setOnCheckedChangeListener
             }
-            toastSaved()
+            applyBackgroundEnabled(on)
         }
         toggleOf(binding.rowAutoDelete.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
@@ -539,6 +600,23 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.rowSideloadAudit.root.setOnClickListener {
             startActivity(Intent(this, SideloadAuditActivity::class.java))
+        }
+        binding.rowScamCheck.root.setOnClickListener {
+            startActivity(Intent(this, ScamMessageActivity::class.java))
+        }
+        binding.rowCheckup.root.setOnClickListener {
+            startActivity(Intent(this, CheckupWizardActivity::class.java))
+        }
+        binding.rowFamilyGuard.root.setOnClickListener {
+            startActivity(Intent(this, FamilyGuardActivity::class.java))
+        }
+        // Himoya qulfi: PIN o'rnatish/o'zgartirish (PinLockActivity "set" rejimi).
+        binding.rowPinLock.root.setOnClickListener {
+            startActivity(Intent(this, PinLockActivity::class.java)
+                .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_SET))
+        }
+        binding.rowLimits.root.setOnClickListener {
+            startActivity(Intent(this, LimitsActivity::class.java))
         }
         binding.rowPrivacy.root.setOnClickListener { ConsentActivity.openForReview(this) }
         // Boshqaruv paneli — veb-panel ilova ichida (WebView): admin login+parol bilan
@@ -776,5 +854,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun toastSaved() {
         Toast.makeText(this, getString(R.string.save), Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        // Himoyani o'chirish oldidan PIN tekshiruvi natijasi.
+        private const val RC_PIN_PROTECT = 0x9101
     }
 }

@@ -1,6 +1,7 @@
 package com.uzguard
 
 import android.util.Log
+import java.security.MessageDigest
 import java.util.zip.ZipFile
 
 // Поиск ДРОППЕРОВ — APK, который содержит ВНУТРИ ещё один APK / DEX / .so для
@@ -29,6 +30,11 @@ object DropperDetector {
 
     private val ALLOWED_SO_ABIS = setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64", "armeabi", "mips", "mips64")
 
+    // Ikkinchi-bosqich zond (second-stage probe) uchun XOR kaliti — shu malware oilasida
+    // ishlatiladigan ma'lum kalit (ObfuscatedSignatures.XOR_KEY bilan bir xil). 0x00 = passthrough (raw).
+    private const val XOR_KEY_5A = 0x5A
+    private const val PROBE_CAP = 20L * 1024 * 1024   // ≤20MB — zond faqat shu chegaragacha ishlaydi
+
     data class Findings(
         val score: Int,
         val hiddenApks: List<String>,
@@ -41,7 +47,21 @@ object DropperDetector {
          * XOR-shifrlangan DEX/APK, runtime'da dekriptlanib yuklanadi.
          */
         val encryptedPayloads: List<String> = emptyList(),
+        /**
+         * Ikkinchi-bosqich zondi (XOR 0x5A / passthrough / Base64) dekodlaganda ICHIDA haqiqiy
+         * APK/DEX/ELF magic topilgan payload nomlari. Bular "shubhali konteyner"'dan qat'iy
+         * yashirin-APK/DEX/ELF DANGER signaliga KO'TARILADI (ApkScanner reason: "dropper:xor_payload").
+         */
+        val xorPayloads: List<String> = emptyList(),
+        /**
+         * Dekodlangan ichki payload'larning SHA-256'lari (lowercase hex) — [ApkScanner] ularni
+         * mavjud [MaliciousHashes]/[ThreatDb] IOC bazasidan o'tkazadi (ichki-hash mosligi = DANGER).
+         */
+        val innerHashes: List<String> = emptyList(),
     )
+
+    private enum class InnerKind { APK, DEX, ELF }
+    private data class Probe(val kind: InnerKind, val sha256: String?)
 
     fun analyze(apkPath: String): Findings {
         val hiddenApks = mutableListOf<String>()
@@ -49,6 +69,8 @@ object DropperDetector {
         val hiddenElf = mutableListOf<String>()
         val soOutsideLib = mutableListOf<String>()
         val encryptedPayloads = mutableListOf<String>()
+        val xorPayloads = mutableListOf<String>()
+        val innerHashes = mutableListOf<String>()
 
         try {
             ZipFile(apkPath).use { zip ->
@@ -102,6 +124,18 @@ object DropperDetector {
                             if (isSuspectEncryptedPayload(name, entry.size)) {
                                 if (looksHighEntropy(zip, entry)) {
                                     encryptedPayloads.add(name)
+                                    // Ikkinchi-bosqich zond: XOR 0x5A / passthrough / Base64 dekodlab,
+                                    // ichida haqiqiy APK/DEX/ELF magic bo'lsa — "shubhali konteyner"'ni
+                                    // qat'iy yashirin-payload DANGER signaliga ko'taramiz.
+                                    probeSecondStage(zip, entry)?.let { probe ->
+                                        when (probe.kind) {
+                                            InnerKind.APK -> if (name !in hiddenApks) hiddenApks.add(name)
+                                            InnerKind.DEX -> if (name !in hiddenDex) hiddenDex.add(name)
+                                            InnerKind.ELF -> if (name !in hiddenElf) hiddenElf.add(name)
+                                        }
+                                        if (name !in xorPayloads) xorPayloads.add(name)
+                                        probe.sha256?.let { if (it !in innerHashes) innerHashes.add(it) }
+                                    }
                                 }
                             }
                         }
@@ -122,7 +156,105 @@ object DropperDetector {
             hiddenElf = hiddenElf,
             soOutsideLib = soOutsideLib,
             encryptedPayloads = encryptedPayloads,
+            xorPayloads = xorPayloads,
+            innerHashes = innerHashes,
         )
+    }
+
+    /**
+     * CHEAP ikkinchi-bosqich zond. FAQAT allaqachon yuqori-entropiyali (shifrlangan) deb belgilangan
+     * payload uchun chaqiriladi. Hard cap'lar: entry ≤ [PROBE_CAP] (20MB), rekursiya YO'Q (1 daraja),
+     * O(payload). Uchta transformni sinaydi: XOR 0x5A, passthrough (XOR 0x00 = xom), Base64-decode.
+     * Dekodlangan birinchi baytlarda APK(PK\x03\x04)/DEX("dex\n")/ELF magic bo'lsa — [Probe] qaytaradi
+     * (kind + to'liq dekodlangan payload SHA-256). Aks holda null. Hech qachon throw qilmaydi.
+     */
+    private fun probeSecondStage(zip: ZipFile, entry: java.util.zip.ZipEntry): Probe? {
+        val size = entry.size
+        if (size <= 4 || size > PROBE_CAP) return null
+        return try {
+            val raw = readAllBounded(zip, entry) ?: return null
+            if (raw.size < 4) return null
+            val headLen = minOf(8, raw.size)
+
+            // 1) XOR 0x5A — DEOBFUSKATSIYA. Bosh baytlarni arzon transformlab magic tekshiramiz;
+            //    mos bo'lsagina to'liq (bir o'tishli) XOR + SHA-256 hisoblaymiz. Dekodlangan magic
+            //    mosligi yuqori ishonchli (tasodif ~1/2^32) — legit yuqori-entropiya asset'da bo'lmaydi.
+            innerKindOf(xorBytes(raw, XOR_KEY_5A, headLen))?.let { kind ->
+                return Probe(kind, sha256Hex(xorBytes(raw, XOR_KEY_5A)))
+            }
+            // 2) Base64-decode — payload ASCII base64 bo'lsa. Binar/yaroqsiz base64 → exception → null.
+            val decoded = try {
+                android.util.Base64.decode(raw, android.util.Base64.DEFAULT)
+            } catch (_: Throwable) {
+                null
+            }
+            if (decoded != null && decoded.size >= 4) {
+                innerKindOf(decoded.copyOf(minOf(8, decoded.size)))?.let { kind ->
+                    return Probe(kind, sha256Hex(decoded))
+                }
+            }
+            // 3) Passthrough (XOR 0x00 = xom) — xom magic. DEX/ELF xom magic asosiy `when`da ushlanadi
+            //    (bu yerga yetmaydi). APK (PK..) xom magic esa legit data-zip (masalan tzdata distro.zip)
+            //    bo'lishi mumkin — shuning uchun asosiy yo'ldagi AYNAN SHU looksLikeEmbeddedApk guard'ini
+            //    qo'llaymiz (ichida AndroidManifest.xml/classes.dex bo'lsagina haqiqiy embedded APK).
+            //    Aks holda legit data-zip noto'g'ri qat'iy DANGER bo'lardi (FP).
+            innerKindOf(raw.copyOf(headLen))?.let { kind ->
+                if (kind != InnerKind.APK || looksLikeEmbeddedApk(zip, entry)) {
+                    return Probe(kind, sha256Hex(raw))
+                }
+            }
+            null
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
+    /** Entry'ni ≤[PROBE_CAP] baytgacha to'liq o'qiydi. Cap'dan katta/o'lchamsiz → null. */
+    private fun readAllBounded(zip: ZipFile, entry: java.util.zip.ZipEntry): ByteArray? {
+        val size = entry.size
+        if (size <= 0L || size > PROBE_CAP) return null
+        val target = size.toInt()
+        val buf = ByteArray(target)
+        var off = 0
+        return try {
+            zip.getInputStream(entry).use { input ->
+                while (off < target) {
+                    val n = input.read(buf, off, target - off)
+                    if (n <= 0) break
+                    off += n
+                }
+            }
+            if (off < 4) null else if (off == target) buf else buf.copyOf(off)
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
+    /** [src]'ning dastlabki [count] baytini [key] bilan XOR qiladi (yangi massiv qaytaradi). */
+    private fun xorBytes(src: ByteArray, key: Int, count: Int = src.size): ByteArray {
+        val n = minOf(count, src.size).coerceAtLeast(0)
+        val out = ByteArray(n)
+        for (i in 0 until n) out[i] = (src[i].toInt() xor key).toByte()
+        return out
+    }
+
+    private fun innerKindOf(head: ByteArray): InnerKind? = when {
+        head.startsWith(APK_MAGIC) -> InnerKind.APK
+        head.startsWith(DEX_MAGIC) -> InnerKind.DEX
+        head.startsWith(ELF_MAGIC) -> InnerKind.ELF
+        else -> null
+    }
+
+    private val HEX = "0123456789abcdef".toCharArray()
+
+    private fun sha256Hex(bytes: ByteArray): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
+        val sb = StringBuilder(digest.size * 2)
+        for (b in digest) {
+            sb.append(HEX[(b.toInt() ushr 4) and 0x0F])
+            sb.append(HEX[b.toInt() and 0x0F])
+        }
+        return sb.toString()
     }
 
     /**

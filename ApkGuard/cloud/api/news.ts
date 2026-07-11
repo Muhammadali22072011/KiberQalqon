@@ -19,15 +19,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     // O'qish: kirgan panel foydalanuvchisi (egasi yoki admin) YOKI qurilma (APK,
     // x-device-secret). E'lonlar hamma uchun — APK bosh ekranda lentani ko'rsatadi.
-    if (!canRead(req) && !checkDeviceSecret(req)) {
+    const admin = canRead(req);
+    if (!admin && !checkDeviceSecret(req)) {
       return res.status(401).json({ ok: false, error: 'auth' });
     }
-    const { data, error } = await sb
+
+    // Panel (admin) — HAMMA e'lonni group_id bilan ko'radi (guruh yorlig'ini ko'rsatish uchun).
+    // Qurilma — ?g=<join_code> yuboradi: global (group_id null) + O'Z guruhi e'lonlari. Guruhga
+    // yo'naltirish butun flotni spamlamaslik uchun (alert charchashiga qarshi). Kod noto'g'ri/yo'q
+    // bo'lsa — faqat global e'lonlar (fail-soft, qurilma buzilmaydi).
+    let base = sb
       .from('news')
-      .select('id, title, body, level, image_url, pinned, created_at')
+      .select('id, title, body, level, image_url, pinned, group_id, created_at')
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(100);
+
+    if (!admin) {
+      let gid: string | null = null;
+      const code = typeof req.query.g === 'string' ? req.query.g.trim().toUpperCase().slice(0, 16) : '';
+      if (code) {
+        const { data: g } = await sb.from('device_groups').select('id').eq('join_code', code).maybeSingle();
+        gid = g?.id ?? null;
+      }
+      base = gid ? base.or(`group_id.is.null,group_id.eq.${gid}`) : base.is('group_id', null);
+    }
+
+    const { data, error } = await base;
     if (error) { console.error(`[news] list db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
     return res.status(200).json({ ok: true, news: data ?? [] });
   }
@@ -52,10 +70,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // panelда ko'rinardi — jim nomuvofiqlik). javascript:/data: kabi URI'lar ham rad etiladi.
       const rawImg = String(b.image_url ?? '').trim();
       const image_url = /^https:\/\//i.test(rawImg) ? rawImg : null;
+      // group_id — ixtiyoriy guruh yo'nalishi (uuid). null/yaroqsiz → global e'lon (hamma qurilma).
+      const gidRaw = typeof b.group_id === 'string' ? b.group_id.trim() : '';
+      const group_id = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(gidRaw) ? gidRaw : null;
       const { data, error } = await sb
         .from('news')
-        .insert({ title, body, level, image_url })
-        .select('id, title, body, level, image_url, pinned, created_at')
+        .insert({ title, body, level, image_url, group_id })
+        .select('id, title, body, level, image_url, pinned, group_id, created_at')
         .single();
       if (error) { console.error(`[news] create db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
       await audit(req, 'news_create', `${data?.id ?? '?'}: ${title.slice(0, 80)}`);

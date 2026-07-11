@@ -146,6 +146,11 @@ export interface DeviceRow {
   // Guruh (16_groups): null = guruhsiz. member_* — foydalanuvchi qo'shilishda o'zi kiritgan.
   group_id?: string | null; group_name?: string | null; group_color?: string | null;
   member_first?: string | null; member_last?: string | null; member_phone?: string | null;
+  // Himoya batareyasi (qurilma yuborgan yoniq/o'chiq holat) + bayroq (yo'qolgan/buzilgan).
+  protections?: Record<string, boolean | number> | null; // {svc,a11y,notif,postN,linkH,apkH,vpn,batt,scanAgeH,ts}
+  flag?: string | null;       // null | 'lost' | 'compromised'
+  flag_at?: string | null;
+  flag_note?: string | null;
 }
 // Qurilma guruhi (rang-yorliq segment). join_code — ilovada kiritiladigan/QR kod.
 export interface GroupRow {
@@ -167,6 +172,7 @@ export interface ScanRow {
 export interface NewsItem {
   id: string; title: string; body?: string | null; level?: string;
   image_url?: string | null; pinned?: boolean; created_at: string;
+  group_id?: string | null; // null/bo'sh = global (hammaga); aks holda guruhga yo'naltirilgan
 }
 export interface AuditRow {
   id: number; at: string; actor: string; action: string;
@@ -186,4 +192,23 @@ export interface DayPoint {
 // Tizim salomatligi kartasi (stats?series=1 bilan birga keladi).
 export interface SystemHealth {
   db_ok: boolean; last_scan_at: string | null; last_device_seen: string | null;
+}
+// Feature wave: park himoya-salomatligi (devices?health=1) — Qurilmalar ro'yxati tepasidagi qator.
+export interface FleetHealth {
+  total: number; reporting: number; svc_off: number; a11y_off: number;
+  notif_off: number; vpn_off: number; linkh_off: number; stale: number;
+}
+// YARA-lite aniqlash qoidasi (threats?rules=1) — imzolangan feed orqali barcha telefonlarga.
+export interface ThreatRule {
+  rule_id: string; family?: string | null; severity: string; target: string;
+  needles: string[]; min_hits: number; enabled: boolean; muted: boolean;
+  notes?: string | null; created_at?: string; updated_at?: string;
+}
+// Yaxshi ro'yxat (threats?good=1) — faqat SUSPICIOUS'ni pasaytiradi, DANGER'ni hech qachon.
+export interface KnownGood {
+  package_name: string; cert_sha256?: string | null; label?: string | null; created_at?: string;
+}
+// Qoida statistikasi (threats?rulestats=1) — noto'g'ri ishga tushish (FP) nazorati.
+export interface RuleStat {
+  rule_id: string; fires: number; devices: number; dismissed: number; last_fire?: string | null;
 }

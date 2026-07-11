@@ -60,6 +60,11 @@ object CloudBlacklist {
             // Keshlangan konvert — oxirgi qabul qilingan (imzo tekshirilgan) feed; ikkala manbani ham
             // (hash/paket + domen) qo'llaymiz (ThreatDb merge faqat QO'SHADI, hech qachon zaiflashtirmaydi).
             mergeIntoThreatDb(payload, applyThreats = true, applyDomains = true)
+            // YARA-lite qoida paketlari + known-good (RuleStore) — MUSTAQIL rv/gv rollback-guard'lar
+            // RuleStore ichida (uzguard_rules prefs). Keshlangan konvert allaqachon imzo bo'yicha
+            // qayta tekshirilgan; RuleStore faqat versiya guard'ini qo'llaydi. Fail-soft.
+            RuleStore.applyRules(ctx, payload.optJSONArray("rules"), payload.optInt("rv", 0))
+            RuleStore.applyGood(ctx, payload.optJSONArray("good"), payload.optInt("gv", 0))
         } catch (e: Throwable) {
             Log.w(TAG, "loadCached failed", e)
         }
@@ -145,6 +150,13 @@ object CloudBlacklist {
             if (mergeIntoThreatDb(payload, applyThreats, applyDomains)) {
                 Config.markDatabaseUpdated(ctx)
             }
+            // YARA-lite qoida paketlari (rules) + known-good (good) — hash/paket/domen feed'idan
+            // MUSTAQIL. rv/gv rollback-guard'lar RuleStore ichida (uzguard_rules prefs) — CloudBlacklist'ning
+            // KEY_V/KEY_DV idiomasi kabi (remote >= stored → qo'llanadi). 0 = neytral (qoida yo'q).
+            // Fail-soft: RuleStore hech qachon throw qilmaydi. Rules FAQAT detektsiyani kuchaytiradi;
+            // good esa ApkScanner'da DOWNGRADE-ONLY (soft signal → SAFE, hard DANGER'ga tegmaydi).
+            RuleStore.applyRules(ctx, payload.optJSONArray("rules"), payload.optInt("rv", 0))
+            RuleStore.applyGood(ctx, payload.optJSONArray("good"), payload.optInt("gv", 0))
             Log.i(TAG, "cloud blacklist qo'llandi (v=$remoteV, dv=$remoteDv, threats=$applyThreats, domains=$applyDomains)")
         } catch (e: Throwable) {
             Log.w(TAG, "refresh failed (assets bazasi saqlanadi)", e)

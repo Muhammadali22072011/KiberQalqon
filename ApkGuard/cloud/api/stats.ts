@@ -139,6 +139,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ ok: true, series, health });
   }
 
+  // ?weekly=1 → oxirgi 7 kunlik yig'ma hisobot (panel "Haftalik hisobot" + Telegram yetkazish
+  // uchun). Alohida funksiya EMAS (Vercel Hobby 12-funksiya limiti) — stats?series=1 uslubidagi
+  // branch. Global yig'indi + eng ko'p uchragan tahdid oilalari. FAQAT EGASI.
+  if (req.query.weekly === '1') {
+    if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const [total, danger, susp, safe, devs, fams] = await Promise.all([
+      sb.from('scans').select('*', { count: 'exact', head: true }).gte('scanned_at', since),
+      sb.from('scans').select('*', { count: 'exact', head: true }).eq('verdict', 'danger').gte('scanned_at', since),
+      sb.from('scans').select('*', { count: 'exact', head: true }).eq('verdict', 'suspicious').gte('scanned_at', since),
+      sb.from('scans').select('*', { count: 'exact', head: true }).eq('verdict', 'safe').gte('scanned_at', since),
+      sb.from('scans').select('device_id').gte('scanned_at', since).not('device_id', 'is', null).limit(20000),
+      sb.from('threats').select('family, app_label, seen_count').gte('last_seen', since).order('seen_count', { ascending: false }).limit(10),
+    ]);
+    const activeDevices = new Set(((devs.data ?? []) as Array<{ device_id: string }>).map((r) => r.device_id)).size;
+    const topThreats = ((fams.data ?? []) as Array<{ family?: string | null; app_label?: string | null; seen_count?: number }>)
+      .map((t) => ({ name: t.family || t.app_label || '—', count: t.seen_count ?? 0 }));
+    return res.status(200).json({
+      ok: true,
+      weekly: {
+        since,
+        total: total.count ?? 0,
+        danger: danger.count ?? 0,
+        suspicious: susp.count ?? 0,
+        safe: safe.count ?? 0,
+        active_devices: activeDevices,
+        top_threats: topThreats,
+      },
+    });
+  }
+
   const { data, error } = await sb.from('v_stats_today').select('*').single();
   if (error) { console.error(`[stats] db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
   return res.status(200).json({ ok: true, stats: data });

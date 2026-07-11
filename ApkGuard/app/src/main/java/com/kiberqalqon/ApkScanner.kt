@@ -1209,12 +1209,70 @@ object ApkScanner {
             }
             val fakeSecurityScore = if (fakeSecurityMicAbuse) 50 else 0
 
+            // === YARA-lite bulut qoidalari (RuleEngine) + bulut known-good + ZIP anomaliya + ichki-hash IOC ===
+            // Manifest haystack'i (best-effort): AndroidManifest.xml baytlarini kichik-harfli ISO-8859-1
+            // sifatida o'qiymiz (AXML string pool ichidagi ruxsat/komponent nomlari uchun). ISSIQLIK:
+            // faqat "manifest" target'li qoida MAVJUD bo'lsagina qo'shimcha ZIP ochamiz (odatda yo'q →
+            // qo'shimcha IO yo'q). Kichik fayl (≤4MB), fail-soft.
+            val manifestTextLower = try {
+                if (RuleStore.rules().any { it.target == "manifest" }) {
+                    ZipFile(apkPath).use { z ->
+                        z.getEntry("AndroidManifest.xml")
+                            ?.takeIf { it.size in 1..(4L * 1024 * 1024) }
+                            ?.let { e -> z.getInputStream(e).use { it.readBytes() } }
+                    }?.let { String(it, Charsets.ISO_8859_1).lowercase() }
+                } else null
+            } catch (e: Throwable) {
+                Log.w(TAG, "manifest text read failed", e); null
+            }
+
+            // dex_string haystack'i — DexPatternAnalyzer allaqachon o'qigan DEX matni (qayta IO yo'q).
+            val ruleHits = try {
+                RuleEngine.evaluate(dexFindings.dexStringsLower, manifestTextLower, apkPath.lowercase())
+            } catch (e: Throwable) {
+                Log.w(TAG, "RuleEngine failed", e); emptyList()
+            }
+            // NON-advisory + critical/high → QAT'IY (hard) DANGER hissa (obfuscatedSignature kabi).
+            val ruleHardHit = ruleHits.any {
+                !it.advisory && (it.severity == "critical" || it.severity == "high")
+            }
+            // Qolganlar (medium/low YOKI istalgan advisory) → faqat SUSPICIOUS-darajali score. Yakka o'zi
+            // DANGER'ga yetmasligi uchun umumiy hissa 60 bilan cheklangan (dangerThreshold'dan past).
+            val ruleSoftScore = (ruleHits.count {
+                it.advisory || (it.severity != "critical" && it.severity != "high")
+            } * 30).coerceAtMost(60)
+
+            // Ichki-payload hash IOC (DropperDetector ikkinchi-bosqich zondi) — mavjud IOC bazasidan.
+            val innerHashFamily = try {
+                dropperFindings.innerHashes.firstNotNullOfOrNull { MaliciousHashes.maliciousFamily(it) }
+            } catch (e: Throwable) {
+                Log.w(TAG, "inner-hash IOC lookup failed", e); null
+            }
+            val innerHashMalicious = innerHashFamily != null
+
+            // ZIP struktura anomaliyalari (MASLAHAT) — modest SUSPICIOUS score, hech qachon standalone DANGER.
+            val zipAnomalyScore = if (zipEncFindings.anomalies.isNotEmpty()) 30 else 0
+
+            // Bulut known-good (DOWNGRADE-ONLY) — VERIFIED bilan STRUKTURA jihatdan bir xil: faqat yumshoq
+            // signalni bosadi (decideVerdict'da reputatsiya qalqoni TIER-1 hard signallardan KEYIN turadi,
+            // shuning uchun hard DANGER'ni HECH QACHON bosa olmaydi). Mos: paket + (cert bo'sh YOKI mos).
+            val goodListTrusted = try {
+                val pkgL = packageNameForHeuristic?.lowercase()
+                val certL = certFingerprint?.lowercase()
+                pkgL != null && RuleStore.good().any { g ->
+                    g.pkg == pkgL && (g.cert.isEmpty() || g.cert == certL)
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "good-list lookup failed", e); false
+            }
+
             // MUHIM: native topilma endi MUSTAQIL DANGER bermaydi (bu false-positive'ning
             // asosiy sababi edi — har bir native lib'da dlopen/JNI_OnLoad bor). U umumiy
             // score'ga qo'shiladi va boshqa signallar bilan tasdiqlanishi kerak.
+            // ruleSoftScore + zipAnomalyScore — MASLAHAT hissa (cheklangan, yakka o'zi DANGER bermaydi).
             val totalScore = manifestFindings.score + comboScore + dexFindings.score +
                     dropperFindings.score + filenameFindings.score + nativeFindings.score +
-                    fakeSecurityScore + oversizedDexPenalty
+                    fakeSecurityScore + oversizedDexPenalty + ruleSoftScore + zipAnomalyScore
 
             // Threshold'lar masofaviy config'dan (RemoteConfig). Baked standartlar avvalgi
             // qiymatlar bilan AYNAN bir xil (high 55/28, medium 85/40, low 120/60); masofaviy
@@ -1253,6 +1311,8 @@ object ApkScanner {
                     // MALWARE_PATHS) va halol REST-mijozlarda ham uchraydi. Faqat banker korroboratori
                     // (strongCombo / dropped .so / random-pkg / yashirin APK|DEX|ELF) bilan yoqiladi;
                     // barcha malware'ga-XOS IoC'lar (domen/kalit/bot) baribir yakka o'zi hard chiqadi.
+                    // ruleHardHit — NON-advisory bulut qoidasi (critical/high): qat'iy IoC kabi TIER-1.
+                    // innerHashMalicious — dropper ikkinchi-bosqich zondi topgan ichki payload IOC bazada.
                     obfuscatedSignature = signaturesFound.any {
                         ObfuscatedSignatures.isHardFamily(it) && it !in ObfuscatedSignatures.GENERIC_BANKER_PATHS
                     } || (
@@ -1261,10 +1321,12 @@ object ApkScanner {
                                 dropperFindings.hiddenApks.isNotEmpty() ||
                                 dropperFindings.hiddenDex.isNotEmpty() ||
                                 dropperFindings.hiddenElf.isNotEmpty())
-                    ),
+                    ) || ruleHardHit || innerHashMalicious,
                     strongCombo = strongCombo,
                     evasionCount = evasionCount,
-                    verifiedTrusted = verifiedTrusted,
+                    // goodListTrusted — bulut known-good (DOWNGRADE-ONLY). VERIFIED bilan bir xil qatlamda:
+                    // TIER-1 hard signallardan KEYIN → hard DANGER'ni bosa OLMAYDI, faqat yumshoq → SAFE.
+                    verifiedTrusted = verifiedTrusted || goodListTrusted,
                     trustedInstalledApp = trustedInstalledApp,
                     totalScore = totalScore,
                     dangerThreshold = dangerThreshold,
@@ -1310,6 +1372,27 @@ object ApkScanner {
                 )
             } catch (e: Throwable) {
                 Log.w(TAG, "MlRiskModel failed", e); -1.0
+            }
+
+            // Bulut-qoida / dropper-zond / ZIP-anomaliya reason'larini malwareSignatures'ga qo'shamiz.
+            // MUHIM: bu verdict HISOBLANGANIDAN KEYIN bajariladi — obfuscatedSignature (yuqorida
+            // signaturesFound.any{...} bilan) bu qatorlarni HISOBGA OLMAYDI (ruleHardHit/innerHashMalicious
+            // allaqachon alohida signal orqali kirdi). Cloud "rule:<id>" prefiksini telemetriya uchun
+            // parse qiladi — aynan shu ko'rinishda saqlaymiz.
+            for (h in ruleHits) {
+                val rr = "rule:${h.ruleId} ${h.family}"
+                if (rr !in signaturesFound) signaturesFound.add(rr)
+            }
+            if (dropperFindings.xorPayloads.isNotEmpty() && "dropper:xor_payload" !in signaturesFound) {
+                signaturesFound.add("dropper:xor_payload")
+            }
+            innerHashFamily?.let { fam ->
+                val hr = "hash:$fam"
+                if (hr !in signaturesFound) signaturesFound.add(hr)
+            }
+            for (a in zipEncFindings.anomalies) {
+                val zr = "zip_anomaly:$a"
+                if (zr !in signaturesFound) signaturesFound.add(zr)
             }
 
             val details = mutableListOf<String>()
@@ -1382,9 +1465,33 @@ object ApkScanner {
                 details.addAll(filenameFindings.flags.take(3))
             }
 
+            // === Bulut qoidalari (RuleEngine) ===
+            if (ruleHits.isNotEmpty()) {
+                details.add("Bulut qoidasi mos keldi: ${ruleHits.take(3).joinToString(", ") { it.family }}")
+            }
+
+            // === Dropper ikkinchi-bosqich zondi (XOR/Base64 dekod) ===
+            if (dropperFindings.xorPayloads.isNotEmpty()) {
+                details.add("🚫 Yashirin payload dekodlandi — ichida haqiqiy APK/DEX/ELF: ${dropperFindings.xorPayloads.take(2).joinToString(", ")}")
+            }
+            if (innerHashFamily != null) {
+                details.add("🚫 Ichki payload ma'lum zararli (IOC): $innerHashFamily")
+            }
+
+            // === ZIP struktura anomaliyasi (maslahat) ===
+            if (zipEncFindings.anomalies.isNotEmpty()) {
+                details.add("⚠️ ZIP tuzilmasi anomaliyasi: ${zipEncFindings.anomalies.joinToString(", ")}")
+            }
+
             // === ML advisory ===
             if (mlRisk >= 0.35) {
                 details.add("🤖 AI bahosi: zararli bo'lish ehtimoli ~${(mlRisk * 100).toInt()}% (daraja: ${mlBandUz(mlRisk)}) — maslahat, xulosaga ta'sir qilmaydi")
+            }
+
+            // Bulut known-good qo'llangan bo'lsa (va qat'iy signal yo'qligida SAFE bo'lgan bo'lsa) —
+            // foydalanuvchiga sababni ko'rsatamiz. Bu DOWNGRADE-ONLY: DANGER holatida ko'rinmaydi.
+            if (goodListTrusted && verdict == ScanResult.Verdict.SAFE) {
+                details.add(0, "ℹ️ Bulut ishonchli ro'yxatida (good:cloud) — yumshoq belgilar bosildi")
             }
 
             if (details.isEmpty()) {

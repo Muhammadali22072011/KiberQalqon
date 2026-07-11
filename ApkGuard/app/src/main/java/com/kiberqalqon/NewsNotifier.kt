@@ -55,6 +55,12 @@ object NewsNotifier {
             if (now in last..(last + CHECK_INTERVAL_MS)) return
             sp.edit().putLong(KEY_LAST_CHECK, now).apply()
 
+            // Piggyback: shu mavjud tekshiruv-tsikliga (ekran ochiq ~3 daq, Doze ~40 daq) egasidan
+            // kelgan masofaviy buyruq/bayroq (message/flag/rescan) pollini ilamiz. YANGI taymer
+            // QO'SHILMAYDI (loyiha isish tarixiga sezgir) — mavjud uyg'onishni ulashamiz, shu sabab
+            // admin xabari App.onCreate + 6 soatlik Heartbeat o'rniga deyarli real-vaqtda keladi.
+            try { CloudTelemetry.pollCommands(ctx) } catch (_: Throwable) {}
+
             // Yangi ro'yxat: avval tarmoqdan (NewsStore keshini ham yangilaydi), bo'lmasa
             // (throttle/oflayn) keshdan. NewsNotifier 30 daq > NewsStore 10 daq throttle,
             // shu sabab odatda refresh haqiqatan tarmoqdan oladi.

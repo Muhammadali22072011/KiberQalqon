@@ -5,10 +5,20 @@ import { verifyDeviceWrite, issueDeviceToken } from '../../lib/devauth.js';
 import { readRaw } from '../../lib/rawbody.js';
 import { resolveGeoNoDowngrade, readDeviceGeo, clientIp } from '../../lib/geo.js';
 import { audit } from '../../lib/audit.js';
+import { sendMessage, adminChatIds } from '../../lib/telegram.js';
 
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-// Panelddan qurilmaga yuboriladigan buyruq turlari (hozircha faqat masofadan qayta skan).
-const ALLOWED_CMD_TYPES = ['rescan'];
+// Panelddan qurilmaga yuboriladigan buyruq turlari:
+//   rescan  — masofadan qayta skan (avvaldan bor).
+//   message — egasidan 1:1 xabar (payload {title, body}) → qurilmada bildirishnoma.
+// 'flag'/'unflag' buyruq EMAS — u devices.flag ustuniga BARQAROR holat yozadi (pastga qarang).
+const ALLOWED_CMD_TYPES = ['rescan', 'message'];
+// Qurilmani belgilash holatlari — "yo'qolgan" / "buzilgan" (poll BARQAROR qaytaradi).
+const FLAG_STATES = ['lost', 'compromised'];
+// Himoya-holati (protections jsonb) ichida KRITIK himoyalar — bulardan biri ON→OFF
+// bo'lsa egaga Telegram ogohlantirishi (throttle bilan). a11y/vpn ataylab o'chirilishi
+// mumkin (normal), shuning uchun kritik to'plamga kirmaydi.
+const CRITICAL_PROTECTIONS = ['svc', 'notif'] as const;
 
 // register XOM tanani o'qiydi (imzo tekshiruvi uchun). GET'da tana yo'q — ta'sir qilmaydi.
 export const config = { api: { bodyParser: false } };
@@ -85,10 +95,15 @@ async function handlePoll(req: VercelRequest, res: VercelResponse) {
   }
 
   const sb = db();
-  const { data: dev, error: dErr } = await sb.from('devices').select('id').eq('device_token', dtok).maybeSingle();
+  // flag/flag_note ham o'qiymiz — bayroq BARQAROR holat (bir martalik buyruq emas): belgilangan
+  // qurilma har pollda uni oladi va to'liq ekranli ogohlantirishni ko'rsatib turadi (unflag → tozalanadi).
+  const { data: dev, error: dErr } = await sb.from('devices').select('id, flag, flag_note').eq('device_token', dtok).maybeSingle();
   if (dErr) { console.error(`[device] poll device lookup: ${dErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
   res.setHeader('Cache-Control', 'no-store');
-  if (!dev) return res.status(200).json({ ok: true, commands: [] }); // noma'lum token — bo'sh (xato bermaymiz)
+  if (!dev) return res.status(200).json({ ok: true, commands: [], flag: null }); // noma'lum token — bo'sh (xato bermaymiz)
+  const flag = dev.flag && FLAG_STATES.includes(dev.flag)
+    ? { state: dev.flag as string, note: typeof dev.flag_note === 'string' ? dev.flag_note : '' }
+    : null;
 
   const { data: cmds, error: cErr } = await sb
     .from('device_commands')
@@ -108,7 +123,7 @@ async function handlePoll(req: VercelRequest, res: VercelResponse) {
       .in('id', ids);
     if (uErr) console.error(`[device] poll mark done: ${uErr.message}`); // yetkazildi deb belgilay olmadik — keyingi pollda qayta keladi
   }
-  return res.status(200).json({ ok: true, commands: list.map((c) => ({ id: c.id, type: c.type, payload: c.payload })) });
+  return res.status(200).json({ ok: true, commands: list.map((c) => ({ id: c.id, type: c.type, payload: c.payload })), flag });
 }
 
 // --- #3: paneldan buyruq qo'yish (FAQAT EGASI) — POST /api/device/<uuid> {type,payload} ---
@@ -120,17 +135,45 @@ async function handleEnqueue(req: VercelRequest, res: VercelResponse, id?: strin
   let b: { type?: string; payload?: unknown };
   try { b = JSON.parse(raw || '{}'); } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
   const type = String(b.type || '');
-  if (!ALLOWED_CMD_TYPES.includes(type)) return res.status(400).json({ ok: false, error: 'bad type' });
+  const payload = (b.payload && typeof b.payload === 'object') ? b.payload as Record<string, unknown> : {};
 
   const sb = db();
   const { data: dev, error: dErr } = await sb.from('devices').select('id').eq('id', id).maybeSingle();
   if (dErr) { console.error(`[device] enqueue lookup: ${dErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
   if (!dev) return res.status(404).json({ ok: false, error: 'not found' });
 
-  const payload = (b.payload && typeof b.payload === 'object') ? b.payload : {};
+  // ── flag/unflag — BARQAROR holat (device_commands EMAS): devices.flag ustuniga yozamiz.
+  // Belgilangan qurilma har pollda bayroqni oladi (bir martalik buyruq emas). MDM emas:
+  // faqat to'liq-ekran ogohlantirish + kuchli heartbeat, masofaviy o'chirish/qulflash YO'Q.
+  if (type === 'flag' || type === 'unflag') {
+    let row: Record<string, unknown>;
+    if (type === 'unflag') {
+      row = { flag: null, flag_at: null, flag_note: null };
+    } else {
+      const state = String(payload.state || '');
+      if (!FLAG_STATES.includes(state)) return res.status(400).json({ ok: false, error: 'bad state' });
+      const note = typeof payload.note === 'string' ? payload.note.trim().slice(0, 300) : null;
+      row = { flag: state, flag_at: new Date().toISOString(), flag_note: note };
+    }
+    const { error } = await sb.from('devices').update(row).eq('id', id);
+    if (error) { console.error(`[device] flag update: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    await audit(req, 'device_flag', `${type} → ${id.slice(0, 8)}…`);
+    return res.status(200).json({ ok: true, flag: type === 'unflag' ? null : row.flag });
+  }
+
+  if (!ALLOWED_CMD_TYPES.includes(type)) return res.status(400).json({ ok: false, error: 'bad type' });
+
+  // message — payload {title, body} tekshiruvi (bo'sh xabar yubormaymiz).
+  if (type === 'message') {
+    const title = typeof payload.title === 'string' ? payload.title.trim().slice(0, 120) : '';
+    const body = typeof payload.body === 'string' ? payload.body.trim().slice(0, 1000) : '';
+    if (!title && !body) return res.status(400).json({ ok: false, error: 'bo\'sh xabar' });
+    b.payload = { title, body };
+  }
+
   const { data, error } = await sb
     .from('device_commands')
-    .insert({ device_id: id, type, payload, created_by: 'owner' })
+    .insert({ device_id: id, type, payload: b.payload && typeof b.payload === 'object' ? b.payload : {}, created_by: 'owner' })
     .select('id, type, status, created_at')
     .single();
   if (error) { console.error(`[device] enqueue insert: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
@@ -222,7 +265,25 @@ type RegisterBody = {
   lat?: number | string;
   lng?: number | string;
   loc_accuracy_m?: number | string;
+  // "Himoya batareyasi": qaysi himoyalar haqiqatan YOQILGAN (mijoz SecurityScore'dan yig'adi).
+  protections?: Record<string, unknown>;
 };
+
+// protections jsonb'ni normallashtiramiz — faqat kutilgan kalitlar, boolean/int, ishonchsiz
+// JSON'dan kelgani uchun (kirish-qattiqlash falsafasi: scan/upload.ts kabi).
+const PROT_BOOL_KEYS = ['svc', 'a11y', 'notif', 'postN', 'linkH', 'apkH', 'vpn', 'batt'];
+function normProtections(raw: unknown): Record<string, unknown> | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const src = raw as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const k of PROT_BOOL_KEYS) {
+    if (typeof src[k] === 'boolean') out[k] = src[k];
+  }
+  const age = Number(src.scanAgeH);
+  if (Number.isFinite(age) && age >= 0) out.scanAgeH = Math.min(100000, Math.round(age));
+  out.ts = Math.floor(Date.now() / 1000);
+  return Object.keys(out).length > 1 ? out : null; // ts'dan tashqari kamida bitta signal
+}
 
 async function handleRegister(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
@@ -252,6 +313,22 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     app_ver: b.app_ver ?? null,
     last_seen: new Date().toISOString(),
   };
+
+  // Himoya-holati (protections) — kelsa yozamiz. Watchdog uchun AVVALGI holatni o'qib olamiz
+  // (kritik himoya ON→OFF bo'lsa egaga ogohlantirish). Null qiymat eskini o'chirmaydi.
+  const prot = normProtections(b.protections);
+  let prevProt: Record<string, unknown> | null = null;
+  let prevName: string | null = null;
+  if (prot) {
+    row.protections = prot;
+    const { data: cur } = await sb
+      .from('devices')
+      .select('protections, name')
+      .eq('device_token', b.device_token)
+      .maybeSingle();
+    prevProt = (cur?.protections as Record<string, unknown> | null) ?? null;
+    prevName = (cur?.name as string | null) ?? null;
+  }
 
   // Geo — GPS authoritative (har doim yoziladi); GPS yo'q bo'lsa IP taxmini qurilmada
   // joylashuv allaqachon bor bo'lsa YOZILMAYDI (to'g'ri nuqtani IP shahriga sakratmaymiz).
@@ -293,6 +370,31 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
     .single();
 
   if (error) { console.error(`[register] device upsert db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+  // Himoya-tushishi qorovuli (watchdog): kritik himoya AVVAL ON edi, ENDI OFF bo'lsa —
+  // egaga bir qatorli Telegram ogohlantirishi (throttle 6 soat, alert_state orqali). Bolalar
+  // va OEM batareya-o'ldirgichlari himoyani jimgina o'chiradi; alertsiz egasi buni faqat
+  // hodisa paytida bilib qoladi. Fail-soft: har qanday xato → faqat log, register buzilmaydi.
+  if (prot && prevProt && data?.id) {
+    try {
+      const dropped = CRITICAL_PROTECTIONS.filter((k) => prevProt![k] === true && prot[k] === false);
+      if (dropped.length) {
+        const key = `proto_drop:${data.id}`;
+        const { data: st } = await sb.from('alert_state').select('last_at').eq('key', key).maybeSingle();
+        const lastMs = st?.last_at ? new Date(st.last_at).getTime() : 0;
+        if (Date.now() - lastMs > 6 * 3600 * 1000) {
+          await sb.from('alert_state').upsert({ key, last_at: new Date().toISOString() }, { onConflict: 'key' });
+          const label = prevName || b.name || data.id.slice(0, 8);
+          const names: Record<string, string> = { svc: 'Himoya xizmati', notif: 'Bildirishnoma ruxsati' };
+          const list = dropped.map((k) => names[k] || k).join(', ');
+          const text = `⚠️ *Himoya o'chdi*\n"${label}" qurilmasida: *${list}* — endi o'chiq.\nPanel orqali tekshiring.`;
+          await Promise.all(adminChatIds().map((chatId) => sendMessage(chatId, text, { parseMode: 'Markdown' })));
+        }
+      }
+    } catch (e) {
+      console.error(`[register] protection watchdog failed: ${(e as Error).message}`);
+    }
+  }
 
   // Per-device token beramiz — qurilma keyingi yozuvlarni shu bilan IMZOLAYDI (HMAC).
   // Determinik (HMAC(device_token, DEVICE_TOKEN_SECRET)), serverda saqlanmaydi. Kalit

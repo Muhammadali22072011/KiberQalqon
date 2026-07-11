@@ -101,7 +101,86 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const body = (req.body ?? {}) as {
       action?: string; domain?: unknown; category?: string; severity?: string;
       apk_hash?: unknown; family?: unknown; review_status?: unknown;
+      rule_id?: unknown; target?: unknown; needles?: unknown; min_hits?: unknown; notes?: unknown; muted?: unknown;
+      package_name?: unknown; cert_sha256?: unknown; label?: unknown;
     };
+
+    // ── YARA-lite qoida paketlari — bulutdan yangilanadigan dex-satr qoidalari.
+    // Ilovani QAYTA CHIQARMASDAN yangi variantni bloklash (feed 30 daqiqada yetadi).
+    if (body.action === 'add_rule') {
+      const rid = typeof body.rule_id === 'string' ? body.rule_id.trim().toLowerCase() : '';
+      if (!/^[a-z0-9_]{2,40}$/.test(rid)) return res.status(400).json({ ok: false, error: 'rule_id: a-z0-9_ (2-40)' });
+      const family = typeof body.family === 'string' ? body.family.trim().slice(0, 60) : null;
+      const severity = ['low', 'medium', 'high', 'critical'].includes(String(body.severity)) ? String(body.severity) : 'high';
+      const target = ['dex_string', 'manifest', 'path'].includes(String(body.target)) ? String(body.target) : 'dex_string';
+      // needles — kichik harf, har biri 2..64 belgi, 1..8 ta. Bo'sh/juda uzun rad etiladi.
+      const rawNeedles = Array.isArray(body.needles) ? body.needles : [];
+      const needles = rawNeedles
+        .map((n) => (typeof n === 'string' ? n.trim().toLowerCase() : ''))
+        .filter((n) => n.length >= 2 && n.length <= 64);
+      if (needles.length < 1 || needles.length > 8) return res.status(400).json({ ok: false, error: '1-8 ta needle (2-64 belgi)' });
+      const minHits = Math.max(0, Math.min(needles.length, Math.round(Number(body.min_hits) || 0)));
+      const notes = typeof body.notes === 'string' ? body.notes.trim().slice(0, 300) : null;
+      const { error } = await db().from('threat_rules').upsert(
+        { rule_id: rid, family, severity, target, needles, min_hits: minHits, enabled: true, notes, updated_at: new Date().toISOString() },
+        { onConflict: 'rule_id' },
+      );
+      if (error) { console.error(`[threats] add_rule: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'rule_add', `${rid} (${severity}, ${needles.length} needle)`);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (body.action === 'delete_rule') {
+      const rid = typeof body.rule_id === 'string' ? body.rule_id.trim().toLowerCase() : '';
+      if (!/^[a-z0-9_]{2,40}$/.test(rid)) return res.status(400).json({ ok: false, error: 'bad rule_id' });
+      const { error } = await db().from('threat_rules').delete().eq('rule_id', rid);
+      if (error) { console.error(`[threats] delete_rule: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'rule_del', rid);
+      return res.status(200).json({ ok: true });
+    }
+
+    // mute_rule — qoidani MASLAHAT (advisory) darajasiga tushiradi (FP-flood o'chirgichi).
+    // O'chirmaydi: mijoz qoidani ishlatishda davom etadi, lekin faqat SUSPICIOUS chiqaradi,
+    // hech qachon DANGER emas. RemoteConfig'ning "faqat kuchaytir" invariantiga rioya: mute
+    // detektsiyani ZAIFLASHTIRISHI mumkin, lekin bu FAQAT egasi qo'lida (imzolangan feed).
+    if (body.action === 'mute_rule') {
+      const rid = typeof body.rule_id === 'string' ? body.rule_id.trim().toLowerCase() : '';
+      if (!/^[a-z0-9_]{2,40}$/.test(rid)) return res.status(400).json({ ok: false, error: 'bad rule_id' });
+      const muted = Boolean(body.muted);
+      const { error } = await db().from('threat_rules').update({ muted, updated_at: new Date().toISOString() }).eq('rule_id', rid);
+      if (error) { console.error(`[threats] mute_rule: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'rule_mute', `${rid} → ${muted}`);
+      return res.status(200).json({ ok: true });
+    }
+
+    // ── known_good — imzolangan "yaxshi ro'yxat". DOWNGRADE-only (FP tuzatish, DANGER emas).
+    if (body.action === 'add_good') {
+      const pkg = typeof body.package_name === 'string' ? body.package_name.trim().toLowerCase() : '';
+      if (!/^[a-z0-9_.]{3,120}$/.test(pkg) || !pkg.includes('.')) return res.status(400).json({ ok: false, error: 'paket nomi noto\'g\'ri' });
+      const certRaw = typeof body.cert_sha256 === 'string' ? body.cert_sha256.trim().toLowerCase().replace(/[:\s]/g, '') : '';
+      const cert = certRaw ? (/^[a-f0-9]{64}$/.test(certRaw) ? certRaw : null) : null;
+      if (certRaw && !cert) return res.status(400).json({ ok: false, error: 'sert SHA-256 (64 hex) noto\'g\'ri' });
+      const label = typeof body.label === 'string' ? body.label.trim().slice(0, 80) : null;
+      const { error } = await db().from('known_good').upsert(
+        { package_name: pkg, cert_sha256: cert, label },
+        { onConflict: 'package_name,cert_sha256' },
+      );
+      if (error) { console.error(`[threats] add_good: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'good_add', `${pkg}${cert ? ' +cert' : ''}`);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (body.action === 'delete_good') {
+      const pkg = typeof body.package_name === 'string' ? body.package_name.trim().toLowerCase() : '';
+      if (!pkg) return res.status(400).json({ ok: false, error: 'paket kerak' });
+      const certRaw = typeof body.cert_sha256 === 'string' ? body.cert_sha256.trim().toLowerCase().replace(/[:\s]/g, '') : '';
+      let q = db().from('known_good').delete().eq('package_name', pkg);
+      q = certRaw ? q.eq('cert_sha256', certRaw) : q.is('cert_sha256', null);
+      const { error } = await q;
+      if (error) { console.error(`[threats] delete_good: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'good_del', pkg);
+      return res.status(200).json({ ok: true });
+    }
 
     // ── #6: tahdid oilasi/kampaniya yorlig'ini belgilash (egasi). Bo'sh → tozalash. ──
     if (body.action === 'set_family') {
@@ -179,6 +258,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .limit(500);
     if (error) { console.error(`[threats] domains db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
     return res.status(200).json({ ok: true, domains: data ?? [] });
+  }
+
+  // ===== Panel: YARA-lite qoidalar jadvali (ko'rish/boshqarish — egasi/admin) =====
+  if (req.query.rules === '1' && isAdmin) {
+    const { data, error } = await sb
+      .from('threat_rules')
+      .select('rule_id, family, severity, target, needles, min_hits, enabled, muted, notes, created_at, updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(500);
+    if (error) { console.error(`[threats] rules db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, rules: data ?? [] });
+  }
+
+  // ===== Panel: known_good "yaxshi ro'yxat" =====
+  if (req.query.good === '1' && isAdmin) {
+    const { data, error } = await sb
+      .from('known_good')
+      .select('package_name, cert_sha256, label, created_at')
+      .order('created_at', { ascending: false })
+      .limit(1000);
+    if (error) { console.error(`[threats] good db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, good: data ?? [] });
+  }
+
+  // ===== Panel: qoida-sifati statistikasi (FP-paneli) — ishlashlar / qurilmalar / rad etilgan =====
+  if (req.query.rulestats === '1' && isAdmin) {
+    const { data, error } = await sb
+      .from('v_rule_stats')
+      .select('rule_id, fires, devices, dismissed, last_fire')
+      .order('fires', { ascending: false })
+      .limit(500);
+    if (error) { console.error(`[threats] rulestats db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, stats: data ?? [] });
   }
   // CLOUD-01: bitta soxta "danger" yuklama butun parkni bloklab qo'ymasligi uchun feed'ga
   // faqat KAMIDA shuncha HAR XIL qurilmada tasdiqlangan tahdid tushadi.
@@ -268,6 +380,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error(`[threats] threat_domains exception: ${(e as Error).message}`);
     }
 
+    // ── YARA-lite qoida paketlari (mijoz RuleEngine ularni baked jadvallar bilan qo'shadi).
+    // enabled qoidalar; muted → adv:1 (mijozda faqat SUSPICIOUS, hech qachon DANGER). FAIL-SOFT:
+    // jadval yo'q bo'lsa (migratsiya ishlamagan) — qoidasiz davom etamiz.
+    type RuleRow = { rule_id: string; family?: string | null; severity?: string | null; target?: string | null; needles?: unknown; min_hits?: number | null; muted?: boolean | null };
+    let rules: { id: string; f: string; s: string; t: string; n: string[]; m: number; adv?: number }[] = [];
+    let ruleMaxSeen = 0;
+    try {
+      const rq = await sb
+        .from('threat_rules')
+        .select('rule_id, family, severity, target, needles, min_hits, muted, updated_at')
+        .eq('enabled', true)
+        .limit(1000);
+      if (rq.error) {
+        console.error(`[threats] threat_rules skipped: ${rq.error.message}`);
+      } else {
+        rules = ((rq.data ?? []) as RuleRow[])
+          .map((r) => {
+            const needles = Array.isArray(r.needles) ? (r.needles as unknown[]).map(String).filter((s) => s.length >= 2 && s.length <= 64) : [];
+            return { id: r.rule_id, f: r.family || 'Cloud.rule', s: r.severity || 'high', t: r.target || 'dex_string', n: needles, m: Math.max(0, Math.round(Number(r.min_hits) || 0)), ...(r.muted ? { adv: 1 } : {}) };
+          })
+          .filter((r) => r.n.length > 0);
+        if (rules.length) ruleMaxSeen = Math.floor(Date.now() / 1000);
+      }
+    } catch (e) {
+      console.error(`[threats] threat_rules exception: ${(e as Error).message}`);
+    }
+
+    // ── known_good (yaxshi ro'yxat) — mijoz DOWNGRADE-only ishonch kirishi. FAIL-SOFT.
+    type GoodRow = { package_name?: string | null; cert_sha256?: string | null };
+    let good: { p: string; c: string }[] = [];
+    let goodMaxSeen = 0;
+    try {
+      const gq = await sb.from('known_good').select('package_name, cert_sha256').limit(4000);
+      if (gq.error) {
+        console.error(`[threats] known_good skipped: ${gq.error.message}`);
+      } else {
+        good = ((gq.data ?? []) as GoodRow[])
+          .filter((g) => g.package_name)
+          .map((g) => ({ p: String(g.package_name).toLowerCase(), c: g.cert_sha256 ? String(g.cert_sha256).toLowerCase() : '' }));
+        if (good.length) goodMaxSeen = Math.floor(Date.now() / 1000);
+      }
+    } catch (e) {
+      console.error(`[threats] known_good exception: ${(e as Error).message}`);
+    }
+
     // Monotonik versiyalar — server soati (epoch sek). AVVAL v = max(last_seen) edi (faqat feed'ga
     // TUSHGAN satrlar bo'yicha) → egasi eng yangi tahdidni RAD ETSA (set_review → 'dismissed', feed'dan
     // chiqadi) yoki eng yangi satr yo'qolsa, v PASAYIB ketardi. Mijozdagi rollback-guard (remoteV < KEY_V)
@@ -281,7 +438,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // (past versiya → rad). Domen (`dv`) versiyasi ham ALOHIDA baholanadi (yuqoriga qarang).
     const nowEpoch = Math.floor(Date.now() / 1000);
     const threatVersion = (hashes.length || packages.length) ? nowEpoch : 1;
-    const payload = { v: threatVersion, dv: domainMaxSeen, ts: Date.now(), hashes, packages, domains };
+    // rv/gv — qoida va yaxshi-ro'yxat versiyalari ALOHIDA (domen dv kabi) → mijozda har ro'yxat
+    // uchun mustaqil monotonik rollback-guard. Bo'sh o'qish (fail-soft, 0) mijozdagi keshni CLOBBER
+    // qilmaydi (past versiya → rad).
+    const payload = { v: threatVersion, dv: domainMaxSeen, rv: ruleMaxSeen, gv: goodMaxSeen, ts: Date.now(), hashes, packages, domains, rules, good };
     res.setHeader('Cache-Control', 'public, max-age=300');
     return res.status(200).json({ ok: true, feed: signEnvelope(payload) });
   }

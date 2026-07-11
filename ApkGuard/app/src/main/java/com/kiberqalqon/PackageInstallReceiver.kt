@@ -83,6 +83,22 @@ class PackageInstallReceiver : BroadcastReceiver() {
     }
 
     private fun rescanReplacedPackage(context: Context, pkg: String) {
+        // Manifest-diff (supply-chain himoyasi): yangilanish XAVFLI qobiliyat oldimi (yangi SMS/
+        // accessibility/device-admin/notification-listener yoki targetSdk pasayishi)? Metadata-only
+        // taqqoslash — deyarli tekin, qizdirmaydi. Ishonchli store (Play) yangilanishlari uchun HAM
+        // ishlaydi: "yaxshi ilova N+1 versiyada zararli bo'ldi" bo'shlig'ini to'liq rescan qamramaydi
+        // (isFromTrustedStore pastda skip qiladi). diffOnReplace ichida yangi snapshot qayta yoziladi.
+        try {
+            val deltas = CapabilitySnapshot.diffOnReplace(context, pkg)
+            if (deltas.isNotEmpty()) {
+                val lbl = try {
+                    context.packageManager.getApplicationInfo(pkg, 0)
+                        .loadLabel(context.packageManager).toString()
+                } catch (_: Throwable) { pkg }
+                NotificationHelper.showCapabilityGainNotification(context, pkg, lbl, deltas)
+            }
+        } catch (e: Throwable) { Log.w(TAG, "capability diff failed", e) }
+
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(pkg, 0)
@@ -149,6 +165,10 @@ class PackageInstallReceiver : BroadcastReceiver() {
     }
 
     private fun scanInstalledPackage(context: Context, pkg: String) {
+        // Manifest-diff bazasi: yangi o'rnatilgan ilovaning qobiliyat snapshotini olamiz, shunda
+        // keyingi yangilanishda (PACKAGE_REPLACED) xavfli o'zgarishni taqqoslay olamiz (Play uchun ham).
+        try { CapabilitySnapshot.snapshot(context, pkg) } catch (e: Throwable) { Log.w(TAG, "capsnap failed", e) }
+
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(pkg, 0)

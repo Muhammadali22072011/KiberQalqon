@@ -123,6 +123,9 @@ class App : android.app.Application() {
                 // Bulutdan yangilanadigan qora ro'yxat (keshlangan) — assets ustiga qo'shamiz.
                 // Tarmoq YO'Q: faqat avval tekshirilgan keshni ThreatDb'ga merge qiladi.
                 CloudBlacklist.loadCached(this@App)
+                // YARA-lite qoidalar + known-good (keshlangan) — birinchi skandan OLDIN yuklaymiz.
+                // O'z prefs'idan (uzguard_rules) tiklaydi; tarmoq YO'Q, hech qachon throw qilmaydi.
+                RuleStore.loadCached(this@App)
             } catch (e: Throwable) {
                 Log.e("UzGuard", "ThreatDb init failed", e)
             }

@@ -152,6 +152,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ ok: false, error: 'scan insert' });
   }
 
+  // Qoida-sifati sikli: mijoz YARA-lite qoidasi ishlaganda reasons ichida "rule:<rule_id>"
+  // yuboradi. Har bir ishlashni rule_hits'ga yozamiz → panel FP-paneli (v_rule_stats) qaysi
+  // qoida ko'p ishlaydi / rad etiladi (dismissed) ni ko'rsatadi va egasi paneldan "mute" qiladi.
+  // FAIL-SOFT: jadval yo'q bo'lsa (migratsiya ishlamagan) — faqat log.
+  try {
+    const ruleIds = Array.from(new Set(
+      reasons
+        .map((r) => { const m = /(?:^|[^a-z0-9_])rule:([a-z0-9_]{2,40})/i.exec(r); return m ? m[1].toLowerCase() : null; })
+        .filter((x): x is string => x !== null),
+    ));
+    if (ruleIds.length) {
+      const hits = ruleIds.map((rid) => ({ rule_id: rid, device_id: dev.id, apk_hash: b.apk_hash.toLowerCase(), verdict: b.verdict }));
+      const { error: rhErr } = await sb.from('rule_hits').insert(hits);
+      if (rhErr) console.error(`[upload] rule_hits insert: ${rhErr.message}`);
+    }
+  } catch (e) {
+    console.error(`[upload] rule_hits exception: ${(e as Error).message}`);
+  }
+
   // Xavfli/shubhali bo'lsa — qurilma APK namunasini Storage'ga yuklashi uchun
   // imzolangan (signed) URL beramiz. Qurilma faylni TO'G'RIDAN-TO'G'RI Storage'ga
   // yuklaydi (Vercel ~4.5MB body chegarasini chetlab o'tadi, 50MB gacha APK uchun).

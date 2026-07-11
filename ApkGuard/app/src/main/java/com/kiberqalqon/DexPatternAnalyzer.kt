@@ -41,11 +41,22 @@ object DexPatternAnalyzer {
     private const val TAG = "DexPatternAnalyzer"
     private const val SAMPLE_SIZE = 4 * 1024 * 1024     // первые 4 MB достаточно для большинства
 
+    // RuleEngine (YARA-lite) uchun to'plangan kichik-harfli DEX string-pool matni chegarasi.
+    // DEX baytlar ALLAQACHON o'qiladi (qo'shimcha IO yo'q) — faqat lowercase nusxa yig'iladi.
+    // OOM'dan himoya uchun umumiy hajmni cheklaymiz (patologik multidex'ga qarshi).
+    private const val MAX_RULE_TEXT = 6 * 1024 * 1024
+
     data class Findings(
         val score: Int,
         val patterns: List<String>,
         val packerDetected: String? = null,
-        val tooManyDex: Boolean = false
+        val tooManyDex: Boolean = false,
+        /**
+         * classes*.dex string-pool matnining KICHIK HARFLI (ISO-8859-1) birlashmasi —
+         * [RuleEngine] uchun "dex_string" haystack'i. Bo'sh/o'qib bo'lmasa null.
+         * DEX baytlari shu analiz vaqtida bir marta o'qiladi (qayta IO yo'q → issiqlik oshmaydi).
+         */
+        val dexStringsLower: String? = null,
     )
 
     private data class Pattern(
@@ -149,6 +160,8 @@ object DexPatternAnalyzer {
         var totalScore = 0
         var packer: String? = null
         var dexCount = 0
+        // RuleEngine uchun kichik-harfli DEX matni (bounded). null qoladi, agar hech nima o'qilmasa.
+        val ruleText = StringBuilder()
 
         try {
             ZipFile(apkPath).use { zip ->
@@ -182,6 +195,13 @@ object DexPatternAnalyzer {
                     val data = if (off == readBytes) buf else buf.copyOf(off)
                     // DEX string pool — UTF-8. ISO-8859-1 ловит всё то же + бинарные совпадения.
                     val text = String(data, Charsets.ISO_8859_1)
+
+                    // RuleEngine haystack'i uchun kichik-harfli matnni yig'amiz (umumiy cap ostida).
+                    if (ruleText.length < MAX_RULE_TEXT) {
+                        val remaining = MAX_RULE_TEXT - ruleText.length
+                        val slice = if (text.length <= remaining) text else text.substring(0, remaining)
+                        ruleText.append(slice.lowercase())
+                    }
 
                     for (pattern in PATTERNS) {
                         // Балл 0 = задокументированный, но безобидный паттерн (рефлексия,
@@ -220,7 +240,8 @@ object DexPatternAnalyzer {
             score = totalScore,
             patterns = found.map { it.first },
             packerDetected = packer,
-            tooManyDex = tooMany
+            tooManyDex = tooMany,
+            dexStringsLower = if (ruleText.length == 0) null else ruleText.toString(),
         )
     }
 }

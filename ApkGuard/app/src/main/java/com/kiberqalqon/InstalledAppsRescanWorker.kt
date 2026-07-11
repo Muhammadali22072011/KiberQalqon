@@ -68,6 +68,18 @@ class InstalledAppsRescanWorker(
                 // Skip самого UzGuard — для self-skip есть SelfGuard, но дешевле сразу пропустить.
                 if (name == ctx.packageName || name == "${ctx.packageName}.debug") continue
 
+                // Manifest-diff catch-up: dinamik registratsiya qilingan PackageInstallReceiver
+                // protsess O'LGANда PACKAGE_REPLACED'ni o'tkazib yuboradi — kunlik rescan xavfli
+                // qobiliyat o'zgarishini shu yerda ilib oladi (metadata-only, arzon; snapshot yo'q
+                // bo'lsa faqat baza o'rnatiladi). diffOnReplace ichida yangi snapshot qayta yoziladi.
+                try {
+                    val deltas = CapabilitySnapshot.diffOnReplace(ctx, name)
+                    if (deltas.isNotEmpty()) {
+                        val lbl = try { pkg.applicationInfo?.loadLabel(pm)?.toString() ?: name } catch (_: Throwable) { name }
+                        NotificationHelper.showCapabilityGainNotification(ctx, name, lbl, deltas)
+                    }
+                } catch (e: Throwable) { Log.w(TAG, "capsnap catchup failed for $name", e) }
+
                 val app = pkg.applicationInfo ?: continue
                 val sourceDir = app.sourceDir ?: continue
                 if (!File(sourceDir).exists()) continue

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, apiPost, type DeviceCommand, type DeviceRow, type ScanRow } from '../lib/api';
+import { apiGet, apiPost, type DeviceCommand, type DeviceRow, type FleetHealth, type ScanRow } from '../lib/api';
 import { Empty, Panel, PanelHead, Spinner, VerdictBadge } from '../components/ui';
 import { agoSafe, catUz, riskColor, uzDateSafe } from '../lib/format';
 import { nearestCity } from '../lib/uzRegions';
@@ -27,6 +27,70 @@ function isOffline(lastSeen?: string | null): boolean {
   return Date.now() - t > OFFLINE_MS;
 }
 
+// Qurilma yuboradigan himoya holati kalitlari → o'zbekcha yorliq (himoya batareyasi).
+const PROT_LABELS: Array<{ k: string; label: string }> = [
+  { k: 'svc', label: 'Himoya xizmati' },
+  { k: 'a11y', label: "O'rnatish qalqoni" },
+  { k: 'notif', label: 'Bildirishnoma' },
+  { k: 'postN', label: 'Bildirishnoma ruxsati' },
+  { k: 'linkH', label: 'Havola qalqoni' },
+  { k: 'apkH', label: 'APK darvozasi' },
+  { k: 'vpn', label: 'VPN filtri' },
+  { k: 'batt', label: 'Batareya erkinligi' },
+];
+const FLAG_UZ: Record<string, string> = { lost: "Yo'qolgan", compromised: 'Buzilgan' };
+
+// Himoya batareyasi — qurilma yuborgan holatni yashil (yoniq) / qizil (o'chiq) ko'rsatkichlar
+// qatori bilan ko'rsatadi. protections yo'q bo'lsa — hali holat kelmagan.
+function ProtectionBattery({ prot }: { prot?: Record<string, boolean | number> | null }) {
+  if (!prot) return <p className="bulk-hint" style={{ margin: '4px 0 2px' }}>Himoya holati hali kelmadi</p>;
+  const age = prot.scanAgeH;
+  return (
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '6px 0 4px' }}>
+        {PROT_LABELS.map(({ k, label }) => {
+          const on = Boolean(prot[k]);
+          return (
+            <span key={k} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'var(--ink-2)', border: '1px solid var(--hair-2)', borderRadius: 999, padding: '5px 11px', whiteSpace: 'nowrap' }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', flex: '0 0 auto', background: on ? 'var(--ok)' : 'var(--danger)', boxShadow: `0 0 0 3px ${on ? 'var(--ok-dim)' : 'var(--danger-bg)'}` }} />
+              {label}
+            </span>
+          );
+        })}
+      </div>
+      {typeof age === 'number' && (
+        <p className="bulk-hint" style={{ margin: '4px 0 2px' }}>Oxirgi skan: {Math.round(age)} soat oldin</p>
+      )}
+    </>
+  );
+}
+
+// Park salomatligi qatori (qurilmalar ro'yxati tepasida) — bir martalik so'rov; xato bo'lsa
+// jim qoladi (fail-soft). Faqat noldan katta muammolarni ko'rsatadi.
+function FleetHealthStrip() {
+  const [h, setH] = useState<FleetHealth | null>(null);
+  useEffect(() => {
+    let alive = true;
+    apiGet<{ health: FleetHealth }>('/api/devices?health=1')
+      .then((r) => { if (alive) setH(r.health); })
+      .catch(() => { /* fail-soft: hech narsa ko'rsatmaymiz */ });
+    return () => { alive = false; };
+  }, []);
+  if (!h) return null;
+  const parts: string[] = [];
+  if (h.svc_off) parts.push(`Xizmat o‘chiq: ${h.svc_off}`);
+  if (h.notif_off) parts.push(`Bildirishnoma o‘chiq: ${h.notif_off}`);
+  if (h.vpn_off) parts.push(`VPN o‘chiq: ${h.vpn_off}`);
+  if (h.stale) parts.push(`3+ kun jim: ${h.stale}`);
+  const allGood = parts.length === 0;
+  return (
+    <div className={'note' + (allGood ? ' ok' : ' warn')} style={{ marginBottom: 16 }}>
+      <span className="ni">{allGood ? '🛡' : '⚠️'}</span>
+      <span>Himoya batareyasi — {allGood ? 'Hamma himoya joyida ✓' : parts.join(' · ')}</span>
+    </div>
+  );
+}
+
 function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { isOwner } = useAuth();
   const { show } = useToast();
@@ -36,6 +100,11 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const [err, setErr] = useState('');
   const [sending, setSending] = useState(false);
   const [nonce, setNonce] = useState(0); // qayta yuklash uchun
+  const [flagNote, setFlagNote] = useState('');
+  const [flagBusy, setFlagBusy] = useState(false);
+  const [msgTitle, setMsgTitle] = useState('');
+  const [msgBody, setMsgBody] = useState('');
+  const [msgBusy, setMsgBusy] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -60,6 +129,49 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
     } finally {
       setSending(false);
     }
+  };
+
+  // Egaga xos amallar cheklangan admin uchun 403 qaytarishi mumkin — chiroyli toast bilan ushlaymiz.
+  const permToast = (e: unknown) => {
+    const m = (e as Error).message || 'xato';
+    show(/40[13]|ruxsat|forbidden|egas/i.test(m) ? 'Bu amal faqat egasida' : `Xato: ${m}`);
+  };
+
+  // Bayroq: qurilmani "yo'qolgan"/"buzilgan" deb belgilash (izoh ixtiyoriy). Egasi amali.
+  const setFlag = async (state: 'lost' | 'compromised') => {
+    if (flagBusy) return;
+    setFlagBusy(true);
+    try {
+      await apiPost(`/api/device/${id}`, { type: 'flag', payload: { state, note: flagNote.trim() } });
+      show(state === 'lost' ? 'Yo‘qolgan deb belgilandi' : 'Buzilgan deb belgilandi');
+      setFlagNote('');
+      setNonce((n) => n + 1);
+    } catch (e) { permToast(e); }
+    finally { setFlagBusy(false); }
+  };
+
+  const clearFlag = async () => {
+    if (flagBusy) return;
+    setFlagBusy(true);
+    try {
+      await apiPost(`/api/device/${id}`, { type: 'unflag' });
+      show('Bayroq olib tashlandi');
+      setNonce((n) => n + 1);
+    } catch (e) { permToast(e); }
+    finally { setFlagBusy(false); }
+  };
+
+  // Admin xabari: sarlavha + matnni qurilmaga yuboradi (yetkazish holati buyruqlar ro'yxatida).
+  const sendMessage = async () => {
+    if (msgBusy || !msgTitle.trim()) return;
+    setMsgBusy(true);
+    try {
+      await apiPost(`/api/device/${id}`, { type: 'message', payload: { title: msgTitle.trim(), body: msgBody.trim() } });
+      show('Yuborildi (yetkazilganda belgilanadi)');
+      setMsgTitle(''); setMsgBody('');
+      setNonce((n) => n + 1);
+    } catch (e) { permToast(e); }
+    finally { setMsgBusy(false); }
   };
 
   return (
@@ -97,6 +209,29 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
               <div><span>Ro‘yxatdan o‘tgan</span><b>{uzDateSafe(dev.created_at)}</b></div>
               <div><span>Oxirgi faollik</span><b>{agoSafe(dev.last_seen)}</b></div>
             </div>
+
+            <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>Himoya batareyasi</div>
+            <ProtectionBattery prot={dev.protections} />
+
+            <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>Qurilma holati</div>
+            <div className="pp-rows" style={{ borderTop: 'none' }}>
+              <div>
+                <span>Bayroq</span>
+                <b style={{ color: dev.flag ? 'var(--danger)' : 'var(--ink)' }}>{dev.flag ? (FLAG_UZ[dev.flag] || dev.flag) : 'Yo‘q'}</b>
+              </div>
+              {dev.flag && dev.flag_note && <div><span>Izoh</span><b>{dev.flag_note}</b></div>}
+              {dev.flag && dev.flag_at && <div><span>Belgilangan</span><b>{agoSafe(dev.flag_at)}</b></div>}
+            </div>
+            {isOwner && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '2px 0 8px' }}>
+                <input placeholder="Izoh (ixtiyoriy)" value={flagNote} onChange={(e) => setFlagNote(e.target.value)} style={{ height: 36 }} />
+                <div className="row-inline" style={{ flexWrap: 'wrap' }}>
+                  <button className="btn sm" onClick={() => setFlag('lost')} disabled={flagBusy}>Yo‘qolgan deb belgilash</button>
+                  <button className="btn sm danger" onClick={() => setFlag('compromised')} disabled={flagBusy}>Buzilgan deb belgilash</button>
+                  {dev.flag && <button className="btn sm ghost" onClick={clearFlag} disabled={flagBusy}>Bayroqni olib tashlash</button>}
+                </div>
+              </div>
+            )}
             {isOwner && (
               <>
                 <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>Masofaviy boshqaruv</div>
@@ -107,13 +242,21 @@ function DeviceDetail({ id, onClose }: { id: string; onClose: () => void }) {
                   <div className="dd-cmds">
                     {cmds.map((c) => (
                       <div className="dd-cmd" key={c.id}>
-                        <span>{c.type === 'rescan' ? 'Qayta skan' : c.type}</span>
+                        <span>{c.type === 'rescan' ? 'Qayta skan' : c.type === 'message' ? 'Xabar' : c.type}</span>
                         <span className={'cmd-st cmd-' + c.status}>{CMD_STATUS_UZ[c.status] || c.status}</span>
                         <span className="mono" style={{ color: 'var(--ink-3)' }}>{agoSafe(c.created_at)}</span>
                       </div>
                     ))}
                   </div>
                 )}
+                <div className="pp-thr-head" style={{ borderTop: '1px solid var(--hair)' }}>Admin xabari</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '2px 0 8px' }}>
+                  <input placeholder="Sarlavha" value={msgTitle} onChange={(e) => setMsgTitle(e.target.value)} maxLength={140} style={{ height: 36 }} />
+                  <textarea placeholder="Xabar matni" value={msgBody} onChange={(e) => setMsgBody(e.target.value)} rows={3} />
+                  <button className="btn sm" onClick={sendMessage} disabled={msgBusy || !msgTitle.trim()} style={{ alignSelf: 'flex-start' }}>
+                    {msgBusy ? <span className="spinner" /> : 'Yuborish'}
+                  </button>
+                </div>
               </>
             )}
             {scans.length > 0 && (
@@ -194,6 +337,8 @@ export default function Devices() {
         <h1>Himoyalangan qurilmalar</h1>
         <p>UzGuard o‘rnatilgan qurilmalar, ularning xavf darajasi va skan tarixi. Qatorni bosib tafsilotni oching.</p>
       </div>
+
+      <FleetHealthStrip />
 
       <div className={'grid' + (sel ? ' map-grid' : '')}>
         <Panel>

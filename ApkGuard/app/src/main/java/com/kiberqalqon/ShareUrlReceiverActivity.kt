@@ -31,7 +31,18 @@ class ShareUrlReceiverActivity : Activity() {
             val text = intent?.getStringExtra(Intent.EXTRA_TEXT)?.trim().orEmpty()
             val url = extractFirstUrl(text)
             if (url == null) {
-                Toast.makeText(this, R.string.kq4_link_no_url, Toast.LENGTH_LONG).show()
+                // Havola YO'Q — lekin matn bo'lsa, uni firibgarlik-tekshiruviga uzatamiz (avval
+                // bu yo'l shunchaki toast+finish edi = o'lik tupik). Firibgarlik ko'pincha
+                // havolasiz keladi ("kod yuboring", "yutuq"), shuning uchun eng foydali yo'l shu.
+                if (text.isNotBlank()) {
+                    startActivity(Intent(this, ScamMessageActivity::class.java).apply {
+                        action = Intent.ACTION_SEND
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, text)
+                    })
+                } else {
+                    Toast.makeText(this, R.string.kq4_link_no_url, Toast.LENGTH_LONG).show()
+                }
                 finish()
                 return
             }

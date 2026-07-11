@@ -9,6 +9,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
   if (!checkAdminSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
+  // ── Epidemiya rejimi (outbreak): shu hashni BILDIRGAN qurilmalar ro'yxati (masofaviy
+  // qayta-skan fan-out uchun). Panel bir hashni ko'rgan qurilmalarga rescan buyrug'ini
+  // tarqatadi. distinct device_id (2000 tagacha yaqin skan oynasidan).
+  const hash = String(req.query.hash ?? '').toLowerCase();
+  if (hash) {
+    if (!/^[a-f0-9]{64}$/.test(hash)) return res.status(400).json({ ok: false, error: 'bad hash' });
+    const { data, error } = await db()
+      .from('scans')
+      .select('device_id')
+      .eq('apk_hash', hash)
+      .not('device_id', 'is', null)
+      .order('scanned_at', { ascending: false })
+      .limit(2000);
+    if (error) { console.error(`[scans] hash db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    const ids = Array.from(new Set((data ?? []).map((r) => r.device_id as string)));
+    return res.status(200).json({ ok: true, device_ids: ids });
+  }
+
   const limit = clamp(Number(req.query.limit ?? 50), 1, 200);
   const verdict = String(req.query.verdict ?? '');
 

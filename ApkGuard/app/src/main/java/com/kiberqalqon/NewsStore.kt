@@ -81,8 +81,15 @@ object NewsStore {
             val deviceSecret = Secrets.cloudDeviceSecret().trim()
             if (deviceSecret.isBlank()) return null
 
+            // Guruhga yo'naltirilgan e'lonlar: qurilma o'z guruh kodini yuboradi (?g=), server
+            // global + SHU guruh e'lonlarini qaytaradi (bir maktabga tegishli ogohlantirish butun
+            // viloyatni spamlamaydi). Kod yo'q bo'lsa — faqat global (avvalgidek).
+            val gc = CloudTelemetry.savedGroupCode(ctx)
+                ?.uppercase()?.filter { it in 'A'..'Z' || it in '2'..'9' }?.take(16).orEmpty()
+            val url = if (gc.isNotEmpty()) "$base/api/news?g=$gc" else "$base/api/news"
+
             val req = Request.Builder()
-                .url("$base/api/news")
+                .url(url)
                 .header("x-device-secret", deviceSecret)
                 .get()
                 .build()

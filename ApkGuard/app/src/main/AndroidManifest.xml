@@ -181,6 +181,42 @@
             android:label="Xavfsizlik balli"
             android:theme="@style/Theme.UzGuard" />
 
+        <!-- "Bu xabar firibgarlikmi?" — matn (SMS/Telegram) firibgarlik signallarini oflayn tekshirish.
+             exported=false: matn ShareUrlReceiverActivity (URL topilmasa) yoki ilova ichidan uzatiladi. -->
+        <activity
+            android:name=".ScamMessageActivity"
+            android:exported="false"
+            android:label="Xabar tekshiruvi"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- 30 soniyalik tekshiruv — mavjud himoya tekshiruvlarini bitta ustada birlashtiradi. -->
+        <activity
+            android:name=".CheckupWizardActivity"
+            android:exported="false"
+            android:label="Tez tekshiruv"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Himoya qulfi — himoyani o'chirish/Sozlamalardan oldin PIN. -->
+        <activity
+            android:name=".PinLockActivity"
+            android:exported="false"
+            android:label="Himoya qulfi"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Oila qalqoni — guruh a'zolarining himoya-holatini ko'rish (masofaviy tuzatish yo'q). -->
+        <activity
+            android:name=".FamilyGuardActivity"
+            android:exported="false"
+            android:label="Oila qalqoni"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- "Nimadan himoya qila olmaymiz" — halol cheklovlar ekrani. -->
+        <activity
+            android:name=".LimitsActivity"
+            android:exported="false"
+            android:label="Himoya chegaralari"
+            android:theme="@style/Theme.UzGuard" />
+
         <!-- Play'dan tashqari o'rnatilgan ilovalar auditi (+ masofaviy boshqaruv ilovalari). -->
         <activity
             android:name=".SideloadAuditActivity"

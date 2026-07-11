@@ -739,6 +739,56 @@
                         android:layout_height="1dp"
                         android:background="@color/kq_hairline" />
 
+                    <!-- "Bu xabar firibgarlikmi?" — matn firibgarlik tekshiruvi → ScamMessageActivity -->
+                    <include
+                        android:id="@+id/rowScamCheck"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- 30 soniyalik tez tekshiruv (usta) → CheckupWizardActivity -->
+                    <include
+                        android:id="@+id/rowCheckup"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Oila qalqoni → FamilyGuardActivity -->
+                    <include
+                        android:id="@+id/rowFamilyGuard"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Himoya qulfi (PIN) → PinLockActivity (set/o'zgartirish) -->
+                    <include
+                        android:id="@+id/rowPinLock"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- "Nimadan himoya qila olmaymiz" — halol cheklovlar → LimitsActivity -->
+                    <include
+                        android:id="@+id/rowLimits"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
                     <!-- Wi-Fi straj toggle (Config.isWifiGuardEnabled → ochiq tarmoq ogohlantirishi) -->
                     <include
                         android:id="@+id/rowWifiGuard"

@@ -762,5 +762,86 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(("upd_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
     }
 
+    /**
+     * Admin (egasi) xabari — paneldan qurilmaga 1:1 xabar (message buyrug'i). SMS'siz yetkazish.
+     * Jim kanal (CH_NEWS). Tap → ilova ochiladi. Title/body serverdan keladi (allaqachon qisqartirilgan).
+     */
+    fun showAdminMessageNotification(context: Context, title: String, body: String) {
+        val ctx = LocaleHelper.apply(context)
+        createChannels(ctx)
+        val open = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = if (open != null) PendingIntent.getActivity(
+            ctx, 0x0A11, open, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        ) else null
+        val builder = NotificationCompat.Builder(ctx, CH_NEWS)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(title.ifBlank { "Admin xabari" })
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        if (pi != null) builder.setContentIntent(pi)
+        NotificationManagerCompat.from(ctx).notify(0x0A11, builder.build())
+    }
+
+    /**
+     * Qurilma "yo'qolgan"/"buzilgan" deb belgilangan (flag) — barqaror, katta bosimli, o'chmaydigan
+     * ogohlantirish. MDM emas: faqat ko'rinadigan e'lon (masofaviy qulflash/o'chirish yo'q).
+     */
+    fun showDeviceFlagNotification(context: Context, state: String, note: String) {
+        val ctx = LocaleHelper.apply(context)
+        createChannels(ctx)
+        val title = if (state == "lost") "⚠️ Bu qurilma yo'qolgan deb belgilangan"
+                    else "⚠️ Bu qurilma xavf ostida deb belgilangan"
+        val text = if (note.isNotBlank()) note
+                   else "Administrator bu qurilmani belgiladi. IT xonasiga / ega bilan bog'laning."
+        val builder = NotificationCompat.Builder(ctx, CH_FULL)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setOngoing(true)
+            .setAutoCancel(false)
+        NotificationManagerCompat.from(ctx).notify(DEVICE_FLAG_NOTIF_ID, builder.build())
+    }
+
+    /** Flag olib tashlanganda barqaror ogohlantirishni tozalaydi. */
+    fun clearDeviceFlagNotification(context: Context) {
+        try { NotificationManagerCompat.from(context).cancel(DEVICE_FLAG_NOTIF_ID) } catch (_: Throwable) {}
+    }
+
+    /**
+     * Ilova YANGILANISHda xavfli qobiliyat oldi (manifest-diff): masalan yangi SMS o'qish
+     * huquqi / accessibility / device-admin, yoki targetSdk pasayishi. "Yaxshi ilova N+1
+     * versiyada zararli bo'ldi" (supply-chain) vektoriga qarshi ogohlantirish. Tap → ilova ma'lumotlari.
+     */
+    fun showCapabilityGainNotification(context: Context, pkg: String, appLabel: String, deltas: List<String>) {
+        if (deltas.isEmpty()) return
+        val ctx = LocaleHelper.apply(context)
+        createChannels(ctx)
+        val infoIntent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = android.net.Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val pi = PendingIntent.getActivity(
+            ctx, ("capg_$pkg").hashCode() and 0x7FFFFFFF, infoIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val text = "$appLabel yangilanishda yangi huquq oldi:\n• " + deltas.take(5).joinToString("\n• ")
+        val builder = NotificationCompat.Builder(ctx, CH_VIBRATE)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle("⚠️ Ilova yangilanishda huquq oldi")
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        NotificationManagerCompat.from(ctx).notify(("capg_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
+    }
+
+    private const val DEVICE_FLAG_NOTIF_ID = 0x0F1A
     private const val REMOTE_ACCESS_NOTIF_ID = 0x0F51
 }

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { canRead, checkAdminSecret } from '../lib/auth.js';
+import { canRead, checkAdminSecret, checkDeviceSecret } from '../lib/auth.js';
 import { audit } from '../lib/audit.js';
 import { randomInt } from 'crypto';
 
@@ -78,9 +78,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
+
+  // ===== Oila qalqoni (family guard): qurilma O'Z guruhi a'zolarining SOG'LIG'ini ko'radi =====
+  // Auth: x-device-secret (admin EMAS) + ?family=1&code=<join_code>. FARZAND ilovani o'rnatadi,
+  // OTA-ONA xavf ostida — farzand guruh kodi bilan oilaning himoya-holatini ko'radi. Maxfiylik:
+  // FAQAT ism/familiya + oxirgi ko'rinish + xavf darajasi + bayroq qaytariladi (telefon/IP/GPS EMAS).
+  if (req.query.family === '1') {
+    if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+    const code = typeof req.query.code === 'string' ? req.query.code.trim().toUpperCase().slice(0, 16) : '';
+    if (!code) return res.status(400).json({ ok: false, error: 'code' });
+    const sbf = db();
+    const { data: g, error: gErr } = await sbf.from('device_groups').select('id, name, color').eq('join_code', code).maybeSingle();
+    if (gErr) { console.error(`[devices] family group: ${gErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    if (!g) return res.status(200).json({ ok: false, error: 'code' });
+    const { data, error } = await sbf
+      .from('v_devices_with_counts')
+      .select('member_first, member_last, name, last_seen, risk_score, last_verdict, danger_count, flag')
+      .eq('group_id', g.id)
+      .order('risk_score', { ascending: false })
+      .limit(500);
+    if (error) { console.error(`[devices] family members: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, group: { name: g.name, color: g.color }, members: data ?? [] });
+  }
+
   if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
 
   const sb = db();
+
+  // ===== Himoya batareyasi — flot sog'lig'i (qaysi himoyalar OFF, nechta qurilma) =====
+  if (req.query.health === '1') {
+    const { data, error } = await sb.from('v_fleet_health').select('*').single();
+    if (error) { console.error(`[devices] health db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, health: data ?? {} });
+  }
 
   // ===== Guruhlar ro'yxati (egasi ham, admin ham ko'radi) =====
   // Har guruhdagi qurilma soni — PostgREST embedded count (devices.group_id FK orqali).

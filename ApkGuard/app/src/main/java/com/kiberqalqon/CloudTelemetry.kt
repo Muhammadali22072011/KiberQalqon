@@ -74,6 +74,10 @@ object CloudTelemetry {
     // Qurilma qo'shilgan guruh (dashboard bejasi + GroupJoinActivity holati uchun).
     private const val KEY_GROUP_NAME = "group_name"
     private const val KEY_GROUP_COLOR = "group_color"
+    // Guruh qo'shilish kodi — guruhga yo'naltirilgan e'lonlar (NewsClient ?g=) + oila qalqoni uchun.
+    private const val KEY_GROUP_CODE = "group_code"
+    // Oxirgi ko'rsatilgan bayroq holati (yo'qolgan/buzilgan) — har pollda qayta ogohlantirmaslik uchun.
+    private const val KEY_LAST_FLAG = "last_flag_state"
     // Storage'ga yuklanadigan eng katta APK (ConsentActivity 4(a) va'dasi bilan bir xil).
     private const val MAX_SAMPLE_BYTES = 50L * 1024 * 1024
 
@@ -144,6 +148,9 @@ object CloudTelemetry {
                 put("name", "${Build.MANUFACTURER} ${Build.MODEL}")
                 put("android_ver", "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
                 put("app_ver", "${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})")
+                // "Himoya batareyasi": qaysi himoyalar haqiqatan YOQILGAN — panel flot sog'lig'ini
+                // shundan biladi ("200 o'rnatilgan" emas, "140 himoyalangan"). Fail-soft: xato → qo'shilmaydi.
+                try { put("protections", ProtectionState.collect(ctx)) } catch (_: Throwable) {}
             }
             if (fix != null) {
                 body.put("lat", fix.lat)
@@ -195,11 +202,27 @@ object CloudTelemetry {
                 }
                 val root = try { JSONObject(body) } catch (_: Throwable) { return@launch }
                 if (!root.optBoolean("ok", false)) return@launch
+
+                // Barqaror bayroq (flag) — bir martalik buyruq EMAS, har pollda keladi. O'zgarganda
+                // (yo'q→bor / holat almashsa) bir marta ogohlantirish ko'rsatamiz; olib tashlansa tozalaymiz.
+                handleFlag(ctx, root.optJSONObject("flag"))
+
                 val arr = root.optJSONArray("commands") ?: return@launch
                 var rescan = false
                 for (i in 0 until arr.length()) {
-                    when (arr.optJSONObject(i)?.optString("type")) {
+                    val cmd = arr.optJSONObject(i) ?: continue
+                    when (cmd.optString("type")) {
                         "rescan" -> rescan = true
+                        "message" -> {
+                            // Egasidan 1:1 xabar — bildirishnoma sifatida ko'rsatamiz (at-most-once:
+                            // server poll paytida buyruqni 'done' ga o'tkazadi, qayta kelmaydi).
+                            val p = cmd.optJSONObject("payload")
+                            val title = p?.optString("title").orEmpty()
+                            val text = p?.optString("body").orEmpty()
+                            if (title.isNotBlank() || text.isNotBlank()) {
+                                try { NotificationHelper.showAdminMessageNotification(ctx, title, text) } catch (_: Throwable) {}
+                            }
+                        }
                         else -> { /* noma'lum tur — e'tiborsiz (kelajakdagi turlar) */ }
                     }
                 }
@@ -215,6 +238,33 @@ object CloudTelemetry {
             } catch (e: Throwable) {
                 Log.w(TAG, "pollCommands failed", e)
             }
+        }
+    }
+
+    /**
+     * Barqaror bayroq (flag) holatini qayta ishlaydi. `flagObj` = {state, note} yoki null.
+     * O'zgarganda bir marta ogohlantirish; null'ga o'tsa ogohlantirishni tozalaydi. Holatni
+     * lokal saqlaymiz — har poll (bayroq har javobda keladi) qayta bildirishnoma bermasin.
+     */
+    private fun handleFlag(ctx: Context, flagObj: JSONObject?) {
+        try {
+            val sp = prefs(ctx)
+            val state = flagObj?.optString("state").orEmpty().takeIf { it == "lost" || it == "compromised" }
+            val last = sp.getString(KEY_LAST_FLAG, null)
+            if (state == null) {
+                if (last != null) {
+                    sp.edit().remove(KEY_LAST_FLAG).apply()
+                    NotificationHelper.clearDeviceFlagNotification(ctx)
+                }
+                return
+            }
+            if (state != last) {
+                sp.edit().putString(KEY_LAST_FLAG, state).apply()
+                val note = flagObj?.optString("note").orEmpty()
+                NotificationHelper.showDeviceFlagNotification(ctx, state, note)
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "handleFlag failed", e)
         }
     }
 
@@ -324,6 +374,10 @@ object CloudTelemetry {
         return GroupInfo(name, color)
     }
 
+    /** Saqlangan guruh qo'shilish kodi — guruhga yo'naltirilgan e'lonlar/oila qalqoni uchun. Yo'q bo'lsa null. */
+    fun savedGroupCode(ctx: Context): String? =
+        prefs(ctx).getString(KEY_GROUP_CODE, null)?.takeIf { it.isNotBlank() }
+
     /**
      * Qurilmani KOD bilan guruhga qo'shadi (foydalanuvchi ochiq amal — GroupJoinActivity).
      * Register'dan FARQLI: bu community-share consent'ini talab QILMAYDI (foydalanuvchi
@@ -359,6 +413,7 @@ object CloudTelemetry {
                         prefs(ctx).edit()
                             .putString(KEY_GROUP_NAME, name)
                             .putString(KEY_GROUP_COLOR, color)
+                            .putString(KEY_GROUP_CODE, code.trim().uppercase())
                             .apply()
                         JoinResult(true, null, name, color)
                     } else {
