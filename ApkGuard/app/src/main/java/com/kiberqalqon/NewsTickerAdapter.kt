@@ -23,6 +23,11 @@ class NewsTickerAdapter(
 
     private val bmpCache = HashMap<String, Bitmap>()
 
+    // Manfiy kesh: muvaffaqiyatsiz (404/offline/rasm emas) URL FAIL_TTL_MS davomida
+    // qayta urilmaydi. Cheksiz aylanuvchi lentada har bind'da qayta so'rov yubormaslik
+    // uchun — aks holda radio uyg'onib, batareya/harorat yeyiladi.
+    private val failedAt = HashMap<String, Long>()
+
     val realCount: Int get() = items.size
 
     inner class VH(val b: ItemNewsTickerBinding) : RecyclerView.ViewHolder(b.root)
@@ -73,11 +78,17 @@ class NewsTickerAdapter(
             holder.b.newsThumbCard.visibility = View.VISIBLE
             return
         }
-        // Hali keshda yo'q — yashirib turamiz va yuklaymiz.
+        // Hali keshda yo'q — yashirib turamiz.
         holder.b.newsItemImage.setImageBitmap(null)
         holder.b.newsThumbCard.visibility = View.GONE
+        // Yaqinda muvaffaqiyatsiz bo'lgan bo'lsa — TTL o'tguncha qayta urinmaymiz.
+        failedAt[url]?.let { if (System.currentTimeMillis() - it in 0..FAIL_TTL_MS) return }
         NewsClient.loadImage(url) { bmp ->
-            if (bmp == null) return@loadImage
+            if (bmp == null) {
+                failedAt[url] = System.currentTimeMillis()
+                return@loadImage
+            }
+            failedAt.remove(url)
             bmpCache[url] = bmp
             // Holder boshqa pozitsiyaga qayta ishlatilgan bo'lishi mumkin — hozir
             // unga bog'langan e'lon shu url bo'lsagina rasmni qo'yamiz.
@@ -87,6 +98,11 @@ class NewsTickerAdapter(
                 holder.b.newsThumbCard.visibility = View.VISIBLE
             }
         }
+    }
+
+    private companion object {
+        // Manfiy kesh muddati (NewsImages bilan bir xil).
+        const val FAIL_TTL_MS = 5L * 60 * 1000
     }
 
     // "2026-05-29T06:00:00Z" → "29.05.2026"; parse qila olmasak — bo'sh.

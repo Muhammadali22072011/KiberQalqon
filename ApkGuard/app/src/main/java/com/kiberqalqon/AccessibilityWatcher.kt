@@ -49,7 +49,7 @@ class AccessibilityWatcher(
             for (svc in newServices) {
                 val pkg = svc.substringBefore('/')
                 if (pkg in WHITELIST_PACKAGES) continue
-                if (isSystemAccessibility(pkg)) continue
+                if (isSystemAccessibility(ctx, pkg)) continue
 
                 Log.w(TAG, "New accessibility service: $svc")
                 try {
@@ -86,10 +86,24 @@ class AccessibilityWatcher(
         }
     }
 
-    private fun isSystemAccessibility(pkg: String): Boolean {
-        return pkg.startsWith("com.google.android.") ||
-                pkg.startsWith("com.android.") ||
-                pkg.startsWith("com.samsung.accessibility")
+    /**
+     * Paket ROSTDAN HAM tizim (platform-imzolangan) ekanini PackageManager
+     * orqali tekshiradi. Paket NOMINI (com.android.*, com.google.android.*)
+     * ISHONCH SIFATIDA ISHLATMAYMIZ — sideload qilingan banker o'zini
+     * `com.android.systemservice` yoki `com.google.android.gms.helper` deb
+     * atashi mumkin, lekin unda FLAG_SYSTEM bo'lmaydi. Faqat tizim bo'limiga
+     * o'rnatilgan (yoki tizimga yangilangan) ilovalarnigina o'tkazamiz.
+     */
+    private fun isSystemAccessibility(ctx: Context, pkg: String): Boolean {
+        return try {
+            val ai = ctx.packageManager.getApplicationInfo(pkg, 0)
+            val systemFlags = android.content.pm.ApplicationInfo.FLAG_SYSTEM or
+                    android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+            (ai.flags and systemFlags) != 0
+        } catch (_: Throwable) {
+            // Paket topilmasa yoki xato bo'lsa — tizim deb HISOBLAMAYMIZ (alert yuboriladi).
+            false
+        }
     }
 
     companion object {

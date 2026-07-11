@@ -642,15 +642,31 @@ class ScanResultActivity : AppCompatActivity() {
     private fun showDeletedSuccess() {
         // Faqat keshdagi NUSXAni o'chirgan bo'lsak — asl fayl manba ilovasida qolishi mumkin.
         // Avval uni ham o'chirishga urinamiz; bo'lmasa "xavfsiz" deb soxta xabar bermaymiz.
-        if (isScratchCopy() && !tryDeleteOrigin()) {
-            Toast.makeText(
-                this,
-                getString(R.string.autoscan_copy_deleted_original_remains),
-                Toast.LENGTH_LONG
-            ).show()
-            binding.btnDelete.visibility = View.GONE
+        if (isScratchCopy()) {
+            // tryDeleteOrigin() cross-process content-provider IPC + disk IO qiladi — buni
+            // UI oqimida bajarish ANR keltirib chiqaradi (Telegram/ExternalStorageProvider
+            // sekin bo'lsa). Shuning uchun IO oqimida bajarib, natijani Main'da qaytaramiz.
+            scope.launch {
+                val originGone = withContext(Dispatchers.IO) { tryDeleteOrigin() }
+                if (isFinishing || isDestroyed) return@launch
+                if (originGone) {
+                    markDeletedSafe()
+                } else {
+                    Toast.makeText(
+                        this@ScanResultActivity,
+                        getString(R.string.autoscan_copy_deleted_original_remains),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.btnDelete.visibility = View.GONE
+                }
+            }
             return
         }
+        markDeletedSafe()
+    }
+
+    /** Muvaffaqiyat kartasini ko'rsatadi va natijani RESULT_OK qiladi. */
+    private fun markDeletedSafe() {
         Toast.makeText(this, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
         setResult(RESULT_OK)
         binding.btnDelete.visibility = View.GONE
@@ -661,8 +677,12 @@ class ScanResultActivity : AppCompatActivity() {
     /** Skanlangan fayl bizning kesh ichidagi vaqtinchalik NUSXAmi (share/content URI)? */
     private fun isScratchCopy(): Boolean {
         if (apkIsCopy) return true
+        // FAQAT bizning O'ZIMIZNING kesh papkamiz sanaladi. Umumiy "/cache/" substringiga
+        // ishonmaymiz: Telegram va boshqa ilovalar yuklamalarni ".../cache/..." papkasida
+        // saqlaydi — bu HAQIQIY fayl, vaqtinchalik nusxa emas. Aks holda haqiqatan
+        // o'chirilgan xavfli faylni "nusxa o'chdi, asli qoldi" deb noto'g'ri xabar berardik.
         return try {
-            apkPath.startsWith(cacheDir.absolutePath) || apkPath.contains("/cache/")
+            apkPath.startsWith(cacheDir.absolutePath)
         } catch (_: Throwable) {
             false
         }

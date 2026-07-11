@@ -11,6 +11,7 @@ import com.uzguard.databinding.ActivityQuarantineV4Binding
 import com.uzguard.databinding.ItemKq4QuarantineEntryBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -51,6 +52,14 @@ class QuarantineActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         reload()
+    }
+
+    override fun onDestroy() {
+        // Activity yo'q qilinganda davom etayotgan coroutine'larni bekor qilamiz:
+        // aks holda scope o'lik Activity/binding'ni ushlab (leak) reload()/Toast'ni
+        // yo'q qilingan ekranga chaqiradi.
+        scope.cancel()
+        super.onDestroy()
     }
 
     private fun reload() {

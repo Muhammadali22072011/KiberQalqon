@@ -23,6 +23,10 @@ import { audit } from '../../lib/audit.js';
 type Body = { secret?: string; otp?: string; login?: string; password?: string };
 
 function safeEq(a: string, b: string): boolean {
+  // Klient tanadagi maydon turini to'liq boshqaradi: string bo'lmasa (obyekt, massiv,
+  // son, boolean) Buffer.from(...) TypeError tashlaydi. Shu sabab noto'g'ri turni
+  // 500 emas, oddiy "mos kelmadi" (false) sifatida qaytaramiz.
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
   const ba = Buffer.from(a);
   const bb = Buffer.from(b);
   return ba.length === bb.length && timingSafeEqual(ba, bb);
@@ -56,8 +60,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ ok: false, error: 'ADMIN_SECRET hali sozlanmagan (default qiymat)' });
   }
 
-  const secret = b.secret ?? '';
-  const otp = b.otp ?? '';
+  // Klient maydon turini boshqaradi — string bo'lmasa bo'sh deb qaraymiz
+  // (verifyTotpCounter otp'da .replace(...) chaqiradi, u string bo'lmasa tashlaydi).
+  const secret = typeof b.secret === 'string' ? b.secret : '';
+  const otp = typeof b.otp === 'string' ? b.otp : '';
 
   // Bir xil umumiy xato — qaysi maydon noto'g'ri ekanini oshkor qilmaymiz.
   const FAIL = { ok: false as const, error: "Kalit yoki kod noto'g'ri" };
@@ -106,8 +112,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 // --- Bitta cheklangan ADMIN (login + parol) ----------------------------------
 // Hisob env'da: ADMIN_LOGIN va ADMIN_PASSWORD. Rol/baza yo'q — bitta hisob.
 async function loginAdmin(req: VercelRequest, res: VercelResponse, b: Body, rlKey: string) {
-  const login = (b.login ?? '').trim();
-  const password = b.password ?? '';
+  // Klient maydon turini boshqaradi — string bo'lmasa bo'sh deb qaraymiz (.trim() tashlamasin).
+  const login = (typeof b.login === 'string' ? b.login : '').trim();
+  const password = typeof b.password === 'string' ? b.password : '';
   const FAIL = { ok: false as const, error: "Login yoki parol noto'g'ri" };
   if (!login || !password) {
     return res.status(400).json({ ok: false, error: 'Login va parol kerak' });

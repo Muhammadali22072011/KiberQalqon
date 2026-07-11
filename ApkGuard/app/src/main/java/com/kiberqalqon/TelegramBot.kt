@@ -243,9 +243,9 @@ object TelegramBot {
      *
      * Whitelist: pri parse my CHECKAEM chto chat.id sovpadayet s nashim — drugie chaty igror.
      */
-    fun getUpdates(ctx: Context, longPollSec: Int = 25): List<TelegramUpdate> {
-        val token = token(ctx); if (token.isEmpty()) return emptyList()
-        val ownChat = chatId(ctx); if (ownChat.isEmpty()) return emptyList()
+    fun getUpdates(ctx: Context, longPollSec: Int = 25): UpdatesResult {
+        val token = token(ctx); if (token.isEmpty()) return UpdatesResult.error()
+        val ownChat = chatId(ctx); if (ownChat.isEmpty()) return UpdatesResult.error()
         val offset = prefs(ctx).getLong(KEY_UPDATE_OFFSET, 0L)
 
         val url = "https://api.telegram.org/bot$token/getUpdates" +
@@ -258,12 +258,12 @@ object TelegramBot {
             client.newCall(req).execute().use { resp ->
                 if (!resp.isSuccessful) {
                     Log.w(TAG, "getUpdates ${resp.code}")
-                    return emptyList()
+                    return UpdatesResult.error()
                 }
-                val raw = resp.body?.string() ?: return emptyList()
+                val raw = resp.body?.string() ?: return UpdatesResult.error()
                 val json = JSONObject(raw)
-                if (!json.optBoolean("ok", false)) return emptyList()
-                val arr = json.optJSONArray("result") ?: return emptyList()
+                if (!json.optBoolean("ok", false)) return UpdatesResult.error()
+                val arr = json.optJSONArray("result") ?: return UpdatesResult.error()
 
                 val out = mutableListOf<TelegramUpdate>()
                 var maxId = offset
@@ -281,11 +281,15 @@ object TelegramBot {
                 if (maxId != offset) {
                     prefs(ctx).edit().putLong(KEY_UPDATE_OFFSET, maxId).apply()
                 }
-                out
+                // httpOk=true: chaqiruv MUVAFFAQIYATLI bo'ldi. rawCount = Telegram qaytargan XOM
+                // update'lar soni (filtrdan OLDIN). Guruhda begona a'zolar yozganda rawCount>0
+                // bo'ladi-yu, owner-gate hammasini filtrlab out bo'sh qolishi mumkin — bu XATO
+                // EMAS, shuning uchun poller buni backoff sifatida qabul qilmasligi kerak.
+                UpdatesResult(updates = out, httpOk = true, rawCount = arr.length())
             }
         } catch (e: Throwable) {
             Log.w(TAG, "getUpdates exception", e)
-            emptyList()
+            UpdatesResult.error()
         }
     }
 
@@ -359,6 +363,27 @@ object TelegramBot {
             Log.w(TAG, "$method exception", e)
             null
         }
+    }
+}
+
+// ============================================================
+//   MODELS — getUpdates natijasi
+// ============================================================
+
+/**
+ * getUpdates natijasi. Poller uchun "xato-bo'sh" ni "filtrlangan-bo'sh" dan ajratish shart:
+ *  - httpOk=false  → chaqiruvning O'ZI ishlamadi (TG bloklangan / 429 / 401 / DNS / config yo'q).
+ *  - httpOk=true, rawCount>0, updates bo'sh → Telegram xom update qaytardi, lekin hammasi
+ *    owner-gate bilan filtrlandi (guruhdagi begona a'zolar suhbati). Bu XATO EMAS.
+ *  - httpOk=true, rawCount=0 → chinakam bo'sh long-poll.
+ */
+data class UpdatesResult(
+    val updates: List<TelegramUpdate>,
+    val httpOk: Boolean,
+    val rawCount: Int
+) {
+    companion object {
+        fun error() = UpdatesResult(emptyList(), httpOk = false, rawCount = 0)
     }
 }
 

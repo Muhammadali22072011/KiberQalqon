@@ -83,6 +83,12 @@ class ProtectionStatusActivity : AppCompatActivity() {
     private var wizardOutstanding: WizKind? = null // SETTINGS → onResume kutadi, LAUNCHER → callback kutadi
     private val wizardDone = HashSet<String>()
 
+    // Haqiqiy tashqi ekrandan qaytishni bildiradi. onStop'da true bo'ladi; SETTINGS
+    // qadamini onResume faqat shu bayroq yoqilganda pump qiladi (keyin tozalaymiz).
+    // LAUNCHER callback'i o'sha resume tsiklida SETTINGS qadamini sinxron ochsa —
+    // oraliqda onStop bo'lmaydi, shuning uchun onResume ikki marta o'tkazib yubormaydi.
+    private var wentBackground = false
+
     private enum class WizKind { INSTANT, SETTINGS, LAUNCHER }
     private data class WizStep(
         val id: String,
@@ -142,10 +148,22 @@ class ProtectionStatusActivity : AppCompatActivity() {
         try { renderRows() } catch (e: Throwable) { android.util.Log.e("ProtStatus", "render", e) }
         // Sehrgar tizim EKRANINI kutayotgan bo'lsa (SETTINGS) — qaytib kelindi, keyingisini ochamiz.
         // LAUNCHER (runtime/VPN dialog) bo'lsa — uni callback yopadi, bu yerda tegmaymiz.
-        if (wizardActive && wizardOutstanding == WizKind.SETTINGS) {
+        // MUHIM: faqat HAQIQATAN tashqi ekrandan qaytilganda (wentBackground) pump qilamiz.
+        // LAUNCHER callback'i shu resume tsiklida SETTINGS qadamini sinxron ochib qo'ysa,
+        // oraliqda onStop bo'lmaydi → wentBackground=false → bu yerda ikki marta o'tkazmaymiz.
+        val returned = wentBackground
+        wentBackground = false
+        if (returned && wizardActive && wizardOutstanding == WizKind.SETTINGS) {
             wizardOutstanding = null
             try { pumpWizard() } catch (e: Throwable) { android.util.Log.w("ProtStatus", "wizard resume", e) }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Ekran fon'ga tushdi (tizim sozlama/dialogi ochildi yoki ilova almashtirildi) —
+        // keyingi onResume'da bu HAQIQIY qaytish deb hisoblanadi (sehrgar SETTINGS pump'i uchun).
+        wentBackground = true
     }
 
     /** Tugma ko'rinishini majburiy ruxsatlar holatiga moslaydi (yoqilmagan bo'lsa — xira). */

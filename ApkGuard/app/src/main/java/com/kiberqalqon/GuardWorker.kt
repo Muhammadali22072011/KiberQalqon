@@ -88,6 +88,7 @@ class GuardWorker(
                     var uploaded = 0
                     var scanned = 0
                     for (p in explicitPaths) {
+                        if (isStopped) break  // Worker to'xtatilsa og'ir skanni davom ettirmaymiz (batareya/qizish)
                         val f = File(p)
                         if (!f.exists()) continue
                         val item = ApkItem(f, f.name, f.absolutePath, f.length())
@@ -120,6 +121,7 @@ class GuardWorker(
                     var uploaded = 0
                     var scanned = 0
                     for (apk in apks) {
+                        if (isStopped) break  // Worker to'xtatilsa (batareya past bo'lib qolsa) qolgan APK'larni skanlamaymiz
                         if (!apk.file.exists()) continue
                         // Dedup path+mtime+size bo'yicha: avval faqat path edi → o'sha yo'ldagi YANGI
                         // (o'zgargan) APK qayta skanlanmasdan o'tib ketardi. mtime/size o'zgarsa — qayta skan.
@@ -178,6 +180,7 @@ class GuardWorker(
                     val now = System.currentTimeMillis()
                     var uploaded = 0
                     for (item in list.take(10)) {
+                        if (isStopped) break  // Worker to'xtatilsa qolgan skanlarni to'xtatamiz
                         if (!item.file.exists()) continue
                         val result = try {
                             ApkScanner.scan(applicationContext, item.file.absolutePath)
@@ -208,6 +211,10 @@ class GuardWorker(
                     Result.success(workDataOf("scanned" to list.size, "uploaded" to uploaded))
                 }
             }
+        } catch (ce: kotlinx.coroutines.CancellationException) {
+            // Worker to'xtatildi (bekor qilindi) — bu XATO emas. Ichki throw ce'lar shu yergacha
+            // yetib kelsin: bekor qilishni Result.failure()'ga aylantirib yutmaymiz, propagatsiya bo'lsin.
+            throw ce
         } catch (e: Exception) {
             Log.e(TAG, "Critical error in background worker", e)
             Result.failure()

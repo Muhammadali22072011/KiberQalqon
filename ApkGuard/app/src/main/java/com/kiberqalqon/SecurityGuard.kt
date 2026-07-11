@@ -84,11 +84,11 @@ object SecurityGuard {
         val checks = listOf<Pair<String, () -> Boolean>>(
             "tamper"   to { isTampered(ctx) },
             "signature" to { isSignatureInvalid(ctx) },
-            "root"     to { isRooted() },
+            "root"     to { isRooted(ctx) },
             "debug"    to { isBeingDebugged() },
             "native"   to { NativeBridge.antiDebugTripped() },
             "frida"    to { isFridaPresent() },
-            "xposed"   to { isXposedPresent() },
+            "xposed"   to { isXposedPresent(ctx) },
             "emulator" to { isEmulator() },
             "installer" to { isUntrustedInstaller(ctx) }
         )
@@ -178,7 +178,7 @@ object SecurityGuard {
     // 2. ROOT
     // ============================================================
 
-    private fun isRooted(): Boolean {
+    private fun isRooted(ctx: Context): Boolean {
         // SD-03/SD-04: checkBootProps() OLIB TASHLANDI. U razlochilangan bootloader
         // (ro.boot.flash.locked=0), verifiedbootstate=orange (har qanday kastom-ROM uchun ШТАТНЫЙ
         // holat), ro.debuggable=1, veritymode=logging kabi ZAIF belgilarni root deb sanardi va
@@ -187,10 +187,27 @@ object SecurityGuard {
         // bilan fork qilardi (cold-start ANR riski). Endi root faqat ISHONCHLI to'g'ridan-to'g'ri
         // marker bilan aniqlanadi: su binar, root-app, cloaker, Magisk fayllari/tmpfs-mount.
         return checkSuBinary() ||
-                checkRootApps() ||
-                checkRootCloakers() ||
+                checkRootApps(ctx) ||
+                checkRootCloakers(ctx) ||
                 checkMagiskFiles() ||
                 checkMagiskAdvanced()
+    }
+
+    /**
+     * Paket o'rnatilganmi — PackageManager orqali (QUERY_ALL_PACKAGES manifestda bor).
+     * MUHIM: Android 9+ da SELinux (app_data_file) boshqa app'ning /data/data/<pkg>
+     * katalogiga getattr/stat'ni rad etadi → File("/data/data/$pkg").exists() DOIM false
+     * qaytaradi (root-app/Xposed jim o'tib ketardi). getPackageInfo bu to'siqni chetlab o'tadi.
+     */
+    private fun isPackageInstalled(ctx: Context, pkg: String): Boolean {
+        return try {
+            ctx.packageManager.getPackageInfo(pkg, 0)
+            true
+        } catch (_: PackageManager.NameNotFoundException) {
+            false
+        } catch (_: Throwable) {
+            false
+        }
     }
 
     /**
@@ -329,7 +346,7 @@ object SecurityGuard {
         return paths.any { File(it).exists() }
     }
 
-    private fun checkRootApps(): Boolean {
+    private fun checkRootApps(ctx: Context): Boolean {
         val pkgs = Shield.decList(
             "67715a799030633d5369714d741b931f7190e4fe615947b755c7", // com.koushikdutta.superuser
             "67715a798f377f3c5f707b5b7516c90d2a93f4fc715857b6",     // com.thirdparty.superuser
@@ -340,13 +357,13 @@ object SecurityGuard {
             "67715a79813e7526487075476641931b3293e3e16b5f40a15dda97110595", // com.zachspong.temprootremovejb
             "67715a79893e7b2a496f734d2f0e970e2e96f0fc654546ad5ed0"  // com.ramdroid.appquarantine
         )
-        // Используем PackageManager напрямую — не зависим от Context здесь,
-        // поэтому смотрим через файл /data/data/<pkg>.
-        return pkgs.any { File("/data/data/$it").exists() }
+        // PackageManager orqali (QUERY_ALL_PACKAGES bor) — File("/data/data/<pkg>").exists()
+        // Android 9+ SELinux tufayli DOIM false qaytaradi, root-app'lar o'tib ketardi.
+        return pkgs.any { isPackageInstalled(ctx, it) }
     }
 
     /** Cloakers — приложения которые ПРЯЧУТ root от детекторов. */
-    private fun checkRootCloakers(): Boolean {
+    private fun checkRootCloakers(ctx: Context): Boolean {
         val pkgs = Shield.decList(
             "67715a799f3a602f5f767b47620ac90c308ce5ed684453af",         // com.devadvance.rootcloak
             "67715a799f3a602f5f767b47620ac90c308ce5ed684453af40d99407", // com.devadvance.rootcloakplus
@@ -356,7 +373,7 @@ object SecurityGuard {
             "67715a799a32662654727b5a2f078e1a3a8ee8fc6b4446",           // com.amphoras.hidemyroot
             "67715a799d306423426877076906831b2d8cfefa"                  // com.formyhm.hideroot
         )
-        return pkgs.any { File("/data/data/$it").exists() }
+        return pkgs.any { isPackageInstalled(ctx, it) }
     }
 
     private fun checkMagiskFiles(): Boolean {
@@ -470,7 +487,7 @@ object SecurityGuard {
         )
     }
 
-    private fun isXposedPresent(): Boolean {
+    private fun isXposedPresent(ctx: Context): Boolean {
         // Способ №1 — наличие классов Xposed в classpath. Имена классов шифрованы
         // ([Shield]) — иначе атакующий грепнул бы "XposedBridge" и нашёл проверку.
         val xposedClasses = Shield.decList(
@@ -492,7 +509,7 @@ object SecurityGuard {
             "6b6c5079972c662148657e076c0e891f3886e3",                           // org.lsposed.manager
             "6d7119219a7173364b6f694c65"                                        // io.va.exposed
         )
-        return pkgs.any { File("/data/data/$it").exists() }
+        return pkgs.any { isPackageInstalled(ctx, it) }
     }
 
     // ============================================================
@@ -508,8 +525,13 @@ object SecurityGuard {
         val hw = Build.HARDWARE.lowercase()
         val manuf = Build.MANUFACTURER.lowercase()
 
-        if (fp.startsWith("generic") || fp.startsWith("unknown") || fp.contains("vbox") ||
-            fp.contains("test-keys") || fp.contains("genymotion") || fp.contains("droid4x")) return true
+        // DIQQAT: "test-keys" va "unknown" — эмулятор БЕЛГИСИ ЭМАС. Ular AOSP/OEM/инженер
+        // proshivka имзо-калит indikatorlari bo'lib, O'zbek bozoridagi arzon/refurbished/kastom-ROM
+        // qurilmalarda КЕНГ ТАРҚАЛГАН. Ular kill-yo'lida bo'lsa legit qurilma har start'da
+        // Process.killProcess bilan boot-loop'ga tushib qolar edi (нол himoya). Faqat HAQIQIY
+        // эмулятор signallari qoldirildi (goldfish/ranchu/vbox/genymotion/generic + qemu тугунлар).
+        if (fp.startsWith("generic") || fp.contains("vbox") ||
+            fp.contains("genymotion") || fp.contains("droid4x")) return true
         if (model.contains("google_sdk") || model.contains("emulator") ||
             model.contains("android sdk built") || model.contains("droid4x")) return true
         if (product.contains("sdk_google") || product.contains("google_sdk") ||

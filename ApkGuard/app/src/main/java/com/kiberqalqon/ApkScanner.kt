@@ -922,7 +922,11 @@ object ApkScanner {
                     fun scanEntry(entry: java.util.zip.ZipEntry, maxBytes: Int) {
                         try {
                             zip.getInputStream(entry).use { input ->
-                                val bytesToRead = maxBytes.coerceAtMost(entry.size.toInt().coerceAtLeast(1))
+                                // entry.size ZIP markaziy katalogidan olinadi (hujumchi nazorati ostida).
+                                // >=2GB e'lon qilingan o'lcham .toInt() bilan manfiyga aylanib, oldin
+                                // bytesToRead=1 bo'lib qolar edi → DEX imzolari o'qilmasdan o'tkazib
+                                // yuborilardi. Narrowingdan oldin min'ni Long fazoda bajaramiz.
+                                val bytesToRead = minOf(maxBytes.toLong(), entry.size.coerceAtLeast(1L)).toInt()
                                 val bytes = ByteArray(bytesToRead)
                                 var off = 0
                                 while (off < bytesToRead) {

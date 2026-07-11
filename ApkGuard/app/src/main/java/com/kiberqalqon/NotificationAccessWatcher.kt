@@ -1,6 +1,7 @@
 package com.uzguard
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.provider.Settings
 import android.util.Log
 import androidx.work.CoroutineWorker
@@ -41,7 +42,7 @@ class NotificationAccessWatcher(
             for (comp in newOnes) {
                 val pkg = comp.substringBefore('/')
                 if (pkg == ctx.packageName || pkg == "${ctx.packageName}.debug") continue
-                if (isSystem(pkg)) continue
+                if (isSystem(ctx, pkg)) continue
 
                 Log.w(TAG, "New notification listener: $comp")
                 val label = try {
@@ -77,13 +78,20 @@ class NotificationAccessWatcher(
         emptySet()
     }
 
-    private fun isSystem(pkg: String): Boolean =
-        pkg.startsWith("com.google.android.") ||
-            pkg.startsWith("com.android.") ||
-            pkg.startsWith("com.samsung.") ||
-            pkg.startsWith("com.sec.") ||
-            pkg.startsWith("com.miui.") ||
-            pkg.startsWith("com.xiaomi.")
+    /**
+     * Tizim ilovasi EKANINI paket-nomi prefiksi bilan EMAS, balki haqiqiy o'rnatilgan
+     * ApplicationInfo bayroqlari (FLAG_SYSTEM / FLAG_UPDATED_SYSTEM_APP) bilan tekshiramiz.
+     * OTP-o'g'ri o'zini `com.miui.securitycenter.plugin` yoki `com.samsung.notify` deb
+     * atasa ham, sideload qilingan APK'da bu bayroqlar bo'lmaydi → tizim deb tan olinmaydi
+     * va alert ishlaydi.
+     */
+    private fun isSystem(ctx: Context, pkg: String): Boolean = try {
+        val ai = ctx.packageManager.getApplicationInfo(pkg, 0)
+        (ai.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0
+    } catch (_: Throwable) {
+        // Paket topilmasa yoki o'qib bo'lmasa — tizim emas deb hisoblaymiz (xavfsiz tomon).
+        false
+    }
 
     companion object {
         private const val TAG = "NotifAccessWatcher"

@@ -50,8 +50,6 @@ object SelfGuard {
     /** True, если этот файл — наш собственный установленный APK или сборочный артефакт. */
     fun isOwnApk(context: Context, apkPath: String): Boolean {
         try {
-            val path = apkPath.replace('\\', '/').lowercase()
-
             // 1) Системные пути установленного приложения.
             //    Android хранит APK как /data/app/<package>-<hash>/base.apk, а на
             //    Android 10+ — /data/app/~~rand~~/<package>-<hash>/base.apk.
@@ -65,15 +63,27 @@ object SelfGuard {
             //    "o'zimiznikidir" deb SAFE qaytarilardi (ZipEncryption/Dropper
             //    tekshiruvlari umuman ishga tushmasdan). Endi faqat HAQIQIY
             //    o'rnatilgan joy — /data/app/ ostidagi APK — "o'ziniki" deb
-            //    hisoblanadi. App hech qachon /data/app/ ga yozolmaydi, shuning
-            //    uchun u yerda paket nomimiz bilan turgan APK kafolatli bizniki.
+            //    hisoblanadi.
+            //
+            //    HAVFSIZLIK (HIGH bug-fix): avval `path.contains("/data/app/")`
+            //    ishlatilardi — bu ANCHOR'lanmagan substring. Hujumchi
+            //    /storage/emulated/0/Download/data/app/com.uzguard/evil.apk
+            //    yaratsa, unda ham "/data/app/" va "/com.uzguard/" bor edi →
+            //    APK skanlashdan CHETLATILARDI (va o'chirishdan ham). Endi
+            //    HAQIQIY fayl tizimi ildiziga anchor qilamiz: canonicalPath
+            //    ROSA "/data/app/" bilan boshlanishi shart (app u yerga
+            //    yozolmaydi), keyingina paket segmentini tekshiramiz.
             //    O'zimizning APK boshqa joyda bo'lsa ham (2) paket va (4) imzo
             //    tekshiruvlari baribir tutadi.
-            for (pkg in OWN_PACKAGES) {
-                if (path.contains("/data/app/") &&
-                    (path.contains("/$pkg-") || path.contains("/$pkg/"))) {
-                    Log.d(TAG, "Self APK detected by install path: $apkPath")
-                    return true
+            val canonical = try { File(apkPath).canonicalPath } catch (_: Exception) { apkPath }
+                .replace('\\', '/')
+            val canonLower = canonical.lowercase()
+            if (canonLower.startsWith("/data/app/")) {
+                for (pkg in OWN_PACKAGES) {
+                    if (canonLower.contains("/$pkg-") || canonLower.contains("/$pkg/")) {
+                        Log.d(TAG, "Self APK detected by install path: $apkPath")
+                        return true
+                    }
                 }
             }
 

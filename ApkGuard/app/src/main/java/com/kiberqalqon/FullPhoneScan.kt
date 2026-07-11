@@ -82,16 +82,33 @@ object FullPhoneScan {
             return
         }
         
-        // Пропускаем системные папки
-        val skipFolders = setOf(
-            "Android/data",
-            "Android/obb",
-            ".android_secure",
-            ".thumbnails",
-            ".cache"
-        )
-        
-        if (skipFolders.any { dir.absolutePath.contains(it) }) {
+        // Пропускаем системные папки — сравниваем по СЕГМЕНТАМ пути, а НЕ подстрокой.
+        // Ране: dir.absolutePath.contains(".cache") и т.п. — любая пользовательская папка
+        // типа /sdcard/Download/.cache (или "my.cache") исключала ВСЁ поддерево из обхода.
+        // Этим мог воспользоваться дроппер: спрятать payload.apk в /sdcard/Download/.cache/
+        // (в отличие от настоящего /Android/data — эту папку юзер свободно читает/пишет),
+        // и полное сканирование его бы никогда не увидело.
+        val storageRoot = Environment.getExternalStorageDirectory()?.absolutePath?.trimEnd('/')
+        val absPath = dir.absolutePath.trimEnd('/')
+        // Сегменты пути ОТНОСИТЕЛЬНО корня внешнего хранилища (если dir внутри него)
+        val relPath = if (storageRoot != null &&
+            (absPath == storageRoot || absPath.startsWith("$storageRoot/"))) {
+            absPath.substring(storageRoot.length)
+        } else {
+            absPath
+        }
+        val segments = relPath.split('/').filter { it.isNotEmpty() }
+
+        // Скрытые кэш/эскизы/secure — пропускаем по ИМЕНИ сегмента, где бы он ни был
+        val reservedNames = setOf(".android_secure", ".thumbnails", ".cache")
+        if (segments.any { it in reservedNames }) {
+            return
+        }
+        // Android/data и Android/obb — пропускаем ТОЛЬКО в корне хранилища (реальные песочницы)
+        if (segments.size >= 2 &&
+            segments[0].equals("Android", ignoreCase = true) &&
+            (segments[1].equals("data", ignoreCase = true) ||
+             segments[1].equals("obb", ignoreCase = true))) {
             return
         }
         

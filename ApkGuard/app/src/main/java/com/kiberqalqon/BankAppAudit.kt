@@ -49,12 +49,18 @@ object BankAppAudit {
         val fromPlay: Boolean,
     ) {
         /**
-         * SOXTA deb hisoblash uchun LABEL_LOOKS_LIKE_BANK'dan TASHQARI kamida bitta tasdiqlovchi
-         * dalil shart (ikonka taqlidi / paket typosquat / Play'dan emas / imzo noto'g'ri).
-         * Faqat nom o'xshashligi YETARLI EMAS — aks holda har bir legal fintech yoki bankning
-         * ikkilamchi ilovasi (boshqa paket, lekin rasmiy imzo) noto'g'ri soxta deb belgilanardi.
+         * SOXTA deb hisoblash uchun KUCHLI tasdiqlovchi dalil shart: ikonka taqlidi,
+         * paket typosquat YOKI imzo rasmiy emas. Faqat nom o'xshashligi YETARLI EMAS; shuningdek
+         * NOT_PLAY_INSTALL (sideload) YAKKA o'zi ham YETARLI EMAS — aks holda label'i biror
+         * bank tokeniga (masalan "milliy", "xazna" kabi keng o'zbek so'zlari) tasodifan mos
+         * kelgan har qanday sideload ilova soxta deb belgilanib, false-positive toshqini bo'lardi.
+         * Sideload — faqat qo'shimcha (zaif) signal, yakka o'zi soxta verdikt bermaydi.
          */
-        val isFake: Boolean get() = reasons.any { it != Reason.LABEL_LOOKS_LIKE_BANK }
+        val isFake: Boolean get() = reasons.any {
+            it == Reason.ICON_IMPERSONATION ||
+                it == Reason.PACKAGE_TYPOSQUAT ||
+                it == Reason.CERT_NOT_OFFICIAL
+        }
     }
 
     enum class Reason {
@@ -90,16 +96,39 @@ object BankAppAudit {
                 // 1) Brend-o'xshashlik: label yoki paket biror bank brendiga o'xshaydimi?
                 val bank = looksLikeBank(label, pkg) ?: continue
 
-                // 2) Haqiqiy bank o'z paketi ostida → soxta emas, o'tkazib yuboramiz.
-                if (pkg.equals(bank.pkg, ignoreCase = true)) continue
-
-                // Bu yerga kelsak: brendga o'xshaydi, lekin paket begona = nomzod.
                 val fromPlay = fromPlay(pm, pkg)
 
-                // 2b) Bir noshirning LEGAL ikkilamchi ilovasi: Play'dan o'rnatilgan VA imzosi
-                //     haqiqiy bankning rasmiy imzosiga to'g'ri kelsa — HECH QACHON soxta emas
-                //     (masalan "Kapitalbank Biznes" boshqa paket ostida, lekin o'sha rasmiy imzo).
-                if (fromPlay && certMatchesOfficial(context, pkg, bank)) continue
+                // 2) Nomzod paketi AYNAN haqiqiy bank paketi bo'lsa — ko'r-ko'rona o'tkazib
+                //    YUBORMAYMIZ. KnownBanks'da ko'p kanonik (endi 404/o'lik) paketlar "eski
+                //    o'rnatmalar uchun" saqlanadi (masalan uz.click.evo). Play'da bunday paket
+                //    endi yo'q, shuning uchun trojan uni erkin da'vo qila oladi (paket
+                //    to'qnashuvisiz) — imzo tekshirilmasa audit uni butunlay o'tkazib yuborardi.
+                if (pkg.equals(bank.pkg, ignoreCase = true)) {
+                    // Play'dan o'rnatilgan → kanonik paketni Play'da soxta ilova e'lon qila
+                    //   olmaydi (paket to'qnashuvi) → haqiqiy bank, soxta emas.
+                    if (fromPlay) continue
+                    // Play'dan EMAS: imzo ishonchli pin (real noshirning Play'dan olingan
+                    //   sertifikati) bilan tasdiqlansa — legal eski o'rnatma, o'tkazamiz.
+                    val fp = try { CertUtil.installedFingerprintSha256(context, pkg) } catch (_: Throwable) { null }
+                    if (fp != null && TrustedSignatures.trustedName(pkg, fp) != null) continue
+                    // Aks holda: bank brendining kanonik paketini Play'dan tashqarida,
+                    //   tasdiqlanmagan imzo bilan da'vo qilmoqda = taqlid → soxta deb belgilaymiz.
+                    val reasons = ArrayList<Reason>()
+                    reasons.add(Reason.LABEL_LOOKS_LIKE_BANK)
+                    reasons.add(Reason.CERT_NOT_OFFICIAL)
+                    reasons.add(Reason.NOT_PLAY_INSTALL)
+                    if (hasIconImpersonation(context, app, pkg)) reasons.add(Reason.ICON_IMPERSONATION)
+                    out.add(Finding(pkg, label, bank, reasons, fromPlay))
+                    continue
+                }
+
+                // Bu yerga kelsak: brendga o'xshaydi, lekin paket begona = nomzod.
+
+                // 2b) Bir noshirning LEGAL ikkilamchi ilovasi: imzosi haqiqiy bankning rasmiy
+                //     imzosiga to'g'ri kelsa — HECH QACHON soxta emas. Kriptografik imzo mosligi
+                //     bir noshir ekanini isbotlaydi, o'rnatish manbasidan (Play/sideload) qat'i
+                //     nazar; O'zbekistonda banklar APK'ni o'z saytidan ham tarqatadi.
+                if (certMatchesOfficial(context, pkg, bank)) continue
 
                 val reasons = ArrayList<Reason>()
                 reasons.add(Reason.LABEL_LOOKS_LIKE_BANK)

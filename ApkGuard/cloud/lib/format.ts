@@ -60,6 +60,6 @@ export function formatStats(s: {
 }
 
 // Markdown belgilarini ekran qiladi (Telegram MarkdownV1 uchun yetarli)
-function escape(s: string): string {
-  return s.replace(/([_*`\[])/g, '\\$1');
+export function escape(s: string): string {
+  return s.replace(/([\\_*`\[])/g, '\\$1');
 }

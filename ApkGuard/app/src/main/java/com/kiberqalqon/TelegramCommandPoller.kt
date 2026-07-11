@@ -46,14 +46,24 @@ class TelegramCommandPoller(ctx: Context, params: WorkerParameters) : CoroutineW
         var failed = false
         val started = SystemClock.elapsedRealtime()
         try {
-            val updates = TelegramBot.getUpdates(ctx, longPollSec = LONG_POLL_SEC)
+            val result = TelegramBot.getUpdates(ctx, longPollSec = LONG_POLL_SEC)
             val elapsedMs = SystemClock.elapsedRealtime() - started
-            if (updates.isNotEmpty()) {
-                for (u in updates) CommandRouter.handle(ctx, u)
-            } else if (elapsedMs < LONG_POLL_SEC * 1000L - FAST_RETURN_MARGIN_MS) {
-                // Bo'sh, lekin long-poll vaqtidan ANCHA tez qaytdi → endpoint ishlamayapti.
-                Log.w(TAG, "getUpdates returned empty too fast (${elapsedMs}ms) — treating as failure")
-                failed = true
+            if (result.updates.isNotEmpty()) {
+                for (u in result.updates) CommandRouter.handle(ctx, u)
+            }
+            failed = when {
+                // Chaqiruvning O'ZI ishlamadi (TG bloklangan / 429 / 401 / DNS / config yo'q) → backoff.
+                !result.httpOk -> true
+                // Telegram XOM update qaytardi (rawCount>0), lekin owner-gate hammasini filtrladi
+                // (guruhdagi begona a'zolar suhbati) → bu XATO EMAS, backoff qilmaymiz.
+                result.rawCount > 0 -> false
+                // Chinakam bo'sh, lekin long-poll vaqtidan ANCHA tez qaytdi → endpoint ishlamayapti.
+                elapsedMs < LONG_POLL_SEC * 1000L - FAST_RETURN_MARGIN_MS -> {
+                    Log.w(TAG, "getUpdates returned empty too fast (${elapsedMs}ms) — treating as failure")
+                    true
+                }
+                // Chinakam bo'sh, to'liq long-poll kutdi → normal bo'sh sikl.
+                else -> false
             }
         } catch (e: Throwable) {
             Log.w(TAG, "poll cycle failed", e)

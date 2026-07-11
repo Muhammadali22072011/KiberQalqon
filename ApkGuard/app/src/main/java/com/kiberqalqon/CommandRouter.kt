@@ -109,6 +109,28 @@ object CommandRouter {
         val safeName = TelegramBot.mdEscape(entry.apkName)
         val safePath = TelegramBot.mdEscape(entry.apkPath)
         val file = File(entry.apkPath)
+        // #delete-false-success: boshqa ilova sandbox'idagi (/Android/data/<pkg>/) fayl
+        // uchun file.exists() Android 11+ da HAR DOIM false qaytaradi (boshqa ilovaning
+        // sandbox'ini stat qila olmaymiz), lekin virus fizik jihatdan hali joyida turadi.
+        // FileDeleter.delete() bu tekshiruvni o'z !exists() short-circuit'idan YUQORIGA
+        // qo'ygan — remote/Telegram yo'l ham xuddi shunday halol bo'lishi kerak, aks holda
+        // "allaqachon yo'q" deb yolg'on aytamiz.
+        val sandboxOwner = FileDeleter.sandboxOwner(file)
+        if (sandboxOwner != null) {
+            replyOrEdit(ctx, cb.messageId, buildString {
+                append("⚠️ *Masofadan o'chirib bo'lmaydi*\n")
+                append("`$safeName`\n\n")
+                append("Path: `$safePath`\n\n")
+                append("Bu fayl boshqa ilova (`${TelegramBot.mdEscape(sandboxOwner)}`) ")
+                append("sandbox papkasida (/Android/data/) joylashgan. Android qonuni bo'yicha ")
+                append("uni boshqa ilova (UzGuard) o'chira olmaydi — u yerda hali ham turibdi.\n\n")
+                append("Yo'l A (eng oson): shu APK'ni yuborgan *Telegram xabarini o'chiring* — ")
+                append("fayl ham u bilan birga yo'qoladi.\n")
+                append("Yoki UzGuard ilovasini telefonda oching va u yerdan tozalash bo'yicha ")
+                append("ko'rsatmalarga amal qiling.")
+            }, backKeyboard())
+            return
+        }
         if (!file.exists()) {
             ThreatActions.remove(ctx, token)
             replyOrEdit(ctx, cb.messageId,

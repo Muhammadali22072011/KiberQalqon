@@ -152,9 +152,13 @@ object NotificationHelper {
             putExtra("apk_name", apkFile.name)
         }
 
+        // Har fayl uchun unikal id/requestCode — aks holda ekran qulf/o'chiq paytida
+        // topilgan ikkinchi xavfli APK birinchisining bildirishnomasini (777) va uning
+        // PendingIntent extras'ini almashtirib yuborardi (birinchi tahdid ko'rinmay qolardi).
+        val rc = apkFile.absolutePath.hashCode() and 0x7FFFFFFF
         val pendingIntent = PendingIntent.getActivity(
             context,
-            101,
+            rc,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -174,7 +178,7 @@ object NotificationHelper {
             .setFullScreenIntent(pendingIntent, VersionCompat.canUseFullScreenIntent(context))
         applyLegacyPrefs(context, builder)
 
-        NotificationManagerCompat.from(context).notify(777, builder.build())
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
     }
 
     /**
@@ -207,8 +211,12 @@ object NotificationHelper {
             putExtra("verdict", "DANGER")
             putExtra("reason", reason)
         }
+        // Har karantinga olingan fayl uchun unikal id/requestCode — aks holda ketma-ket
+        // karantinga olingan bir nechta fayl bir-birining bildirishnomasini (7100) almashtirib
+        // yuborardi (oldingi "o'chirildi" xabari yo'qolardi).
+        val rc = (originalPath ?: fileName).hashCode() and 0x7FFFFFFF
         val pi = PendingIntent.getActivity(
-            context, 7100, openIntent,
+            context, rc, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val builder = NotificationCompat.Builder(context, channelFor(context))
@@ -228,7 +236,7 @@ object NotificationHelper {
             // ANIQ uzatamiz (PRIORITY_MAX + CATEGORY_ALARM tufayli baribir baland heads-up keladi).
             .setFullScreenIntent(pi, VersionCompat.canUseFullScreenIntent(context))
         applyLegacyPrefs(context, builder)
-        NotificationManagerCompat.from(context).notify(7100, builder.build())
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
         // Tunda (ekran o'chiq/qulf) topilgan tahdid — uyg'otuvchi sirena (o'zi gate qiladi).
         try { AlarmSiren.blast(context) } catch (_: Throwable) {}
     }

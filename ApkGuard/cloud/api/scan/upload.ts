@@ -68,6 +68,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // scan_duration_ms — ishonchsiz JSON'dan; chegaralanmagan/manfiy qiymat int ustunini
   // buzishi mumkin. 0..600000 ms (0..10 daqiqa) oralig'iga clamp qilamiz (risk_score kabi).
   const scanDurationMs = Math.max(0, Math.min(600000, Math.round(Number(b.scan_duration_ms) || 0)));
+  // reasons — ishonchsiz JSON'dan; jsonb ustun bo'lgani uchun bare string ham qabul qilinadi.
+  // classify() ichida .join() chaqiriladi → string kelsa TypeError → butun yuklash 500 bilan
+  // yiqilib, DANGER alert va threat yozuvi KETMAY qolardi. Bir marta massivga aylantiramiz
+  // (#24/#43 kirish-qattiqlash falsafasi) va hamma joyda shuni ishlatamiz.
+  const reasons: string[] = Array.isArray(b.reasons) ? b.reasons.map(String) : [];
 
   const sb = db();
 
@@ -137,7 +142,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       verdict: b.verdict,
       risk_score: risk,
       scan_duration_ms: scanDurationMs,
-      reasons: b.reasons ?? [],
+      reasons,
       perms: b.perms ?? [],
     })
     .select('id')
@@ -161,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       p_hash: b.apk_hash.toLowerCase(),
       p_package: b.package_name ?? null,
       p_label: b.app_label ?? null,
-      p_category: classify(b.reasons ?? []),
+      p_category: classify(reasons),
       p_severity: severity,
     });
     // Avval xato e'tiborsiz qoldirilardi — agar upsert_threat RPC bo'lmasa yoki
@@ -192,7 +197,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       package_name: b.package_name ?? null,
       apk_hash: b.apk_hash,
       verdict: b.verdict,
-      reasons: b.reasons ?? [],
+      reasons,
       device_name: dev.name,
     });
 

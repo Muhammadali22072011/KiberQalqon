@@ -51,7 +51,14 @@ object DexPatternAnalyzer {
     private data class Pattern(
         val needle: String,
         val score: Int,
-        val label: String
+        val label: String,
+        // ANTI-DEAD-NEEDLE (2026-07): raw DEX string pool'da tip deskriptori
+        // (masalan "Landroid/telephony/SmsManager;") va metod nomi ("sendTextMessage")
+        // ALOHIDA, tutash bo'lmagan string_data yozuvlarida yotadi. Smali'dagi
+        // "Lclass;->method" konkatenatsiyasi DEX baytlarida HECH QACHON tutash uchramaydi.
+        // Shu bois metod-havolani ikki bo'lakka bo'lamiz: needle (deskriptor) VA needle2
+        // (metod nomi) — ikkalasi ham SHU dex ichida bo'lsa hit. needle2=null → oddiy bitta needle.
+        val needle2: String? = null
     )
 
     // РЕКАЛИБРОВКА (2026-05): множество паттернов встречается в КАЖДОМ крупном
@@ -67,20 +74,22 @@ object DexPatternAnalyzer {
         Pattern("Ljava/lang/reflect/Method;", 0, "Reflection API"),             // рефлексия есть у всех
 
         // Native loading
-        Pattern("Ljava/lang/System;->load", 0, "System.load native chaqiruv"),  // любой app с .so
-        Pattern("Ljava/lang/Runtime;->exec", 25, "Runtime.exec (shell chaqiruv)"),
+        Pattern("Ljava/lang/System;", 0, "System.load native chaqiruv"),  // любой app с .so
+        // Runtime.exec: deskriptor + metod nomi alohida uchraydi → ikkalasi ham shu dex'da bo'lsin.
+        Pattern("Ljava/lang/Runtime;", 25, "Runtime.exec (shell chaqiruv)", needle2 = "exec"),
 
         // Sensitive APIs (часто в analytics/ads SDK легитимных приложений → низкий балл)
-        Pattern("Landroid/telephony/TelephonyManager;->getDeviceId", 8, "IMEI o'qish"),
-        Pattern("Landroid/telephony/TelephonyManager;->getSubscriberId", 10, "IMSI o'qish"),
-        Pattern("Landroid/telephony/TelephonyManager;->getSimSerialNumber", 10, "SIM serial o'qish"),
-        Pattern("Landroid/telephony/SmsManager;->sendTextMessage", 35, "SMS yuborish API"),
-        Pattern("Landroid/telephony/SmsManager;->sendMultipartTextMessage", 35, "Multipart SMS yuborish"),
+        // Metod nomlari o'zi yetarli darajada o'ziga xos → bare needle bilan qidiramiz.
+        Pattern("getDeviceId", 8, "IMEI o'qish"),
+        Pattern("getSubscriberId", 10, "IMSI o'qish"),
+        Pattern("getSimSerialNumber", 10, "SIM serial o'qish"),
+        Pattern("sendTextMessage", 35, "SMS yuborish API"),
+        Pattern("sendMultipartTextMessage", 35, "Multipart SMS yuborish"),
         Pattern("android.provider.Telephony.SMS_RECEIVED", 20, "SMS qabul intent"),
         Pattern("android.intent.action.NEW_OUTGOING_CALL", 18, "Chiquvchi qo'ng'iroqlarni ushlash"),
 
         // Anti-analysis
-        Pattern("Landroid/os/Debug;->isDebuggerConnected", 5, "Anti-debug check"),
+        Pattern("isDebuggerConnected", 5, "Anti-debug check"),
         Pattern("TracerPid", 15, "TracerPid /proc anti-debug"),
 
         // Telegram bot C2 (классический pattern Uzbek banking malware)
@@ -94,8 +103,8 @@ object DexPatternAnalyzer {
         Pattern("Lcom/ijiami/", 40, "Ijiami packer"),
 
         // Crypto/encoding — повсеместно (HTTPS, токены, кэш). Не штрафуем.
-        Pattern("Ljavax/crypto/Cipher;->doFinal", 0, "Cipher.doFinal"),
-        Pattern("Landroid/util/Base64;->decode", 0, "Base64 decode"),
+        Pattern("Ljavax/crypto/Cipher;", 0, "Cipher.doFinal"),
+        Pattern("Landroid/util/Base64;", 0, "Base64 decode"),
 
         // Дополнительные SMS-стилер маркеры
         Pattern("android.provider.Telephony.SMS_DELIVER", 25, "SMS_DELIVER (приоритетный перехват)"),
@@ -106,8 +115,9 @@ object DexPatternAnalyzer {
         Pattern("TYPE_APPLICATION_OVERLAY", 12, "Application overlay (banker fake oynasi)"),
         Pattern("TYPE_PHONE", 10, "Eski overlay TYPE_PHONE — banker xattilik belgisi"),
         // Accessibility orqali OTP'ni topish (это уже malware-специфично):
-        Pattern("AccessibilityEvent;->getText", 25, "Accessibility orqali matn o'qish (OTP grabber)"),
-        Pattern("AccessibilityNodeInfo;->getText", 20, "AccessibilityNode matn o'qish"),
+        // getText o'zi juda keng tarqalgan → tip deskriptori bilan juftlab qidiramiz.
+        Pattern("AccessibilityEvent;", 25, "Accessibility orqali matn o'qish (OTP grabber)", needle2 = "getText"),
+        Pattern("AccessibilityNodeInfo;", 20, "AccessibilityNode matn o'qish", needle2 = "getText"),
         Pattern("performGlobalAction", 18, "performGlobalAction (Accessibility orqali tap simulyatsiyasi)"),
 
         // === Anti-analysis (README §3.6 — Ajina.Banker hiylalari) ===
@@ -177,7 +187,11 @@ object DexPatternAnalyzer {
                         // Балл 0 = задокументированный, но безобидный паттерн (рефлексия,
                         // Base64, System.load...). Не добавляем в находки, чтобы не шуметь.
                         if (pattern.score <= 0) continue
-                        if (text.contains(pattern.needle)) {
+                        // needle2 bo'lsa — ikkala string ham shu dex ichida bo'lishi shart
+                        // (metod-havola DEX'da deskriptor + metod nomi ko'rinishida alohida yotadi).
+                        val matched = text.contains(pattern.needle) &&
+                            (pattern.needle2 == null || text.contains(pattern.needle2))
+                        if (matched) {
                             // Не дублируем один и тот же needle между classes2.dex/classes3.dex
                             if (found.none { it.first == pattern.label }) {
                                 found.add(pattern.label to pattern.score)

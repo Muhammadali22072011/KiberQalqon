@@ -66,16 +66,33 @@ object InstallProtectionGuide {
      * "ochish" oynasi yagona qulay usul.
      */
     fun triggerSetDefaultApk(ctx: Context): Boolean = try {
-        val own = java.io.File(ctx.applicationInfo.sourceDir)
-        val dir = java.io.File(ctx.cacheDir, "shared").apply { mkdirs() }
-        val bait = java.io.File(dir, "uzguard-setup.apk")
-        own.copyTo(bait, overwrite = true)
-        val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", bait)
-        val view = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        ctx.startActivity(view)
+        // Butun base.apk (CameraX + ZXing + native lib ~15-30 MB) nusxasi arzon qurilmalarda
+        // sekin eMMC'da UI thread'ni bloklaydi (freeze/ANR). Nusxalashni fon oqimida bajaramiz,
+        // intent'ni esa asosiy oqimda otamiz. Zaxira sozlamalari — nusxa muvaffaqiyatsiz bo'lsa.
+        val appCtx = ctx.applicationContext
+        Thread {
+            val view: Intent? = try {
+                val own = java.io.File(appCtx.applicationInfo.sourceDir)
+                val dir = java.io.File(appCtx.cacheDir, "shared").apply { mkdirs() }
+                val bait = java.io.File(dir, "uzguard-setup.apk")
+                // Bait fayl allaqachon dolzarb bo'lsa (hajm+vaqt mos) — qayta nusxalamaymiz.
+                if (!(bait.exists() && bait.length() == own.length() && bait.lastModified() >= own.lastModified())) {
+                    own.copyTo(bait, overwrite = true)
+                }
+                val uri = androidx.core.content.FileProvider.getUriForFile(appCtx, "${appCtx.packageName}.fileprovider", bait)
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            } catch (t: Throwable) {
+                Log.w(TAG, "triggerSetDefaultApk copy failed", t)
+                null
+            }
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                if (view != null && safeStart(appCtx, view)) return@post
+                openDefaultAppsFallback(appCtx)
+            }
+        }.start()
         true
     } catch (t: Throwable) {
         Log.w(TAG, "triggerSetDefaultApk failed", t)
@@ -84,7 +101,11 @@ object InstallProtectionGuide {
 
     /** Zaxira: standart ilovalar sozlamasini ochadi (trigger ishlamaganda). */
     fun promptSetDefaultApk(ctx: Context) {
-        if (triggerSetDefaultApk(ctx)) return
+        triggerSetDefaultApk(ctx)
+    }
+
+    /** "Ochish" intent'i ishlamaganda — standart ilovalar/ilova sozlamalari ekraniga. */
+    private fun openDefaultAppsFallback(ctx: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
             safeStart(ctx, Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
         ) return

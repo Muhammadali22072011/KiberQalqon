@@ -194,14 +194,28 @@ class ProtectionService : Service() {
             // Sovuq startda (ребут/обновление/рестарт сервиса) I/O sekin — 800ms butun ro'yxatga
             // yetmay, eng ESKI fayllar (MediaStore DATE_MODIFIED DESC oxiri) seed'ga tushmasdi va
             // keyingi pollda "yangi" deb ochilib ketardi. To'liq listing tugaguncha seed qilamiz.
+            //
+            // MUHIM (flood tuzatuvi): SEED'ni FAQAT "Barcha fayllarga ruxsat" (hasFileScanAccess)
+            // bor bo'lganda qilamiz. Aks holda service ruxsatsiz ishga tushsa (MainActivity/
+            // SettingsActivity toggle-ON ni hasFileScanAccess tekshirmasdan start chaqiradi, yoki
+            // ребут paytida MediaStore hali tayyor emas) — findApkFiles deyarli bo'sh qaytadi va
+            // seenPaths bo'sh qoladi. Keyin foydalanuvchi ruxsat bersa, seenPaths eski (bo'sh)
+            // holida qolgani uchun keyingi pollda qurilmadagi HAMMA eski APK "yangi" deb topilib,
+            // AutoScanActivity oynalari + GuardWorker'lar toshib ketardi. Shuning uchun dostup
+            // holatini kuzatamiz va yo'q→bor o'tishida seenPaths ni tozalab QAYTA seed qilamiz.
+            var seeded = false
+            var lastAccess = false
             try {
-                if (Config.isBackgroundEnabled(applicationContext)) {
+                if (Config.isBackgroundEnabled(applicationContext) &&
+                    VersionCompat.hasFileScanAccess(applicationContext)) {
                     val initial = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = SEED_SCAN_BUDGET_MS)
                         .filter { it.file.exists() }
                     NewApkDetector.seed(
                         initial.map { NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified()) },
                         seenPaths,
                     )
+                    seeded = true
+                    lastAccess = true
                 }
             } catch (t: Throwable) {
                 android.util.Log.w(TAG, "seed scan failed", t)
@@ -238,6 +252,34 @@ class ProtectionService : Service() {
 
                 try {
                     if (!Config.isBackgroundEnabled(applicationContext)) continue
+
+                    // Fayl-dostupi holatini kuzatamiz: yo'q→bor ga o'tsa (yoki service ruxsatsiz
+                    // ishga tushib hali umuman seed qilinmagan bo'lsa) — seenPaths ni tozalab QAYTA
+                    // seed qilamiz, so'ng shu iteratsiyani o'tkazamiz. Aks holda endigina ko'rinadigan
+                    // bo'lgan eski APK'lar "yangi" deb topilib, oynalar/worker'lar toshib ketardi.
+                    val access = VersionCompat.hasFileScanAccess(applicationContext)
+                    if (access && (!seeded || !lastAccess)) {
+                        try {
+                            seenPaths.clear()
+                            val reseed = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = SEED_SCAN_BUDGET_MS)
+                                .filter { it.file.exists() }
+                            NewApkDetector.seed(
+                                reseed.map { NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified()) },
+                                seenPaths,
+                            )
+                            seeded = true
+                            lastAccess = true
+                            // O'zgarish-imzosini ham reset qilamiz — keyingi iteratsiya toza boshlansin.
+                            lastDirSig = ""
+                            lastFullFindAt = SystemClock.elapsedRealtime()
+                            android.util.Log.d(TAG, "Re-seeded after file access became available")
+                        } catch (t: Throwable) {
+                            android.util.Log.w(TAG, "re-seed after access grant failed", t)
+                        }
+                        continue
+                    }
+                    lastAccess = access
+
                     // Arzon o'zgarish-detektori: kuzatilayotgan papkalar mtime imzosi o'zgarmagan
                     // bo'lsa (va zaxira to'liq-obhod vaqti yetmagan bo'lsa) — qimmat obhodni
                     // O'TKAZAMIZ. Yangi APK papkaga tushganda katalog mtime'si o'zgaradi → obhod.

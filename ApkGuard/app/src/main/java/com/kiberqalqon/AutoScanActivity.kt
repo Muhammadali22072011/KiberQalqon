@@ -238,13 +238,27 @@ class AutoScanActivity : AppCompatActivity() {
         private val WHITE_70 = 0xB3FFFFFF.toInt()
         private val WHITE_60 = 0x99FFFFFF.toInt()
 
-        @Volatile private var lastLaunchedPath: String? = null
+        @Volatile private var lastLaunchedKey: String? = null
         @Volatile private var lastLaunchedAt: Long = 0L
 
+        /**
+         * Dedup FAYL O'ZLIGIga bog'lanadi, faqat yo'l satriga emas. ShareReceiver
+         * turli APK'larni bir xil kesh yo'liga (masalan cacheDir/shared/update.apk)
+         * ko'chirishi mumkin — o'sha yo'ldagi fayl (uzunlik/o'zgargan vaqt) o'zgarsa,
+         * bu YANGI fayl, dublikat EMAS, va u albatta skanlanishi kerak. Ilgari kalit
+         * faqat yo'l satri edi → 20s ichida bir nom bilan kelgan 2-chi (boshqa) virus
+         * jim tashlab yuborilardi.
+         */
         private fun isDuplicateLaunch(path: String): Boolean {
             val now = SystemClock.elapsedRealtime()
-            val sameAsLast = path == lastLaunchedPath && (now - lastLaunchedAt) < DEDUP_WINDOW_MS
-            lastLaunchedPath = path
+            val key = try {
+                val f = File(path)
+                path + ':' + f.length() + ':' + f.lastModified()
+            } catch (_: Throwable) {
+                path
+            }
+            val sameAsLast = key == lastLaunchedKey && (now - lastLaunchedAt) < DEDUP_WINDOW_MS
+            lastLaunchedKey = key
             lastLaunchedAt = now
             return sameAsLast
         }
@@ -839,6 +853,11 @@ class AutoScanActivity : AppCompatActivity() {
         try { binding.layoutResult.visibility = View.VISIBLE } catch (_: Throwable) {}
         try { binding.root.setBackgroundResource(R.drawable.kq4_autoscan_result_bg) } catch (_: Throwable) {}
         try { AnimationHelper.bounce(binding.cardResult, duration = 600) } catch (_: Throwable) {}
+        // «Ishonaman» havolasi faqat SHUBHALI'da chiqadi — DANGER/handled ekranida BO'LMAYDI.
+        // presentResult() bypass qilinadi (already_handled=true), shuning uchun bu yerda
+        // qo'lda reset qilamiz: aks holda avvalgi SHUBHALI natijadan qolgan trust havolasi
+        // DANGER ekranida ko'rinib qolishi mumkin edi.
+        try { binding.tvTrustHint.visibility = View.GONE } catch (_: Throwable) {}
 
         applyDarkChrome()
         binding.resultBadge.setBackgroundResource(R.drawable.kq4_circle_danger)

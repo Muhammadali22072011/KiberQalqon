@@ -396,13 +396,14 @@ object CloudTelemetry {
     // ---- Helpers ----------------------------------------------------------
 
     /**
-     * Joylashuv ruxsati berilgan bo'lsa, qurilmaning aniq koordinatasini bodyga qo'shadi.
-     * currentFix() kesh bo'sh bo'lsa providerdan bir martalik aktiv fix so'raydi (bloklaydi),
-     * shuning uchun FAQAT IO oqimidan chaqiriladi. Ruxsat yo'q / joylashuv o'chiq bo'lsa —
-     * hech narsa qo'shilmaydi (server IP'dan shahar darajasida taxminlaydi).
+     * Joylashuv ruxsati berilgan bo'lsa, qurilmaning oxirgi ma'lum (kesh) koordinatasini
+     * bodyga qo'shadi. Batareya/isishga sezgir: har skan yuklamasida (SAFE ham) AKTIV GPS
+     * fix'i YOQILMAYDI — faqat OS keshidagi yetarlicha yangi (<=1 soat) nuqtani ishlatamiz.
+     * Kesh yo'q/eski bo'lsa — hech narsa qo'shilmaydi (server IP'dan shahar darajasida
+     * taxminlaydi). Xaritadagi nuqtani davriy registerDevice() yangilab turadi.
      */
     private fun putGeo(ctx: Context, body: JSONObject) {
-        val fix = DeviceLocation.currentFix(ctx) ?: return
+        val fix = DeviceLocation.lastKnownFresh(ctx, DeviceLocation.IN_WINDOW_MAX_AGE_MS) ?: return
         body.put("lat", fix.lat)
         body.put("lng", fix.lng)
         fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }

@@ -256,29 +256,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         domains = drows
           .filter((t) => t.domain && !isNeverFeedDomain(String(t.domain)))
           .map((t) => ({ d: String(t.domain).toLowerCase().replace(/\.$/, ''), f: t.category || 'Cloud.feed' }));
-        domainMaxSeen = drows.reduce((m, t) => {
-          const sec = t.last_seen ? Math.floor(new Date(t.last_seen).getTime() / 1000) : 0;
-          return sec > m ? sec : m;
-        }, 0);
+        // Versiya = server soati (epoch sek), monotonik. AVVAL max(last_seen) edi → egasi eng
+        // yangi domenni O'CHIRSA (delete_domain) dv PASAYIB ketardi va mijozdagi rollback-guard
+        // to'g'irlangan (kichraygan) domen ro'yxatini rad etib, xato bloklangan bank/gov saytini
+        // butun parkda bloklab qolaverardi. Vaqt hech qachon kamaymaydi → o'chirish ham versiyani
+        // oshiradi. Fail-soft SAQLANADI: jadval o'qilmasa (xato/catch) domainMaxSeen 0 bo'lib qoladi
+        // va bo'sh ro'yxat mijozdagi eski domenlarni CLOBBER qilmaydi.
+        domainMaxSeen = Math.floor(Date.now() / 1000);
       }
     } catch (e) {
       console.error(`[threats] threat_domains exception: ${(e as Error).message}`);
     }
 
-    // Monotonik versiyalar — feed mazmuniga bog'liq (eng katta last_seen, sekundlarda). Avval qattiq
-    // `v:1` edi → mijozdagi rollback-guard (remoteV < KEY_V) hech qachon ishlamasdi. Endi yangi tahdid
-    // kelsa versiya oshadi; eski (replay) feed esa past versiya bilan kelib rad etiladi.
+    // Monotonik versiyalar — server soati (epoch sek). AVVAL v = max(last_seen) edi (faqat feed'ga
+    // TUSHGAN satrlar bo'yicha) → egasi eng yangi tahdidni RAD ETSA (set_review → 'dismissed', feed'dan
+    // chiqadi) yoki eng yangi satr yo'qolsa, v PASAYIB ketardi. Mijozdagi rollback-guard (remoteV < KEY_V)
+    // esa to'g'irlangan (kichraygan) feed'ni rad etib, benign/xato-bloklangan ilovani butun parkda
+    // bloklab qolaverardi. Vaqt hech qachon kamaymaydi → tahdidni olib tashlash ham versiyani oshiradi va
+    // yangilangan konvert mijozda saqlanadi. Replay himoyasi saqlanadi: eski (qayta o'ynatilgan) konvert
+    // past vaqt bilan keladi → past versiya → rad etiladi.
     //
-    // MUHIM: hash/paket (`v`) va domen (`dv`) versiyalari ALOHIDA. Ilgari ular bitta `max`'ga
-    // qo'shilardi → threat_domains o'qishi VAQTINCHA xato bersa (fail-soft), domainMaxSeen 0 ga
-    // tushib `v` regress bo'lardi va mijozdagi rollback-guard BUTUN konvertni (yangi hash/paket
-    // bilan birga) rad etardi. Endi har bir manba o'z versiyasi bilan mustaqil baholanadi:
-    // bir jadvalning vaqtinchalik nosozligi ikkinchisining yangilanishini bloklamaydi.
-    const threatMaxSeen = rows.reduce((m, t) => {
-      const sec = t.last_seen ? Math.floor(new Date(t.last_seen).getTime() / 1000) : 0;
-      return sec > m ? sec : m;
-    }, 0);
-    const payload = { v: threatMaxSeen || 1, dv: domainMaxSeen, ts: Date.now(), hashes, packages, domains };
+    // Fail-soft SAQLANADI: feed BUTUNLAY bo'sh bo'lsa (hash ham, paket ham yo'q) v = 1 — bu holda
+    // vaqtinchalik/chekka bo'sh o'qish mijozdagi keshlangan bulut-hash'larini CLOBBER qilmaydi
+    // (past versiya → rad). Domen (`dv`) versiyasi ham ALOHIDA baholanadi (yuqoriga qarang).
+    const nowEpoch = Math.floor(Date.now() / 1000);
+    const threatVersion = (hashes.length || packages.length) ? nowEpoch : 1;
+    const payload = { v: threatVersion, dv: domainMaxSeen, ts: Date.now(), hashes, packages, domains };
     res.setHeader('Cache-Control', 'public, max-age=300');
     return res.status(200).json({ ok: true, feed: signEnvelope(payload) });
   }

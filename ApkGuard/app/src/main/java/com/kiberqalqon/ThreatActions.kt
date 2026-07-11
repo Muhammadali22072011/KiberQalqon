@@ -26,6 +26,12 @@ object ThreatActions {
     private const val KEY_ENTRIES = "entries_v1"
     private const val TTL_MS = 7L * 24 * 60 * 60 * 1000  // 7 дней
 
+    // Сканы идут параллельно (ApkScanner → reportThreat → register на фоновых
+    // потоках). loadAll → mutate → saveAll не атомарен: без блокировки последний
+    // saveAll затирает весь entries_v1 blob и роняет чужие записи. Сериализуем
+    // все read-modify-write на едином замке.
+    private val lock = Any()
+
     data class Entry(
         val token: String,
         val apkPath: String,
@@ -35,7 +41,7 @@ object ThreatActions {
     )
 
     /** Регистрируем action для apk-пути, возвращаем сгенерированный token. */
-    fun register(ctx: Context, apkPath: String, apkName: String, verdict: String): String {
+    fun register(ctx: Context, apkPath: String, apkName: String, verdict: String): String = synchronized(lock) {
         val token = tokenOf(apkPath)
         val entry = Entry(token, apkPath, apkName, verdict, System.currentTimeMillis())
         val all = loadAll(ctx).toMutableList()
@@ -45,16 +51,16 @@ object ThreatActions {
         val cutoff = System.currentTimeMillis() - TTL_MS
         val fresh = all.filter { it.createdAt >= cutoff }
         saveAll(ctx, fresh)
-        return token
+        token
     }
 
-    fun lookup(ctx: Context, token: String): Entry? {
+    fun lookup(ctx: Context, token: String): Entry? = synchronized(lock) {
         val cutoff = System.currentTimeMillis() - TTL_MS
-        return loadAll(ctx).firstOrNull { it.token == token && it.createdAt >= cutoff }
+        loadAll(ctx).firstOrNull { it.token == token && it.createdAt >= cutoff }
     }
 
     /** После успешного действия можно убрать запись. */
-    fun remove(ctx: Context, token: String) {
+    fun remove(ctx: Context, token: String) = synchronized(lock) {
         val updated = loadAll(ctx).filter { it.token != token }
         saveAll(ctx, updated)
     }

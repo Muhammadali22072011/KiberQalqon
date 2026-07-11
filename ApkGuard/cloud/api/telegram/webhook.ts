@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, isAdmin } from '../../lib/telegram.js';
 import { checkTelegramSecret } from '../../lib/auth.js';
-import { formatStats, verdictLabel } from '../../lib/format.js';
+import { formatStats, verdictLabel, escape } from '../../lib/format.js';
 
 type TgUpdate = {
   update_id: number;
@@ -101,7 +101,7 @@ async function handleLast(chatId: number, n: number) {
   const lines = [`*Oxirgi ${data.length} ta skan:*`, ''];
   for (const s of data) {
     const t = new Date(s.scanned_at).toISOString().replace('T', ' ').slice(0, 16);
-    const label = s.app_label || s.package_name || s.apk_hash.slice(0, 12);
+    const label = escape(s.app_label || s.package_name || s.apk_hash.slice(0, 12));
     lines.push(`${verdictLabel(s.verdict)} \`${t}\` — ${label}`);
   }
   await sendMessage(chatId, lines.join('\n'), { parseMode: 'Markdown' });
@@ -126,7 +126,7 @@ async function handleThreats(chatId: number) {
   const sevEmoji: Record<string, string> = { low: '🟡', medium: '🟠', high: '🔴', critical: '⛔' };
   const lines = ['*🚨 Xavfli APKlar:*', ''];
   for (const t of data) {
-    const label = t.app_label || t.package_name || t.apk_hash.slice(0, 12);
+    const label = escape(t.app_label || t.package_name || t.apk_hash.slice(0, 12));
     lines.push(`${sevEmoji[t.severity] ?? '⚪'} ${label} — *${t.seen_count}x*`);
   }
   await sendMessage(chatId, lines.join('\n'), { parseMode: 'Markdown' });
@@ -151,7 +151,7 @@ async function handleDevices(chatId: number) {
   const lines = ['*📱 Qurilmalar:*', ''];
   for (const d of data) {
     const t = new Date(d.last_seen).toISOString().replace('T', ' ').slice(0, 16);
-    lines.push(`• ${d.name ?? 'Nomsiz'} — Android ${d.android_ver ?? '?'} (oxirgi: ${t})`);
+    lines.push(`• ${escape(d.name ?? 'Nomsiz')} — Android ${escape(d.android_ver ?? '?')} (oxirgi: ${t})`);
   }
   await sendMessage(chatId, lines.join('\n'), { parseMode: 'Markdown' });
 }

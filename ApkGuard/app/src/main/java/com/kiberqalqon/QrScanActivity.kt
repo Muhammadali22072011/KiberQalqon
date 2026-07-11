@@ -377,9 +377,25 @@ class QrScanActivity : AppCompatActivity() {
         // Bo'sh joyli matn — havola emas (URL'da bo'sh joy bo'lmaydi).
         if (t.any { it.isWhitespace() }) return false
         // Sxemali boshqa URI'lar (tel:, mailto:, bitcoin: ...) — havola emas, neytral matn.
-        if (lower.contains("://") || lower.matches(Regex("^[a-z][a-z0-9+.-]*:.*"))) return false
+        // DIQQAT: host:port (masalan "evil.com:8443/login") sxema EMAS — ':' dan oldingi
+        // qismda nuqta bo'lsa, bu host, sxema emas; shuning uchun rad etmaymiz, davom etamiz.
+        if (lower.contains("://")) return false
+        val colon = lower.indexOf(':')
+        if (colon > 0) {
+            val scheme = lower.substring(0, colon)
+            // Haqiqiy URI sxemasi = nuqtasiz token (host.tld emas). Nuqta bo'lsa — host:port deb qaraymiz.
+            if (!scheme.contains('.') && scheme.matches(Regex("^[a-z][a-z0-9+-]*$"))) return false
+        }
+        // host qismi: yo'l (/), so'rov (?) va port (:) belgilaridan tozalaymiz.
+        val hostPart = t.substringBefore('/').substringBefore('?').substringBefore(':')
+        // IPv4 host (masalan "185.220.101.5/pay") — TLD harfli emas, lekin bu ham havola.
+        val octets = hostPart.split('.')
+        if (octets.size == 4 &&
+            octets.all { o -> o.isNotEmpty() && o.all { it.isDigit() } && (o.toIntOrNull() ?: -1) in 0..255 }
+        ) {
+            return true
+        }
         // host.tld ko'rinishi: kamida bitta nuqta, oxirgi qism harfli (TLD).
-        val hostPart = t.substringBefore('/').substringBefore('?')
         val dot = hostPart.lastIndexOf('.')
         if (dot <= 0 || dot >= hostPart.length - 1) return false
         val tld = hostPart.substring(dot + 1)

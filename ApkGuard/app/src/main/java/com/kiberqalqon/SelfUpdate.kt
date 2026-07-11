@@ -42,6 +42,7 @@ object SelfUpdate {
     private const val TAG = "SelfUpdate"
     private const val CHANNEL_ID = "kq_self_update"
     private const val NOTIF_ID = 7781
+    private const val NOTIF_INSTALL_ID = 7782
     private const val PREFS = "uzguard_self_update"
     private const val KEY_NOTIFIED_VC = "notified_vc"
 
@@ -142,12 +143,65 @@ object SelfUpdate {
                 setDataAndType(uri, "application/vnd.android.package-archive")
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
-            app.startActivity(intent)
+            // MUHIM: bu metod fon thread'da (SelfUpdateActivity allaqachon finish() qilingan)
+            // ishlaydi. Android 10+ (API 29+) da fon jarayonidan startActivity JIM tashlanadi —
+            // istisno OTILMAYDI, shuning uchun to'g'ridan-to'g'ri chaqirsak o'rnatish oynasi
+            // umuman chiqmaydi-yu, biz null (=OK) qaytarardik va foydalanuvchi yangilandim deb
+            // o'ylardi. Buning o'rniga o'rnatishni FOYDALANUVCHI BOSADIGAN bildirishnoma orqali
+            // beramiz: tap foreground kontekstdan keladi, BAL cheklovi tegmaydi. Ishonchli yo'l
+            // bo'lmasa (bildirishnoma o'chirilgan) — haqiqiy xato qaytaramiz.
+            if (!offerInstall(app, intent)) {
+                Log.w(TAG, "o'rnatish oynasini ochib bo'lmadi (fon + bildirishnoma yo'q)")
+                return R.string.kq4_update_err_download
+            }
             return null
         } catch (e: Throwable) {
             Log.w(TAG, "downloadVerifyInstall failed", e)
             try { out.delete() } catch (_: Throwable) {}
             return R.string.kq4_update_err_download
+        }
+    }
+
+    /**
+     * O'rnatish oynasini ISHONCHLI ochadi. Avval to'g'ridan-to'g'ri urinamiz (agar biror
+     * foreground activity qolgan bo'lsa ishlaydi), so'ng — asosiy yo'l — foydalanuvchi
+     * bosadigan bildirishnoma qo'yamiz: uning tap'i foreground kontekstdan keladi va
+     * Android 10+ fon-launch cheklovidan qutuladi. Ishonchli yo'l o'rnatilsa true, aks
+     * holda (bildirishnoma o'chirilgan — jim yo'qolish xavfi) false qaytaradi.
+     */
+    private fun offerInstall(app: Context, intent: Intent): Boolean {
+        // Best-effort to'g'ridan-to'g'ri (foreground bo'lsa darhol ochiladi).
+        try { app.startActivity(intent) } catch (_: Throwable) {}
+
+        // Ishonchli yo'l: tap-to-install bildirishnoma. Bu foreground'dan ochiladi.
+        return try {
+            if (!NotificationManagerCompat.from(app).areNotificationsEnabled()) return false
+            val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+                ?: return false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                nm.createNotificationChannel(
+                    NotificationChannel(
+                        CHANNEL_ID, "Yangilanish", NotificationManager.IMPORTANCE_HIGH
+                    )
+                )
+            }
+            val pi = PendingIntent.getActivity(
+                app, 1, intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            val n = NotificationCompat.Builder(app, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_shield)
+                .setContentTitle(app.getString(R.string.kq4_update_notif_title))
+                .setContentText(app.getString(R.string.kq4_update_notif_body))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build()
+            nm.notify(NOTIF_INSTALL_ID, n)
+            true
+        } catch (e: Throwable) {
+            Log.w(TAG, "offerInstall notification failed", e)
+            false
         }
     }
 }

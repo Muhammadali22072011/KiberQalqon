@@ -251,8 +251,18 @@ object DropperDetector {
         return try {
             zip.getInputStream(entry).use { input ->
                 val buf = ByteArray(8)
-                val read = input.read(buf)
-                if (read < 4) null else buf
+                // DEFLATE-siqilgan entry uchun getInputStream InflaterInputStream qaytaradi:
+                // birinchi read() inflater biror bayt chiqarishi bilan qaytadi va so'ralgandan
+                // KAM bayt berishi mumkin (1-3 bayt). Bitta read()'ga tayanib < 4'da null qaytarish
+                // yashiringan APK/DEX/ELF payload'ni butunlay o'tkazib yuborardi. Shu bois EOF yoki
+                // kamida buf to'lguncha (8 bayt) sikl bilan o'qiymiz.
+                var total = 0
+                while (total < buf.size) {
+                    val n = input.read(buf, total, buf.size - total)
+                    if (n <= 0) break
+                    total += n
+                }
+                if (total < 4) null else buf
             }
         } catch (_: Throwable) {
             null

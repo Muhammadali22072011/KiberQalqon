@@ -90,15 +90,34 @@ class InstallShieldService : AccessibilityService() {
      *     keyin baribir o'rnatmoqchi). Tasdiq yaqinda bo'lsa — bloklamaymiz (soxta-blok yo'q).
      */
     private fun shouldBlock(label: String?): Boolean {
+        // 1) Aniq: shu yorliq UzGuard tomonidan DANGER deb belgilangan.
         if (label != null && InstallApproval.isDanger(this, label)) return true
+        // 2) Vaqt-oynasi FAQAT yorliqni umuman o'qiy olmaganimizda (label == null) ishlaydi.
+        //    Agar oynadan haqiqiy ilova nomini o'qigan bo'lsak-u u DANGER emas bo'lsa —
+        //    yaqinda boshqa narsa DANGER bo'lgani uchun BEGONA (masalan, qonuniy o'yin yoki
+        //    do'kon yangilanishi) o'rnatishini bloklamaymiz (soxta-blok yo'q). Bu holatni
+        //    baribir PackageInstallReceiver (PACKAGE_ADDED → snos) ushlab qoladi.
+        if (label != null) return false
         return InstallApproval.hasRecentDanger(this, RECENT_DANGER_MS) &&
             !InstallApproval.hasRecentApproval(this, RECENT_OK_MS)
     }
 
     private fun isOwnAppLabel(label: String): Boolean {
-        val n = label.trim().lowercase()
-        return n.contains("uzguard") || n.contains("kiberqalqon") || n.contains("qalqon")
+        // XAVFSIZLIK: o'z ilovamizni FAQAT ANIQ yorliq bo'yicha tanaymiz — substring EMAS.
+        // Ilgari contains("qalqon"/"uzguard") ishlatilardi; soxta "UzGuard Pro" yoki
+        // "Kiber Qalqon Update" nomli virus shu tekshiruvdan o'tib, qalqon uni bekor
+        // qilmasdi (impersonatsiya bypass'i). Endi normallashtirilgan aniq tenglik.
+        val n = normalizeLabel(label)
+        if (n.isEmpty()) return false
+        if (n in OWN_LABELS) return true
+        // Lokalizatsiya/rebrend uchun: haqiqiy o'rnatilgan ilova yorlig'i bilan solishtiramiz.
+        val self = try { normalizeLabel(getString(R.string.app_name)) } catch (_: Throwable) { "" }
+        return self.isNotEmpty() && n == self
     }
+
+    /** Yorliqni taqqoslash uchun normallashtiramiz (past registr, bo'sh joylarsiz). */
+    private fun normalizeLabel(s: String): String =
+        s.trim().lowercase().filter { !it.isWhitespace() }
 
     /** Daraxtni yengil aylanib, ko'rinadigan matnlarni yig'amiz (chuqurlik/soni cheklangan). */
     private fun collectTexts(node: AccessibilityNodeInfo?, out: MutableList<String>, depth: Int) {
@@ -213,6 +232,9 @@ class InstallShieldService : AccessibilityService() {
             "com.coloros.packageinstaller",
             "p.android.packageinstaller",
         )
+        // O'z ilovamizning ANIQ yorliqlari (normallashtirilgan: past registr, bo'sh joysiz).
+        // Substring emas — aniq tenglik uchun. Joriy: "UZGUARD"; tarixiy brendlar ham.
+        private val OWN_LABELS = setOf("uzguard", "kiberqalqon", "anorqalqon")
         private val INSTALL_WORDS = setOf("install", "o'rnatish", "ornatish", "установить", "o‘rnatish")
         private val CANCEL_WORDS = listOf("Cancel", "Bekor", "Bekor qilish", "Отмена", "Отменить", "Yopish", "Закрыть")
         private val CANCEL_IDS = listOf("android:id/button2", "com.android.packageinstaller:id/cancel_button")

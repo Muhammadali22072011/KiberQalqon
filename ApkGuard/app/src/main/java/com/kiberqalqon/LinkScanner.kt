@@ -248,6 +248,10 @@ object LinkScanner {
             val afterHost = afterScheme.substringAfter('/', "")
             if (afterHost.isEmpty()) "" else "/$afterHost"
         }.lowercase()
+        // Yo'l/query'ni %-dekod qilamiz (brauzer/yuklovchi %2E→'.' , %5F→'_' qiladi). Aks holda
+        // hujumchi bitta belgini %-kodlash bilan APK_DELIVERY/PHISHING_PATH (ikkala HARD) dan
+        // qochib qutuladi (video%2emp4%2eapk, /api/upload%5fsms). Ikkala shaklda ham tekshiramiz.
+        val decodedPath = percentDecode(pathAndQuery).lowercase()
         val lowerUrl = normalized.lowercase()
 
         if (rawHost.isEmpty() || (!rawHost.contains('.') && !isIpLiteral(rawHost))) {
@@ -310,7 +314,12 @@ object LinkScanner {
         }
 
         // 6) Juda ko'p subdomen (paypal.com.evil.tk) — IP'da emas. Haqiqiy bank domenida bekor.
-        if (!isIp && !isKnownGoodBank && labelCount(rawHost) >= 4) flags.add(Flag.EXCESSIVE_SUBDOMAINS)
+        //    Subdomen chuqurligini registrable (eTLD+1) ga NISBATAN sanaymiz, aks holda ko'p-qismli
+        //    suffiks ostidagi oddiy host (news.bbc.co.uk) ham 4 yorliq bo'lib xato belgilanardi.
+        if (!isIp && !isKnownGoodBank) {
+            val sub = labelCount(rawHost) - labelCount(registrableDomain(rawHost))
+            if (sub >= 2) flags.add(Flag.EXCESSIVE_SUBDOMAINS)
+        }
 
         // 7) Shubhali TLD (eTLD oxirgi qismi).
         val tld = if (!isIp) effectiveTld(rawHost) else ""
@@ -326,12 +335,17 @@ object LinkScanner {
         }
 
         // 10) APK-dropper: yo'l .apk bilan tugaydi yoki ikki-kengaytma (.mp4.apk). Store hostlari mustasno.
-        if (!blacklisted && rawHost !in STORE_HOSTS && isApkDelivery(pathAndQuery)) {
+        //     Xom VA %-dekod qilingan shaklda ham (video%2emp4%2eapk hiylasini ochish uchun).
+        if (!blacklisted && rawHost !in STORE_HOSTS &&
+            (isApkDelivery(pathAndQuery) || isApkDelivery(decodedPath))
+        ) {
             flags.add(Flag.APK_DELIVERY)
         }
 
-        // 11) Ma'lum C2/exfil yo'li (HARD).
-        if (MALWARE_PATHS.any { pathAndQuery.contains(it) }) flags.add(Flag.PHISHING_PATH)
+        // 11) Ma'lum C2/exfil yo'li (HARD). Xom VA %-dekod shaklda (/api/upload%5fsms).
+        if (MALWARE_PATHS.any { pathAndQuery.contains(it) || decodedPath.contains(it) }) {
+            flags.add(Flag.PHISHING_PATH)
+        }
 
         // 12) Ijtimoiy/messenjer brend taqlidi (rasmiy domenda emas).
         if (!isIp && socialImpersonation(rawHost)) flags.add(Flag.SOCIAL_IMPERSONATION)
@@ -339,8 +353,11 @@ object LinkScanner {
         // 13) Yashirin yo'naltirish: ?url=/?next=/redirect= ichida ikkinchi (chet) URL.
         if (hasEmbeddedRedirectUrl(normalized)) flags.add(Flag.OPEN_REDIRECT)
 
-        // 14) UZ firibgar lure so'zlari (host/path). Haqiqiy bank domenida bekor.
-        if (!isKnownGoodBank && SCAM_LURE_TOKENS.any { rawHost.contains(it) || pathAndQuery.contains(it) }) {
+        // 14) UZ firibgar lure so'zlari (host/path). Haqiqiy bank domenida bekor. %-dekod ham.
+        if (!isKnownGoodBank && SCAM_LURE_TOKENS.any {
+                rawHost.contains(it) || pathAndQuery.contains(it) || decodedPath.contains(it)
+            }
+        ) {
             flags.add(Flag.SCAM_LURE)
         }
 
@@ -348,7 +365,9 @@ object LinkScanner {
         //     account.google.com, paypal.com soxta-FP beradi edi). Faqat: yo'l/query ichida
         //     moliyaviy kalit so'z bo'lib, host'da BREND signali (typosquat/lookalike/social/
         //     punycode/blacklist) ham bor. Haqiqiy bank domenida bekor.
-        if (!isKnownGoodBank && financialKeywordSignal(pathAndQuery, flags)) {
+        if (!isKnownGoodBank &&
+            (financialKeywordSignal(pathAndQuery, flags) || financialKeywordSignal(decodedPath, flags))
+        ) {
             flags.add(Flag.FINANCIAL_KEYWORDS)
         }
 

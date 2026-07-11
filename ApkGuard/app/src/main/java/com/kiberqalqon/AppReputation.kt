@@ -41,7 +41,7 @@ object AppReputation {
         "com.microsoft.",
         "com.facebook.",
         "com.instagram.",
-        "com.whatsapp",
+        "com.whatsapp.",         // faqat haqiqiy sub-paketlar (masalan .w4b); dotsiz prefiks com.whatsappspy kabi taqlidchilarni ham ushlab qolardi
         "org.telegram.",
         "androidx.",
         "com.qualcomm.",
@@ -71,6 +71,8 @@ object AppReputation {
      */
     private val TRUSTED_EXACT = setOf(
         // Mashhur uchinchi-tomon
+        "com.whatsapp",                      // WhatsApp (asosiy paket — prefiks "com.whatsapp." endi faqat sub-paketlarni ushlaydi)
+        "com.whatsapp.w4b",                  // WhatsApp Business
         "ch.protonvpn.android",
         "com.isaiasmatewos.texpand",
         "com.viber.voip",
