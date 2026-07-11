@@ -499,8 +499,20 @@ object ApkScanner {
             Log.w(TAG, "Statistics update failed", e)
         }
 
+        // 2026-07-11 (FP-toshqin fix): Dashboard "barcha o'rnatilgan ilovalar" rescan HAR BIR
+        // o'rnatilgan ilovaning base.apk'sini (sourceDir) skanlaydi. Bular O'ZI-SKAN (installed
+        // self-scan) — ular uchun Telegram + community alert YUBORMAYMIZ, aks holda alifbo bo'yicha
+        // 50+ alert "toshqini" ketardi va har bir o'rnatilgan APK community'ga yuklanardi. Haqiqiy
+        // sideload fayllar (Download / Telegram-cache) o'rnatilgan sourceDir EMAS → guard false →
+        // ular baribir alert beradi. CloudTelemetry.uploadScan (quyida) allaqachon shu guard bilan
+        // himoyalangan — panel "Tahdid to'lqini" spike HEAD'da shu bois tuzatilgan, Telegram esa yo'q edi.
+        val installedSelfScan = try {
+            val archivePkg = context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName
+            isInstalledSelfScan(context, archivePkg, apkPath)
+        } catch (_: Throwable) { false }
+
         // Шлём результат скана в Telegram-телеметрию (текст + при включенной опции, сам APK файл).
-        try {
+        if (!installedSelfScan) try {
             val f = File(apkPath)
             val verdictIcon = when (verdict) {
                 ScanResult.Verdict.DANGER -> "🚫"
@@ -556,8 +568,9 @@ object ApkScanner {
         }
 
         // Community threat sharing: только если юзер отдельно opt-in (см. ConsentActivity),
-        // и только для DANGER/SUSPICIOUS. SAFE никогда не шлётся.
-        try {
+        // и только для DANGER/SUSPICIOUS. SAFE никогда не шлётся. O'ZI-skan (o'rnatilgan ilova
+        // base.apk) bo'lsa — bu ham o'tkazib yuboriladi (installed self-scan FP-toshqin fix).
+        if (!installedSelfScan) try {
             CommunityReportClient.reportThreat(context, apkPath, result)
         } catch (e: Throwable) {
             Log.w(TAG, "Community report failed", e)
@@ -1234,7 +1247,21 @@ object ApkScanner {
                     // DANGER beradi. Generik API markerlari (overlay.*/anti.*/jetski — halol ilovalarda
                     // ham bor) obfuscatedSignature'ni YOQMAYDI (ObfuscatedSignatures.SOFT_FAMILIES);
                     // ular details'da qoladi, lekin VERIFIED/ishonchli ilovani "virus" qilib qo'ymaydi.
-                    obfuscatedSignature = signaturesFound.any { ObfuscatedSignatures.isHardFamily(it) },
+                    // 2026-07-11: uchta GENERIK banker REST-yo'li (banker.overlay_inject=/api/inject,
+                    // banker.sms_exfil=/api/upload_sms, banker.admin_panel=/admin/banks) HARD bo'lsa-da
+                    // yakka o'zi TIER-1 DANGER bermaydi — ular UzGuard'ning O'Z DEX'ida (LinkScanner
+                    // MALWARE_PATHS) va halol REST-mijozlarda ham uchraydi. Faqat banker korroboratori
+                    // (strongCombo / dropped .so / random-pkg / yashirin APK|DEX|ELF) bilan yoqiladi;
+                    // barcha malware'ga-XOS IoC'lar (domen/kalit/bot) baribir yakka o'zi hard chiqadi.
+                    obfuscatedSignature = signaturesFound.any {
+                        ObfuscatedSignatures.isHardFamily(it) && it !in ObfuscatedSignatures.GENERIC_BANKER_PATHS
+                    } || (
+                        signaturesFound.any { it in ObfuscatedSignatures.GENERIC_BANKER_PATHS } &&
+                            (strongCombo || droppedSo || randomPkg ||
+                                dropperFindings.hiddenApks.isNotEmpty() ||
+                                dropperFindings.hiddenDex.isNotEmpty() ||
+                                dropperFindings.hiddenElf.isNotEmpty())
+                    ),
                     strongCombo = strongCombo,
                     evasionCount = evasionCount,
                     verifiedTrusted = verifiedTrusted,

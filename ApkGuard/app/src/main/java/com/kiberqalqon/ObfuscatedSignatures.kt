@@ -131,6 +131,25 @@ object ObfuscatedSignatures {
      */
     fun isHardFamily(family: String): Boolean = family !in SOFT_FAMILIES
 
+    /**
+     * "GENERIK BANKER" REST-yo'l teglari — bular texnik jihatdan HARD (SOFT_FAMILIES'da emas),
+     * lekin ularning IoC'i shunchaki umumiy REST endpoint YO'LI (path) bo'lib, halol ilovada
+     * ham (yoki UzGuard'ning O'ZIDA — uning DEX'ida LinkScanner.MALWARE_PATHS bu satrlarni
+     * saqlaydi) uchrashi mumkin:
+     *   • banker.overlay_inject = "/api/inject"
+     *   • banker.sms_exfil      = "/api/upload_sms"
+     *   • banker.admin_panel    = "/admin/banks"
+     * Shu sabab (2026-07-11 ommaviy false-positive + o'z-o'zini DANGER qilish) bu uchtasi
+     * YAKKA O'ZI TIER-1 DANGER bermasin — ApkScanner ularni faqat banker korroboratori bilan
+     * (strongCombo / dropped .so / random-pkg / yashirin APK|DEX|ELF) yoqadi. Aniq malware'ga
+     * XOS IoC'lar (C2 domen/kalit hash, bot-nomlar, "/commends" bot-endpoint) bu to'plamda EMAS
+     * → ular baribir yakka o'zi TIER-1 chiqadi. LinkScanner (alohida URL-skan yo'li) bu yo'llarni
+     * o'zgarishsiz HARD saqlaydi.
+     */
+    val GENERIC_BANKER_PATHS: Set<String> = setOf(
+        "banker.overlay_inject", "banker.sms_exfil", "banker.admin_panel",
+    )
+
     @Volatile private var decryptedCache: List<Pair<String, String>>? = null
 
     // PERF: matchTokenHashes() bitta DEX uchun o'n minglab token'ni hash qiladi. Avval HAR token
