@@ -122,13 +122,13 @@ class ScamMessageActivity : AppCompatActivity() {
         } catch (_: Throwable) { null }
     }
 
-    private fun runAnalysis(text: String) {
+    private fun runAnalysis(msg: String) {
         resultBox.removeAllViews()
-        if (text.isBlank()) {
+        if (msg.isBlank()) {
             resultBox.addView(hintLine("Avval xabar matnini kiriting."))
             return
         }
-        val result = try { ScamTextAnalyzer.analyze(text) }
+        val result = try { ScamTextAnalyzer.analyze(msg) }
             catch (_: Throwable) { ScamTextAnalyzer.Result(emptyList(), "shubhali") }
 
         // Daraja bezagi.
