@@ -11,6 +11,48 @@ on:
   pull_request:
 
 jobs:
+  # #1 Tez gejt: FAQAT Kotlin kompilyatsiyasi (og'ir assemble/R8/dex/NDK'siz) + detekt.
+  # Maqsad: kompilyatsiya xatosi (masalan "Val cannot be reassigned" shadowing) to'liq
+  # buildni kutmasdan ~1 daqiqada qizil bo'lsin. To'liq `android` job'i bilan PARALLEL yuradi.
+  quick:
+    name: Quick — Kotlin compile + detekt (fast fail)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ApkGuard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      # Bu qadam qizil bo'lsa — kod KOMPILYATSIYA bo'lmaydi (native/dex/paket emas, aynan Kotlin).
+      - name: Kotlin compile (fast fail)
+        run: ./gradlew :app:compileDebugKotlin --stacktrace
+      # #3 detekt — statik tahlil. ADVISORY (continue-on-error): mavjud kodda topilmalar
+      # bo'lishi mumkin, shuning uchun hozircha pipeline'ni yiqitmaydi; hisobot artefakt bo'ladi.
+      # Baseline yaratilgach bloklovchi qilinadi. CLI orqali (build.gradle o'zgarmaydi → xavfsiz).
+      - name: Detekt static analysis (advisory)
+        continue-on-error: true
+        run: |
+          V=1.23.7
+          curl -sSL -o detekt-cli.jar "https://github.com/detekt/detekt/releases/download/v${V}/detekt-cli-${V}-all.jar" || { echo "detekt yuklab bo'lmadi — o'tkazildi"; exit 0; }
+          java -jar detekt-cli.jar --input app/src/main/java --report txt:detekt.txt --report sarif:detekt.sarif || true
+          echo "=== Detekt topilmalar (advisory, top 80) ==="
+          [ -f detekt.txt ] && tail -80 detekt.txt || echo "(hisobot yo'q)"
+      - name: Upload detekt report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-report
+          path: |
+            ApkGuard/detekt.txt
+            ApkGuard/detekt.sarif
+          if-no-files-found: ignore
+
   android:
     name: Android — unit tests + debug build
     runs-on: ubuntu-latest
