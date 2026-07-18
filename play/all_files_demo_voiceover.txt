@@ -1,0 +1,13 @@
+UzGuard — all-files demo ovozli matni (O'zbekcha)
+Ovoz: edge-tts uz-UZ-MadinaNeural, rate +6%. Har qatorga bitta slayd.
+Qayta yaratish: scratchpad/mkvoiced.py (edge-tts + moviepy).
+
+v0 (intro):   UzGuard — telefoningizni viruslardan himoya qiladigan oflayn antivirus.
+v1 (dash):    Hozir tekshirish tugmasi bilan tekshiruvni boshlaysiz.
+v2 (skaner):  UzGuard Yuklamalar va Telegram papkalaridagi barcha APK fayllarni o'qiydi va tekshiradi.
+v3 (natija):  Zararli APK topilsa, u aniqlanadi va o'chiriladi.
+v4 (himoya):  Yangi fayllar doimiy, avtomatik ravishda kuzatib boriladi.
+v5 (outro):   UzGuard. Oflayn. Maxfiy. Aloqa — Telegram zimdevuz.
+
+Chiqish: play/all_files_demo_voiced.mp4 (32.8s, 1080x1920, ovozli).
+Ovozsiz variant: play/all_files_demo.mp4 (20s).

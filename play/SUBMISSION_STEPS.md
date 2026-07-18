@@ -139,7 +139,7 @@
 
 ## ЭТАП 9. Демо-видео для All-files-access
 
-- [ ] Готово: **`play/all_files_demo.mp4`** (20 сек, 1080×1920) — объясняет использование all-files (скан APK в Download/Telegram + английские подписи для ревьюера). Приложить в форме All-files-access (Этап 6) или загрузить на YouTube (unlisted) и дать ссылку.
+- [ ] Готово: **`play/all_files_demo_voiced.mp4`** (33 сек, 1080×1920, **с узбекской озвучкой** edge-tts Madina) — объясняет использование all-files (скан APK в Download/Telegram + английские подписи для ревьюера). Приложить в форме All-files-access (Этап 6) или загрузить на YouTube (unlisted) и дать ссылку. (Без озвучки: `play/all_files_demo.mp4`, 20 сек. Текст озвучки: `play/all_files_demo_voiceover.txt`.)
 - 💡 Сильнее всего — **живая запись экрана** на телефоне: открыть UzGuard → Diagnostika (тест-вирус) → скан находит → удалить. Если запишешь — используй её вместо слайд-версии.
 
 ---
