@@ -418,6 +418,7 @@ class DashboardNewActivity : AppCompatActivity() {
             // tsiklda qizirdi. Endi: (1) HAR urinish limitga sanaladi; (2) timeout bo'lgan ilova
             // 24 soat backoff oladi (kunlik InstalledAppsRescanWorker baribir tekshiradi).
             var attempted = 0
+            var foundThreatOnOpen = false   // ilova ochilishida o'rnatilgan (sideload) virus topildimi
             val nowMs = System.currentTimeMillis()
             for (data in rows) {
                 if (attempted >= 40) break           // bitta ochilishda ko'pi bilan 40 urinish — qizib ketmasin
@@ -438,8 +439,14 @@ class DashboardNewActivity : AppCompatActivity() {
                 rescanPrefs.edit().putString("verdict_${data.pkgName}", scanned.verdict.name).apply()
                 // Tegni jonli yangilaymiz — foydalanuvchi tekshiruv ketayotganini ko'radi.
                 rowByPkg[data.pkgName]?.let { applyAppTag(it, scanned.verdict.name) }
+                if (scanned.verdict != ScanResult.Verdict.SAFE) foundThreatOnOpen = true
                 yield()
             }
+            // Ilova ochilganda inline skan o'rnatilgan (sideload) ilovada VIRUS topgan bo'lsa —
+            // "So'nggi tahdidlar" panelini DARHOL yangilaymiz. Aks holda topilgan virus faqat
+            // keyingi onResume'da ko'rinardi (panel skan tugashidan OLDIN chizilgan). Play Market
+            // ilovalari umuman skanlanmaydi (yuqorida SAFE) — shuning uchun bu yerga tushmaydi.
+            if (foundThreatOnOpen) populateThreatRows()
         }
     }
 
