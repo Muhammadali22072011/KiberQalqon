@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     // Ruxsat berilgach skan/kuzatuvchini bir martagina ishga tushiramiz —
     // har onResume'da (masalan, sozlamalardan qaytganda) takror skan bo'lmasligi uchun.
     private var scanStarted = false
+    // O'rnatilgan ilovalar skani bir vaqtda BITTA ishlashi uchun guard (tez-tez bosishda takror ishga tushmasin).
+    @Volatile private var installedScanRunning = false
     // v4: joriy filtr (Hammasi/Xavfli/Xavfsiz) — chip ko'rinishini renderChips() shu orqali chizadi.
     private var currentFilter = ApkAdapter.Filter.ALL
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -589,6 +591,48 @@ class MainActivity : AppCompatActivity() {
                             }
                         } catch (e: Exception) {
                             android.util.Log.e("MainActivity", "Scan error: ${apkItem.path}", e)
+                        }
+                    }
+                }
+
+                // O'RNATILGAN ILOVALARNI ham virusga tekshiramiz. Fayl-skani (findApkFiles) faqat
+                // xotiradagi APK fayllarni topadi — lekin telefonda ALLAQACHON o'rnatilgan zararli
+                // ilova (masalan, Telegram orqali kelib o'rnatilgan bank-troyani) fayl sifatida yo'q,
+                // shuning uchun u fayl-skanidan chetda qolardi. scanInstalledForThreats rasmiy do'kon
+                // (Play Market / Galaxy...) ilovalarini O'TKAZIB yuboradi (foydalanuvchi talabi) va
+                // faqat sideload o'rnatilgan ilovalarni tekshiradi.
+                if (!installedScanRunning) {
+                    installedScanRunning = true
+                    scope.launch(Dispatchers.IO) {
+                        try {
+                            val threats = ApkScanner.scanInstalledForThreats(applicationContext)
+                            val dangers = threats.filter { it.result.verdict == ScanResult.Verdict.DANGER }
+                            // Baland ovozli bildirishnoma/sirena faqat YANGI (avval xabar berilmagan)
+                            // o'rnatilgan tahdid uchun — har skanda takror portlamasin. Umumiy son Toast'da
+                            // doim ko'rinadi. Ketgan tahdidlar to'plamdan chiqadi (qayta paydo bo'lsa yana ogohlantiradi).
+                            val prefs = getSharedPreferences("uzguard_rescan", android.content.Context.MODE_PRIVATE)
+                            val notified = prefs.getStringSet("installed_threat_notified", emptySet()) ?: emptySet()
+                            val fresh = dangers.filter { it.pkg !in notified }
+                            prefs.edit().putStringSet("installed_threat_notified", dangers.map { it.pkg }.toSet()).apply()
+                            if (threats.isEmpty()) return@launch
+                            withContext(Dispatchers.Main) {
+                                for (t in fresh) {
+                                    try {
+                                        NotificationHelper.showInstalledDangerNotification(
+                                            applicationContext, t.pkg, t.label, t.result
+                                        )
+                                    } catch (_: Throwable) {}
+                                }
+                                val msg = if (dangers.isNotEmpty())
+                                    "⚠️ ${dangers.size} ta o'rnatilgan ilovada virus topildi"
+                                else
+                                    "⚠️ ${threats.size} ta o'rnatilgan ilova shubhali"
+                                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
+                            }
+                        } catch (e: Throwable) {
+                            android.util.Log.e("MainActivity", "installed-apps scan error", e)
+                        } finally {
+                            installedScanRunning = false
                         }
                     }
                 }

@@ -338,6 +338,59 @@ object ApkScanner {
         }
     }
 
+    /** O'rnatilgan ilovada topilgan tahdid — [scanInstalledForThreats] qaytaradi. */
+    data class InstalledThreat(val pkg: String, val label: String, val result: ScanResult)
+
+    /**
+     * QURILMAGA O'RNATILGAN ilovalarni virusga tekshiradi (fayllarni EMAS — o'rnatilgan
+     * ilovalarning o'z base.apk'sini). Foydalanuvchi "Skanla" bosganda — telefonda allaqachon
+     * o'rnatilgan zararli ilova (masalan, Telegram orqali kelib o'rnatilgan bank-troyani) shu
+     * yerda topiladi. Fayl-skani (findApkFiles) buni QAMRAMAYDI.
+     *
+     * SKIP qilinadi: (1) tizim ilovalari (yangilangan-tizim bundan mustasno — u yerda sideload-hujum
+     * apdeytlari bo'ladi); (2) UzGuard o'zi; (3) RASMIY DO'KONdan (Play Market / Galaxy / AppGallery...)
+     * o'rnatilganlar — foydalanuvchi so'raganidek, ularga tegmaymiz (Play Protect tekshirgan).
+     *
+     * Faqat SAFE bo'lmagan (DANGER/SUSPICIOUS) natijalar qaytariladi. Budjet [limit] ilova (qizishdan
+     * saqlanish). ScanCache tufayli takroriy chaqiruvlar arzon. Fon oqimida (IO) chaqiring.
+     */
+    fun scanInstalledForThreats(context: Context, limit: Int = 40): List<InstalledThreat> {
+        val out = mutableListOf<InstalledThreat>()
+        val pm = context.packageManager
+        val packages = try {
+            pm.getInstalledPackages(0)
+        } catch (e: Throwable) {
+            Log.w(TAG, "getInstalledPackages failed", e); return out
+        }
+        var budget = 0
+        for (p in packages) {
+            if (budget >= limit) break
+            try {
+                val app = p.applicationInfo ?: continue
+                val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+                if (isSystem && !updatedSystem) continue
+                val name = p.packageName ?: continue
+                if (name == context.packageName || name == "${context.packageName}.debug") continue
+                // Rasmiy do'kondan o'rnatilgan — TEGMAYMIZ (foydalanuvchi talabi + Play Protect).
+                if (isFromTrustedStore(context, name)) continue
+                val src = app.sourceDir ?: continue
+                if (!java.io.File(src).exists()) continue
+                budget++
+                val res = try { scan(context, src) } catch (e: Throwable) {
+                    Log.w(TAG, "installed scan failed for $name", e); continue
+                }
+                if (res.verdict != ScanResult.Verdict.SAFE) {
+                    val label = try { app.loadLabel(pm).toString() } catch (_: Throwable) { name }
+                    out.add(InstalledThreat(name, label, res))
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "installed-threat iteration failed", e)
+            }
+        }
+        return out
+    }
+
     /** MlRiskModel darajasi — foydalanuvchiga ko'rinadigan matn faqat o'zbekcha. */
     private fun mlBandUz(p: Double): String = when (MlRiskModel.band(p)) {
         "critical" -> "juda yuqori"
