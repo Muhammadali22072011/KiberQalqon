@@ -279,6 +279,8 @@ object NotificationHelper {
             // Ko'rinadigan "O'chirish" tugmasi — foydalanuvchi butun bildirishnomani emas,
             // to'g'ridan-to'g'ri tugmani bosib uninstall dialogini ochadi.
             .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), pi)
+        // Topilgan zararli ilovaning O'Z ikonkasini ko'rsatamiz — foydalanuvchi qaysi ilova ekanini yuzidan taniydi.
+        installedAppIcon(context, pkg)?.let { builder.setLargeIcon(it) }
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(pkg.hashCode() and 0x7FFFFFFF, builder.build())
         // O'rnatilgan ilova endi xavfli + telefon uxlab yotgan bo'lsa — uyg'otuvchi sirena.
@@ -331,6 +333,8 @@ object NotificationHelper {
             .setContentIntent(pi)
             // setFullScreenIntent ATAYLAB CHAQIRILMAYDI — aks holda Activity avtomatik
             // ochilib, batch scan paytida bir nechta Activity stack'da to'planadi.
+        // APK fayl ichidagi ilova ikonkasini ko'rsatamiz (soxta bank/ilova ikonkasi ko'zga tashlanadi).
+        apkFileIcon(context, apkFile.absolutePath)?.let { builder.setLargeIcon(it) }
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(rc, builder.build())
         // Xavfli fayl + telefon uxlab yotgan bo'lsa — uyg'otuvchi sirena (AlarmSiren gate qiladi).
@@ -338,6 +342,38 @@ object NotificationHelper {
             try { AlarmSiren.blast(context) } catch (_: Throwable) {}
         }
     }
+
+    /** Drawable → Bitmap (bildirishnoma largeIcon uchun). Vektor/adaptiv ikonkalarni ham chizadi. */
+    private fun drawableToBitmap(d: android.graphics.drawable.Drawable?): android.graphics.Bitmap? {
+        if (d == null) return null
+        return try {
+            val bd = d as? android.graphics.drawable.BitmapDrawable
+            if (bd?.bitmap != null) return bd.bitmap
+            val w = d.intrinsicWidth.takeIf { it > 0 } ?: 96
+            val h = d.intrinsicHeight.takeIf { it > 0 } ?: 96
+            val bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
+            val c = android.graphics.Canvas(bmp)
+            d.setBounds(0, 0, c.width, c.height)
+            d.draw(c)
+            bmp
+        } catch (_: Throwable) { null }
+    }
+
+    /** O'rnatilgan ilovaning ikonkasi (paket bo'yicha) — topilgan virusni yuzidan ko'rsatish uchun. */
+    private fun installedAppIcon(context: Context, pkg: String): android.graphics.Bitmap? = try {
+        drawableToBitmap(context.packageManager.getApplicationIcon(pkg))
+    } catch (_: Throwable) { null }
+
+    /** APK fayl ICHIDAGI ilova ikonkasi (hali o'rnatilmagan fayl uchun; soxta bank-ikonkasi ko'rinadi). */
+    private fun apkFileIcon(context: Context, apkPath: String): android.graphics.Bitmap? = try {
+        val pm = context.packageManager
+        val pi = pm.getPackageArchiveInfo(apkPath, 0)
+        pi?.applicationInfo?.let { ai ->
+            ai.sourceDir = apkPath
+            ai.publicSourceDir = apkPath
+            drawableToBitmap(ai.loadIcon(pm))
+        }
+    } catch (_: Throwable) { null }
 
     /**
      * Foydalanuvchi qurilmasi (Xiaomi/MIUI/Huawei va h.k.) UzGuard jarayonini
