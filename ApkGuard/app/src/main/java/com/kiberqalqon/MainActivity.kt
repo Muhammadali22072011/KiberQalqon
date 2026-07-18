@@ -534,7 +534,51 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     startFileObserver()
                 }
-                
+
+                // ENG AVVAL — telefonga O'RNATILGAN ilovalarni tekshiramiz (foydalanuvchi talabi:
+                // "birinchi navbatda o'rnatilganlarni skanla"). Fayl-skani (pastda) faqat APK fayllarni
+                // topadi; o'rnatilgan zararli ilova esa shu yerda topiladi va DARHOL o'chirishga chiqariladi.
+                // Rasmiy do'kon (Play Market) ilovalari o'tkaziladi. Fayl-skani bilan parallel ishlaydi,
+                // shuning uchun o'rnatilgan tahdid fayl qidiruvini kutmaydi.
+                if (!installedScanRunning) {
+                    installedScanRunning = true
+                    scope.launch(Dispatchers.IO) {
+                        try {
+                            val threats = ApkScanner.scanInstalledForThreats(applicationContext)
+                            val dangers = threats.filter { it.result.verdict == ScanResult.Verdict.DANGER }
+                            // YANGI (avval ko'rilmagan) tahdidlar — bildirishnoma + DARHOL o'chirish oynasi.
+                            // Ketgan tahdidlar to'plamdan chiqadi (qayta paydo bo'lsa yana ogohlantiriladi).
+                            val prefs = getSharedPreferences("uzguard_rescan", android.content.Context.MODE_PRIVATE)
+                            val notified = prefs.getStringSet("installed_threat_notified", emptySet()) ?: emptySet()
+                            val fresh = dangers.filter { it.pkg !in notified }
+                            prefs.edit().putStringSet("installed_threat_notified", dangers.map { it.pkg }.toSet()).apply()
+                            if (threats.isEmpty()) return@launch
+                            withContext(Dispatchers.Main) {
+                                for (t in fresh) {
+                                    try {
+                                        NotificationHelper.showInstalledDangerNotification(
+                                            applicationContext, t.pkg, t.label, t.result
+                                        )
+                                    } catch (_: Throwable) {}
+                                    // DARHOL o'chirish: tizim uninstall oynasini ochamiz. Android boshqa
+                                    // ilovani JIMGINA o'chirishga RUXSAT BERMAYDI — foydalanuvchi "O'chirish"ni
+                                    // bosishi shart; biz oynani darhol chiqaramiz, faqat bir tap qoladi.
+                                    launchUninstall(t.pkg)
+                                }
+                                val msg = if (dangers.isNotEmpty())
+                                    "⚠️ ${dangers.size} ta o'rnatilgan virus — o'chirishga chiqarildi"
+                                else
+                                    "⚠️ ${threats.size} ta o'rnatilgan ilova shubhali"
+                                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
+                            }
+                        } catch (e: Throwable) {
+                            android.util.Log.e("MainActivity", "installed-apps scan error", e)
+                        } finally {
+                            installedScanRunning = false
+                        }
+                    }
+                }
+
                 // Асинхронно сканируем все существующие APK с таймаутом
                 android.util.Log.d("MainActivity", "🔍 Начинаю поиск APK...")
                 
@@ -594,48 +638,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-
-                // O'RNATILGAN ILOVALARNI ham virusga tekshiramiz. Fayl-skani (findApkFiles) faqat
-                // xotiradagi APK fayllarni topadi — lekin telefonda ALLAQACHON o'rnatilgan zararli
-                // ilova (masalan, Telegram orqali kelib o'rnatilgan bank-troyani) fayl sifatida yo'q,
-                // shuning uchun u fayl-skanidan chetda qolardi. scanInstalledForThreats rasmiy do'kon
-                // (Play Market / Galaxy...) ilovalarini O'TKAZIB yuboradi (foydalanuvchi talabi) va
-                // faqat sideload o'rnatilgan ilovalarni tekshiradi.
-                if (!installedScanRunning) {
-                    installedScanRunning = true
-                    scope.launch(Dispatchers.IO) {
-                        try {
-                            val threats = ApkScanner.scanInstalledForThreats(applicationContext)
-                            val dangers = threats.filter { it.result.verdict == ScanResult.Verdict.DANGER }
-                            // Baland ovozli bildirishnoma/sirena faqat YANGI (avval xabar berilmagan)
-                            // o'rnatilgan tahdid uchun — har skanda takror portlamasin. Umumiy son Toast'da
-                            // doim ko'rinadi. Ketgan tahdidlar to'plamdan chiqadi (qayta paydo bo'lsa yana ogohlantiradi).
-                            val prefs = getSharedPreferences("uzguard_rescan", android.content.Context.MODE_PRIVATE)
-                            val notified = prefs.getStringSet("installed_threat_notified", emptySet()) ?: emptySet()
-                            val fresh = dangers.filter { it.pkg !in notified }
-                            prefs.edit().putStringSet("installed_threat_notified", dangers.map { it.pkg }.toSet()).apply()
-                            if (threats.isEmpty()) return@launch
-                            withContext(Dispatchers.Main) {
-                                for (t in fresh) {
-                                    try {
-                                        NotificationHelper.showInstalledDangerNotification(
-                                            applicationContext, t.pkg, t.label, t.result
-                                        )
-                                    } catch (_: Throwable) {}
-                                }
-                                val msg = if (dangers.isNotEmpty())
-                                    "⚠️ ${dangers.size} ta o'rnatilgan ilovada virus topildi"
-                                else
-                                    "⚠️ ${threats.size} ta o'rnatilgan ilova shubhali"
-                                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
-                            }
-                        } catch (e: Throwable) {
-                            android.util.Log.e("MainActivity", "installed-apps scan error", e)
-                        } finally {
-                            installedScanRunning = false
-                        }
-                    }
-                }
             } catch (e: TimeoutCancellationException) {
                 android.util.Log.e("MainActivity", "Timeout searching APK", e)
                 withContext(Dispatchers.Main) {
@@ -659,6 +661,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Zararli O'RNATILGAN ilovani o'chirish — tizim uninstall oynasini DARHOL ochadi.
+     * DIQQAT: Android bir ilovaga boshqasini JIMGINA (fonda) o'chirishga ruxsat bermaydi —
+     * foydalanuvchi tizim dialogida "O'chirish"ni bosishi shart. Biz shu dialogni bir tapga
+     * yaqinlashtiramiz. Skan foreground'da ishlagani uchun Activity ochish ruxsat etilgan.
+     */
+    private fun launchUninstall(pkg: String) {
+        try {
+            startActivity(
+                Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        } catch (e: Throwable) {
+            android.util.Log.w("MainActivity", "uninstall launch failed for $pkg", e)
+        }
+    }
+
     /**
      * Список-skan'da topilgan xavfli fayl haqida xabar berish.
      *
