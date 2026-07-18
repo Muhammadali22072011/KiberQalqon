@@ -64,6 +64,13 @@ end $$;
 -- --- CL-06: "bugungi" statistika Asia/Tashkent kuni bo'yicha -----------------
 -- Supabase default UTC. O'zbekiston UTC+5 — eski `scanned_at >= current_date` bugungi
 -- hisoblagichni mahalliy 05:00 da nolga tushirardi va tunги skanni "kechaga" qo'shardi.
+--
+-- AVVAL: prod scans jadvalida scan_duration_ms ustuni bo'lmasligi mumkin (prod eski sxemadan
+-- yaratilgan, schema.sql:40 dagi add-column qo'lда prod'ga qo'llanmagan). Vyuxa unga tayanadi,
+-- shuning uchun ustun+indeksni shu yerda IDEMPOTENT qo'shamiz (schema.sql:40,45 bilan bir xil).
+alter table scans add column if not exists scan_duration_ms int default 0;
+create index if not exists idx_scans_duration on scans(scan_duration_ms) where scan_duration_ms > 0;
+
 create or replace view v_stats_today as
 select
   count(*)                                       as total_scans,

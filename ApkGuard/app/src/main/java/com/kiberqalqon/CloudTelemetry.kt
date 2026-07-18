@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -24,7 +24,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * KiberQalqon Cloud telemetriyasi — markaziy monitoring paneli/xaritasi uchun.
+ * UzGuard Cloud telemetriyasi — markaziy monitoring paneli/xaritasi uchun.
  *
  * Bu CommunityReportClient (Telegram) dan ALOHIDA modul. Farqi:
  *   - CommunityReportClient: faqat DANGER/SUSPICIOUS ni dev Telegram'iga MATN qilib yuboradi.
@@ -55,7 +55,7 @@ import javax.crypto.spec.SecretKeySpec
 object CloudTelemetry {
 
     private const val TAG = "CloudTelemetry"
-    private const val PREFS = "kiberqalqon_cloud"
+    private const val PREFS = "uzguard_cloud"
     private const val KEY_DEVICE_TOKEN = "device_token"
     // Per-device imzo tokeni — register javobida server beradi, yozuvlarni HMAC bilan
     // imzolash uchun. Bo'lmasa (hali register bo'lmagan / server kalitsiz) — faqat
@@ -71,6 +71,13 @@ object CloudTelemetry {
     private const val GEO_MOVE_THRESHOLD_M = 500.0
     // Bulutga allaqachon yuklangan APK namuna hash'lari — qayta yuklamaslik uchun.
     private const val KEY_UPLOADED_SAMPLES = "uploaded_samples"
+    // Qurilma qo'shilgan guruh (dashboard bejasi + GroupJoinActivity holati uchun).
+    private const val KEY_GROUP_NAME = "group_name"
+    private const val KEY_GROUP_COLOR = "group_color"
+    // Guruh qo'shilish kodi — guruhga yo'naltirilgan e'lonlar (NewsClient ?g=) + oila qalqoni uchun.
+    private const val KEY_GROUP_CODE = "group_code"
+    // Oxirgi ko'rsatilgan bayroq holati (yo'qolgan/buzilgan) — har pollda qayta ogohlantirmaslik uchun.
+    private const val KEY_LAST_FLAG = "last_flag_state"
     // Storage'ga yuklanadigan eng katta APK (ConsentActivity 4(a) va'dasi bilan bir xil).
     private const val MAX_SAMPLE_BYTES = 50L * 1024 * 1024
 
@@ -141,6 +148,9 @@ object CloudTelemetry {
                 put("name", "${Build.MANUFACTURER} ${Build.MODEL}")
                 put("android_ver", "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
                 put("app_ver", "${BuildConfig.VERSION_NAME} (#${BuildConfig.VERSION_CODE})")
+                // "Himoya batareyasi": qaysi himoyalar haqiqatan YOQILGAN — panel flot sog'lig'ini
+                // shundan biladi ("200 o'rnatilgan" emas, "140 himoyalangan"). Fail-soft: xato → qo'shilmaydi.
+                try { put("protections", ProtectionState.collect(ctx)) } catch (_: Throwable) {}
             }
             if (fix != null) {
                 body.put("lat", fix.lat)
@@ -166,6 +176,99 @@ object CloudTelemetry {
     }
 
     /**
+     * #3: Paneldan (EGASI) yuborilgan masofaviy buyruqlarni oladi va bajaradi.
+     * At-most-once: server poll paytida buyruqni 'done' ga o'tkazadi (qayta kelmaydi →
+     * masofaviy "rescan" cheksiz sikl yaratmaydi). Chaqiriladi: App.onCreate (ilova
+     * ochilganda DARHOL) + HeartbeatWorker (fon, ~6 soatgacha). ALOHIDA tez-tez tsikl
+     * QO'SHILMAYDI — batareya/isish regressi bo'lmasin (loyiha isish tarixiga sezgir).
+     * Hozircha yagona tur: "rescan" (to'liq qayta skan → GuardWorker).
+     */
+    fun pollCommands(ctx: Context) {
+        if (!enabled(ctx)) return
+        val base = baseUrl() ?: return
+        val secret = deviceSecret() ?: return
+        val token = deviceToken(ctx)
+        scope.launch {
+            try {
+                val req = Request.Builder()
+                    .url("$base/api/device/poll")
+                    .header("x-device-secret", secret)
+                    .header("x-device-token", token)
+                    .get()
+                    .build()
+                val body = client.newCall(req).execute().use { resp ->
+                    if (!resp.isSuccessful) return@launch
+                    resp.body?.string().orEmpty()
+                }
+                val root = try { JSONObject(body) } catch (_: Throwable) { return@launch }
+                if (!root.optBoolean("ok", false)) return@launch
+
+                // Barqaror bayroq (flag) — bir martalik buyruq EMAS, har pollda keladi. O'zgarganda
+                // (yo'q→bor / holat almashsa) bir marta ogohlantirish ko'rsatamiz; olib tashlansa tozalaymiz.
+                handleFlag(ctx, root.optJSONObject("flag"))
+
+                val arr = root.optJSONArray("commands") ?: return@launch
+                var rescan = false
+                for (i in 0 until arr.length()) {
+                    val cmd = arr.optJSONObject(i) ?: continue
+                    when (cmd.optString("type")) {
+                        "rescan" -> rescan = true
+                        "message" -> {
+                            // Egasidan 1:1 xabar — bildirishnoma sifatida ko'rsatamiz (at-most-once:
+                            // server poll paytida buyruqni 'done' ga o'tkazadi, qayta kelmaydi).
+                            val p = cmd.optJSONObject("payload")
+                            val title = p?.optString("title").orEmpty()
+                            val text = p?.optString("body").orEmpty()
+                            if (title.isNotBlank() || text.isNotBlank()) {
+                                try { NotificationHelper.showAdminMessageNotification(ctx, title, text) } catch (_: Throwable) {}
+                            }
+                        }
+                        else -> { /* noma'lum tur — e'tiborsiz (kelajakdagi turlar) */ }
+                    }
+                }
+                if (rescan) {
+                    // Unique work — bir nechta rescan buyrug'i kelsa ham bitta skan navbatga tushadi.
+                    androidx.work.WorkManager.getInstance(ctx).enqueueUniqueWork(
+                        "remote_rescan",
+                        androidx.work.ExistingWorkPolicy.KEEP,
+                        androidx.work.OneTimeWorkRequestBuilder<GuardWorker>().build(),
+                    )
+                    Log.i(TAG, "masofaviy qayta skan navbatga qo'yildi")
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "pollCommands failed", e)
+            }
+        }
+    }
+
+    /**
+     * Barqaror bayroq (flag) holatini qayta ishlaydi. `flagObj` = {state, note} yoki null.
+     * O'zgarganda bir marta ogohlantirish; null'ga o'tsa ogohlantirishni tozalaydi. Holatni
+     * lokal saqlaymiz — har poll (bayroq har javobda keladi) qayta bildirishnoma bermasin.
+     */
+    private fun handleFlag(ctx: Context, flagObj: JSONObject?) {
+        try {
+            val sp = prefs(ctx)
+            val state = flagObj?.optString("state").orEmpty().takeIf { it == "lost" || it == "compromised" }
+            val last = sp.getString(KEY_LAST_FLAG, null)
+            if (state == null) {
+                if (last != null) {
+                    sp.edit().remove(KEY_LAST_FLAG).apply()
+                    NotificationHelper.clearDeviceFlagNotification(ctx)
+                }
+                return
+            }
+            if (state != last) {
+                sp.edit().putString(KEY_LAST_FLAG, state).apply()
+                val note = flagObj?.optString("note").orEmpty()
+                NotificationHelper.showDeviceFlagNotification(ctx, state, note)
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "handleFlag failed", e)
+        }
+    }
+
+    /**
      * Skan natijasini cloudga yuboradi. finalizeResult ichidan HAR BIR skan uchun
      * chaqiriladi (SAFE ham!) — panel "jami skan"ni va xaritadagi yashil nuqtalarni
      * shundan biladi. Tarmoq ishi fonda (IO), skan oqimini bloklamaydi.
@@ -178,6 +281,15 @@ object CloudTelemetry {
         val needsSample = result.verdict == ScanResult.Verdict.DANGER ||
             result.verdict == ScanResult.Verdict.SUSPICIOUS
         scope.launch {
+            // #FP-2026-07-09: o'rnatilgan ilovaning O'Z base.apk'si (sourceDir) skanini bulutga
+            // YUBORMAYMIZ. Bu — foydalanuvchining SHAXSIY ilovalar ro'yxati (DashboardNewActivity
+            // har ochilganda 40 tagacha ilovani skanlaydi, InstalledAppsRescanWorker kunlik), "yovvoyi"
+            // tahdid emas. Aks holda egasi paneli o'z telefonining har bir ilovasi uchun skan/alert bilan
+            // to'lib ketardi (spike-alert ham noto'g'ri chiqardi). Haqiqiy tahdid yo'llari — yuklab olingan
+            // APK fayl (GuardWorker sweep), real-time (ProtectionService), ulashilgan fayl (ShareReceiver) —
+            // sourceDir EMAS, shuning uchun ular baribir yuboriladi. O'rnatilgan malware'ni
+            // InstalledAppsRescanWorker Telegram orqali alohida xabar qiladi.
+            if (isInstalledAppSelfScan(ctx, apkPath)) return@launch
             var snapshot: File? = null
             try {
                 val original = File(apkPath)
@@ -247,6 +359,75 @@ object CloudTelemetry {
         }
     }
 
+    // ---- Guruhga qo'shilish (GroupJoinActivity) ---------------------------
+
+    /** Guruhga qo'shilish natijasi. ok=false bo'lsa `error` sababi (code/fields/net/...). */
+    data class JoinResult(val ok: Boolean, val error: String?, val groupName: String?, val groupColor: String?)
+
+    /** Saqlangan guruh (mahalliy) — dashboard bejasi/holat uchun. Yo'q bo'lsa null. */
+    data class GroupInfo(val name: String, val color: String)
+
+    fun savedGroup(ctx: Context): GroupInfo? {
+        val sp = prefs(ctx)
+        val name = sp.getString(KEY_GROUP_NAME, null)?.takeIf { it.isNotBlank() } ?: return null
+        val color = sp.getString(KEY_GROUP_COLOR, null)?.takeIf { it.isNotBlank() } ?: "#C2143D"
+        return GroupInfo(name, color)
+    }
+
+    /** Saqlangan guruh qo'shilish kodi — guruhga yo'naltirilgan e'lonlar/oila qalqoni uchun. Yo'q bo'lsa null. */
+    fun savedGroupCode(ctx: Context): String? =
+        prefs(ctx).getString(KEY_GROUP_CODE, null)?.takeIf { it.isNotBlank() }
+
+    /**
+     * Qurilmani KOD bilan guruhga qo'shadi (foydalanuvchi ochiq amal — GroupJoinActivity).
+     * Register'dan FARQLI: bu community-share consent'ini talab QILMAYDI (foydalanuvchi
+     * o'zi ism/familiya/telefonini kiritib qo'shilishga rozi bo'ladi), faqat ToS (hasUserConsent)
+     * + bulut sozlangan bo'lishi kerak. `cb` FON ipida chaqiriladi — chaqiruvchi UI'ga
+     * runOnUiThread bilan o'tkazadi.
+     */
+    fun joinGroup(ctx: Context, code: String, first: String, last: String, phone: String, cb: (JoinResult) -> Unit) {
+        val base = baseUrl()
+        val secret = deviceSecret()
+        if (base == null || secret == null || !Config.hasUserConsent(ctx)) {
+            cb(JoinResult(false, "unconfigured", null, null)); return
+        }
+        val token = deviceToken(ctx)
+        scope.launch {
+            val result = try {
+                val body = JSONObject().apply {
+                    put("device_token", token)
+                    put("code", code.trim().uppercase())
+                    put("first", first.trim())
+                    put("last", last.trim())
+                    put("phone", phone.trim())
+                }
+                val resp = postJsonForResult(ctx, "$base/api/device/join", secret, "device/join", body)
+                if (resp == null) {
+                    JoinResult(false, "net", null, null)
+                } else {
+                    val j = JSONObject(resp)
+                    if (j.optBoolean("ok", false)) {
+                        val g = j.optJSONObject("group")
+                        val name = g?.optString("name")?.takeIf { it.isNotBlank() } ?: code.trim().uppercase()
+                        val color = g?.optString("color")?.takeIf { it.isNotBlank() } ?: "#C2143D"
+                        prefs(ctx).edit()
+                            .putString(KEY_GROUP_NAME, name)
+                            .putString(KEY_GROUP_COLOR, color)
+                            .putString(KEY_GROUP_CODE, code.trim().uppercase())
+                            .apply()
+                        JoinResult(true, null, name, color)
+                    } else {
+                        JoinResult(false, j.optString("error", "generic").ifBlank { "generic" }, null, null)
+                    }
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "joinGroup failed", e)
+                JoinResult(false, "net", null, null)
+            }
+            cb(result)
+        }
+    }
+
     // ---- Gating -----------------------------------------------------------
 
     private fun enabled(ctx: Context): Boolean =
@@ -270,13 +451,14 @@ object CloudTelemetry {
     // ---- Helpers ----------------------------------------------------------
 
     /**
-     * Joylashuv ruxsati berilgan bo'lsa, qurilmaning aniq koordinatasini bodyga qo'shadi.
-     * currentFix() kesh bo'sh bo'lsa providerdan bir martalik aktiv fix so'raydi (bloklaydi),
-     * shuning uchun FAQAT IO oqimidan chaqiriladi. Ruxsat yo'q / joylashuv o'chiq bo'lsa —
-     * hech narsa qo'shilmaydi (server IP'dan shahar darajasida taxminlaydi).
+     * Joylashuv ruxsati berilgan bo'lsa, qurilmaning oxirgi ma'lum (kesh) koordinatasini
+     * bodyga qo'shadi. Batareya/isishga sezgir: har skan yuklamasida (SAFE ham) AKTIV GPS
+     * fix'i YOQILMAYDI — faqat OS keshidagi yetarlicha yangi (<=1 soat) nuqtani ishlatamiz.
+     * Kesh yo'q/eski bo'lsa — hech narsa qo'shilmaydi (server IP'dan shahar darajasida
+     * taxminlaydi). Xaritadagi nuqtani davriy registerDevice() yangilab turadi.
      */
     private fun putGeo(ctx: Context, body: JSONObject) {
-        val fix = DeviceLocation.currentFix(ctx) ?: return
+        val fix = DeviceLocation.lastKnownFresh(ctx, DeviceLocation.IN_WINDOW_MAX_AGE_MS) ?: return
         body.put("lat", fix.lat)
         body.put("lng", fix.lng)
         fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
@@ -488,6 +670,20 @@ object CloudTelemetry {
     private fun inferPackage(ctx: Context, apkPath: String): String? = try {
         ctx.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName
     } catch (_: Throwable) { null }
+
+    /**
+     * Skanlanayotgan fayl AYNAN o'rnatilgan biror ilovaning O'Z base.apk'si (sourceDir)mi?
+     * Ha bo'lsa — bu qurilmaning shaxsiy ilovalar ro'yxati, bulut tahdid feed'iga yubormaymiz
+     * (uploadScan boshidagi guard). Bitta paket-lookup — arzon (barcha paketlarni aylanmaydi).
+     */
+    private fun isInstalledAppSelfScan(ctx: Context, apkPath: String): Boolean {
+        val pkg = inferPackage(ctx, apkPath) ?: return false
+        return try {
+            ctx.packageManager.getApplicationInfo(pkg, 0).sourceDir == apkPath
+        } catch (_: Throwable) {
+            false
+        }
+    }
 
     /** Arxiv APK ichidagi ilova yorlig'i (ko'rinadigan nom). Topilmasa null. */
     private fun inferLabel(ctx: Context, apkPath: String): String? = try {

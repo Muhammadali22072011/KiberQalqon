@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Главная CTA по макету (brand/mockup.html .cta): anor-градиент #E11D48→#C2143D,
+     радиус 18dp. Бренд-константа — одинакова в light и dark. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#E11D48"
+                android:endColor="#C2143D" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+</ripple>

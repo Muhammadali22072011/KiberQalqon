@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — «Рентген разрешений» (PermissionXrayActivity), русский. -->
+<resources>
+
+    <!-- ═══ Заголовок + интро ═══ -->
+    <string name="kq4_xray_eyebrow">РЕНТГЕН РАЗРЕШЕНИЙ</string>
+    <string name="kq4_xray_title">Рентген разрешений</string>
+    <string name="kq4_xray_intro">Проверяем разрешения установленных приложений по опасным комбинациям. Сверху — приложения с самым опасным набором разрешений.</string>
+
+    <!-- ═══ Состояния ═══ -->
+    <string name="kq4_xray_checking">Проверяем приложения…</string>
+    <string name="kq4_xray_none">Приложений с опасной комбинацией разрешений не найдено.</string>
+    <string name="kq4_xray_count">%1$d приложений требуют внимания</string>
+
+    <!-- ═══ Карточка ═══ -->
+    <string name="kq4_xray_score_tag">Риск: %1$d</string>
+    <string name="kq4_xray_no_combo">Отдельной опасной комбинации не найдено</string>
+    <string name="kq4_xray_sideload">Установлено вне Play Market</string>
+    <string name="kq4_xray_expand">Показать разрешения ▾</string>
+    <string name="kq4_xray_collapse">Свернуть ▴</string>
+
+    <!-- ═══ Разделы деталей ═══ -->
+    <string name="kq4_xray_sec_crit">Самые опасные разрешения</string>
+    <string name="kq4_xray_sec_warn">Обратите внимание</string>
+    <string name="kq4_xray_no_perms">Критичных разрешений с пояснением не найдено.</string>
+
+    <!-- ═══ Кнопки исправления ═══ -->
+    <string name="kq4_xray_act_appinfo">Настройки приложения</string>
+    <string name="kq4_xray_act_a11y">Проверить спец. возможности</string>
+    <string name="kq4_xray_open_fail">Не удалось открыть настройки</string>
+
+    <!-- ═══ Пояснения разрешений, специфичные для рентгена ═══ -->
+    <string name="kq4_xray_perm_notif">Доступ к уведомлениям</string>
+    <string name="kq4_xray_perm_notif_s">Читает все уведомления — крадёт банковские коды даже без RECEIVE_SMS</string>
+    <string name="kq4_xray_perm_admin">Администратор устройства</string>
+    <string name="kq4_xray_perm_admin_s">Защищает себя от удаления и может заблокировать телефон</string>
+    <string name="kq4_xray_perm_location">Точное местоположение</string>
+    <string name="kq4_xray_perm_location_s">Точно отслеживает, где вы находитесь</string>
+
+</resources>

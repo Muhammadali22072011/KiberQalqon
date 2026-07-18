@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — новые строки входа в Настройках (Защита банковских приложений,
+     Рентген разрешений, Еженедельный отчёт). Волна 5 функций, A6. Русский. -->
+<resources>
+
+    <!-- Аудит банковских приложений → BankGuardActivity -->
+    <string name="kq4_set_row_bankguard">Защита банковских приложений</string>
+    <string name="kq4_set_row_bankguard_sub">Находит поддельные банковские приложения и предупреждает</string>
+
+    <!-- Рентген разрешений → PermissionXrayActivity -->
+    <string name="kq4_set_row_xray">Рентген разрешений</string>
+    <string name="kq4_set_row_xray_sub">Показывает, какое приложение запрашивает лишние разрешения</string>
+
+    <!-- Переключатель еженедельного отчёта (Config.isWeeklyReportEnabled) -->
+    <string name="kq4_set_row_weekly">Еженедельный отчёт</string>
+    <string name="kq4_set_row_weekly_sub">Каждую неделю присылает уведомление с итогами проверки</string>
+
+    <!-- Переключатель уведомлений о новостях (Config.isNewsNotificationEnabled → NewsNotifier) -->
+    <string name="kq4_set_row_newsnotif">Уведомления о новостях</string>
+    <string name="kq4_set_row_newsnotif_sub">Присылает уведомление, когда появляется новое объявление</string>
+
+    <!-- Переключатель DNS C2-фильтра (Config.isVpnFilterEnabled → VpnFilterService) -->
+    <string name="kq4_set_row_vpn">Защита интернета (DNS-фильтр)</string>
+    <string name="kq4_set_row_vpn_sub">Блокирует подключение вирусов к их серверам управления (экспериментально)</string>
+    <string name="kq4_vpn_perm_denied">Разрешение VPN не выдано — фильтр не включён</string>
+</resources>

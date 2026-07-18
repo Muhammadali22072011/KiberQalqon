@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Анализ КОМБИНАЦИЙ разрешений, а не их количества.
@@ -43,6 +43,14 @@ object PermissionCombos {
             score = 60,
             required = setOf("${P}READ_SMS", "${P}INTERNET"),
             anyOf = setOf("${P}RECEIVE_SMS", "${P}SEND_SMS")
+        ),
+        // READ_SMS — Play-restricted ruxsat; legit non-default-SMS ilovalar deyarli
+        // olmaydi. READ_SMS + INTERNET yakka o'zi exfil signali: skрытный spyware
+        // inbox/OTP bazasini o'qib C2 ga yuborishi uchun RECEIVE_SMS/SEND_SMS shart emas.
+        Combo(
+            label = "SMS reader + net exfil",
+            score = 45,
+            required = setOf("${P}READ_SMS", "${P}INTERNET")
         ),
         Combo(
             label = "Overlay phisher (soxta bank oynasi)",

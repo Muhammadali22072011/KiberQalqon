@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Yangiliklar — bulut e'lonlari (dashboard karuseli + NewsActivity). -->
+<resources>
+    <string name="kq4_news_eyebrow">Yangiliklar</string>
+    <string name="kq4_news_title">Yangiliklar</string>
+    <string name="kq4_news_sub">Rasmiy e\'lonlar va ogohlantirishlar</string>
+    <string name="kq4_news_pinned">Qadab qo\'yilgan</string>
+
+    <!-- Daraja teglari (server level: info/warning/critical) -->
+    <string name="kq4_news_level_info">Ma\'lumot</string>
+    <string name="kq4_news_level_warn">Ogohlantirish</string>
+    <string name="kq4_news_level_crit">Muhim</string>
+
+    <string name="kq4_news_empty_title">Hozircha e\'lonlar yo\'q</string>
+    <string name="kq4_news_empty_sub">Yangi xabarlar shu yerda ko\'rinadi</string>
+
+    <!-- Sana yorlig'i -->
+    <string name="kq4_news_today">Bugun</string>
+    <string name="kq4_news_yesterday">Kecha</string>
+    <string name="kq4_news_days_ago">%1$d kun avval</string>
+
+    <string name="kq4_news_image_cd">E\'lon rasmi</string>
+</resources>

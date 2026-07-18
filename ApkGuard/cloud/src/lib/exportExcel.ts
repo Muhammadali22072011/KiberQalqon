@@ -1,6 +1,7 @@
 import type * as XLSXNS from 'xlsx';
 import {
   apiGet, type Stats, type DeviceRow, type ThreatFamily, type FeedItem, type MapPoint,
+  type GroupMember,
 } from './api';
 import { nearestCity } from './uzRegions';
 import { VERDICT_UZ, catUz } from './format';
@@ -26,12 +27,13 @@ export async function exportAllToExcel(): Promise<void> {
   let okCount = 0;
   const ok = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
     p.then((v) => { okCount++; return v; }).catch(() => fallback);
-  const [statsR, devicesR, threatsR, feedR, geoR] = await Promise.all([
+  const [statsR, devicesR, threatsR, feedR, geoR, membersR] = await Promise.all([
     ok(apiGet<{ stats: Stats }>('/api/stats'), { stats: {} as Stats }),
     ok(apiGet<{ devices: DeviceRow[] }>('/api/devices'), { devices: [] as DeviceRow[] }),
     ok(apiGet<{ threats: ThreatFamily[] }>('/api/threats'), { threats: [] as ThreatFamily[] }),
     ok(apiGet<{ feed: FeedItem[] }>('/api/feed'), { feed: [] as FeedItem[] }),
     ok(apiGet<{ points: MapPoint[] }>('/api/geo'), { points: [] as MapPoint[] }),
+    ok(apiGet<{ members: GroupMember[] }>('/api/devices?members=1'), { members: [] as GroupMember[] }),
   ]);
   if (okCount === 0) throw new Error('export: barcha endpointlar xato');
 
@@ -46,6 +48,9 @@ export async function exportAllToExcel(): Promise<void> {
 
   const deviceRows = (devicesR.devices || []).map((d) => ({
     Nomi: d.name ?? '',
+    Guruh: d.group_name ?? '',
+    'A‘zo': [d.member_first, d.member_last].filter(Boolean).join(' '),
+    Telefon: d.member_phone ?? '',
     Shahar: nearestCity(d.lat, d.lng) ?? d.city ?? '',
     Mamlakat: d.country ?? '',
     Android: d.android_ver ?? '',
@@ -86,9 +91,25 @@ export async function exportAllToExcel(): Promise<void> {
     "So'nggi xulosa": verdictUz(p.last_verdict),
   }));
 
+  // Guruh rostri (a'zolar) — guruh, ism/familiya, telefon + qurilma. Guruhga bo'lingan
+  // qurilmalargina (v_group_members). Egasi guruh bo'yicha odamlar ro'yxatini eksport qiladi.
+  const memberRows = (membersR.members || []).map((m) => ({
+    Guruh: m.group_name ?? '',
+    Ism: m.member_first ?? '',
+    Familiya: m.member_last ?? '',
+    Telefon: m.member_phone ?? '',
+    Qurilma: m.device_name ?? '',
+    Shahar: m.city ?? '',
+    'Xavf bali': m.risk_score ?? 0,
+    Skanlar: m.scan_count ?? 0,
+    Xavflilar: m.danger_count ?? 0,
+    "Oxirgi ko'rinish": m.last_seen ?? '',
+  }));
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, statsRows), 'Umumiy');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, deviceRows), 'Qurilmalar');
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, memberRows), 'Guruhlar');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, threatRows), 'Tahdidlar');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, feedRows), 'Oqim');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, geoRows), 'Xarita');

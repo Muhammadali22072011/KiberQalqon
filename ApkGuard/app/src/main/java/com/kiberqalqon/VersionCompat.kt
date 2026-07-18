@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -92,6 +92,32 @@ object VersionCompat {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             hasPerm(ctx, Manifest.permission.POST_NOTIFICATIONS)
         } else true
+    }
+
+    /**
+     * True если приложение может показывать full-screen-intent уведомления — те, что
+     * САМИ разворачивают Activity (AutoScanActivity) поверх блокировки экрана.
+     *
+     * Android 14 (API 34) забрал это право у обычных приложений: авто-грант остался
+     * только у звонилок/будильников. Свежая установка на устройстве, которое сразу
+     * вышло на 14/15 (например Samsung A56), его НЕ получает → setFullScreenIntent(…true)
+     * молча деградирует в обычный heads-up, окно само не открывается. Поэтому проверяем,
+     * и при false ведём юзера в ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT.
+     *
+     * До API 34 это право не гейтило FSI → возвращаем true (старые телефоны как раньше,
+     * именно поэтому окно работает на Samsung J4 / Android 8-9).
+     */
+    fun canUseFullScreenIntent(ctx: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true
+        return try {
+            // applicationContext: ruxsat tekshiruvi locale'dan mustaqil — LocaleHelper bilan
+            // o'ralgan ContextWrapper emas, asl app konteksti orqali tizim xizmatini olamiz.
+            val app = ctx.applicationContext ?: ctx
+            (app.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager)
+                .canUseFullScreenIntent()
+        } catch (_: Throwable) {
+            false
+        }
     }
 
     private fun hasManageStorage(): Boolean {

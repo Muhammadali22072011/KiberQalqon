@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Yangiliklar — bulut e'lonlarining to'liq ro'yxati (dashboard karuseli "Hammasi" → shu yer).
+  v4 sarlavha-naqshi: icon-btn back + eyebrow + h-title + sub, pastda RecyclerView.
+  Bo'sh holat (e'lon yo'q / hali yuklanmagan) — markazda qo'ng'iroqcha + matn.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="18dp"
+        android:paddingTop="14dp">
+
+        <FrameLayout
+            android:id="@+id/kq4NewsBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/kq4_icon_btn"
+            android:clickable="true"
+            android:contentDescription="@string/kq4_back"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_back"
+                app:tint="@color/kq_ink" />
+        </FrameLayout>
+
+        <TextView
+            style="@style/KQ4.Eyebrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/kq4_news_eyebrow" />
+
+        <TextView
+            style="@style/KQ4.HTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/kq4_news_title" />
+
+        <TextView
+            style="@style/KQ4.HSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/kq4_news_sub" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/kq4NewsList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingHorizontal="18dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="30dp"
+        android:scrollbars="none" />
+
+    <LinearLayout
+        android:id="@+id/kq4NewsEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="40dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/kq4_circle_primary_soft">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_bell"
+                app:tint="@color/kq_primary" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/onest_bold"
+            android:text="@string/kq4_news_empty_title"
+            android:textColor="@color/kq_ink"
+            android:textSize="17sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/onest_regular"
+            android:gravity="center"
+            android:text="@string/kq4_news_empty_sub"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="13.5sp" />
+    </LinearLayout>
+</LinearLayout>

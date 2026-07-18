@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Scan result banner — safe. 160° gradient turquoise. §3.6 -->
+<!-- Scan result banner — safe. 160° gradient GREEN (статус, не бренд):
+     anor-редизайн закрепил язык «красный = бренд/действие, зелёный = безопасно»,
+     поэтому SAFE-баннер больше не на kq_primary_light (это теперь anor-красный). -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
         android:angle="315"
-        android:startColor="@color/kq_primary_light"
-        android:endColor="@color/kq_primary_2_light"
+        android:startColor="#27AE60"
+        android:endColor="#1F7A47"
         android:type="linear" />
 </shape>

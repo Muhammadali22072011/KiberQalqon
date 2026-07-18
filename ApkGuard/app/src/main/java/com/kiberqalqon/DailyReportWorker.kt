@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -64,7 +64,7 @@ class DailyReportWorker(
 
     companion object {
         private const val TAG = "DailyReportWorker"
-        private const val WORK_NAME = "kiberqalqon_daily_report"
+        private const val WORK_NAME = "uzguard_daily_report"
 
         /**
          * Stavyem na ~21:00 lokalnogo vremeni. PeriodicWorkRequest ne podderzhivaet

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Base64
@@ -31,9 +31,12 @@ import javax.crypto.spec.SecretKeySpec
 object RemoteConfig {
 
     private const val TAG = "RemoteConfig"
-    private const val PREFS = "kiberqalqon_remote_config"
+    private const val PREFS = "uzguard_remote_config"
     private const val KEY_V = "rc_v"
     private const val KEY_FETCHED_AT = "rc_fetched_at"
+    // Davriy (GuardWorker) yangilash uchun oxirgi URINISH vaqti + eskirish oynasi.
+    private const val KEY_LAST_REFRESH_ATTEMPT = "rc_last_refresh_attempt"
+    private const val REFRESH_STALE_MS = 6L * 60 * 60 * 1000  // 6 soat
 
     // ====== BAKED (ichki) standartlar — ApkScanner'dagi joriy qiymatlar bilan AYNAN bir xil ======
     // O'zgartirsangiz, ApkScanner verdikt mantig'i bilan mos bo'lishini tekshiring.
@@ -46,6 +49,31 @@ object RemoteConfig {
     private const val BAKED_STRONG_COMBO_MIN = 90
     private const val BAKED_RANDOM_FILENAME_MIN = 40
     private const val BAKED_RANDOM_PERMS_MIN = 3
+
+    // ====== PASTKI POL (floor) — masofaviy config faqat KUCHAYTIRA oladi, lekin NOLGA
+    // tushira olmaydi. Aks holda imzolangan (server xatosi yoki kalit o'g'irlangan) config
+    // chegarani 0 qilib, HAR BIR skan APK'ni DANGER deb belgilashi mumkin edi (totalScore
+    // doim >= 0). Bu — ommaviy false-positive DoS. Shu sabab har bir maydonga kichik musbat
+    // pol qo'yamiz: chegara hech qachon 0 bo'lmaydi, minlar hech qachon 0 bo'lmaydi.
+    private const val FLOOR_THRESHOLD = 10   // danger/suspicious chegaralari uchun
+    private const val FLOOR_STRONG_COMBO = 10
+    private const val FLOOR_RANDOM_FILENAME = 5
+    private const val FLOOR_RANDOM_PERMS = 1
+
+    /** Pref kaliti bo'yicha pastki pol. Noma'lum kalit → 1 (hech qachon 0). */
+    private fun floorFor(key: String): Int = when (key) {
+        "rc_high_danger", "rc_high_susp",
+        "rc_med_danger", "rc_med_susp",
+        "rc_low_danger", "rc_low_susp" -> FLOOR_THRESHOLD
+        "rc_strong_combo_min" -> FLOOR_STRONG_COMBO
+        "rc_random_filename_min" -> FLOOR_RANDOM_FILENAME
+        "rc_random_perms_min" -> FLOOR_RANDOM_PERMS
+        else -> 1
+    }
+
+    /** Keshdan o'qishda ham polni qayta qo'llaymiz: minOf(baked, maxOf(kesh, pol)). */
+    private fun clampRead(sp: android.content.SharedPreferences, key: String, bakedVal: Int): Int =
+        minOf(bakedVal, maxOf(sp.getInt(key, bakedVal), floorFor(key)))
 
     /** Skan vaqtida o'qiladigan amaldagi (clamp qilingan) qiymatlar. */
     data class Effective(
@@ -90,16 +118,18 @@ object RemoteConfig {
         // O'QISHDA ham qayta clamp = min(kesh, BAKED): keshlangan qiymat keyingi build'da
         // pasaytirilgan baked'dan KATTA (zaif) bo'lib qolmasin. min faqat detekt tomon
         // siljitadi — golden qoidaga to'liq mos, downside YO'Q.
+        // O'QISHDA: minOf(baked, maxOf(kesh, pol)) — pol tufayli chegara/min hech qachon
+        // 0 (yoki juda past) bo'lib qolmaydi, hatto kesh buzilgan bo'lsa ham.
         Effective(
-            highDanger = minOf(sp.getInt("rc_high_danger", baked.highDanger), baked.highDanger),
-            highSusp = minOf(sp.getInt("rc_high_susp", baked.highSusp), baked.highSusp),
-            medDanger = minOf(sp.getInt("rc_med_danger", baked.medDanger), baked.medDanger),
-            medSusp = minOf(sp.getInt("rc_med_susp", baked.medSusp), baked.medSusp),
-            lowDanger = minOf(sp.getInt("rc_low_danger", baked.lowDanger), baked.lowDanger),
-            lowSusp = minOf(sp.getInt("rc_low_susp", baked.lowSusp), baked.lowSusp),
-            strongComboMin = minOf(sp.getInt("rc_strong_combo_min", baked.strongComboMin), baked.strongComboMin),
-            randomPkgFilenameMin = minOf(sp.getInt("rc_random_filename_min", baked.randomPkgFilenameMin), baked.randomPkgFilenameMin),
-            randomPkgDangerousPermsMin = minOf(sp.getInt("rc_random_perms_min", baked.randomPkgDangerousPermsMin), baked.randomPkgDangerousPermsMin),
+            highDanger = clampRead(sp, "rc_high_danger", baked.highDanger),
+            highSusp = clampRead(sp, "rc_high_susp", baked.highSusp),
+            medDanger = clampRead(sp, "rc_med_danger", baked.medDanger),
+            medSusp = clampRead(sp, "rc_med_susp", baked.medSusp),
+            lowDanger = clampRead(sp, "rc_low_danger", baked.lowDanger),
+            lowSusp = clampRead(sp, "rc_low_susp", baked.lowSusp),
+            strongComboMin = clampRead(sp, "rc_strong_combo_min", baked.strongComboMin),
+            randomPkgFilenameMin = clampRead(sp, "rc_random_filename_min", baked.randomPkgFilenameMin),
+            randomPkgDangerousPermsMin = clampRead(sp, "rc_random_perms_min", baked.randomPkgDangerousPermsMin),
         )
     } catch (_: Throwable) { baked }
 
@@ -108,6 +138,24 @@ object RemoteConfig {
      * IO thread'da chaqirilishi shart (chaqiruvchi coroutine/Worker ichida). Bloklaydi.
      * Hamma narsa fail-safe: muvaffaqiyatsizlikda kesh tegmaydi → baked yoki oldingi clamp.
      */
+    /**
+     * Davriy (GuardWorker) yo'li uchun: oxirgi urinishdan 6 soat o'tgan bo'lsagina tarmoqdan
+     * yangilaydi. Sabab: [refresh] faqat App.onCreate'da chaqirilardi — jarayon foreground
+     * service tufayli kunlab tirik qolsa sovuq start bo'lmaydi va yangi config (jumladan
+     * SelfUpdate "update" bloki) HECH QACHON yetib kelmasdi. Attempt-throttle: urinish vaqti
+     * xatoda ham yoziladi (oflaynda har 30 daqiqada tarmoqqa uravermaslik uchun).
+     */
+    fun refreshIfStale(ctx: Context) {
+        try {
+            val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val last = sp.getLong(KEY_LAST_REFRESH_ATTEMPT, 0L)
+            val now = System.currentTimeMillis()
+            if (last in 1..now && now - last < REFRESH_STALE_MS) return
+            sp.edit().putLong(KEY_LAST_REFRESH_ATTEMPT, now).apply()
+            refresh(ctx)
+        } catch (_: Throwable) { /* fail-safe: keyingi oynada qayta uriniladi */ }
+    }
+
     fun refresh(ctx: Context) {
         try {
             val base = BuildConfig.CLOUD_BASE_URL.trim().trimEnd('/')
@@ -189,16 +237,46 @@ object RemoteConfig {
         if (payload.has("randomPkgDangerousPermsMin"))
             putClampedMin(ed, "rc_random_perms_min", payload.optInt("randomPkgDangerousPermsMin", baked.randomPkgDangerousPermsMin), baked.randomPkgDangerousPermsMin)
 
+        // Ixtiyoriy o'z-o'zini yangilash bloki: {"update": {"versionCode": N, "apkUrl": "https://…",
+        // "apkSha256": "…"}}. Butun payload HMAC bilan imzolangan + rollback-guard — bu metadata
+        // ishonchli. Qo'shimcha himoya baribir [SelfUpdate]'da: yuklangan APK SHA-256 va IMZO
+        // SERTIFIKATI o'zimiznikiga mos kelmasa O'RNATILMAYDI. Maydonlar yo'q bo'lsa — hech narsa.
+        val up = payload.optJSONObject("update")
+        if (up != null) {
+            val upVc = up.optInt("versionCode", -1)
+            val upUrl = up.optString("apkUrl", "")
+            val upSha = up.optString("apkSha256", "")
+            if (upVc > 0 && upUrl.startsWith("https://") && upSha.length >= 32) {
+                ed.putInt("rc_up_vc", upVc)
+                ed.putString("rc_up_url", upUrl)
+                ed.putString("rc_up_sha", upSha.lowercase())
+            }
+        }
+
         ed.putInt(KEY_V, remoteV)
         ed.putLong(KEY_FETCHED_AT, System.currentTimeMillis())
         ed.apply()
         Log.i(TAG, "remote config qo'llandi (v=$remoteV, clamp=min)")
     }
 
+    /** O'z-o'zini yangilash ma'lumoti (imzolangan config'dan keshlangan). Yo'q bo'lsa null. */
+    fun updateInfo(ctx: Context): SelfUpdate.Info? = try {
+        val sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val vc = sp.getInt("rc_up_vc", -1)
+        val url = sp.getString("rc_up_url", null)
+        val sha = sp.getString("rc_up_sha", null)
+        if (vc > 0 && !url.isNullOrBlank() && !sha.isNullOrBlank()) {
+            SelfUpdate.Info(vc, url, sha)
+        } else null
+    } catch (_: Throwable) { null }
+
     // clamp: faqat baked'dan KICHIK (yoki teng) qiymatlar saqlanadi — ko'proq aniqlash tomon.
     // Manfiy/aqlsiz qiymatlardan ham himoya: 0 dan kichik bo'lsa baked.
+    // PASTKI POL: masofaviy config chegarani nolga (yoki polдан pastga) tushira olmaydi —
+    // aks holda dangerThreshold=0 barcha APK'ni DANGER qilib, ommaviy false-positive DoS
+    // yasardi. safe = minOf(baked, maxOf(remote, pol)).
     private fun putClampedMin(ed: android.content.SharedPreferences.Editor, key: String, remote: Int, baked: Int) {
-        val safe = if (remote < 0) baked else minOf(remote, baked)
+        val safe = if (remote < 0) baked else minOf(baked, maxOf(remote, floorFor(key)))
         ed.putInt(key, safe)
     }
 

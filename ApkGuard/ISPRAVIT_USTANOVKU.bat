@@ -26,7 +26,7 @@ echo.
 echo Новый APK: app\build\outputs\apk\debug\app-debug.apk
 echo.
 echo ВАЖНО:
-echo 1. Удали старую версию KiberQalqon с телефона
+echo 1. Удали старую версию UzGuard с телефона
 echo 2. Скопируй новый APK на телефон
 echo 3. Установи
 echo.

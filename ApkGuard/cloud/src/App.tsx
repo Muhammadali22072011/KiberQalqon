@@ -8,8 +8,10 @@ import MapPage from './pages/MapPage';
 import Feed from './pages/Feed';
 import Threats from './pages/Threats';
 import Devices from './pages/Devices';
+import Groups from './pages/Groups';
 import News from './pages/News';
 import Profile from './pages/Profile';
+import Audit from './pages/Audit';
 
 function RequireAuth() {
   const { authed, ready } = useAuth();
@@ -36,7 +38,9 @@ export default function App() {
           <Route path="feed" element={<Feed />} />
           <Route path="threats" element={<Threats />} />
           <Route path="devices" element={<Devices />} />
+          <Route path="groups" element={<Groups />} />
           <Route path="news" element={<News />} />
+          <Route path="audit" element={<Audit />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Route>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KIBER QALQON</string>
-    <string name="widget_description">KiberQalqon himoya holatini va oxirgi tekshiruvni ko\'rsatadi. Bir bosish bilan tezkor skan.</string>
+    <string name="app_name">UZGUARD</string>
+    <string name="widget_description">UzGuard himoya holatini va oxirgi tekshiruvni ko\'rsatadi. Bir bosish bilan tezkor skan.</string>
 
     <!-- Permissions dialogs (SplashActivity) -->
     <string name="perm_storage_title">Fayllarga ruxsat</string>
-    <string name="perm_storage_msg">KiberQalqon barcha fayllaringizni tekshirishi uchun ruxsat kerak.\n\nOK bosib ruxsat bering.</string>
+    <string name="perm_storage_msg">UzGuard barcha fayllaringizni tekshirishi uchun ruxsat kerak.\n\nOK bosib ruxsat bering.</string>
     <string name="perm_overlay_title">Boshqa oynalar ustida ruxsat</string>
     <string name="perm_overlay_msg">Virus topilganda darhol ogohlantirish chiqarish uchun ruxsat kerak.\n\nOK bosing.</string>
     <string name="perm_required_title">Ruxsat kerak</string>
-    <string name="perm_required_msg">Fayllarga kirmay turib KiberQalqon qurilmangizni himoya qila olmaydi.</string>
+    <string name="perm_required_msg">Fayllarga kirmay turib UzGuard qurilmangizni himoya qila olmaydi.</string>
     <string name="btn_retry">Qayta urinish</string>
     <string name="btn_exit">Chiqish</string>
 
@@ -35,8 +35,8 @@
     <!-- Share scan result -->
     <string name="share_result">DO\'STLARGA OGOHLANTIRISH</string>
     <string name="share_subject">⚠️ Diqqat: zararli APK aniqlandi</string>
-    <string name="share_text_danger">⚠️ DIQQAT! KiberQalqon zararli faylni aniqladi:\n\n📦 %1$s\n\n❌ Bu fayl viruslar tarkibida — uni telefoningizga O\'RNATMANG!\n\n🛡️ KiberQalqon orqali tekshiring: t.me/kiberqalqon_alerts_bot</string>
-    <string name="share_text_suspicious">⚠️ KiberQalqon shubhali fayl aniqladi:\n\n📦 %1$s\n\nO\'rnatishdan oldin yaxshilab tekshiring.\n\nt.me/kiberqalqon_alerts_bot</string>
+    <string name="share_text_danger">⚠️ DIQQAT! UzGuard zararli faylni aniqladi:\n\n📦 %1$s\n\n❌ Bu fayl viruslar tarkibida — uni telefoningizga O\'RNATMANG!\n\n🛡️ UzGuard orqali tekshiring: t.me/uzguard_alerts_bot</string>
+    <string name="share_text_suspicious">⚠️ UzGuard shubhali fayl aniqladi:\n\n📦 %1$s\n\nO\'rnatishdan oldin yaxshilab tekshiring.\n\nt.me/uzguard_alerts_bot</string>
     <string name="share_via">Yuborish</string>
 
     <!-- AutoScanActivity install/back -->
@@ -49,7 +49,7 @@
     <string name="autoscan_scanning">Tekshirilmoqda…</string>
     <string name="autoscan_delete_cancelled">O\'chirish bekor qilindi. Fayl hali ham qurilmada.</string>
     <string name="autoscan_no_path">Fayl yo\'li ko\'rsatilmagan.</string>
-    <string name="autoscan_self_refused">Bu KiberQalqonning o\'zi — himoyachini o\'chirish taqiqlangan.</string>
+    <string name="autoscan_self_refused">Bu UzGuardning o\'zi — himoyachini o\'chirish taqiqlangan.</string>
 
     <!-- FileDeleter results -->
     <string name="filedel_no_permission">Faylni o\'chirib bo\'lmadi — ruxsat yo\'q. Qo\'lda o\'chiring.</string>
@@ -88,6 +88,9 @@
 
     <!-- Dashboard - redesign §3.3 -->
     <string name="status_protected">Himoyalangan</string>
+    <string name="status_partial">Qisman himoyalangan</string>
+    <string name="status_at_risk">Himoya yetarli emas</string>
+    <string name="kq_hero_sub">Jami %1$d ta tekshirildi · %2$d ta bloklandi</string>
     <string name="last_scan_subtitle">So\'nggi tekshiruv 12 daqiqa oldin</string>
     <string name="kq_scan_now">Hozir tekshirish</string>
     <string name="kq_threats_today">Bugungi topilmalar</string>
@@ -127,14 +130,14 @@
     <string name="ctx_from_telegram">Bu APK Telegram orqali keldi. Videolar hech qachon APK shaklida yuborilmaydi — ehtiyot bo\'ling.</string>
     <string name="ctx_from_whatsapp">Bu APK WhatsApp orqali keldi. Haqiqiy ilovalar faqat Play Store dan o\'rnatiladi.</string>
     <string name="ctx_from_download">Bu APK yuklab olingan. O\'rnatishdan oldin manbaiga ishonch hosil qiling.</string>
-    <string name="ctx_from_share">Siz bu APKni KiberQalqonga tekshirish uchun yubordingiz.</string>
+    <string name="ctx_from_share">Siz bu APKni UzGuardga tekshirish uchun yubordingiz.</string>
 
     <!-- Onboarding (design copy from screens-onboarding.jsx) -->
     <string name="onb_eyebrow_1">01 · BOSHLASH</string>
     <string name="onb_eyebrow_2">02 · ANIQLASH</string>
     <string name="onb_eyebrow_3">03 · NAZORAT</string>
     <string name="onboarding_title_1">Avtomatik himoya — 24/7</string>
-    <string name="onboarding_desc_1">KiberQalqon Telegram, Yuklab olishlar va boshqa papkalarni har 15 daqiqada tekshirib turadi. Zararli APK fayl topilsa — darhol bloklanadi.</string>
+    <string name="onboarding_desc_1">UzGuard Telegram, Yuklab olishlar va boshqa papkalarni har 15 daqiqada tekshirib turadi. Zararli APK fayl topilsa — darhol bloklanadi.</string>
     <string name="onboarding_title_2">5 ta zararli oilani aniqlaymiz</string>
     <string name="onboarding_desc_2">Ajina.Banker, RoundRift va boshqa Markaziy Osiyo bank troyanlarining yangi avlodlari sizning telefoningizgacha yetib bormaydi.</string>
     <string name="onboarding_title_3">Sodda til, kuchli himoya</string>
@@ -356,7 +359,7 @@
     <string name="scanning_text">Scanning...</string>
 
     <!-- Dashboard new redesign extras (2026-05-27 localization pass) -->
-    <string name="dash_brand">KiberQalqon</string>
+    <string name="dash_brand">UzGuard</string>
     <string name="dash_protection_on">HIMOYA · FAOL</string>
     <string name="dash_your_phone">SIZNING TELEFONINGIZ</string>
     <string name="dash_recent_threats">SO\'NGGI XAVFLAR</string>
@@ -372,45 +375,45 @@
     <string name="settings_eyebrow">SOZLAMALAR</string>
     <string name="settings_header_title">Boshqaruv</string>
     <string name="settings_header_subtitle">Himoya darajasini moslashtiring</string>
-    <string name="settings_pro_title">KiberQalqon Pro</string>
+    <string name="settings_pro_title">UzGuard Pro</string>
     <string name="settings_pro_version">VERSIYA 7.8 · NAVOIY</string>
     <string name="settings_pro_active">✓ FAOL</string>
     <string name="settings_section_protection">HIMOYA</string>
     <string name="settings_section_server">SERVER</string>
     <string name="settings_server_url_label">Server manzili</string>
-    <string name="settings_server_url_example">https://api.kiberqalqon.uz</string>
+    <string name="settings_server_url_example">https://api.uzguard.uz</string>
     <string name="settings_theme_label">Mavzu</string>
     <string name="settings_theme_desc">Yorug\' yoki tungi rejim</string>
     <string name="settings_accent_label">Brendning asosiy rangi</string>
     <string name="settings_section_language">TIL</string>
     <string name="settings_section_about">HAQIDA</string>
-    <string name="settings_footer">KIBERQALQON v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
+    <string name="settings_footer">UZGUARD v7.8 · BUILD 78  /  © 2026 · Muhammadali Izzatullaev · Navoiy</string>
 
     <!-- About / Terms / Privacy / Consent / Welcome / Settings hardcoded -->
-    <string name="about_intro">KIBER QALQON — bu O\'zbekiston uchun ishlab chiqilgan zamonaviy kiber-himoya ilovasi. Telefoningizni zararli APK fayllar, viruslar va aldamchi (fishing) hujumlardan asraydi.</string>
+    <string name="about_intro">UZGUARD — bu O\'zbekiston uchun ishlab chiqilgan zamonaviy kiber-himoya ilovasi. Telefoningizni zararli APK fayllar, viruslar va aldamchi (fishing) hujumlardan asraydi.</string>
     <string name="about_section_features">IMKONIYATLAR</string>
     <string name="about_features_body">🛡 Fonda avtomatik himoya\n  • Har 15 daqiqada tekshirish\n  • Xavfli fayllarni o\'chirish\n\n🔍 Qo\'lda tekshirish\n  • Barcha APK fayllar ro\'yxati\n  • Batafsil tahlil natijalari\n\n📡 Serverga yuklash\n  • Xavflilarni tahlil uchun yuborish\n\n🚫 Aldamchi bildirishnomalar himoyasi\n  • Shubhalilarni bloklash\n  • Bank va to\'lov xavfsizligi\n\n🌐 Ikki til\n  • O\'zbekcha (asosiy)\n  • Русский</string>
     <string name="about_tech_body">• Kotlin — zamonaviy dasturlash tili\n• Material Design 3 — chiroyli dizayn\n• Android Jetpack — ishonchli komponentlar\n• WorkManager — fonda ishlash\n• ProGuard — kod himoyasi\n• OkHttp — xavfsiz tarmoq</string>
     <string name="about_section_tech">TEXNOLOGIYALAR</string>
     <string name="about_section_author">MUALLIF</string>
-    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/KiberQalqon\nEmail: support@KiberQalqon.uz</string>
+    <string name="about_author_body">Muhammadali\n\nGitHub: github.com/UzGuard\nEmail: support@UzGuard.uz</string>
     <string name="about_section_license">LITSENZIYA</string>
-    <string name="about_license_body">Bu loyiha ochiq kodli va o\'quv maqsadlarida ishlatilishi mumkin.\n\n© 2026 KIBER QALQON. Barcha huquqlar himoyalangan.</string>
+    <string name="about_license_body">Bu loyiha ochiq kodli va o\'quv maqsadlarida ishlatilishi mumkin.\n\n© 2026 UZGUARD. Barcha huquqlar himoyalangan.</string>
     <string name="about_section_project">LOYIHA HAQIDA</string>
     <string name="about_version">VERSION 7.6</string>
 
     <string name="terms_breadcrumb">Foydalanish shartlari</string>
     <string name="terms_intro_title">Foydalanishni boshlashdan oldin</string>
-    <string name="terms_last_update">OXIRGI YANGILANISH · 2026 · 05 · 29</string>
+    <string name="terms_last_update">OXIRGI YANGILANISH · 2026 · 06 · 10</string>
     <string name="terms_section_terms">FOYDALANISH SHARTLARI</string>
     <string name="terms_section_privacy">MAXFIYLIK SIYOSATI</string>
-    <string name="terms_terms_body">KIBER QALQON ilovasidan foydalanish orqali siz ushbu shartlarga rozilik bildirasiz. Agar shartlar bilan rozi bo\'lmasangiz, ilovadan foydalanmang.</string>
-    <string name="terms_privacy_body">KIBER QALQON sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
+    <string name="terms_terms_body">UZGUARD ilovasidan foydalanish orqali siz ushbu shartlarga rozilik bildirasiz. Agar shartlar bilan rozi bo\'lmasangiz, ilovadan foydalanmang.</string>
+    <string name="terms_privacy_body">UZGUARD sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
     <string name="terms_changes_body">Biz ushbu shartlarni istalgan vaqtda o\'zgartirish huquqini saqlab qolamiz. O\'zgarishlar ilovada e\'lon qilinadi.</string>
 
     <string name="consent_terms_chk">Foydalanish shartlarini o\'qib chiqdim *</string>
     <string name="consent_privacy_chk">Maxfiylik siyosatiga roziman *</string>
-    <string name="consent_community_chk">Jamoatchilik xavfsizligi uchun ma\'lumot ulashish *</string>
+    <string name="consent_community_chk">Jamoatchilik xavfsizligi uchun ma\'lumot ulashish (ixtiyoriy)</string>
     <string name="consent_reject">Rad etish</string>
     <string name="consent_accept">Qabul qilaman</string>
 
@@ -438,7 +441,7 @@
     <string name="auto_scan_label_detected">ANIQLANGAN</string>
     <string name="auto_scan_dangerous_perms">XAVFLI RUXSATLAR</string>
 
-    <string name="splash_logo_title">KIBER QALQON</string>
+    <string name="splash_logo_title">UZGUARD</string>
 
     <string name="apk_list_eyebrow">APK fayllar</string>
 
@@ -493,7 +496,7 @@
     <string name="scan_hero_eyebrow">TIZIM HOLATI</string>
     <string name="scan_hero_status_clean">Tizim toza</string>
     <string name="scan_hero_status_idle">Tekshirishga tayyor</string>
-    <string name="scan_hero_subtitle">Anor qalqon kuzatib turibdi</string>
+    <string name="scan_hero_subtitle">UzGuard kuzatib turibdi</string>
     <string name="scan_live_chip">JONLI</string>
     <string name="scan_stat_all">Hammasi</string>
     <string name="scan_stat_danger">Xavfli</string>
@@ -555,7 +558,7 @@
 
     <!-- ═══ Localization pass 2026-05-28: AutoScanActivity hardcoded UI ═══ -->
     <string name="autoscan_unknown_file">Noma\'lum fayl</string>
-    <string name="autoscan_need_write_perm">Faylni o\'chirish uchun \"Saqlash\" ruxsati kerak.\n\nSozlamalar → Ilovalar → KiberQalqon → Ruxsatlar → Saqlash</string>
+    <string name="autoscan_need_write_perm">Faylni o\'chirish uchun \"Saqlash\" ruxsati kerak.\n\nSozlamalar → Ilovalar → UzGuard → Ruxsatlar → Saqlash</string>
     <string name="autoscan_open_settings_btn">SOZLAMALARNI OCHISH</string>
     <string name="autoscan_permission_granted_deleting">Ruxsat berildi — o\'chirilmoqda…</string>
     <string name="autoscan_cannot_show_result">Natijani ko\'rsatib bo\'lmadi: %1$s</string>
@@ -573,8 +576,51 @@
     <string name="autoscan_need_all_files">Faylni o\'chirish uchun \"Barcha fayllarga kirish\" ruxsati kerak.\n\nPastdagi tugmani bosing va tugmachani yoqing.</string>
     <string name="autoscan_grant_btn">RUXSAT BERISH</string>
     <string name="autoscan_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida.\n\nFaylni faqat \"%1$s\" ilovasi orqali o\'chirish mumkin (masalan: Telegram → Sozlamalar → Ma\'lumotlarni tozalash).</string>
+    <!-- Sandbox (/Android/data/<owner>/) faylini hech kim o'chira olmaydi — lekin u xavfsiz: o'rnatilmaguncha zarar yetkazmaydi, UzGuard o'rnatishni bloklaydi. Bir tugma bilan egasi ilovani ochamiz. -->
+    <string name="sandboxed_inert_msg">✅ Siz xavfsizsiz — bu virus telefoningizga ZARAR BERA OLMAYDI.\n\nBu fayl «%1$s» ilovasining himoyalangan ichki papkasida (Android /Android/data). Android bu papkani boshqa ilovaga — UzGuardga ham — ochmaydi, shuning uchun uni to\'g\'ridan-to\'g\'ri o\'chirib bo\'lmaydi. Bu Android tizimining cheklovi, xato emas.\n\nLEKIN xavf yo\'q: virus faqat O\'RNATILGANDA ishga tushadi, UzGuard esa uni o\'rnatishga YO\'L QO\'YMAYDI — o\'rnatishni avtomatik bloklaydi.\n\nFaylni butunlay yo\'q qilmoqchimisiz? Eng oson yo\'l: «%1$s»ni oching va virus yuborilgan XABARNI o\'chiring — shunda fayl ham o\'chadi. Hech narsa yuklab olish shart emas. (Ilg\'or foydalanuvchilar uchun: «Haqiqatan o\'chirish (Shizuku)».)</string>
+    <string name="sandboxed_open_owner">«%1$s»da o\'chirish</string>
+    <string name="sandboxed_open_owner_hint">«%1$s» ochildi. Virus yuborilgan xabarni bosib turing → «O\'chirish»ni tanlang. Shunda fayl butunlay o\'chadi. (Yoki Sozlamalar → Ma\'lumotlar va xotira → keshni tozalang.)</string>
+    <string name="sandboxed_dialog_title">🛡 Bloklandi: bu virusni o\'rnatib bo\'lmaydi</string>
+
+    <!-- Shizuku — /Android/data ichidagi virusni HAQIQATAN o'chirish (root'siz) -->
+    <string name="shizuku_real_delete">Haqiqatan o\'chirish (Shizuku)</string>
+    <string name="shizuku_title">Shizuku orqali haqiqiy o\'chirish</string>
+    <string name="shizuku_msg_install">Bu fayl boshqa ilovaning himoyalangan papkasida — Android uni oddiy yo\'l bilan o\'chirtirmaydi. «Shizuku» yordamchisi orqali uni ROOT\'siz haqiqatan o\'chirish mumkin.\n\nAvval Shizuku ilovasini o\'rnating (bir marta).</string>
+    <string name="shizuku_msg_start">Shizuku o\'rnatilgan, lekin ishga tushmagan. Uni oching va «Boshlash» (simsiz nosozliklarni tuzatish / Wireless debugging orqali, kompyutersiz) tugmasini bosing, so\'ng qaytib keling.</string>
+    <string name="shizuku_msg_permission">Shizuku tayyor. UzGuard\'ga faylni o\'chirishga ruxsat bering.</string>
+    <string name="shizuku_btn_install">Shizuku\'ni o\'rnatish</string>
+    <string name="shizuku_btn_open">Shizuku\'ni ochish</string>
+    <string name="shizuku_btn_grant">Ruxsat berish</string>
+    <string name="shizuku_not_deleted">O\'chirilmadi. Shizuku ishga tushganini va ruxsat berilganini tekshiring.</string>
+    <string name="shizuku_deleted">Virus haqiqatan o\'chirildi (Shizuku).</string>
     <string name="autoscan_delete_btn">O\'CHIRISH</string>
     <string name="autoscan_delete_hint_done">O\'chirish bu APK ni telefoningizga o\'rnatishga imkon bermaydi</string>
+    <string name="autoscan_copy_deleted_original_remains">⚠️ Faqat tekshirilgan NUSXA o\'chirildi. Asl fayl uni yuborgan ilovada (masalan, Telegram) qoldi — Android boshqa ilovaga uni o\'chirishga ruxsat bermaydi. Iltimos, uni o\'sha ilovada qo\'lda o\'chiring.\n\nFayl O\'RNATILMAGUNCHA zarar yetkazmaydi, UzGuard esa uni o\'rnatishga yo\'l qo\'ymaydi.</string>
+
+    <!-- Jonli o'rnatish qalqoni (Accessibility) -->
+    <string name="install_shield_label">UzGuard</string>
+    <string name="install_shield_a11y_desc">Zararli ilova o\'rnatilishini avtomatik to\'xtatadi. UzGuard tizimning «O\'rnatasizmi?» oynasini kuzatadi va tasdiqlanmagan xavfli APK o\'rnatilishini bekor qiladi.</string>
+    <string name="install_blocked_notif_title">O\'rnatish bloklandi</string>
+    <string name="install_blocked_notif_body">«%1$s» xavfli deb topildi — UzGuard uning o\'rnatilishini to\'xtatdi.</string>
+    <string name="install_blocked_notif_body_generic">Xavfli ilova o\'rnatilishi UzGuard tomonidan to\'xtatildi.</string>
+    <string name="install_default_t">APK fayllar uchun standart ilova</string>
+    <string name="install_default_s">Har bir APK avval UzGuard\'da tekshiriladi</string>
+    <string name="install_shield_t">Jonli o\'rnatish qalqoni</string>
+    <string name="install_shield_s">Zararli APK o\'rnatilishini avtomatik bekor qiladi</string>
+    <string name="unknown_sources_t">Noma\'lum manbalarni o\'chirish</string>
+    <string name="unknown_sources_s">Telegram/brauzer\'ga APK o\'rnatishni taqiqlang</string>
+    <string name="unknown_sources_none">Xavfli manba ilovasi topilmadi</string>
+    <string name="unknown_sources_dialog_title">Qaysi ilovaga taqiqlaymiz?</string>
+    <string name="open_source_app_t">Manba ilovasini ochish</string>
+    <string name="set_default_apk_prompt_title">UzGuard\'ni APK uchun standart qilish</string>
+    <string name="set_default_apk_prompt_msg">Hozir «Qaysi ilova bilan ochish?» oynasi chiqadi.\n\n«UzGuard»ni tanlang va «Doimo» (Always) bosing — shunda har bir APK avval UzGuard\'da tekshiriladi. APK qidirish shart emas.</string>
+    <string name="set_default_apk_btn">Tanlash oynasini ochish</string>
+    <string name="set_default_apk_done">✓ Tayyor! Endi har bir APK avval UzGuard\'da tekshiriladi.</string>
+    <string name="set_default_apk_tip">Keyingi safar «Doimo»ni tanlang — shunda har APK avtomatik UzGuard\'da ochiladi.</string>
+    <string name="devadmin_block_title">Virus «administrator» huquqini olgan</string>
+    <string name="devadmin_block_msg">Bu zararli ilova «Qurilma administratori» huquqini olgan — shuning uchun Android uni darhol o\'chirishga ruxsat bermaydi.\n\nOchilgan ro\'yxatda shu ilovani toping va «O\'chirish» / «Faolsizlantirish»ni bosing, so\'ng qaytib uni telefondan o\'chiring.</string>
+    <string name="install_shield_guide_title">Jonli o\'rnatish qalqonini yoqish</string>
+    <string name="install_shield_guide_msg">Bu qalqon zararli ilova o\'rnatilishini avtomatik to\'xtatadi.\n\nYoqish:\n1. Ochilgan «Maxsus imkoniyatlar» ekranida pastga tushing → «O\'rnatilgan ilovalar» (Samsung: «Установленные приложения») ni bosing.\n2. Ro\'yxatdan «UzGuard»ni tanlang → tugmani yoqing.\n\nAgar «Cheklangan sozlama» yozuvi chiqsa (ilova Play\'dan emas, APK orqali o\'rnatilgani uchun):\nSozlamalar → Ilovalar → «UzGuard» → o\'ng-tepada ⋮ → «Cheklangan sozlamalarga ruxsat» → PIN. So\'ng yuqoridagi 1–2 ni qayta bajaring.\n\nGalaxy A56/yangi telefonlarda: Xavfsizlik va maxfiylik → «Auto Blocker» yoqiq bo\'lsa, uni o\'chiring (u sideload ilovalarni butunlay bloklaydi).</string>
 
     <!-- Localization pass: InitialScanActivity hardcoded UI -->
     <string name="is_header_safe">Telefoningiz xavfsiz</string>
@@ -582,12 +628,12 @@
     <string name="is_sub_no_threats">Hech qanday xavfli APK fayl topilmadi.</string>
     <string name="is_sub_threats_found">%1$d ta zararli yoki shubhali APK topildi.</string>
     <string name="is_summary_no_threat">Xavf aniqlanmadi</string>
-    <string name="is_summary_no_threat_sub">KiberQalqon endi fonda yangi APK fayllarni avtomatik tekshirib turadi.</string>
+    <string name="is_summary_no_threat_sub">UzGuard endi fonda yangi APK fayllarni avtomatik tekshirib turadi.</string>
     <string name="is_go_main">Asosiy ekranga o\'tish</string>
     <string name="is_dangerous_found_count">%1$d ta xavfli APK topildi</string>
     <string name="is_recommend_delete">Quyidagi fayllarni o\'chirish tavsiya etiladi.</string>
     <string name="is_need_all_files">Faylni o\'chirish uchun \"Barcha fayllarga kirish\" ruxsati kerak.</string>
-    <string name="is_sandboxed_owner">Bu fayl %1$s ilovasining shaxsiy papkasida. Faqat o\'sha ilova orqali o\'chirish mumkin.</string>
+    <string name="is_sandboxed_owner">✅ Xavfsizsiz. Bu fayl %1$s ilovasining himoyalangan papkasida — Android uni o\'chirtirmaydi (tizim cheklovi). LEKIN virus faqat O\'RNATILGANDA zarar beradi, UzGuard esa o\'rnatishni bloklaydi. Haqiqatan o\'chirish uchun — Shizuku.</string>
     <string name="is_dangerous_remaining_count">%1$d ta xavfli APK qoldi</string>
     <string name="is_all_deleted">Barcha xavfli fayllar o\'chirildi.</string>
     <string name="is_delete_n_files_title">%1$d ta faylni o\'chirish?</string>
@@ -613,10 +659,12 @@
     <string name="set_row_background_sub">WorkManager · har 15 daqiqada</string>
     <string name="set_row_upload_title">Bulutga yuklash</string>
     <string name="set_row_upload_sub">Tahlil uchun xavfli APK\'ni serverga yuborish</string>
+    <string name="set_owner_mode_on">Egasi rejimi yoqildi — ichki boʻlimlar ochildi</string>
+    <string name="set_owner_mode_off">Egasi rejimi oʻchirildi — ichki boʻlimlar yashirildi</string>
     <string name="set_help_center">Yordam markazi</string>
-    <string name="set_about_dialog_title">KiberQalqon</string>
-    <string name="set_about_dialog_message">KiberQalqon v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nMarkaziy Osiyo bank troyanlariga qarshi milliy himoya. Ajina.Banker, RoundRift va boshqa zararli oilalarni aniqlaydi.</string>
-    <string name="set_help_dialog_message">Savol yoki muammomi? Bizga aloqada bo\'ling:\n\n• Telegram: @kiberqalqon_uz\n• Email: support@kiberqalqon.uz\n• Web: https://kiberqalqon.uz</string>
+    <string name="set_about_dialog_title">UzGuard</string>
+    <string name="set_about_dialog_message">UzGuard v7.5 · Build 9995\n© 2026 · Made in Tashkent\n\nMarkaziy Osiyo bank troyanlariga qarshi milliy himoya. Ajina.Banker, RoundRift va boshqa zararli oilalarni aniqlaydi.</string>
+    <string name="set_help_dialog_message">Savol yoki muammomi? Bizga aloqada bo\'ling:\n\n• Telegram: @uzguard_uz\n• Email: support@uzguard.uz\n• Web: https://uzguard.uz</string>
     <string name="set_help_send_problem">Muammoni yuborish</string>
     <!-- Muammoni yuborish ekrani -->
     <string name="rp_eyebrow">YORDAM</string>
@@ -640,7 +688,7 @@
     <string name="set_community_label">Jamoatchilik xavfsizligi (faqat hash + paket)</string>
     <string name="set_revoke_consent">Rozilikni qaytarib olish</string>
     <string name="set_revoke_confirm_title">Rozilikni bekor qilish?</string>
-    <string name="set_revoke_confirm_message">Bu Telegram telemetriyani o\'chiradi va keyingi ishga tushirishda KiberQalqon sizdan qayta rozilik so\'raydi.\n\nDavom etamizmi?</string>
+    <string name="set_revoke_confirm_message">Bu Telegram telemetriyani o\'chiradi va keyingi ishga tushirishda UzGuard sizdan qayta rozilik so\'raydi.\n\nDavom etamizmi?</string>
     <string name="set_yes_revoke">Ha, bekor qilish</string>
     <string name="set_consent_revoked">Rozilik bekor qilindi.</string>
     <string name="set_no">Yo\'q</string>
@@ -649,21 +697,21 @@
     <string name="splash_subtitle">TELEFON HIMOYASI · V %1$s</string>
     <string name="splash_version">VERSION %1$s</string>
     <string name="splash_oem_extra_setting_title">%1$s qo\'shimcha sozlamasi</string>
-    <string name="splash_oem_guide_message">Sizning telefoningiz fon ilovalarini avtomatik o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun bir martagina qo\'shimcha sozlash kerak.</string>
+    <string name="splash_oem_guide_message">Sizning telefoningiz fon ilovalarini avtomatik o\'ldiradi. UZGUARD 24/7 ishlashi uchun bir martagina qo\'shimcha sozlash kerak.</string>
     <string name="splash_open_setting">Sozlamani ochish</string>
     <string name="splash_later">Keyinroq</string>
     <string name="splash_dont_show">Ko\'rsatma</string>
     <string name="splash_battery_title">Doimiy himoya uchun ruxsat</string>
-    <string name="splash_battery_message">Xiaomi, Huawei, Samsung va boshqalar \'batareya tejash\' uchun fon ilovalarini o\'ldiradi. KIBER QALQON 24/7 ishlashi uchun ruxsat bering.\n\nRuxsat bermasangiz: skan har 2-3 soatda emas, balki kuniga 1 marta ishlaydi.</string>
+    <string name="splash_battery_message">Xiaomi, Huawei, Samsung va boshqalar \'batareya tejash\' uchun fon ilovalarini o\'ldiradi. UZGUARD 24/7 ishlashi uchun ruxsat bering.\n\nRuxsat bermasangiz: skan har 2-3 soatda emas, balki kuniga 1 marta ishlaydi.</string>
     <string name="splash_location_title">Joylashuv uchun ruxsat</string>
     <string name="splash_location_message">Markaziy himoya xaritasida qurilmangiz aniq joyda ko\'rinishi uchun joylashuvga ruxsat bering.\n\nRuxsat bermasangiz: qurilma xaritada faqat taxminiy shahar darajasida ko\'rinadi.</string>
     <string name="splash_storage_title">Fayllarga kirish uchun ruxsat</string>
-    <string name="splash_storage_message">KIBER QALQON ga APK fayllarni topish va tekshirish uchun barcha fayllarga kirish kerak.\n\nOK ni bosing va ruxsat bering.</string>
+    <string name="splash_storage_message">UZGUARD ga APK fayllarni topish va tekshirish uchun barcha fayllarga kirish kerak.\n\nOK ni bosing va ruxsat bering.</string>
     <string name="splash_overlay_title">Boshqa oynalar ustida ko\'rsatish uchun ruxsat</string>
-    <string name="splash_overlay_message">KIBER QALQON viruslarni aniqlaganda boshqa ilovalar ustida ogohlantirish ko\'rsatishi kerak.\n\nOK ni bosing va ruxsat bering.</string>
+    <string name="splash_overlay_message">UZGUARD viruslarni aniqlaganda boshqa ilovalar ustida ogohlantirish ko\'rsatishi kerak.\n\nOK ni bosing va ruxsat bering.</string>
     <string name="splash_oem_overlay_title">%1$s: qo\'shimcha sozlama</string>
     <string name="splash_oem_overlay_message">Standart \'Display over other apps\' yetarli emas. Sizning telefoningizda alohida sozlamalar bor.</string>
-    <string name="splash_storage_denied_message">Fayllarga kirish bo\'lmasa, KIBER QALQON qurilmangizni himoya qila olmaydi.</string>
+    <string name="splash_storage_denied_message">Fayllarga kirish bo\'lmasa, UZGUARD qurilmangizni himoya qila olmaydi.</string>
     <string name="splash_retry">Qaytarish</string>
     <string name="splash_subtitle2">Zararli APK fayllardan himoyalanish</string>
     <string name="hist_found_threats">Topilgan tahdidlar</string>
@@ -679,18 +727,34 @@
     <string name="widget_scan_btn">Skan</string>
     <string name="notif_dangerous_apk_title">🛡️ Xavfli APK topildi</string>
     <string name="notif_tap_to_check">%1$s — bosing va tekshiring</string>
-    <string name="notif_new_apk_big">Yangi APK fayli aniqlandi:\n%1$s\n\nBildirishnoma ustiga bosing — KiberQalqon to\'liq tekshiruv natijasini ko\'rsatadi va xavfli bo\'lsa o\'chirish tugmasini chiqaradi.</string>
+    <string name="notif_new_apk_big">Yangi APK fayli aniqlandi:\n%1$s\n\nBildirishnoma ustiga bosing — UzGuard to\'liq tekshiruv natijasini ko\'rsatadi va xavfli bo\'lsa o\'chirish tugmasini chiqaradi.</string>
     <string name="notif_installed_danger_title">🔴 Xavfli ilova o\'rnatildi: %1$s</string>
     <string name="notif_verdict_danger">Xavfli APK topildi</string>
     <string name="notif_verdict_suspicious">Shubhali APK topildi</string>
     <string name="notif_verdict_found">APK topildi</string>
     <string name="notif_kill_title">⚠️ Himoya o\'chirilgan edi</string>
-    <string name="notif_kill_text">%1$d soat davomida KIBER QALQON ishlamadi</string>
-    <string name="notif_kill_big">Sizning %1$s qurilmangiz KIBER QALQON jarayonini %2$d soat oldin o\'ldirib qo\'ygan edi. Doimiy himoya uchun qo\'shimcha sozlash zarur.\n\nBosib, %3$s\'ni oching.</string>
+    <string name="notif_kill_text">%1$d soat davomida UZGUARD ishlamadi</string>
+
+    <!-- Masofaviy boshqaruv (AnyDesk/TeamViewer) ogohlantirishi -->
+    <string name="notif_remote_access_title">🖥 Masofaviy boshqaruv ilovasi topildi</string>
+    <string name="notif_remote_access_body">Telefoningizda %1$s o\'rnatilgan. Agar buni \"bank xodimi\" so\'ragan bo\'lsa — bu FIRIBGARLIK. O\'zingiz ishlatmasangiz, darhol o\'chiring.</string>
+
+    <!-- Ochiq Wi-Fi ogohlantirishi -->
+    <string name="notif_open_wifi_title">📶 Ochiq Wi-Fi — ehtiyot bo\'ling</string>
+    <string name="notif_open_wifi_body">\"%1$s\" — parolsiz ochiq tarmoq. Bu yerda bank ilovalariga kirmang va parol kiritmang (ma\'lumot o\'g\'irlanishi mumkin).</string>
+
+    <!-- Bildirishnomadagi xavfli havola ogohlantirishi -->
+    <string name="notif_phish_link_title">🔗 Xavfli havola aniqlandi</string>
+    <string name="notif_phish_link_body">Xabardagi havola xavfli: %1$s. Ochmang — bosish uchun tekshiring.</string>
+
+    <!-- O'rnatilgan ilova yangilanganda "tekshirildi" bildirishnomasi -->
+    <string name="notif_app_updated_title">✅ Ilova yangilandi: %1$s</string>
+    <string name="notif_app_updated_body">Yangi versiya UzGuard tomonidan tekshirildi — xavfsiz.</string>
+    <string name="notif_kill_big">Sizning %1$s qurilmangiz UZGUARD jarayonini %2$d soat oldin o\'ldirib qo\'ygan edi. Doimiy himoya uchun qo\'shimcha sozlash zarur.\n\nBosib, %3$s\'ni oching.</string>
     <string name="notif_kill_center_miui">MIUI Security Center</string>
     <string name="notif_kill_center_default">tizim sozlamasi</string>
     <string name="notif_welcome_title">✓ Himoyangiz yoqildi</string>
-    <string name="notif_welcome_text">KIBER QALQON endi telefoningizni 24/7 himoya qiladi</string>
+    <string name="notif_welcome_text">UZGUARD endi telefoningizni 24/7 himoya qiladi</string>
     <string name="notif_welcome_big">Barcha standart sozlamalar avtomatik yoqildi:\n• Fon skani har 15 daqiqada\n• Yangi APK darhol tekshiriladi\n• Tovushli va tebranishli ogohlantirish\n• Avtomatik baza yangilanishi\n\nHech narsa o\'zgartirmasdan, telefoningiz himoyalangan.</string>
     <string name="notif_installed_suspicious_title">🟠 Shubhali ilova: %1$s</string>
 </resources>

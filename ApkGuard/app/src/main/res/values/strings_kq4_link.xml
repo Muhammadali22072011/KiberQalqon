@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — «Havola tekshirgich» (link checker) ekran satrlari (o'zbekcha). -->
+<resources>
+
+    <!-- ═══ Sarlavha ═══ -->
+    <string name="kq4_link_eyebrow">HAVOLA XAVFSIZLIGI</string>
+    <string name="kq4_link_title">Havolani tekshirish</string>
+
+    <!-- ═══ Kirish (havolani yopishtirish) ═══ -->
+    <string name="kq4_link_input_label">Havolani shu yerga qo\'ying</string>
+    <string name="kq4_link_input_hint">https://…</string>
+    <string name="kq4_link_paste">Qo\'yish</string>
+    <string name="kq4_link_check">Tekshirish</string>
+    <string name="kq4_link_clip_empty">Buferda havola yo\'q</string>
+
+    <!-- ═══ Maslahat ═══ -->
+    <string name="kq4_link_hint">Telegram yoki SMS\'dan kelgan shubhali havolani shu yerga joylashtiring — ochishdan oldin tekshiring.</string>
+    <string name="kq4_link_host_line">Domen: %1$s</string>
+    <string name="kq4_link_reasons_title">Nega bunday?</string>
+
+    <!-- ═══ Banner ostidagi qisqa sabab ═══ -->
+    <string name="kq4_link_reason_safe">Xavfli belgilar topilmadi. Lekin baribir ehtiyot bo\'ling.</string>
+    <string name="kq4_link_reason_suspicious">Shubhali belgilar bor — ochishdan oldin yaxshilab o\'ylab ko\'ring.</string>
+    <string name="kq4_link_reason_danger">Bu havola XAVFLI ko\'rinadi — OCHMANG va hech kimga yubormang.</string>
+    <string name="kq4_link_reason_unparsable">Havolani o\'qib bo\'lmadi — ishonchsiz, ochmang.</string>
+
+    <!-- ═══ Belgilar (Flag → tushuntirish) ═══ -->
+    <string name="kq4_link_flag_blacklisted">Bu domen ma\'lum firibgar/virus ro\'yxatida</string>
+    <string name="kq4_link_flag_typosquat">Bank nomiga o\'xshatib yasalgan soxta domen</string>
+    <string name="kq4_link_flag_punycode">Yashirin harflar bilan yasalgan (homoglyph) hiyla</string>
+    <string name="kq4_link_flag_apk">Havola to\'g\'ridan-to\'g\'ri .apk fayl beradi — dropper xavfi</string>
+    <string name="kq4_link_flag_phishing_path">Ma\'lum zararli manzil (C2/SMS o\'g\'irlash) yo\'li</string>
+    <string name="kq4_link_flag_lookalike_tld">Bank nomi noto\'g\'ri manzilda (\.uz emas)</string>
+    <string name="kq4_link_flag_social">Telegram/ijtimoiy tarmoq nomiga taqlid (rasmiy emas)</string>
+    <string name="kq4_link_flag_ip">Domen o\'rniga raqamli IP manzil — shubhali</string>
+    <string name="kq4_link_flag_at">Manzilda «@» belgisi — haqiqiy saytni yashiradi</string>
+    <string name="kq4_link_flag_redirect">Manzil ichida yashirin yo\'naltirish (boshqa saytga)</string>
+    <string name="kq4_link_flag_subdomains">Juda ko\'p qism — chalg\'ituvchi manzil</string>
+    <string name="kq4_link_flag_tld">Arzon/firibgarlar ishlatadigan domen turi</string>
+    <string name="kq4_link_flag_scam">Sovrin/chegirma/yutuq lure so\'zlari — firibgarlik alomati</string>
+    <string name="kq4_link_flag_idn">Xalqaro (lotin bo\'lmagan) domen — diqqat bilan tekshiring</string>
+    <string name="kq4_link_flag_shortener">Qisqartirgich — haqiqiy manzil yashiringan</string>
+    <string name="kq4_link_flag_financial">Bank/parol/kod so\'zlari bor — fishing alomati</string>
+    <string name="kq4_link_flag_nonhttps">Shifrlanmagan (http) ulanish — xavfsiz emas</string>
+    <string name="kq4_link_flag_unparsable">Havolani o\'qib bo\'lmadi — ishonchsiz</string>
+
+    <!-- ═══ Share qabul qiluvchi ═══ -->
+    <string name="kq4_link_no_url">Matnda havola topilmadi</string>
+
+    <!-- ═══ Havola qalqoni — blok ekрани (LinkBlockActivity) ═══ -->
+    <string name="kq4_block_danger_title">Bu xavfli sayt</string>
+    <string name="kq4_block_suspicious_title">Bu shubhali sayt</string>
+    <string name="kq4_block_danger_sub">UzGuard bu saytni xavfli deb topdi va ochilishini to\'xtatdi. Iltimos, OCHMANG va hech kimga yubormang.</string>
+    <string name="kq4_block_suspicious_sub">Bu saytda shubhali belgilar bor. Ishonchingiz komil bo\'lmasa — ochmang.</string>
+    <string name="kq4_block_close">Yopish</string>
+    <string name="kq4_block_open_anyway">Baribir ochaman</string>
+
+    <!-- ═══ Brauzer tanlash (xavfsiz havolani yo'naltirishda) ═══ -->
+    <string name="kq4_link_pick_browser">Qaysi brauzerda ochilsin?</string>
+    <string name="kq4_link_no_browser">Qurilmada brauzer topilmadi</string>
+
+</resources>

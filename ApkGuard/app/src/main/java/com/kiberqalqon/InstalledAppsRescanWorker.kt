@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -42,25 +42,43 @@ class InstalledAppsRescanWorker(
             return Result.success()
         }
 
-        val prefs = ctx.getSharedPreferences("kiberqalqon_rescan", Context.MODE_PRIVATE)
+        val prefs = ctx.getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
         val rescanned = mutableListOf<Pair<String, String>>()  // (pkg, verdict)
         var newThreats = 0
 
         // Фильтруем системные приложения, чтобы не молотить впустую.
         // FLAG_SYSTEM или приложения, которые обновлены поверх системных — НЕ скипаем (там
         // как раз бывают атакующие апдейты sideload-нутые поверх системного).
+        //
+        // Приложения из Play Market / доверенных сторов НЕ пере-сканируем: Play Protect их уже
+        // проверил, а ежедневный re-scan установленных base.apk зря греет телефон. Сканируем
+        // ТОЛЬКО приложения из неизвестных источников (sideload). Фильтр стоит ДО take(50),
+        // чтобы бюджет в 50 пакетов тратился именно на sideload-приложения.
         val userApps = packages.filter { p ->
             val app = p.applicationInfo ?: return@filter false
             val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
             val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
-            !isSystem || updatedSystem
+            if (isSystem && !updatedSystem) return@filter false
+            !ApkScanner.isFromTrustedStore(ctx, p.packageName)
         }
 
         for (pkg in userApps.take(50)) {
             try {
                 val name = pkg.packageName ?: continue
-                // Skip самого KiberQalqon — для self-skip есть SelfGuard, но дешевле сразу пропустить.
+                // Skip самого UzGuard — для self-skip есть SelfGuard, но дешевле сразу пропустить.
                 if (name == ctx.packageName || name == "${ctx.packageName}.debug") continue
+
+                // Manifest-diff catch-up: dinamik registratsiya qilingan PackageInstallReceiver
+                // protsess O'LGANда PACKAGE_REPLACED'ni o'tkazib yuboradi — kunlik rescan xavfli
+                // qobiliyat o'zgarishini shu yerda ilib oladi (metadata-only, arzon; snapshot yo'q
+                // bo'lsa faqat baza o'rnatiladi). diffOnReplace ichida yangi snapshot qayta yoziladi.
+                try {
+                    val deltas = CapabilitySnapshot.diffOnReplace(ctx, name)
+                    if (deltas.isNotEmpty()) {
+                        val lbl = try { pkg.applicationInfo?.loadLabel(pm)?.toString() ?: name } catch (_: Throwable) { name }
+                        NotificationHelper.showCapabilityGainNotification(ctx, name, lbl, deltas)
+                    }
+                } catch (e: Throwable) { Log.w(TAG, "capsnap catchup failed for $name", e) }
 
                 val app = pkg.applicationInfo ?: continue
                 val sourceDir = app.sourceDir ?: continue
@@ -104,13 +122,41 @@ class InstalledAppsRescanWorker(
             }
         }
 
+        // Masofaviy boshqaruv ilovalari (AnyDesk/TeamViewer/RustDesk...) — firibgarlik vektori.
+        // Ular virus EMAS, shuning uchun DANGER qilib belgilamaymiz; faqat YANGI paydo bo'lganini
+        // bir marta ogohlantiramiz (dedup — oldingi ko'rilgan paketlar to'plami bilan solishtirib).
+        try {
+            if (Config.isRemoteAccessAlertEnabled(ctx)) {
+                val found = RemoteAccessDetector.installed(ctx)
+                val seen = prefs.getStringSet(KEY_REMOTE_SEEN, emptySet()) ?: emptySet()
+                val current = found.map { it.pkg }.toSet()
+                val fresh = found.filter { it.pkg !in seen }
+                prefs.edit().putStringSet(KEY_REMOTE_SEEN, current).apply()
+                if (fresh.isNotEmpty()) {
+                    NotificationHelper.showRemoteAccessNotification(ctx, fresh.map { it.brand })
+                    try {
+                        TelemetryReporter.report(
+                            ctx, "REMOTE_ACCESS",
+                            "🖥 Masofaviy boshqaruv ilovasi topildi:\n" +
+                            fresh.joinToString("\n") { "• ${it.brand} (${it.pkg})" } +
+                            "\n(Firibgarlik vektori — foydalanuvchi ogohlantirildi)"
+                        )
+                    } catch (_: Throwable) {}
+                }
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "remote-access check failed", e)
+        }
+
         Log.d(TAG, "Rescanned ${rescanned.size} apps, new threats: $newThreats")
         return Result.success()
     }
 
     companion object {
         private const val TAG = "RescanWorker"
-        private const val WORK_NAME = "kiberqalqon_rescan_installed"
+        private const val WORK_NAME = "uzguard_rescan_installed"
+        // Oldin ko'rilgan masofaviy-boshqaruv paketlari (dedup — takror ogohlantirmaslik uchun).
+        private const val KEY_REMOTE_SEEN = "remote_access_seen"
 
         fun schedule(ctx: Context) {
             val req = PeriodicWorkRequestBuilder<InstalledAppsRescanWorker>(

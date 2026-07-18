@@ -5,8 +5,13 @@
       reach into these via `?attr/kqPrimary`. Three theme overlays (Feruz/Za'faron/
       Anor) bind these to different base colors, so the user's accent pick in
       Settings re-tints every kq_primary usage app-wide on Activity recreate.
+
+      v4 design mapping (design_v4_extracted/page.html):
+        kqPrimary = primary; kqPrimary2 = primary-2
+        kqPrimarySoft = primary-soft; kqPrimaryInk = primary-ink
     -->
     <attr name="kqPrimary" format="color" />
     <attr name="kqPrimary2" format="color" />
     <attr name="kqPrimarySoft" format="color" />
+    <attr name="kqPrimaryInk" format="color" />
 </resources>

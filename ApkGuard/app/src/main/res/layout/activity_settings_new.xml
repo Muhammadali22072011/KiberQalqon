@@ -1,182 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Settings — §3.7 of the redesign. Spec-ready scaffold; this is the layout the
-  README expects SettingsActivity to migrate to. Today the wired layout is
-  activity_settings.xml, which keeps its own (different) field set. Once
-  SettingsActivity is rewired, deletion of that legacy file is safe.
-
-  Stable IDs kept for forward compatibility with SettingsActivity.kt:
-    btnBack, toolbar, switchBackground, switchUpload, etServerUrl,
-    switchPhishing, btnEnableAccess, radioUzbek, radioRussian, radioGroupLanguage
+  Sozlamalar — v4 «Milliy Kiber Himoya» (screens2.jsx → Settings).
+  screen-pad: 14/18/30, KQ4.Card kartochkalar, kq4_* drawable'lar, ic4_* ikonlar.
+  Pastda umumiy navigatsiya (view_kq_bottom_nav) + KqBottomNav.attach(SETTINGS).
 -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/kq_bg">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:elevation="0dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp">
-
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/kq_icon_btn"
-                android:contentDescription="Back"
-                android:padding="10dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_arrow_back"
-                app:tint="@color/kq_ink" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-        </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="92dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:paddingBottom="96dp"
+        android:scrollbars="none">
 
         <LinearLayout
             android:id="@+id/settingsContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp">
+            android:paddingTop="14dp"
+            android:paddingHorizontal="18dp"
+            android:paddingBottom="30dp">
 
-            <!-- Header: eyebrow + title + sub -->
+            <!-- ── Sarlavha ── -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/settings_eyebrow"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:text="@string/kq4_set_eyebrow" />
 
             <TextView
+                style="@style/KQ4.HTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/settings_header_title"
-                android:textColor="@color/kq_ink"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/kq4_set_title" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="18dp"
-                android:text="@string/settings_header_subtitle"
-                android:textColor="@color/kq_ink_2"
-                android:textSize="13sp" />
-
-            <!-- ╔════ PROFILE CARD ════╗ -->
-            <LinearLayout
+            <!-- ── Profil kartochkasi ── -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/kq_profile_card"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp">
+                android:layout_height="wrap_content">
 
                 <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/kq_brand_tile">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- milliy yulduz naqshi (alpha .05) -->
+                    <ImageView
+                        android:layout_width="78dp"
+                        android:layout_height="78dp"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginEnd="86dp"
+                        android:alpha="0.05"
+                        android:contentDescription="@null"
+                        android:src="@drawable/kq4_star" />
 
                     <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:layout_gravity="center"
+                        android:layout_width="78dp"
+                        android:layout_height="78dp"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginBottom="-30dp"
+                        android:alpha="0.05"
                         android:contentDescription="@null"
-                        android:src="@drawable/kq_shield_mark_white" />
+                        android:src="@drawable/kq4_star" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/kq_logo_anor" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/onest_bold"
+                                android:text="@string/kq4_brand"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tvProfileVersion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:letterSpacing="0.08"
+                                android:text="@string/kq4_set_profile_version"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="10.5sp" />
+                        </LinearLayout>
+
+                        <!-- tag safe: nuqta + Faol -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:background="@drawable/kq4_tag_safe"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="12dp">
+
+                            <ImageView
+                                android:layout_width="7dp"
+                                android:layout_height="7dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/kq4_dot"
+                                app:tint="@color/kq_safe_ink" />
+
+                            <TextView
+                                style="@style/KQ4.Tag"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="7dp"
+                                android:text="@string/kq4_set_active"
+                                android:textColor="@color/kq_safe_ink" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_pro_title"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.1"
-                        android:text="@string/settings_pro_version"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_ink_3"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/kq_sev_safe"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.08"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:text="@string/settings_pro_active"
-                    android:textColor="@color/kq_safe_ink"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- ╔════ HIMOYA ════╗ -->
+            <!-- ════ HIMOYA ════ -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/settings_section_protection"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="9dp"
+                android:text="@string/kq4_set_sec_protection" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -184,68 +161,389 @@
                     android:orientation="vertical">
 
                     <include
-                        layout="@layout/inc_settings_toggle_row"
-                        android:id="@+id/rowAutoScan" />
+                        android:id="@+id/rowAutoScan"
+                        layout="@layout/inc_settings_toggle_row" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginStart="70dp"
-                        android:background="@color/kq_hairline" />
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <include
-                            layout="@layout/inc_settings_toggle_row"
-                            android:id="@+id/rowAutoDelete" />
-                    </FrameLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="70dp"
                         android:background="@color/kq_hairline" />
 
                     <include
-                        layout="@layout/inc_settings_toggle_row"
-                        android:id="@+id/rowPhishing" />
+                        android:id="@+id/rowAutoDelete"
+                        layout="@layout/inc_settings_toggle_row" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginStart="70dp"
                         android:background="@color/kq_hairline" />
 
                     <include
-                        layout="@layout/inc_settings_toggle_row"
-                        android:id="@+id/rowBackground" />
+                        android:id="@+id/rowPhishing"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowBackground"
+                        layout="@layout/inc_settings_toggle_row" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ╔════ SERVER ════╗ -->
+            <!-- ════ KO'RINISH ════ -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/settings_section_server"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="9dp"
+                android:text="@string/kq4_set_sec_appearance" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Mavzu: av + matn ↔ sun/moon segment -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/kq4_av_primary">
+
+                            <ImageView
+                                android:id="@+id/ivThemeIcon"
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_sun"
+                                app:tint="@color/kq_primary" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="13dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/KQ4.RowTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/kq4_set_theme_title" />
+
+                            <TextView
+                                style="@style/KQ4.RowSub"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="@string/kq4_set_theme_sub" />
+                        </LinearLayout>
+
+                        <!-- segment-pilyulya: 2 × (44×36) -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/kq4_settings_seg_track"
+                            android:orientation="horizontal"
+                            android:padding="4dp">
+
+                            <FrameLayout
+                                android:id="@+id/segThemeLight"
+                                android:layout_width="44dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/kq4_settings_seg_active">
+
+                                <ImageView
+                                    android:id="@+id/ivSegSun"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/ic4_sun"
+                                    app:tint="@color/kq_on_primary" />
+                            </FrameLayout>
+
+                            <FrameLayout
+                                android:id="@+id/segThemeDark"
+                                android:layout_width="44dp"
+                                android:layout_height="36dp">
+
+                                <ImageView
+                                    android:id="@+id/ivSegMoon"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/ic4_moon"
+                                    app:tint="@color/kq_ink_3" />
+                            </FrameLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Asosiy rang -->
+                    <TextView
+                        style="@style/KQ4.RowTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/kq4_set_accent_title" />
+
+                    <TextView
+                        style="@style/KQ4.RowSub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
+                        android:text="@string/kq4_set_accent_sub" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Anor -->
+                        <LinearLayout
+                            android:id="@+id/accentPomegranate"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/kq4_settings_swatch_sel"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="14dp">
+
+                            <View
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:background="@drawable/kq4_settings_dot_anor" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="9dp"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq_accent_pomegranate"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="12.5sp" />
+                        </LinearLayout>
+
+                        <!-- Feruz -->
+                        <LinearLayout
+                            android:id="@+id/accentTurquoise"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/kq4_settings_swatch_idle"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="14dp">
+
+                            <View
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:background="@drawable/kq4_settings_dot_feruz" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="9dp"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq_accent_turquoise"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="12.5sp" />
+                        </LinearLayout>
+
+                        <!-- Za'faron -->
+                        <LinearLayout
+                            android:id="@+id/accentSaffron"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/kq4_settings_swatch_idle"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="14dp">
+
+                            <View
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:background="@drawable/kq4_settings_dot_zafaron" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="9dp"
+                                android:fontFamily="@font/onest_semibold"
+                                android:text="@string/kq_accent_saffron"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="12.5sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════ TIL ════ -->
+            <TextView
+                style="@style/KQ4.Eyebrow"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_marginTop="22dp"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="9dp"
+                android:text="@string/kq4_set_sec_language" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/rowLangUz"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="15dp"
+                        android:paddingVertical="14dp">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/kq4_av_primary">
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_globe"
+                                app:tint="@color/kq_primary" />
+                        </FrameLayout>
+
+                        <TextView
+                            style="@style/KQ4.RowTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="13dp"
+                            android:layout_weight="1"
+                            android:text="@string/language_uzbek" />
+
+                        <ImageView
+                            android:id="@+id/ivLangUzState"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_check_circle"
+                            app:tint="@color/kq_primary" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <LinearLayout
+                        android:id="@+id/rowLangRu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="15dp"
+                        android:paddingVertical="14dp">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/kq4_av_primary">
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_globe"
+                                app:tint="@color/kq_primary" />
+                        </FrameLayout>
+
+                        <TextView
+                            style="@style/KQ4.RowTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="13dp"
+                            android:layout_weight="1"
+                            android:text="@string/language_russian" />
+
+                        <ImageView
+                            android:id="@+id/ivLangRuState"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic4_chevron"
+                            app:tint="@color/kq_ink_3" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════ HAQIDA ════ -->
+            <TextView
+                style="@style/KQ4.Eyebrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="9dp"
+                android:text="@string/kq4_set_sec_about" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -253,15 +551,60 @@
                     android:orientation="vertical">
 
                     <include
-                        layout="@layout/inc_settings_toggle_row"
-                        android:id="@+id/rowUpload" />
+                        android:id="@+id/rowAbout"
+                        layout="@layout/inc_settings_chevron_row" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginStart="70dp"
                         android:background="@color/kq_hairline" />
 
+                    <include
+                        android:id="@+id/rowHelp"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowReportProblem"
+                        layout="@layout/inc_settings_chevron_row" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ════ QO'SHIMCHA ════ -->
+            <TextView
+                style="@style/KQ4.Eyebrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="9dp"
+                android:text="@string/kq4_set_sec_extra" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/rowUpload"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:id="@+id/divServerUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Server manzili (dialog orqali tahrirlanadi; faqat egasi rejimida ko'rinadi) -->
                     <LinearLayout
                         android:id="@+id/rowServerUrl"
                         android:layout_width="match_parent"
@@ -271,444 +614,375 @@
                         android:focusable="true"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="14dp">
+                        android:paddingHorizontal="15dp"
+                        android:paddingVertical="14dp">
 
                         <FrameLayout
                             android:layout_width="44dp"
                             android:layout_height="44dp"
-                            android:background="@drawable/kq_icon_tile_primary">
+                            android:background="@drawable/kq4_av_primary">
 
                             <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
                                 android:layout_gravity="center"
                                 android:contentDescription="@null"
-                                android:src="@drawable/ic_globe"
+                                android:src="@drawable/ic4_globe"
                                 app:tint="@color/kq_primary" />
                         </FrameLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
+                            android:layout_marginStart="13dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                style="@style/KQ4.RowTitle"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/settings_server_url_label"
-                                android:textColor="@color/kq_ink"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:text="@string/settings_server_url_label" />
 
                             <TextView
                                 android:id="@+id/etServerUrl"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:fontFamily="monospace"
+                                android:layout_marginTop="3dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/ssmono_medium"
+                                android:maxLines="1"
                                 android:text="@string/settings_server_url_example"
                                 android:textColor="@color/kq_ink_3"
                                 android:textSize="11.5sp" />
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="10dp"
                             android:contentDescription="@null"
-                            android:src="@drawable/ic_chevron_right"
+                            android:src="@drawable/ic4_chevron"
                             app:tint="@color/kq_ink_3" />
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowHiddenThreats"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:id="@+id/divTelegram"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowTelegram"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowProtectionStatus"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Bank ilovalari himoyasi (soxta bank skaneri) → BankGuardActivity -->
+                    <include
+                        android:id="@+id/rowBankGuard"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Ruxsatlar X-nuri (ortiqcha ruxsat so'ragan ilovalar) → PermissionXrayActivity -->
+                    <include
+                        android:id="@+id/rowPermXray"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Xavfsizlik balli (0–100) → SecurityScoreActivity -->
+                    <include
+                        android:id="@+id/rowSecurityScore"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Play'dan tashqari ilovalar auditi → SideloadAuditActivity -->
+                    <include
+                        android:id="@+id/rowSideloadAudit"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- "Bu xabar firibgarlikmi?" — matn firibgarlik tekshiruvi → ScamMessageActivity -->
+                    <include
+                        android:id="@+id/rowScamCheck"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- 30 soniyalik tez tekshiruv (usta) → CheckupWizardActivity -->
+                    <include
+                        android:id="@+id/rowCheckup"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Oila qalqoni → FamilyGuardActivity -->
+                    <include
+                        android:id="@+id/rowFamilyGuard"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Himoya qulfi (PIN) → PinLockActivity (set/o'zgartirish) -->
+                    <include
+                        android:id="@+id/rowPinLock"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- "Nimadan himoya qila olmaymiz" — halol cheklovlar → LimitsActivity -->
+                    <include
+                        android:id="@+id/rowLimits"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Wi-Fi straj toggle (Config.isWifiGuardEnabled → ochiq tarmoq ogohlantirishi) -->
+                    <include
+                        android:id="@+id/rowWifiGuard"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Masofaviy boshqaruv ogohlantirgichi toggle (Config.isRemoteAccessAlertEnabled) -->
+                    <include
+                        android:id="@+id/rowRemoteAccess"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Uyg'otuvchi signal toggle (Config.isLoudAlarmEnabled → AlarmSiren) -->
+                    <include
+                        android:id="@+id/rowLoudAlarm"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Ilova yangilanishi bildirishnomasi toggle (Config.isAppUpdateNotifyEnabled) -->
+                    <include
+                        android:id="@+id/rowAppUpdate"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Haftalik hisobot toggle (Config.isWeeklyReportEnabled) -->
+                    <include
+                        android:id="@+id/rowWeeklyReport"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Yangilik bildirishnomalari toggle (Config.isNewsNotificationEnabled → NewsNotifier) -->
+                    <include
+                        android:id="@+id/rowNewsNotif"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- DNS C2-filtri toggle (Config.isVpnFilterEnabled → VpnFilterService) -->
+                    <include
+                        android:id="@+id/rowVpnFilter"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Havola qalqoni toggle (Config.isLinkGuardEnabled → LinkGuardActivity) -->
+                    <include
+                        android:id="@+id/rowLinkGuard"
+                        layout="@layout/inc_settings_toggle_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <!-- Ishonchli ro'yxat (UserWhitelist) — ko'rish/olib tashlash dialogi -->
+                    <include
+                        android:id="@+id/rowTrustList"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowPrivacy"
+                        layout="@layout/inc_settings_chevron_row" />
+
+                    <View
+                        android:id="@+id/divAdminPanel"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/kq_hairline" />
+
+                    <include
+                        android:id="@+id/rowAdminPanel"
+                        layout="@layout/inc_settings_chevron_row" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ╔════ KO'RINISH ════╗ -->
+            <!-- ════ MAXFIYLIK (rozilik) ════ -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/kq_settings_appearance"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="9dp"
+                android:text="@string/set_privacy_eyebrow" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <!-- Tema row: title + sub + segmented Kun/Tun -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/settings_theme_label"
-                                android:textColor="@color/kq_ink"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/settings_theme_desc"
-                                android:textColor="@color/kq_ink_2"
-                                android:textSize="11.5sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:background="@drawable/kq_seg_track"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:padding="3dp">
-
-                            <TextView
-                                android:id="@+id/segThemeLight"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/kq_seg_active"
-                                android:gravity="center"
-                                android:minWidth="56dp"
-                                android:paddingHorizontal="14dp"
-                                android:text="@string/kq_theme_day"
-                                android:textColor="@color/kq_on_primary"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/segThemeDark"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:minWidth="56dp"
-                                android:paddingHorizontal="14dp"
-                                android:text="@string/kq_theme_night"
-                                android:textColor="@color/kq_ink_2"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="14dp"
-                        android:background="@color/kq_hairline" />
-
-                    <!-- Asosiy rang -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/kq_accent"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                    android:padding="16dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvConsentTimestamp"
+                        style="@style/KQ4.RowSub"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/settings_accent_label"
-                        android:textColor="@color/kq_ink_2"
-                        android:textSize="11.5sp" />
+                        android:textColor="@color/kq_ink_2" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <LinearLayout
-                            android:id="@+id/accentTurquoise"
+                        <TextView
+                            style="@style/KQ4.RowTitle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:background="@drawable/kq_accent_selected"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
+                            android:text="@string/set_community_label" />
 
-                            <View
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:background="@drawable/kq_swatch_turquoise" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="@string/kq_accent_turquoise"
-                                android:textColor="@color/kq_ink"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/accentSaffron"
-                            android:layout_width="0dp"
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/swCommunityShare"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <View
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:background="@drawable/kq_swatch_saffron" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="@string/kq_accent_saffron"
-                                android:textColor="@color/kq_ink_2"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/accentPomegranate"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <View
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:background="@drawable/kq_swatch_pomegranate" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="@string/kq_accent_pomegranate"
-                                android:textColor="@color/kq_ink_2"
-                                android:textSize="11sp" />
-                        </LinearLayout>
+                            android:layout_marginStart="10dp"
+                            android:thumb="@drawable/kq4_toggle_thumb"
+                            app:track="@drawable/kq4_toggle_track" />
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="@color/kq_hairline" />
+
+                    <TextView
+                        android:id="@+id/btnRevokeConsent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/onest_semibold"
+                        android:paddingVertical="4dp"
+                        android:text="@string/set_revoke_consent"
+                        android:textColor="@color/kq_danger"
+                        android:textSize="14.5sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ╔════ TIL ════╗ -->
+            <!-- ── Futer ── -->
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/settings_section_language"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/tvSettingsFooter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
-
-                <RadioGroup
-                    android:id="@+id/radioGroupLanguage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RadioButton
-                        android:id="@+id/radioUzbek"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:button="@null"
-                        android:checked="true"
-                        android:drawableEnd="@drawable/ic_check_circle"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:padding="14dp"
-                        android:text="@string/language_uzbek"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="14sp"
-                        app:drawableTint="@color/kq_primary" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/kq_hairline" />
-
-                    <RadioButton
-                        android:id="@+id/radioRussian"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:button="@null"
-                        android:drawableEnd="@drawable/ic_chevron_right"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:padding="14dp"
-                        android:text="@string/language_russian"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="14sp"
-                        app:drawableTint="@color/kq_ink_3" />
-                </RadioGroup>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ╔════ HAQIDA ════╗ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/settings_section_about"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <include
-                        layout="@layout/inc_settings_chevron_row"
-                        android:id="@+id/rowAbout" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="20dp"
-                        android:background="@color/kq_hairline" />
-
-                    <include
-                        layout="@layout/inc_settings_chevron_row"
-                        android:id="@+id/rowHelp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="20dp"
-                        android:background="@color/kq_hairline" />
-
-                    <include
-                        layout="@layout/inc_settings_chevron_row"
-                        android:id="@+id/rowPrivacy" />
-
-                    <!-- UX-03: avval faqat sploshdagi yashirin long-press orqali ochiladigan
-                         flagman ekranlar (Yashirin tahdidlar, Telegram, Himoya holati). -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="20dp"
-                        android:background="@color/kq_hairline" />
-
-                    <include
-                        layout="@layout/inc_settings_chevron_row"
-                        android:id="@+id/rowHiddenThreats" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="20dp"
-                        android:background="@color/kq_hairline" />
-
-                    <include
-                        layout="@layout/inc_settings_chevron_row"
-                        android:id="@+id/rowTelegram" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="20dp"
-                        android:background="@color/kq_hairline" />
-
-                    <include
-                        layout="@layout/inc_settings_chevron_row"
-                        android:id="@+id/rowProtectionStatus" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Footer -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="monospace"
+                android:layout_marginTop="26dp"
+                android:fontFamily="@font/ssmono_medium"
                 android:gravity="center"
-                android:letterSpacing="0.08"
-                android:text="@string/settings_footer"
+                android:letterSpacing="0.06"
+                android:lineSpacingMultiplier="1.7"
                 android:textColor="@color/kq_ink_3"
                 android:textSize="10.5sp" />
-
-            <!-- Hidden compat fields. -->
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switchBackground"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switchUpload"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switchPhishing"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEnableAccess"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Единая нижняя нав. KqBottomNav.attach(this, SETTINGS) в SettingsActivity.onCreate. -->
+    <!-- Umumiy pastki navigatsiya: KqBottomNav.attach(this, SETTINGS). -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -716,4 +990,4 @@
 
         <include layout="@layout/view_kq_bottom_nav" />
     </FrameLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

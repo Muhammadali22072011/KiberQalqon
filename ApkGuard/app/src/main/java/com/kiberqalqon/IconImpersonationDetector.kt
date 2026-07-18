@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -53,7 +53,23 @@ object IconImpersonationDetector {
         "uz.ums.tenge" to "Apelsin",
         "com.google.android.apps.nbu.paisa.user" to "Google Pay",
         "com.android.chrome" to "Chrome",
-        "com.google.android.gm" to "Gmail"
+        "com.google.android.gm" to "Gmail",
+        // 2026-07: Play'da tekshirilgan JORIY bank paketlari — fishing-ikonka bazasi
+        // to'g'ri qurilishi uchun (eski yozuvlar 404 edi; ular ham qoldirildi).
+        "air.com.ssdsoftwaresolutions.clickuz" to "Click",
+        "uz.uzcardpay.android" to "Uzcard Pay",
+        "uz.smartbank" to "Openbank UZ",
+        "uz.mobiuz.mobiservice" to "Mobiuz",
+        "uz.kapitalbank.android" to "Uzum Bank",
+        "uz.kapitalbank.kbonline" to "Kapitalbank",
+        "ge.space.app.uzbekistan" to "TBC Bank",
+        "com.hamkorbank.mobile" to "Hamkorbank",
+        "uz.anormobile.retail" to "Anorbank",
+        "uz.xsoft.myinfin" to "InfinBank",
+        "uz.asakabank.myasaka" to "Asakabank",
+        "uz.agrobank.mobile" to "Agrobank",
+        "com.tune.milliy" to "NBU Milliy",
+        "uz.tune.xazna" to "Xalq banki"
     )
 
     data class Match(

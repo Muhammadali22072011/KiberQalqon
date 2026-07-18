@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { usePoll } from '../hooks/usePoll';
-import { apiGet, apiPost, type NewsItem } from '../lib/api';
+import { apiGet, apiPost, type GroupRow, type NewsItem } from '../lib/api';
 import { useToast } from '../components/Toast';
 import { Empty, Panel, PanelHead, Spinner } from '../components/ui';
 import { uzDateSafe } from '../lib/format';
@@ -20,6 +20,18 @@ const fileToDataUrl = (f: File) =>
     fr.readAsDataURL(f);
   });
 
+// Guruhga yo'naltirilgan e'lon uchun rangli yorliq (lentada). group_id noma'lum bo'lsa —
+// oddiy "Guruh". Global e'lonlarda umuman ko'rsatilmaydi.
+function NewsGroupTag({ id, groups }: { id: string; groups: GroupRow[] }) {
+  const g = groups.find((x) => x.id === id);
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flex: 'none', fontSize: 11, color: 'var(--ink-2)', border: '1px solid var(--hair-2)', borderRadius: 999, padding: '3px 9px', whiteSpace: 'nowrap' }}>
+      <span style={{ width: 8, height: 8, borderRadius: 3, background: g?.color || '#888', display: 'inline-block', flex: 'none' }} />
+      {g?.name || 'Guruh'}
+    </span>
+  );
+}
+
 export default function News() {
   const { isOwner } = useAuth();
   const canManage = true; // egasi va admin — ikkalasi ham e'lon JOYLAYDI
@@ -33,12 +45,23 @@ export default function News() {
   const [body, setBody] = useState('');
   const [level, setLevel] = useState('info');
   const [imgUrl, setImgUrl] = useState('');
+  const [groupId, setGroupId] = useState(''); // '' = Hammaga (global)
+  const [groups, setGroups] = useState<GroupRow[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Sahifaga kirilganda — hammasini "o‘qilgan" deb belgilaymiz (sidebar belgisi tushadi).
   useEffect(() => { localStorage.setItem('kq_news_seen', String(Date.now())); }, []);
+
+  // Guruhlar ro'yxati (yo'naltirish selektori + lentadagi yorliq uchun). Xato bo'lsa — jim, faqat global.
+  useEffect(() => {
+    let alive = true;
+    apiGet<{ groups: GroupRow[] }>('/api/devices?groups=1')
+      .then((r) => { if (alive) setGroups(r.groups || []); })
+      .catch(() => { /* guruhlar bo'lmasa — faqat global e'lon */ });
+    return () => { alive = false; };
+  }, []);
 
   const onFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,21 +88,26 @@ export default function News() {
     // Rasm havolasi http(s) bo'lmasa server uni jim tashlab yuboradi (e'lon rasmsiz chiqadi).
     // Foydalanuvchiga oldindan aytamiz — "joyladim, rasm yo'q" sirli holatini oldini olamiz.
     const img = imgUrl.trim();
-    if (img && !/^https?:\/\//i.test(img)) {
+    // Telefon faqat https rasmni ko'rsatadi (cleartext bloklangan) — toast aytgani bilan bir xil
+    // bo'lishi uchun bu yerda ham FAQAT https'ni qabul qilamiz (server ham http'ni rad etadi).
+    if (img && !/^https:\/\//i.test(img)) {
       show("Rasm havolasi noto‘g‘ri — https:// bilan boshlanishi kerak");
       return;
     }
     setSaving(true);
     try {
-      await apiPost('/api/news', {
+      // group_id faqat guruh tanlanganda yuboriladi (bo'sh = global, hammaga).
+      const payload: Record<string, unknown> = {
         action: 'create',
         title: title.trim(),
         body: body.trim(),
         level,
         image_url: img,
-      });
+      };
+      if (groupId) payload.group_id = groupId;
+      await apiPost('/api/news', payload);
       show('E‘lon joylandi');
-      setTitle(''); setBody(''); setLevel('info'); setImgUrl('');
+      setTitle(''); setBody(''); setLevel('info'); setImgUrl(''); setGroupId('');
       reload();
     } catch (ex) {
       show((ex as Error).message || 'Xatolik');
@@ -105,7 +133,7 @@ export default function News() {
         <h1>Yangiliklar va e‘lonlar</h1>
         <p>
           {canManage
-            ? 'Bu yerga joylangan e‘lonlar darhol foydalanuvchilarning KiberQalqon ilovasi bosh ekranida ko‘rinadi.'
+            ? 'Bu yerga joylangan e‘lonlar darhol foydalanuvchilarning UzGuard ilovasi bosh ekranida ko‘rinadi.'
             : 'Rahbariyat e‘lonlari. Bu yerda faqat o‘qiy olasiz — e‘lon joylash huquqi egada.'}
         </p>
       </div>
@@ -127,6 +155,13 @@ export default function News() {
               <span className="fld-lbl">Darajasi</span>
               <select value={level} onChange={(e) => setLevel(e.target.value)}>
                 {LEVELS.map((l) => <option key={l.v} value={l.v}>{l.label}</option>)}
+              </select>
+            </div>
+            <div className="field">
+              <span className="fld-lbl">Qamrov (guruh)</span>
+              <select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
+                <option value="">Hammaga (global)</option>
+                {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
               </select>
             </div>
             <div className="field">
@@ -175,6 +210,7 @@ export default function News() {
                     <div className="nc-top">
                       {n.image_url && <img className="nc-thumb" src={n.image_url} alt="" />}
                       <div className="nc-title">{n.title}</div>
+                      {n.group_id && <NewsGroupTag id={n.group_id} groups={groups} />}
                       <span className="nc-date">{uzDateSafe(n.created_at)}</span>
                       {canEdit && (<>
                         <button className={'nc-act' + (n.pinned ? ' on' : '')} title="Qadab qo‘yish" onClick={() => togglePin(n)}>📌</button>

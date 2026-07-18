@@ -57,7 +57,7 @@ FileObserver теперь:
 4. ✅ Видишь Toast "FileObserver запущен"
 5. Открой браузер
 6. Скачай любой APK файл
-7. ✅ Через 2 секунды выскочит окно KiberQalqon!
+7. ✅ Через 2 секунды выскочит окно UzGuard!
 8. ✅ Видишь "Tekshirilmoqda..." с анимацией
 9. ✅ Через 2 секунды результат с цветом
 
@@ -85,7 +85,7 @@ adb logcat | grep ApkFileObserver
 
 📱 НОВЫЙ APK ГОТОВ:
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 ═══════════════════════════════════════════════════════════════
 

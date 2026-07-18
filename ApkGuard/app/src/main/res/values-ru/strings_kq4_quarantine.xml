@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экранов Карантин и Состояние защиты (русский перевод). -->
+<resources>
+
+    <!-- ───────── Карантин ───────── -->
+    <string name="kq4_quar_eyebrow">Карантин</string>
+    <string name="kq4_quar_title">Удалённые файлы</string>
+    <string name="kq4_quar_sub">Эти файлы были опасны и удалены с вашего телефона. Они больше не могут навредить.</string>
+    <string name="kq4_quar_empty_title">Карантин пуст</string>
+    <string name="kq4_quar_empty_sub">Всё очищено.</string>
+    <string name="kq4_quar_restore">Восстановить</string>
+    <string name="kq4_quar_delete">Удалить</string>
+    <string name="kq4_quar_clear_all">Полностью очистить карантин</string>
+    <string name="kq4_quar_cancel">Отмена</string>
+
+    <string name="kq4_quar_restore_msg">Вернуть «%1$s» на прежнее место? (Этот файл был помечен как опасный.)</string>
+    <string name="kq4_quar_restored">Восстановлено: %1$s</string>
+    <string name="kq4_quar_restore_fail">Не удалось восстановить: %1$s</string>
+    <string name="kq4_quar_purge_title">Удалить навсегда</string>
+    <string name="kq4_quar_purge_msg">Удалить «%1$s» навсегда? Это действие нельзя отменить.</string>
+    <string name="kq4_quar_clear_all_msg">Удалить навсегда все файлы из карантина? Это действие нельзя отменить.</string>
+
+    <string name="kq4_quar_today">Сегодня, %1$s</string>
+    <string name="kq4_quar_yesterday">Вчера, %1$s</string>
+    <string name="kq4_quar_days_ago">%1$d дн. назад</string>
+    <string name="kq4_quar_src_downloads">Загрузки</string>
+    <string name="kq4_quar_src_storage">Память</string>
+
+    <!-- ───────── Состояние защиты / Разрешения ───────── -->
+    <string name="kq4_prot_eyebrow">Состояние защиты</string>
+    <string name="kq4_prot_title">Разрешения</string>
+    <string name="kq4_prot_count">%1$d / %2$d разрешений включено</string>
+    <string name="kq4_prot_all_on">Защита полностью включена</string>
+    <string name="kq4_prot_enable_one">Включите ещё одно разрешение — защита станет сильнее</string>
+    <!-- Мастер «Включить всё» (одна кнопка → запрашивает все разрешения по очереди) -->
+    <string name="kq4_prot_enable_all">Включить всё</string>
+    <string name="kq4_prot_wizard_start">Разрешения запросим по очереди. В каждом нажмите «Разрешить» или «Включить» и вернитесь назад.</string>
+    <string name="kq4_prot_wizard_open">«%1$s» — включите и вернитесь назад</string>
+    <string name="kq4_prot_wizard_done_ok">Все разрешения включены ✓</string>
+    <string name="kq4_prot_wizard_done_partial">Некоторые разрешения не включены. Их можно включить вручную в списке.</string>
+
+    <string name="kq4_prot_row_files_t">Доступ к файлам</string>
+    <string name="kq4_prot_row_files_s">Нужен для проверки APK-файлов</string>
+    <string name="kq4_prot_row_battery_t">Работа без ограничений батареи</string>
+    <string name="kq4_prot_row_battery_s">Следит в фоне даже после закрытия. На Samsung может выглядеть выключенным — необязательно.</string>
+    <string name="kq4_prot_row_overlay_t">Поверх других окон</string>
+    <string name="kq4_prot_row_overlay_s">Нужно, чтобы окно предупреждения само открывалось при угрозе. На некоторых телефонах включить нельзя — тогда предупреждение придёт уведомлением.</string>
+    <string name="kq4_prot_row_fsi_t">Полноэкранное предупреждение</string>
+    <string name="kq4_prot_row_fsi_s">Разрешите, чтобы окно с вирусом само открывалось на заблокированном экране (нужно для Android 14+).</string>
+    <string name="kq4_prot_row_oempopup_t">Всплывающее окно в фоне</string>
+    <string name="kq4_prot_row_oempopup_s">Разрешение показывать окно из фона — обязательно для Xiaomi/MIUI, иначе окно не появится.</string>
+    <string name="kq4_prot_row_notif_s">Нужно для предупреждений об угрозах</string>
+    <string name="kq4_prot_row_loc_t">Геолокация</string>
+    <string name="kq4_prot_row_loc_s">Для карты угроз вашего региона. Необязательно — приложение полностью работает и без неё.</string>
+    <string name="kq4_prot_row_autostart_t">Автозапуск (%1$s)</string>
+    <string name="kq4_prot_row_autostart_s">Включите «Autostart», чтобы телефон не выключал приложение</string>
+    <string name="kq4_prot_row_bg_t">Фоновая работа</string>
+    <string name="kq4_prot_row_bg_s">Постоянное наблюдение должно быть включено</string>
+
+    <string name="kq4_prot_continue_locked">Сначала включите разрешения</string>
+    <string name="kq4_prot_continue_toast">Чтобы продолжить, включите все обязательные разрешения.</string>
+    <string name="kq4_prot_autostart_open">Открыть настройку</string>
+    <string name="kq4_prot_autostart_close">Закрыть</string>
+    <string name="kq4_prot_autostart_fail">Не удалось открыть автоматически. Включите вручную: Настройки → Приложения → UzGuard.</string>
+
+    <!-- Предупреждение «Продолжить», когда не выданы разрешения для авто-окна -->
+    <string name="kq4_prot_window_warn_title">Авто-окно отключено</string>
+    <string name="kq4_prot_window_warn_msg">Без разрешений «Поверх других окон» и «Полноэкранное предупреждение» окно при угрозе не появится само — придёт только уведомление. Для полной защиты включите их.</string>
+    <string name="kq4_prot_window_warn_enable">Включить</string>
+    <string name="kq4_prot_window_warn_skip">Всё равно продолжить</string>
+
+    <!-- ───────── Тексты уведомлений (NotificationHelper) ───────── -->
+    <string name="kq4_notif_quar_title">🛡️ Вирус удалён</string>
+    <string name="kq4_notif_quar_text">%1$s — автоматически помещён в карантин</string>
+    <string name="kq4_notif_quar_big">Файл %1$s признан опасным и автоматически удалён (карантин).\n\nПричина: %2$s\n\nЕсли это ошибка, можно восстановить в течение 7 дней.</string>
+
+    <string name="kq4_notif_secblock_title">UzGuard не запустился</string>
+    <string name="kq4_notif_secblock_tamper">Приложение могло быть вскрыто (перепаковано) — остановлено в целях безопасности.</string>
+    <string name="kq4_notif_secblock_env">Обнаружен root или изменённая система — защита не может работать в этой среде.</string>
+
+    <string name="kq4_notif_a11y_title">⚠️ Приложение получило контроль над экраном</string>
+    <string name="kq4_notif_a11y_text">%1$s — включён Accessibility. Так делают банковские трояны.</string>
+    <string name="kq4_notif_a11y_big">%1$s (%2$s) включил службу Accessibility — теперь он может читать ваш экран, сам нажимать кнопки и контролировать банковские приложения.\n\nЕсли вы НЕ включали это сами — немедленно удалите (возможно, это банкер).\nНажмите: настройки Accessibility → отключите службу.</string>
+    <string name="kq4_notif_a11y_action">Настройки Accessibility</string>
+
+    <string name="kq4_notif_notifacc_title">⚠️ Приложение может читать уведомления</string>
+    <string name="kq4_notif_notifacc_text">%1$s — получил доступ к уведомлениям. Коды OTP под угрозой.</string>
+    <string name="kq4_notif_notifacc_big">%1$s (%2$s) получил право читать уведомления — теперь он видит одноразовые коды (OTP) из банковских и Telegram push-уведомлений. Банкеры именно так крадут их без доступа к SMS.\n\nЕсли вы НЕ давали это сами — немедленно удалите.\nНажмите: настройки доступа к уведомлениям → отзовите разрешение.</string>
+    <string name="kq4_notif_notifacc_action">Настройки</string>
+
+</resources>

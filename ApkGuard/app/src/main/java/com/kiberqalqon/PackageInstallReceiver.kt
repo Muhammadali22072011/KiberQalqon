@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -38,7 +38,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
 
         // Ne treboem skanirovat' samogo sebya, no event vse-ravno otpravim
         // (osobenno PACKAGE_FULLY_REMOVED — chtoby viden bylo, esli kto-to
-        // pytaetsya unintall'nut' KiberQalqon).
+        // pytaetsya unintall'nut' UzGuard).
         val isOwn = pkg == context.packageName || pkg == "${context.packageName}.debug"
         val ctx = context.applicationContext
 
@@ -50,18 +50,24 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 }
                 if (isOwn) return
                 Log.d(TAG, "Package installed: $pkg")
+                // O'rnatish tugadi — bir martalik tasdiqni olib tashlaymiz (qayta ishlatilmasin).
+                try { InstallApproval.clearApproval(ctx, pkg) } catch (_: Throwable) {}
                 scope.launch { scanInstalledPackage(ctx, pkg) }
                 // Yangi ilova darhol accessibility / bildirishnoma kirish so'rashi mumkin —
-                // ikkalasini ham real vaqtda kuzatamiz.
-                AccessibilityWatcher.checkNow(ctx)
-                NotificationAccessWatcher.checkNow(ctx)
+                // ikkalasini ham real vaqtda kuzatamiz. Receiver HECH QACHON qulamasin.
+                try {
+                    AccessibilityWatcher.checkNow(ctx)
+                    NotificationAccessWatcher.checkNow(ctx)
+                } catch (e: Throwable) { Log.w(TAG, "watcher checkNow failed", e) }
             }
             Intent.ACTION_PACKAGE_REPLACED -> {
                 if (isOwn) return
                 Log.d(TAG, "Package replaced: $pkg")
                 scope.launch { rescanReplacedPackage(ctx, pkg) }
-                AccessibilityWatcher.checkNow(ctx)
-                NotificationAccessWatcher.checkNow(ctx)
+                try {
+                    AccessibilityWatcher.checkNow(ctx)
+                    NotificationAccessWatcher.checkNow(ctx)
+                } catch (e: Throwable) { Log.w(TAG, "watcher checkNow failed", e) }
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED, Intent.ACTION_PACKAGE_REMOVED -> {
                 // REMOVED prikhodit s EXTRA_REPLACING=true vo vremya update — skipaem.
@@ -77,9 +83,34 @@ class PackageInstallReceiver : BroadcastReceiver() {
     }
 
     private fun rescanReplacedPackage(context: Context, pkg: String) {
+        // Manifest-diff (supply-chain himoyasi): yangilanish XAVFLI qobiliyat oldimi (yangi SMS/
+        // accessibility/device-admin/notification-listener yoki targetSdk pasayishi)? Metadata-only
+        // taqqoslash — deyarli tekin, qizdirmaydi. Ishonchli store (Play) yangilanishlari uchun HAM
+        // ishlaydi: "yaxshi ilova N+1 versiyada zararli bo'ldi" bo'shlig'ini to'liq rescan qamramaydi
+        // (isFromTrustedStore pastda skip qiladi). diffOnReplace ichida yangi snapshot qayta yoziladi.
+        try {
+            val deltas = CapabilitySnapshot.diffOnReplace(context, pkg)
+            if (deltas.isNotEmpty()) {
+                val lbl = try {
+                    context.packageManager.getApplicationInfo(pkg, 0)
+                        .loadLabel(context.packageManager).toString()
+                } catch (_: Throwable) { pkg }
+                NotificationHelper.showCapabilityGainNotification(context, pkg, lbl, deltas)
+            }
+        } catch (e: Throwable) { Log.w(TAG, "capability diff failed", e) }
+
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(pkg, 0)
+
+            // Ishonchli store'dan kelgan yangilanishni (Play va h.k.) skanlamaymiz — qizishning
+            // oldini olamiz va spam-yangilanish bildirishnomalarini chiqarmaymiz. Sideload
+            // ilovaning yangilanishi (installer = null / package installer) esa tekshiriladi.
+            if (ApkScanner.isFromTrustedStore(context, pkg)) {
+                Log.d(TAG, "Skip rescan (trusted store update): $pkg")
+                return
+            }
+
             val apkPath = info.sourceDir
             val label = info.loadLabel(pm).toString()
             val result = if (apkPath != null && File(apkPath).exists()) {
@@ -93,6 +124,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 when (result.verdict) {
                     ScanResult.Verdict.DANGER -> {
                         Log.w(TAG, "Replaced DANGER package: $pkg — $result")
+                        try { InstallApproval.flagDanger(context, pkg, label) } catch (_: Throwable) {}
                         if (ImprovedApkFileObserver.canLaunchActivityFromBackground(context)) {
                             try {
                                 val intent = Intent(context, AutoScanActivity::class.java).apply {
@@ -114,6 +146,14 @@ class PackageInstallReceiver : BroadcastReceiver() {
                     }
                     ScanResult.Verdict.SAFE -> {
                         Log.d(TAG, "Replaced safe package: $pkg")
+                        // Sideload ilova yangilandi va xavfsiz — foydalanuvchiga "tekshirildi ✅"
+                        // informatsion bildirishnoma (jim). Play yangilanishlari bu yergacha
+                        // yetib kelmaydi (yuqorida isFromTrustedStore bilan skip qilingan).
+                        if (Config.isAppUpdateNotifyEnabled(context)) {
+                            try {
+                                NotificationHelper.showAppUpdatedNotification(context, pkg, label)
+                            } catch (_: Throwable) {}
+                        }
                     }
                 }
             }
@@ -125,9 +165,28 @@ class PackageInstallReceiver : BroadcastReceiver() {
     }
 
     private fun scanInstalledPackage(context: Context, pkg: String) {
+        // Manifest-diff bazasi: yangi o'rnatilgan ilovaning qobiliyat snapshotini olamiz, shunda
+        // keyingi yangilanishda (PACKAGE_REPLACED) xavfli o'zgarishni taqqoslay olamiz (Play uchun ham).
+        try { CapabilitySnapshot.snapshot(context, pkg) } catch (e: Throwable) { Log.w(TAG, "capsnap failed", e) }
+
         try {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(pkg, 0)
+
+            // Play Market / ishonchli store'dan o'rnatilgan ilovani SKANLAMAYMIZ:
+            // Play Protect uni allaqachon tekshirgan, qayta skan telefonni bekorga qizdiradi
+            // (va foydalanuvchiga "base.apk" chiqadi). Faqat noma'lum manbadan (sideload —
+            // Telegram / brauzer / fayl menejeri) kelgan ilovalar tekshiriladi.
+            if (ApkScanner.isFromTrustedStore(context, pkg)) {
+                val label = info.loadLabel(pm).toString()
+                Log.d(TAG, "Skip scan (trusted store): $pkg")
+                TelemetryReporter.report(
+                    context, "INSTALL",
+                    "Yangi ilova o'rnatildi (ishonchli manba — tekshirilmadi):\n📦 $label ($pkg)"
+                )
+                return
+            }
+
             val apkPath = info.sourceDir ?: return
             if (!File(apkPath).exists()) {
                 Log.w(TAG, "sourceDir doesn't exist: $apkPath")
@@ -147,6 +206,7 @@ class PackageInstallReceiver : BroadcastReceiver() {
             when (result.verdict) {
                 ScanResult.Verdict.DANGER -> {
                     Log.w(TAG, "Installed DANGER package: $pkg — $result")
+                    try { InstallApproval.flagDanger(context, pkg, label) } catch (_: Throwable) {}
                     // Avval popup ochishga urinamiz (faqat oldingi planda yoki overlay ruxsati bo'lsa).
                     // Notification full-screen-intent bilan har holda chiqadi — fon'da bo'lsa lock
                     // screen ustida ko'rinadi va telefon ochilsa avtomatik uninstall dialogiga olib boradi.

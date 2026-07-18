@@ -3,7 +3,7 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 Размер: ~7.5 МБ
 Дата: 08.02.2026
 
@@ -13,7 +13,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 1. 🎨 SPLASH SCREEN С ЛОГОТИПОМ:
    ✅ SplashActivity.kt - экран загрузки
    ✅ activity_splash.xml - красивый layout
-   ✅ Логотип KiberQalqon
+   ✅ Логотип UzGuard
    ✅ Название и подзаголовок
    ✅ Плавная анимация появления
    ✅ Автоматический переход в главный экран
@@ -49,12 +49,12 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 1. Открывается Splash Screen с логотипом
 2. Показывается 1.5 секунды
 3. Запрашивается разрешение на чтение файлов:
-   "KiberQalqon нужен доступ ко всем файлам для поиска и проверки APK файлов"
+   "UzGuard нужен доступ ко всем файлам для поиска и проверки APK файлов"
 4. Пользователь нажимает OK
 5. Открываются настройки Android
 6. Пользователь разрешает доступ
 7. Запрашивается разрешение на показ поверх других окон:
-   "KiberQalqon нужно показывать предупреждения поверх других приложений"
+   "UzGuard нужно показывать предупреждения поверх других приложений"
 8. Пользователь нажимает OK
 9. Открываются настройки Android
 10. Пользователь разрешает
@@ -80,7 +80,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 Дизайн:
 - Синий фон (primary color)
 - Белый логотип щита (120x120dp)
-- Название "KIBERQALQON" (32sp, bold)
+- Название "UZGUARD" (32sp, bold)
 - Подзаголовок "Himoya zararli APK fayllardan" (16sp)
 - Плавная анимация fade in
 

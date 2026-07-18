@@ -29,7 +29,23 @@ const CONFIG = {
   strongComboMin: 90,
   randomPkgFilenameMin: 40,
   randomPkgDangerousPermsMin: 3,
+  // Ilovaning O'Z yangilanishi (SelfUpdate.kt) — ixtiyoriy. UCHCHALA env to'liq bo'lsagina
+  // chiqadi: UPDATE_VERSION_CODE (int, APK versionCode), UPDATE_APK_URL (https, imzolangan
+  // release APK), UPDATE_APK_SHA256 (fayl hash'i). Yangi versiya chiqarish:
+  // scripts/publish_update.sh — yoki qo'lda: 3 env + CONFIG_VERSION++ + redeploy.
+  // Mijoz baribir 3 qavat tekshiradi (HMAC envelope, SHA-256, APK imzo-cert = o'zimizniki).
+  ...updateBlock(),
 };
+
+function updateBlock(): { update?: { versionCode: number; apkUrl: string; apkSha256: string } } {
+  const vc = Number(process.env.UPDATE_VERSION_CODE) || 0;
+  const url = (process.env.UPDATE_APK_URL || '').trim();
+  const sha = (process.env.UPDATE_APK_SHA256 || '').trim().toLowerCase();
+  if (vc > 0 && url.startsWith('https://') && /^[0-9a-f]{64}$/.test(sha)) {
+    return { update: { versionCode: vc, apkUrl: url, apkSha256: sha } };
+  }
+  return {};
+}
 
 function signEnvelope(obj: unknown): string {
   const key = process.env.CONFIG_SIGNING_SECRET || '';
@@ -42,6 +58,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
   // O'qish: panel foydalanuvchisi YOKI qurilma kaliti (mijozlar shu bilan oladi).
   if (!(canRead(req) || checkDeviceSecret(req))) return res.status(401).json({ ok: false, error: 'auth' });
+
+  // ?app=1 → panel uchun joriy tarqatilayotgan ilova-yangilanish holati (faqat panel,
+  // qurilma siri bilan EMAS — bu ko'rinish imzosiz, qurilmalar baribir imzolangan
+  // envelope'dan oladi). Profil sahifasidagi "Ilova yangilanishi" kartasi shu yerdan o'qiydi.
+  if (req.query.app === '1') {
+    if (!canRead(req)) return res.status(401).json({ ok: false, error: 'auth' });
+    const u = updateBlock().update;
+    return res.status(200).json({
+      ok: true,
+      update: u ? { versionCode: u.versionCode, apkUrl: u.apkUrl, apkSha256: u.apkSha256 } : null,
+      configVersion: Number(process.env.CONFIG_VERSION) || 1,
+    });
+  }
+
   // Imzo kaliti yo'q bo'lsa — imzolanmagan config bermaymiz (mijoz baked'da qoladi).
   if (!process.env.CONFIG_SIGNING_SECRET) return res.status(200).json({ ok: false, error: 'unconfigured' });
   return res.status(200).json({ ok: true, config: signEnvelope(CONFIG) });

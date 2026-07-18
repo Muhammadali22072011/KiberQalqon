@@ -1,0 +1,128 @@
+{
+ "splash-language": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_splash.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_language_select.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/SplashActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/LanguageSelectActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_lang_ring.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_splash.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_splash.xml"
+ ],
+ "onboarding-initialscan": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_onboarding.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/item_onboarding_page.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_initial_scan.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/OnboardingActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/InitialScanActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_onboarding.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_onboarding.xml"
+ ],
+ "dashboard": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_dashboard_new.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/inc_dashboard_threat_row.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/inc_dashboard_app_row.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/DashboardNewActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_dash_iconbtn24.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_dashboard.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_dashboard.xml"
+ ],
+ "apps-skaner": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_main.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/item_apk.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/MainActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/ApkAdapter.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_skaner_chip_on.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_skaner_chip_off.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_skaner_badge_on.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_skaner.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_skaner.xml"
+ ],
+ "autoscan": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_auto_scan.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_autoscan.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_autoscan.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_result_bg.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_pulse.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_step_done.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_step_todo.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_step_dot.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_check.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_filebox.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_halo_outer.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_halo_inner.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_circle_warn.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_btn_ghost.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_autoscan_iconbtn.xml"
+ ],
+ "scanresult-permissions": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_scan_result.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_permissions_detail.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/inc_kq_perm_row.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/ScanResultActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/PermissionsDetailActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_scanres_banner_warn.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_scanres_banner_safe.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_scanres_file_chip.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_scanres_tag_onbanner.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_scanresult.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_scanresult.xml"
+ ],
+ "stats": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_scan_history.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/item_scan_history.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/ScanHistoryActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_stats_bar.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_stats_bar_bad.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_stats_track.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_stats_fill_danger.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_stats_fill_warn.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_stats.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_stats.xml"
+ ],
+ "settings-about": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_settings_new.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_about.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/inc_settings_toggle_row.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/inc_settings_chevron_row.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/SettingsActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_seg_track.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_seg_active.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_swatch_sel.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_swatch_idle.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_dot_anor.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_dot_feruz.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/drawable/kq4_settings_dot_zafaron.xml"
+ ],
+ "report": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_report_problem.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/ReportProblemActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_report.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_report.xml"
+ ],
+ "quarantine-protection": [
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\java\\com\\kiberqalqon\\QuarantineActivity.kt",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\java\\com\\kiberqalqon\\ProtectionStatusActivity.kt",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\res\\layout\\activity_quarantine_v4.xml",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\res\\layout\\activity_protection_v4.xml",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\res\\layout\\item_kq4_quarantine_entry.xml",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\res\\layout\\item_kq4_protection_row.xml",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\res\\values\\strings_kq4_quarantine.xml",
+  "C:\\Users\\User\\OneDrive\\Desktop\\KiberQalqon\\ApkGuard\\app\\src\\main\\res\\values-ru\\strings_kq4_quarantine.xml"
+ ],
+ "misc": [
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_consent.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/ConsentActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_welcome.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_terms.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_privacy.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/activity_apk_list.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/dialog_news.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/layout/item_news_ticker.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/DiagnosticsActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/TelemetrySettingsActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/java/com/kiberqalqon/HiddenThreatsActivity.kt",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values/strings_kq4_misc.xml",
+  "C:/Users/User/OneDrive/Desktop/KiberQalqon/ApkGuard/app/src/main/res/values-ru/strings_kq4_misc.xml"
+ ]
+}

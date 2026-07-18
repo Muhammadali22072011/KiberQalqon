@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Ruxsatlar» — v4 dizayn (screens3.jsx → Permissions).
+  Sarlavha (icon-btn back + eyebrow + fayl nomi) → qizil ogohlantirish kartasi →
+  3 guruh: "Eng xavfli ruxsatlar" (KRITIK) / "E'tibor bering" (DIQQAT) / "Oddiy ruxsatlar"
+  → "Natijaga qaytish" tugmasi. Satrlar inc_kq_perm_row.xml dan inflate qilinadi.
+
+  PermissionsDetailActivity.kt IDlari: btnBack, tvApkName, cardSummary,
+  groupCrit, critContainer, groupWarn, warnContainer, groupNormal, normalContainer,
+  btnBackBottom.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="30dp">
+
+        <!-- Sarlavha qatori -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/kq4_icon_btn"
+                android:contentDescription="@string/kq4_back"
+                android:padding="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic4_back"
+                app:tint="@color/kq_ink" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/KQ4.Eyebrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kq4_scanres_perm_eyebrow" />
+
+                <TextView
+                    android:id="@+id/tvApkName"
+                    style="@style/KQ4.HTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textSize="22sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Qizil ogohlantirish kartasi -->
+        <LinearLayout
+            android:id="@+id/cardSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/kq4_card_danger"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_shield_alert"
+                app:tint="@color/kq_danger" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="13dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/onest_medium"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/kq4_scanres_perm_summary"
+                android:textColor="@color/kq_danger_ink"
+                android:textSize="13.5sp" />
+        </LinearLayout>
+
+        <!-- ═══ Guruh 1: Eng xavfli ruxsatlar (KRITIK) ═══ -->
+        <LinearLayout
+            android:id="@+id/groupCrit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="2dp">
+
+                <TextView
+                    style="@style/KQ4.SecTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/kq4_scanres_group_crit"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:background="@drawable/kq4_tag_danger"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp">
+
+                    <View
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/kq4_dot"
+                        android:backgroundTint="@color/kq_danger_ink" />
+
+                    <TextView
+                        style="@style/KQ4.Tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:text="@string/perm_sev_critical"
+                        android:textColor="@color/kq_danger_ink"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/critContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ═══ Guruh 2: E'tibor bering (DIQQAT) ═══ -->
+        <LinearLayout
+            android:id="@+id/groupWarn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="2dp">
+
+                <TextView
+                    style="@style/KQ4.SecTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/kq4_scanres_group_warn"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:background="@drawable/kq4_tag_warn"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp">
+
+                    <View
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/kq4_dot"
+                        android:backgroundTint="@color/kq_warn_ink" />
+
+                    <TextView
+                        style="@style/KQ4.Tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:text="@string/perm_sev_warning"
+                        android:textColor="@color/kq_warn_ink"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/warnContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ═══ Guruh 3: Oddiy ruxsatlar ═══ -->
+        <LinearLayout
+            android:id="@+id/groupNormal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/KQ4.SecTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="2dp"
+                android:text="@string/kq4_scanres_group_normal"
+                android:textSize="15sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/normalContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBackBottom"
+            style="@style/KQ4.Button.Danger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:minHeight="58dp"
+            android:text="@string/kq4_scanres_back_result"
+            android:textSize="17sp"
+            app:icon="@drawable/ic4_back"
+            app:iconSize="19dp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

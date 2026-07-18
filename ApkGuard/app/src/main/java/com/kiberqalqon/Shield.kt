@@ -1,11 +1,11 @@
-package com.kiberqalqon
+package com.uzguard
 
 import java.security.MessageDigest
 
 /**
  * Shield — runtime-deobfuskatsiya strok.
  *
- * Maqsad: `strings kiberqalqon.apk | grep` IOC'larni (zararli APK xeshlari,
+ * Maqsad: `strings uzguard.apk | grep` IOC'larni (zararli APK xeshlari,
  * paketlar, sertifikatlar) va anti-tamper markerlarini (frida, magisk, su...)
  * KO'RSATMASIN. DEX ichida faqat hex-"axlat" yotadi — u oddiy SHA-256 xeshlardan
  * farq qilmaydi. Haqiqiy qiymat faqat xotirada ochiladi.

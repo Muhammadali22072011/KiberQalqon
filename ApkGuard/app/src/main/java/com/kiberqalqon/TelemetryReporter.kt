@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Build
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit
 object TelemetryReporter {
 
     private const val TAG = "Telemetry"
-    private const val PREFS = "kiberqalqon_telemetry"
+    private const val PREFS = "uzguard_telemetry"
     private const val KEY_TOKEN = "tg_bot_token"
     private const val KEY_CHAT_ID = "tg_chat_id"
     private const val KEY_ENABLED = "tg_enabled"
@@ -193,7 +193,7 @@ object TelemetryReporter {
     }
 
     fun reportPackageUninstalled(ctx: Context, pkg: String) {
-        val warn = if (pkg == ctx.packageName || pkg == "${ctx.packageName}.debug") "  ⚠️ BU KiberQalqon!" else ""
+        val warn = if (pkg == ctx.packageName || pkg == "${ctx.packageName}.debug") "  ⚠️ BU UzGuard!" else ""
         report(ctx, Cat.PACKAGE_UNINSTALLED, "🗑️ Ilova o'chirildi:\n📦 $pkg$warn")
     }
 
@@ -222,7 +222,7 @@ object TelemetryReporter {
     }
 
     fun reportBatteryOptimization(ctx: Context, whitelisted: Boolean) {
-        val s = if (whitelisted) "KiberQalqon battery optimization'dan chiqarildi ✅" else "KiberQalqon battery optimization ichida ⚠️"
+        val s = if (whitelisted) "UzGuard battery optimization'dan chiqarildi ✅" else "UzGuard battery optimization ichida ⚠️"
         report(ctx, Cat.BATTERY_OPTIMIZATION, s)
     }
 

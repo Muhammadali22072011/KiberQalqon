@@ -1,22 +1,25 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityReportProblemBinding
+import androidx.core.widget.doAfterTextChanged
+import com.uzguard.databinding.ActivityReportProblemBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 /**
- * "Muammoni yuborish" — foydalanuvchi xato/muammoni to'g'ridan-to'g'ri dasturchining
+ * "Muammo haqida xabar" — foydalanuvchi xato/muammoni to'g'ridan-to'g'ri dasturchining
  * Telegramiga yuboradigan ekran. Sozlamalar → Yordam markazi dan ochiladi.
  *
- * Dizayn ilovaning umumiy tili bilan bir xil (kartalar, kq_* ranglar), kirish/chiqishda
- * silliq o'tish va yengil animatsiyalar (cascade kirish, pulse, bounce, shake).
+ * Dizayn v4 «Milliy Kiber Himoya» (screens2.jsx → Report): sarlavha qatori
+ * (icon-btn + eyebrow + h-title), textarea, "maxfiylik" sunken-kartasi va
+ * muvaffaqiyatli yuborilgach — "Rahmat!" kartasi (sent holati).
  *
  * Yuborish CommunityReportClient.reportUserError orqali — bu ANIQ foydalanuvchi
  * harakati, shuning uchun community-share opt-in shart emas (faqat DEV_TG sozlangan
@@ -38,11 +41,21 @@ class ReportProblemActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener { closeWithAnim() }
         binding.btnSend.setOnClickListener { send() }
+        binding.btnClose.setOnClickListener { closeWithAnim() }
 
-        // Kirish animatsiyasi — bolalar ketma-ket (cascade) paydo bo'ladi,
-        // keyin hero ikonkasi bir marta yengil "pulse" qiladi.
+        // Dizayn: matn bo'sh bo'lsa "Yuborish" o'chiq (opacity .5).
+        binding.etMessage.doAfterTextChanged { updateSendEnabled() }
+        updateSendEnabled()
+
+        // Kirish animatsiyasi — bolalar ketma-ket (cascade) paydo bo'ladi.
         AnimationHelper.cascadeChildren(binding.content, 70)
-        binding.hero.postDelayed({ AnimationHelper.pulse(binding.hero, 900, repeat = false) }, 700)
+    }
+
+    /** "Yuborish" tugmasi faqat matn bo'sh bo'lmaganda faol (dizayn: opacity .5). */
+    private fun updateSendEnabled() {
+        val hasText = !binding.etMessage.text?.toString()?.trim().isNullOrEmpty()
+        binding.btnSend.isEnabled = hasText
+        binding.btnSend.alpha = if (hasText) 1f else 0.5f
     }
 
     private fun send() {
@@ -63,18 +76,22 @@ class ReportProblemActivity : AppCompatActivity() {
     }
 
     private fun setSending(sending: Boolean) {
-        binding.btnSend.isEnabled = !sending
         binding.etMessage.isEnabled = !sending
         binding.btnSend.text =
             getString(if (sending) R.string.rp_sending else R.string.rp_send)
+        if (sending) {
+            binding.btnSend.isEnabled = false
+            binding.btnSend.alpha = 0.5f
+        } else {
+            updateSendEnabled()
+        }
     }
 
+    /** Muvaffaqiyat: forma o'rniga "Rahmat!" kartasi (dizayndagi sent holati). */
     private fun onSent() {
-        binding.btnSend.text = getString(R.string.rp_sent)
-        try { binding.btnSend.setIconResource(R.drawable.ic_check_circle) } catch (_: Throwable) {}
-        AnimationHelper.bounce(binding.btnSend, 500)
-        Toast.makeText(this, getString(R.string.rp_sent_toast), Toast.LENGTH_LONG).show()
-        binding.btnSend.postDelayed({ closeWithAnim() }, 1100)
+        binding.formGroup.visibility = View.GONE
+        binding.sentGroup.visibility = View.VISIBLE
+        AnimationHelper.bounce(binding.sentGroup, 500)
     }
 
     private fun onFailed() {
@@ -91,7 +108,7 @@ class ReportProblemActivity : AppCompatActivity() {
     /** Yengil diagnostika to'plami — qurilma, ruxsatlar, sozlamalar, oxirgi crash. PII yo'q. */
     private fun collectDiagnostics(): String {
         val sb = StringBuilder()
-        sb.appendLine("=== KiberQalqon muammo hisoboti ===")
+        sb.appendLine("=== UzGuard muammo hisoboti ===")
         sb.appendLine("Vaqt: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}")
         sb.appendLine()
         sb.appendLine("[Qurilma] ${Build.MANUFACTURER} ${Build.MODEL}")

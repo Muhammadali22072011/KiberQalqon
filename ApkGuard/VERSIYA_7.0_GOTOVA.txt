@@ -10,7 +10,7 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 🚀 КАК УСТАНОВИТЬ:
 ------------------

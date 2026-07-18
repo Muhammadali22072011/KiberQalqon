@@ -1,6 +1,7 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.util.Log
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.math.ln
 
@@ -37,7 +38,16 @@ object NativeLibAnalyzer {
         "/proc/self/maps",             // self-inspection (anti-Frida/anti-debug)
     )
 
-    /** Известные безопасные .so — крупные движки/SDK, дающие шум при анализе. */
+    /**
+     * Известные безопасные .so — крупные движки/SDK, дающие шум при анализе.
+     *
+     * ВАЖНО (безопасность): имя .so внутри APK ПОЛНОСТЬЮ контролируется атакующим,
+     * поэтому это НЕ повод пропускать анализ. Dropper мог бы переименовать свой
+     * packed reverse-shell в libflutter.so и обойти детектор. Теперь мы анализируем
+     * КАЖДУЮ .so, а этот список используется лишь для подавления СЛАБОЙ ветки
+     * (2+ импорта без энтропии) у настоящих движков. Сильная комбинация
+     * (execve/sh/ptrace + высокая энтропия) флагуется независимо от имени.
+     */
     private val SAFE_LIB_NAMES = listOf(
         "libflutter.so", "libreactnativejni.so", "libhermes.so", "libjsc.so",
         "libv8", "libunity.so", "libil2cpp.so", "libmonochrome.so", "libchrome.so",
@@ -67,32 +77,40 @@ object NativeLibAnalyzer {
                     if (!entry.name.endsWith(".so", ignoreCase = true)) continue
                     // #32: avval >5MB .so'lar BUTUNLAY o'tkazib yuborilardi — dropper payload'ni
                     //      katta .so ichiga joylab, importlar+entropy tahlilidan qochishi mumkin edi.
-                    //      Endi katta .so ham birinchi SAMPLE_SIZE (256KB) bo'yicha tahlil qilinadi.
+                    // FIX: endi faqat birinchi 256KB emas, .so'ning bosh/o'rta/oxir oynalari
+                    //      (MAX_SO_SIZE gacha) tekshiriladi — payload'ni 256KB'dan keyinga
+                    //      joylab qochib bo'lmaydi. Har bir oyna bo'yicha entropiya alohida
+                    //      hisoblanadi (max olinadi), importlar esa birlashtiriladi.
                     if (entry.isDirectory || entry.size <= 0) continue
 
                     val baseName = entry.name.substringAfterLast('/').lowercase()
-                    if (SAFE_LIB_NAMES.any { baseName.startsWith(it) || baseName == it }) continue
+                    // Имя .so подделываемо → НЕ пропускаем анализ. Используем только для
+                    // подавления слабой ветки у настоящих движков (см. SAFE_LIB_NAMES).
+                    val knownEngine = SAFE_LIB_NAMES.any { baseName == it || baseName.startsWith(it) }
 
-                    val readBytes = entry.size.coerceAtMost(SAMPLE_SIZE.toLong()).toInt()
-                    val buf = ByteArray(readBytes)
-                    var off = 0
-                    try {
-                        zip.getInputStream(entry).use { input ->
-                            while (off < readBytes) {
-                                val n = input.read(buf, off, readBytes - off)
-                                if (n <= 0) break
-                                off += n
-                            }
-                        }
-                    } catch (_: Exception) {
-                        continue
+                    val total = entry.size.coerceAtMost(MAX_SO_SIZE)
+                    val windowLen = SAMPLE_SIZE.toLong()
+                    // Bosh + oxir (+ o'rta, agar fayl yetarlicha katta bo'lsa) oynalari.
+                    val offsets = linkedSetOf(0L)
+                    if (total > windowLen) offsets.add((total - windowLen).coerceAtLeast(0L))
+                    if (total > windowLen * 3) offsets.add((total / 2 - windowLen / 2).coerceAtLeast(0L))
+
+                    val allHits = linkedSetOf<String>()
+                    var maxEnt = 0.0
+                    var readAny = false
+                    for (ofs in offsets) {
+                        val len = (total - ofs).coerceAtMost(windowLen).toInt()
+                        if (len <= 0) continue
+                        val data = readWindow(zip, entry, ofs, len) ?: continue
+                        readAny = true
+                        val text = String(data, Charsets.ISO_8859_1)
+                        STRONG_IMPORTS.filterTo(allHits) { text.contains(it) }
+                        val e = approximateEntropy(data)
+                        if (e > maxEnt) maxEnt = e
                     }
-                    if (off == 0) continue
-                    val data = if (off == readBytes) buf else buf.copyOf(off)
-                    val text = String(data, Charsets.ISO_8859_1)
-
-                    val hits = STRONG_IMPORTS.filter { text.contains(it) }
-                    val ent = approximateEntropy(data)
+                    if (!readAny) continue
+                    val hits = allHits.toList()
+                    val ent = maxEnt
                     val highEntropy = ent > 7.6   // 8.0 = равномерный шум (зашифровано/упаковано)
 
                     // Флаг ТОЛЬКО при реально подозрительной комбинации:
@@ -100,6 +118,9 @@ object NativeLibAnalyzer {
                     //   • ИЛИ 2+ разных сильных импорта (shell-exec + анти-дебаг вместе)
                     // Легитимный OpenSSL/Glide/Flutter сюда не попадает: у них нет execve/ptrace,
                     // а dlopen/mprotect мы вообще не считаем.
+                    // Сильную ветку (execve/sh + энтропия) флагуем ДАЖЕ для движковых имён —
+                    // настоящий движок не бывает packed'ом с shell-exec; так закрываем bypass
+                    // через переименование payload'а в libflutter.so и т.п.
                     when {
                         hits.isNotEmpty() && highEntropy -> {
                             suspicious.add(entry.name)
@@ -108,7 +129,7 @@ object NativeLibAnalyzer {
                                 "Native ${entry.name}: shubhali import [${hits.joinToString(",")}] + yuqori entropiya (${"%.2f".format(ent)})"
                             )
                         }
-                        hits.size >= 2 -> {
+                        hits.size >= 2 && !knownEngine -> {
                             suspicious.add(entry.name)
                             score += 40
                             reasons.add(
@@ -123,6 +144,45 @@ object NativeLibAnalyzer {
         }
         // Бюджетируем вклад: даже несколько .so не должны в одиночку = DANGER.
         return Findings(suspicious, reasons, score.coerceAtMost(60))
+    }
+
+    /**
+     * .so ichidan [offset]'dan boshlab [length] baytlik oyna o'qiydi.
+     * ZIP oqimida seek yo'q, shuning uchun offset'gacha skip qilamiz (deflate bo'lsa ham
+     * MAX_SO_SIZE bilan cheklangan). Xotira faqat bitta oyna hajmida bo'ladi.
+     */
+    private fun readWindow(zip: ZipFile, entry: ZipEntry, offset: Long, length: Int): ByteArray? {
+        return try {
+            zip.getInputStream(entry).use { input ->
+                var toSkip = offset
+                while (toSkip > 0) {
+                    val s = input.skip(toSkip)
+                    if (s > 0) {
+                        toSkip -= s
+                    } else {
+                        // skip 0 qaytarsa — o'qib tashlab yuboramiz.
+                        val chunk = ByteArray(minOf(toSkip, 8192L).toInt())
+                        val r = input.read(chunk)
+                        if (r <= 0) return null
+                        toSkip -= r
+                    }
+                }
+                val buf = ByteArray(length)
+                var off = 0
+                while (off < length) {
+                    val n = input.read(buf, off, length - off)
+                    if (n <= 0) break
+                    off += n
+                }
+                when {
+                    off == 0 -> null
+                    off == length -> buf
+                    else -> buf.copyOf(off)
+                }
+            }
+        } catch (_: Exception) {
+            null
+        }
     }
 
     /** Шенноновская энтропия на байтах, в битах. 0 = всё одинаково, 8 = равномерно случайно. */

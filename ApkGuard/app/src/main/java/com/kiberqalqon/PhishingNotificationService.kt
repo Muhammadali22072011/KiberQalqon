@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -13,16 +13,50 @@ class PhishingNotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn == null || !Config.isPhishingBlockerEnabled(this)) return
         if (sbn.packageName == packageName) return
-        // Ishonchli yuboruvchilar (banklar, Payme/Click/Uzcard, telekom, SMS/dialer,
-        // messenjerlar, tizim ilovalari) hech qachon bloklanmaydi — aks holda haqiqiy
-        // OTP/SMS/o'tkazma bildirishnomalari yashirilib qolardi.
-        if (AppReputation.isTrusted(sbn.packageName)) return
         val text = notificationText(sbn)
+        // 1) Bildirishnomadagi havolalarni [LinkScanner] orqali tekshiramiz. Telegram in-app
+        //    brauzeri LinkGuard'ni chetlab o'tadi — bu yo'l shu teshikni yopadi: xabar matnidagi
+        //    URL XAVFLI bo'lsa foydalanuvchini ogohlantiramiz (bildirishnomani O'CHIRMAYMIZ —
+        //    bu qonuniy xabar bo'lishi mumkin, faqat havola xavfli). Havola tekshiruvi buzg'unchi
+        //    EMAS, shuning uchun u ISHONCHLI yuboruvchilar (Telegram/WhatsApp — aynan shu funksiya
+        //    yopmoqchi bo'lgan asosiy kanal) uchun ham ishga tushishi SHART.
+        scanLinks(text)
+        // Ishonchli yuboruvchilar (banklar, Payme/Click/Uzcard, telekom, SMS/dialer,
+        // messenjerlar, tizim ilovalari) uchun bildirishnomani YASHIRISH yo'li o'chiriladi —
+        // aks holda haqiqiy OTP/SMS/o'tkazma bildirishnomalari yashirilib qolardi. (Havola
+        // ogohlantirishi yuqorida allaqachon ishlab bo'lgan.)
+        if (AppReputation.isTrusted(sbn.packageName)) return
+        // 2) Klassik fishing shakli (havola + moliyaviy kalit so'z) — bildirishnomani yashiramiz.
         if (isPhishingLike(text)) {
             try {
                 cancelNotification(sbn.key)
             } catch (_: Exception) {}
         }
+    }
+
+    /**
+     * Matndan barcha http(s) havolalarni ajratib, har birini [LinkScanner] bilan tekshiradi.
+     * XAVFLI (DANGER) verdikt bo'lsa — bir marta (URL bo'yicha dedup) ogohlantiradi.
+     */
+    private fun scanLinks(text: String) {
+        try {
+            val matcher = URL_PATTERN.matcher(text)
+            var count = 0
+            while (matcher.find() && count < 5) {
+                count++
+                val url = matcher.group().trimEnd('.', ',', ')', ']', '»', '"', '\'')
+                if (url.length < 8) continue
+                val res = LinkScanner.analyze(url)
+                if (res.verdict != ScanResult.Verdict.DANGER) continue
+                val prefs = getSharedPreferences("uzguard_notif_links", MODE_PRIVATE)
+                val key = "warned_${url.hashCode()}"
+                if (prefs.getBoolean(key, false)) continue
+                prefs.edit().putBoolean(key, true).apply()
+                try {
+                    NotificationHelper.showPhishingLinkNotification(this, res.url, res.host)
+                } catch (_: Throwable) {}
+            }
+        } catch (_: Throwable) {}
     }
 
     private fun notificationText(sbn: StatusBarNotification): String {

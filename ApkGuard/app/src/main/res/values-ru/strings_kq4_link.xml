@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экрана «Проверка ссылки» (link checker, русский). -->
+<resources>
+
+    <!-- ═══ Заголовок ═══ -->
+    <string name="kq4_link_eyebrow">БЕЗОПАСНОСТЬ ССЫЛКИ</string>
+    <string name="kq4_link_title">Проверка ссылки</string>
+
+    <!-- ═══ Ввод (вставьте ссылку) ═══ -->
+    <string name="kq4_link_input_label">Вставьте ссылку сюда</string>
+    <string name="kq4_link_input_hint">https://…</string>
+    <string name="kq4_link_paste">Вставить</string>
+    <string name="kq4_link_check">Проверить</string>
+    <string name="kq4_link_clip_empty">В буфере нет ссылки</string>
+
+    <!-- ═══ Подсказка ═══ -->
+    <string name="kq4_link_hint">Вставьте сюда подозрительную ссылку из Telegram или SMS — проверьте её перед тем, как открыть.</string>
+    <string name="kq4_link_host_line">Домен: %1$s</string>
+    <string name="kq4_link_reasons_title">Почему так?</string>
+
+    <!-- ═══ Краткая причина под баннером ═══ -->
+    <string name="kq4_link_reason_safe">Опасных признаков не найдено. Но всё равно будьте осторожны.</string>
+    <string name="kq4_link_reason_suspicious">Есть подозрительные признаки — подумайте, прежде чем открывать.</string>
+    <string name="kq4_link_reason_danger">Эта ссылка выглядит ОПАСНОЙ — НЕ открывайте и никому не пересылайте.</string>
+    <string name="kq4_link_reason_unparsable">Ссылку не удалось разобрать — ненадёжно, не открывайте.</string>
+
+    <!-- ═══ Признаки (Flag → пояснение) ═══ -->
+    <string name="kq4_link_flag_blacklisted">Этот домен в списке известных мошеннических/вирусных</string>
+    <string name="kq4_link_flag_typosquat">Поддельный домен, похожий на название банка</string>
+    <string name="kq4_link_flag_punycode">Уловка со скрытыми буквами (homoglyph)</string>
+    <string name="kq4_link_flag_apk">Ссылка отдаёт файл .apk напрямую — риск дроппера</string>
+    <string name="kq4_link_flag_phishing_path">Известный вредоносный путь (C2 / кража SMS)</string>
+    <string name="kq4_link_flag_lookalike_tld">Название банка на неверном адресе (не \.uz)</string>
+    <string name="kq4_link_flag_social">Имитация Telegram/соцсети (не официальный домен)</string>
+    <string name="kq4_link_flag_ip">Вместо домена числовой IP-адрес — подозрительно</string>
+    <string name="kq4_link_flag_at">В адресе символ «@» — он скрывает настоящий сайт</string>
+    <string name="kq4_link_flag_redirect">Внутри адреса скрытое перенаправление (на другой сайт)</string>
+    <string name="kq4_link_flag_subdomains">Слишком много частей — запутанный адрес</string>
+    <string name="kq4_link_flag_tld">Дешёвый домен, который часто используют мошенники</string>
+    <string name="kq4_link_flag_scam">Слова приз/скидка/выигрыш — признак мошенничества</string>
+    <string name="kq4_link_flag_idn">Международный (не латинский) домен — проверьте внимательно</string>
+    <string name="kq4_link_flag_shortener">Сокращатель — настоящий адрес скрыт</string>
+    <string name="kq4_link_flag_financial">Слова банк/пароль/код — признак фишинга</string>
+    <string name="kq4_link_flag_nonhttps">Незашифрованное (http) соединение — небезопасно</string>
+    <string name="kq4_link_flag_unparsable">Ссылку не удалось разобрать — ненадёжно</string>
+
+    <!-- ═══ Приёмник «Поделиться» ═══ -->
+    <string name="kq4_link_no_url">В тексте не найдена ссылка</string>
+
+</resources>

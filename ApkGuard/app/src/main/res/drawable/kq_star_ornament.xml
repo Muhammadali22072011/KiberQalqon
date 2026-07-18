@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Bitta KATTA 8 qirrali o'zbek yulduzi — splash hero ortida sekin aylanadigan
+  bezak (alpha kichik, kodda boshqariladi). Ikki qavatli kontur: tashqi katta
+  yulduz + ichkarida kichikroq aks-sadosi (kq_star_tile bilan bir uslub).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="320dp"
+    android:viewportWidth="320"
+    android:viewportHeight="320">
+
+    <!-- tashqi yulduz -->
+    <path
+        android:pathData="M160 8 L196 124 L312 160 L196 196 L160 312 L124 196 L8 160 L124 124 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"
+        android:fillColor="#00000000" />
+
+    <!-- ichki aks-sado -->
+    <path
+        android:pathData="M160 56 L184 136 L264 160 L184 184 L160 264 L136 184 L56 160 L136 136 Z"
+        android:strokeWidth="1.4"
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.55"
+        android:fillColor="#00000000" />
+
+    <!-- diagonal nurlar (45°) — yulduzga "kompas" his beradi -->
+    <path
+        android:pathData="M160 96 L178 142 L224 160 L178 178 L160 224 L142 178 L96 160 L142 142 Z"
+        android:strokeWidth="1"
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.3"
+        android:fillColor="#00000000" />
+</vector>

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.provider.Settings
@@ -49,7 +49,7 @@ class AccessibilityWatcher(
             for (svc in newServices) {
                 val pkg = svc.substringBefore('/')
                 if (pkg in WHITELIST_PACKAGES) continue
-                if (isSystemAccessibility(pkg)) continue
+                if (isSystemAccessibility(ctx, pkg)) continue
 
                 Log.w(TAG, "New accessibility service: $svc")
                 try {
@@ -86,18 +86,32 @@ class AccessibilityWatcher(
         }
     }
 
-    private fun isSystemAccessibility(pkg: String): Boolean {
-        return pkg.startsWith("com.google.android.") ||
-                pkg.startsWith("com.android.") ||
-                pkg.startsWith("com.samsung.accessibility")
+    /**
+     * Paket ROSTDAN HAM tizim (platform-imzolangan) ekanini PackageManager
+     * orqali tekshiradi. Paket NOMINI (com.android.*, com.google.android.*)
+     * ISHONCH SIFATIDA ISHLATMAYMIZ — sideload qilingan banker o'zini
+     * `com.android.systemservice` yoki `com.google.android.gms.helper` deb
+     * atashi mumkin, lekin unda FLAG_SYSTEM bo'lmaydi. Faqat tizim bo'limiga
+     * o'rnatilgan (yoki tizimga yangilangan) ilovalarnigina o'tkazamiz.
+     */
+    private fun isSystemAccessibility(ctx: Context, pkg: String): Boolean {
+        return try {
+            val ai = ctx.packageManager.getApplicationInfo(pkg, 0)
+            val systemFlags = android.content.pm.ApplicationInfo.FLAG_SYSTEM or
+                    android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+            (ai.flags and systemFlags) != 0
+        } catch (_: Throwable) {
+            // Paket topilmasa yoki xato bo'lsa — tizim deb HISOBLAMAYMIZ (alert yuboriladi).
+            false
+        }
     }
 
     companion object {
         private const val TAG = "AccessibilityWatcher"
-        private const val PREFS = "kiberqalqon_a11y"
+        private const val PREFS = "uzguard_a11y"
         private const val KEY_PREV = "prev_services"
-        private const val WORK_NAME = "kiberqalqon_a11y_watch"
-        private const val WORK_NOW = "kiberqalqon_a11y_check_now"
+        private const val WORK_NAME = "uzguard_a11y_watch"
+        private const val WORK_NOW = "uzguard_a11y_check_now"
 
         private val WHITELIST_PACKAGES = setOf(
             "com.google.android.marvin.talkback",

@@ -1,10 +1,9 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -15,6 +14,9 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 
 /**
  * «Скрытые / неудаляемые угрозы» — список уже установленных подозрительных приложений
@@ -34,29 +36,53 @@ class HiddenThreatsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeHelper.applyAccent(this)
 
+        // v4 «Milliy Kiber Himoya» reskin — fon kq_bg, eyebrow + h-title sarlavha,
+        // kartalar kq4_card / kq4_card_danger, pill tugmalar. Logika o'zgarmagan.
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(16), dp(16), dp(16), dp(16))
+            setPadding(dp(18), dp(14), dp(18), dp(30))
         }
         root.addView(TextView(this).apply {
-            text = "🔍 Yashirin / o'chmaydigan tahdidlar"
-            textSize = 20f
-            setTypeface(typeface, Typeface.BOLD)
-            setPadding(0, 0, 0, dp(6))
+            text = getString(R.string.kq4_misc_hidden_eyebrow)
+            isAllCaps = true
+            textSize = 12f
+            typeface = font(R.font.onest_bold)
+            letterSpacing = 0.02f
+            setTextColor(c(R.color.kq_primary))
         })
         root.addView(TextView(this).apply {
-            text = "Telefonda o'rnatilgan, lekin ikonkasini yashirgan yoki o'chirishga qarshilik " +
-                "qiladigan ilovalar. Agar ularni o'zingiz bilib o'rnatgan bo'lsangiz — xavfsiz."
-            textSize = 12f
-            setPadding(0, 0, 0, dp(12))
+            text = getString(R.string.kq4_misc_hidden_title)
+            textSize = 24f
+            typeface = font(R.font.onest_bold)
+            letterSpacing = -0.02f
+            setTextColor(c(R.color.kq_ink))
+            setPadding(0, dp(6), 0, dp(8))
+        })
+        root.addView(TextView(this).apply {
+            text = getString(R.string.kq4_misc_hidden_intro)
+            textSize = 13.5f
+            typeface = font(R.font.onest_regular)
+            setTextColor(c(R.color.kq_ink_2))
+            setLineSpacing(0f, 1.4f)
+            setPadding(0, 0, 0, dp(14))
         })
 
         container = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        container.addView(TextView(this).apply { text = "Tekshirilmoqda…"; textSize = 14f })
+        container.addView(TextView(this).apply {
+            text = getString(R.string.kq4_misc_hidden_checking)
+            textSize = 14f
+            typeface = font(R.font.onest_regular)
+            setTextColor(c(R.color.kq_ink_2))
+        })
         root.addView(container)
 
-        setContentView(ScrollView(this).apply { addView(root) })
+        setContentView(ScrollView(this).apply {
+            setBackgroundColor(c(R.color.kq_bg))
+            isFillViewport = true
+            addView(root)
+        })
 
         Thread {
             val findings = try { HiddenThreatScanner.scan(this) } catch (_: Throwable) { emptyList() }
@@ -68,14 +94,19 @@ class HiddenThreatsActivity : AppCompatActivity() {
         container.removeAllViews()
         if (findings.isEmpty()) {
             container.addView(TextView(this).apply {
-                text = "✓ Yashirin yoki o'chmaydigan tahdid topilmadi."
+                text = getString(R.string.kq4_misc_hidden_none)
                 textSize = 15f
-                setPadding(0, dp(8), 0, dp(8))
+                typeface = font(R.font.onest_semibold)
+                setTextColor(c(R.color.kq_safe))
+                background = AppCompatResources.getDrawable(context, R.drawable.kq4_card_safe)
+                setPadding(dp(16), dp(16), dp(16), dp(16))
             })
         } else {
             container.addView(TextView(this).apply {
-                text = "${findings.size} ta ko'rib chiqishga arzigulik ilova:"
+                text = getString(R.string.kq4_misc_hidden_count, findings.size)
                 textSize = 13f
+                typeface = font(R.font.onest_semibold)
+                setTextColor(c(R.color.kq_ink_2))
                 setPadding(0, 0, 0, dp(8))
             })
             for (f in findings) container.addView(card(f))
@@ -86,55 +117,68 @@ class HiddenThreatsActivity : AppCompatActivity() {
     private fun card(f: HiddenThreatScanner.Finding): View {
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(14), dp(12), dp(14), dp(12))
+            setPadding(dp(15), dp(13), dp(15), dp(13))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply { bottomMargin = dp(12) }
-            setBackgroundColor(if (f.family != null) 0x22FF3B5C else 0x14808080)
+            background = AppCompatResources.getDrawable(
+                context,
+                if (f.family != null) R.drawable.kq4_card_danger else R.drawable.kq4_card
+            )
         }
         card.addView(TextView(this).apply {
             text = (if (f.family != null) "🔴 " else "⚠️ ") + f.label
             textSize = 16f
-            setTypeface(typeface, Typeface.BOLD)
+            typeface = font(R.font.onest_bold)
+            letterSpacing = -0.01f
+            setTextColor(c(if (f.family != null) R.color.kq_danger_ink else R.color.kq_ink))
         })
-        card.addView(TextView(this).apply { text = f.pkg; textSize = 11f; alpha = 0.7f })
+        card.addView(TextView(this).apply {
+            text = f.pkg
+            textSize = 11f
+            typeface = font(R.font.ssmono_medium)
+            setTextColor(c(R.color.kq_ink_3))
+        })
         card.addView(TextView(this).apply {
             text = buildString {
-                append("Sabab: ").append(f.traits.joinToString(", ") { traitUz(it) })
-                if (f.family != null) append("\nQora ro'yxat: ${f.family}")
-                if (!f.fromPlay) append("\nManba: Play Store EMAS (sideload)")
-                if (f.dangerousPerms.isNotEmpty()) append("\nXavfli ruxsatlar: ${f.dangerousPerms.size} ta")
+                append(getString(R.string.kq4_misc_hidden_reason, f.traits.joinToString(", ") { traitUz(it) }))
+                if (f.family != null) append("\n" + getString(R.string.kq4_misc_hidden_blacklist, f.family))
+                if (!f.fromPlay) append("\n" + getString(R.string.kq4_misc_hidden_sideload))
+                if (f.dangerousPerms.isNotEmpty()) append("\n" + getString(R.string.kq4_misc_hidden_dangerous_perms, f.dangerousPerms.size))
             }
-            textSize = 12f
-            setPadding(0, dp(4), 0, dp(8))
+            textSize = 12.5f
+            typeface = font(R.font.onest_regular)
+            setTextColor(c(R.color.kq_ink_2))
+            setLineSpacing(0f, 1.35f)
+            setPadding(0, dp(5), 0, dp(8))
         })
 
         // Гид: сначала разоружить (по порядку), потом удалить.
         if (HiddenThreatScanner.Trait.DEVICE_ADMIN in f.traits) {
-            card.addView(actionBtn("1) Administrator huquqini olib tashlash") {
+            card.addView(actionBtn(getString(R.string.kq4_misc_hidden_act_admin)) {
                 openAction(
                     Intent(Settings.ACTION_SECURITY_SETTINGS),
-                    "Xavfsizlik → Qurilma administratorlari → \"${f.label}\" dan belgini oling. So'ng o'chiring."
+                    getString(R.string.kq4_misc_hidden_hint_admin, f.label)
                 )
             })
         }
         if (HiddenThreatScanner.Trait.ACCESSIBILITY in f.traits) {
-            card.addView(actionBtn("2) Accessibility'ni o'chirish") {
+            card.addView(actionBtn(getString(R.string.kq4_misc_hidden_act_access)) {
                 openAction(
                     Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
-                    "Maxsus imkoniyatlar → \"${f.label}\" xizmatini o'chiring."
+                    getString(R.string.kq4_misc_hidden_hint_access, f.label)
                 )
             })
         }
         if (HiddenThreatScanner.Trait.NOTIF_ACCESS in f.traits) {
-            card.addView(actionBtn("Bildirishnoma kirishini o'chirish") {
+            card.addView(actionBtn(getString(R.string.kq4_misc_hidden_act_notif)) {
                 openAction(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), null)
             })
         }
-        card.addView(actionBtn("🗑 O'chirish (uninstall)") {
+        card.addView(actionBtn(getString(R.string.kq4_misc_hidden_act_uninstall), danger = true) {
             openAction(Intent(Intent.ACTION_DELETE, Uri.parse("package:${f.pkg}")), null)
         })
-        card.addView(actionBtn("Ilova haqida ma'lumot") {
+        card.addView(actionBtn(getString(R.string.kq4_misc_hidden_act_appinfo)) {
             openAction(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${f.pkg}")), null)
         })
         return card
@@ -146,45 +190,67 @@ class HiddenThreatsActivity : AppCompatActivity() {
             setPadding(0, dp(18), 0, dp(8))
         }
         f.addView(TextView(this).apply {
-            text = "Agar baribir o'chmasa:"
+            text = getString(R.string.kq4_misc_hidden_footer_title)
             textSize = 15f
-            setTypeface(typeface, Typeface.BOLD)
+            typeface = font(R.font.onest_bold)
+            setTextColor(c(R.color.kq_ink))
             setPadding(0, 0, 0, dp(6))
         })
         f.addView(TextView(this).apply {
-            text = "• XAVFSIZ REJIM (Safe Mode): quvvat tugmasini bosib turing → \"Xavfsiz rejim\"ni " +
-                "tanlang. Unda barcha begona ilovalar (va ularning Accessibility) vaqtincha o'chadi — " +
-                "o'shanda bemalol o'chiring.\n\n" +
-                "• Kompyuter orqali (ADB): USB-debug yoqing, telefonni ulang va buyruqni bajaring " +
-                "(<paket> o'rniga yuqoridagi paket nomini qo'ying):"
-            textSize = 12f
-            setPadding(0, 0, 0, dp(6))
+            text = getString(R.string.kq4_misc_hidden_footer_body)
+            textSize = 12.5f
+            typeface = font(R.font.onest_regular)
+            setTextColor(c(R.color.kq_ink_2))
+            setLineSpacing(0f, 1.4f)
+            setPadding(0, 0, 0, dp(8))
         })
-        val adb = "adb shell pm uninstall --user 0 <paket>"
+        val adb = getString(R.string.kq4_misc_hidden_adb_cmd)
         f.addView(TextView(this).apply {
             text = adb
             textSize = 12f
-            typeface = Typeface.MONOSPACE
+            typeface = font(R.font.ssmono_medium)
+            setTextColor(c(R.color.kq_ink_2))
             setTextIsSelectable(true)
-            setPadding(dp(8), dp(8), dp(8), dp(8))
-            setBackgroundColor(0x14000000)
+            background = AppCompatResources.getDrawable(context, R.drawable.kq4_card_sunken)
+            setPadding(dp(14), dp(12), dp(14), dp(12))
         })
-        f.addView(actionBtn("ADB buyrug'idan nusxa olish") {
+        f.addView(actionBtn(getString(R.string.kq4_misc_hidden_act_copy_adb)) {
             val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.setPrimaryClip(ClipData.newPlainText("adb", adb))
-            Toast.makeText(this, "Nusxa olindi", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.kq4_misc_toast_copied), Toast.LENGTH_SHORT).show()
         })
         return f
     }
 
-    private fun actionBtn(label: String, onClick: () -> Unit): Button = Button(this).apply {
-        text = label
-        isAllCaps = false
-        layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ).apply { topMargin = dp(4) }
-        setOnClickListener { onClick() }
-    }
+    /** v4 pill tugma: soft (standart) yoki danger. */
+    private fun actionBtn(label: String, danger: Boolean = false, onClick: () -> Unit): Button =
+        Button(this).apply {
+            text = label
+            isAllCaps = false
+            textSize = 13.5f
+            typeface = font(R.font.onest_bold)
+            background = AppCompatResources.getDrawable(
+                context,
+                if (danger) R.drawable.kq4_btn_danger else R.drawable.kq4_btn_soft
+            )
+            backgroundTintList = null
+            stateListAnimator = null
+            minHeight = dp(44)
+            minimumHeight = dp(44)
+            setTextColor(c(if (danger) R.color.white else R.color.kq_ink))
+            setPadding(dp(16), dp(9), dp(16), dp(9))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(6) }
+            setOnClickListener { onClick() }
+        }
+
+    // ───────────────────── v4 dizayn yordamchilari ─────────────────────
+
+    private fun c(id: Int): Int = ContextCompat.getColor(this, id)
+
+    private fun font(id: Int): android.graphics.Typeface? =
+        try { ResourcesCompat.getFont(this, id) } catch (_: Exception) { null }
 
     private fun openAction(intent: Intent, hint: String?) {
         try {
@@ -192,17 +258,17 @@ class HiddenThreatsActivity : AppCompatActivity() {
             startActivity(intent)
             if (hint != null) Toast.makeText(this, hint, Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
-            Toast.makeText(this, "Ochib bo'lmadi: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.kq4_misc_hidden_open_fail, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun traitUz(t: HiddenThreatScanner.Trait): String = when (t) {
-        HiddenThreatScanner.Trait.HIDDEN_ICON -> "ikonka yashirilgan"
-        HiddenThreatScanner.Trait.DEVICE_ADMIN -> "qurilma administratori (o'chirishni bloklaydi)"
-        HiddenThreatScanner.Trait.ACCESSIBILITY -> "Accessibility nazorati"
-        HiddenThreatScanner.Trait.NOTIF_ACCESS -> "bildirishnomalarga kirish (OTP)"
-        HiddenThreatScanner.Trait.BLACKLISTED -> "qora ro'yxatda"
-    }
+    private fun traitUz(t: HiddenThreatScanner.Trait): String = getString(when (t) {
+        HiddenThreatScanner.Trait.HIDDEN_ICON -> R.string.kq4_misc_hidden_trait_hidden_icon
+        HiddenThreatScanner.Trait.DEVICE_ADMIN -> R.string.kq4_misc_hidden_trait_admin
+        HiddenThreatScanner.Trait.ACCESSIBILITY -> R.string.kq4_misc_hidden_trait_access
+        HiddenThreatScanner.Trait.NOTIF_ACCESS -> R.string.kq4_misc_hidden_trait_notif
+        HiddenThreatScanner.Trait.BLACKLISTED -> R.string.kq4_misc_hidden_trait_blacklist
+    })
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 }

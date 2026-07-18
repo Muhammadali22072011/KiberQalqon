@@ -1,9 +1,9 @@
-package com.kiberqalqon
+package com.uzguard
 
 import java.security.MessageDigest
 
 /**
- * Зашифрованные сигнатуры — чтобы `strings kiberqalqon.apk | grep` не показал
+ * Зашифрованные сигнатуры — чтобы `strings uzguard.apk | grep` не показал
  * список malware-доменов и индикаторов. Виды защиты:
  *
  * 1) [MALICIOUS_TOKEN_HASHES] — SHA-256 хэши конкретных индикаторов
@@ -103,34 +103,140 @@ object ObfuscatedSignatures {
         "Gzk5PykpMzgzNjMuIx8sPzQudA4DCh8FDBMfDQUOHwIOBRkSGxQdHx4=" to "overlay.text_grab" // encode("AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED")
     )
 
+    /**
+     * "YUMSHOQ" family teglari — bular YAKKA O'ZI DANGER BERMAYDI (obfuscatedSignature ni
+     * yoqmaydi). Sabab (2026-07-09 panelda kuzatilgan ommaviy false-positive):
+     * bu teglar generik Android API/xulq identifikatorlari bo'lib, MILLIONLAB HALOL ilovada
+     * uchraydi:
+     *   • overlay.windowmgr / overlay.type — har qanday overlay ishlatadigan ilovada
+     *     (WindowManager.LayoutParams / TYPE_APPLICATION_OVERLAY) bor.
+     *   • overlay.text_grab — accessibility ishlatadigan ilovalarda.
+     *   • anti.magisk / anti.vpn / anti.frida — bank/o'yin/DRM ilovalari root/frida/VPN'ni
+     *     QONUNIY tekshiradi (Facebook, Instagram, ELSA... shu tufayli "virus" bo'lib qolardi).
+     *   • jetski_family — 6 belgili substring, DEX'ni ISO-8859-1 o'qiganda tasodifan mos keladi.
+     * Ular baribir SCORE'ga hissa qo'shishi va detali sifatida ko'rsatilishi mumkin, lekin
+     * yakuniy DANGER faqat QAT'IY IoC (domen/kalit/bot-nomi hash yoki bot-endpoint) bilan chiqadi.
+     * Sideload malware baribir hard-IoC / dropper / permission-combo / random-pkg bilan ushlanadi.
+     */
+    val SOFT_FAMILIES: Set<String> = setOf(
+        "overlay.windowmgr", "overlay.type", "overlay.text_grab",
+        "anti.magisk", "anti.vpn", "anti.frida",
+        "jetski_family",
+    )
+
+    /**
+     * Family tegi QAT'IY (yakka o'zi DANGER beradigan) IoC'mi? Faqat malware'ga XOS bo'lgan
+     * indikatorlar (aniq C2 domen/kalit hash'lari, bot-nomlar, "/commends" bot-endpoint kabi)
+     * hard hisoblanadi; [SOFT_FAMILIES] generik API markerlaridir.
+     */
+    fun isHardFamily(family: String): Boolean = family !in SOFT_FAMILIES
+
+    /**
+     * "GENERIK BANKER" REST-yo'l teglari — bular texnik jihatdan HARD (SOFT_FAMILIES'da emas),
+     * lekin ularning IoC'i shunchaki umumiy REST endpoint YO'LI (path) bo'lib, halol ilovada
+     * ham (yoki UzGuard'ning O'ZIDA — uning DEX'ida LinkScanner.MALWARE_PATHS bu satrlarni
+     * saqlaydi) uchrashi mumkin:
+     *   • banker.overlay_inject = "/api/inject"
+     *   • banker.sms_exfil      = "/api/upload_sms"
+     *   • banker.admin_panel    = "/admin/banks"
+     * Shu sabab (2026-07-11 ommaviy false-positive + o'z-o'zini DANGER qilish) bu uchtasi
+     * YAKKA O'ZI TIER-1 DANGER bermasin — ApkScanner ularni faqat banker korroboratori bilan
+     * (strongCombo / dropped .so / random-pkg / yashirin APK|DEX|ELF) yoqadi. Aniq malware'ga
+     * XOS IoC'lar (C2 domen/kalit hash, bot-nomlar, "/commends" bot-endpoint) bu to'plamda EMAS
+     * → ular baribir yakka o'zi TIER-1 chiqadi. LinkScanner (alohida URL-skan yo'li) bu yo'llarni
+     * o'zgarishsiz HARD saqlaydi.
+     */
+    val GENERIC_BANKER_PATHS: Set<String> = setOf(
+        "banker.overlay_inject", "banker.sms_exfil", "banker.admin_panel",
+    )
+
     @Volatile private var decryptedCache: List<Pair<String, String>>? = null
 
+    // PERF: matchTokenHashes() bitta DEX uchun o'n minglab token'ni hash qiladi. Avval HAR token
+    // uchun MessageDigest.getInstance("SHA-256") (yangi obyekt) + "%02X".format() (String.format)
+    // chaqirilardi → katta CPU/GC bosimi. Endi thread-local digest qayta ishlatiladi (skanlar
+    // bir vaqtda ishlaydi — shuning uchun ThreadLocal, oddiy maydon emas) va hex lookup ishlatiladi.
+    // Natija BAYT-AYNAN o'sha (katta harf, 16 hex) — ShieldTest/ObfuscatedSignaturesTest invariantlari saqlanadi.
+    private val sha256Local = object : ThreadLocal<MessageDigest>() {
+        override fun initialValue(): MessageDigest = MessageDigest.getInstance("SHA-256")
+    }
+    private val HEX = "0123456789ABCDEF".toCharArray()
+
     /** SHA-256 → first 16 hex chars (uppercase). */
-    fun hash(s: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(s.lowercase().toByteArray(Charsets.UTF_8))
-        return digest.take(8).joinToString("") { "%02X".format(it) }
+    fun hash(s: String): String = hashLower(s.lowercase())
+
+    /**
+     * hash() ning ichki yo'li: argument ALLAQACHON lowercase bo'lishi SHART.
+     * matchTokenHashes() har tokenni bir marta lowercase qiladi, shuning uchun bu yerda
+     * qayta lowercase QILMAYMIZ — har token uchun ortiqcha String allokatsiyasini
+     * (va CPU/GC bosimini) tejaymiz. Natija hash(s) bilan bayt-aynan bir xil.
+     */
+    private fun hashLower(lower: String): String {
+        val md = sha256Local.get()!!
+        md.reset()
+        val digest = md.digest(lower.toByteArray(Charsets.UTF_8))
+        val sb = StringBuilder(16)
+        for (i in 0 until 8) {
+            val b = digest[i].toInt() and 0xFF
+            sb.append(HEX[b ushr 4])
+            sb.append(HEX[b and 0x0F])
+        }
+        return sb.toString()
     }
 
     /**
      * Текстовая токен-сверка: вычленяем "значащие" токены (8+ chars без пробелов),
      * хэшируем, проверяем. Только exact match — никаких regex/word-boundary,
      * чтобы случайный кусок шифра не дал false positive.
+     *
+     * PERF (qizish — 2026-06-18, qurilmada o'lchangan): bitta DEX matni o'n minglab token
+     * beradi, lekin ularning aksariyati TAKRORIY (bir xil tip/metod/string nomlari). Avval
+     * HAR uchrash uchun SHA-256 hisoblanardi → ApkScanner.scan profilida eng issiq joy shu edi
+     * (telefon qizib, protsessor 3+ yadroda band bo'lardi). Endi har UNIKAL token FAQAT BIR
+     * marta hash qilinadi (seen to'plami) va lowercase ham bir marta (hashLower qayta
+     * lowercase qilmaydi). Aniqlash BAYT-AYNAN o'sha: token to'plami va exact-match o'zgarmaydi.
      */
     fun matchTokenHashes(text: String): List<String> {
         val found = mutableSetOf<String>()
-        // Извлекаем кандидаты: alnum + дефис/подчёркивание/точка/слэш, длина 4+
-        val tokenRegex = Regex("[A-Za-z0-9._/\\-]{4,128}")
-        for (m in tokenRegex.findAll(text)) {
-            val tok = m.value.lowercase()
-            val h = hash(tok)
-            MALICIOUS_TOKEN_HASHES[h]?.let { family ->
-                if (found.add(family)) {
-                    // first match per family — достаточно
-                }
+        val seen = HashSet<String>(2048)
+        // Кандидаты: alnum + дефис/подчёркивание/точка/слэш, длина 4..128 (длинный run
+        // режется на куски по 128, как это делал жадный {4,128}; хвост <4 отбрасывается).
+        // PERF (qizish — 2026-07-09, qurilmada am profile bilan o'lchangan): avval bu yerda
+        // Regex.findAll ishlatilardi. Har chaqiruvda ICU MatcherNative.setInput BUTUN matnni
+        // (DEX uchun 8MB gacha) native buferga NUSXALAB olardi, va bu har entry uchun
+        // takrorlanardi (APK'da 260 tagacha entry) — skan profilining ~70% shu edi.
+        // Qo'lda yozilgan belgi-sinf skaneri nusxasiz ishlaydi; token to'plami BAYT-AYNAN o'sha.
+        forEachToken(text) { tok ->
+            if (seen.add(tok)) {   // bu token allaqachon hash qilingan — qayta hisoblamaymiz
+                MALICIOUS_TOKEN_HASHES[hashLower(tok)]?.let { family -> found.add(family) }
             }
         }
         return found.toList()
+    }
+
+    /** Har topilgan token (allaqachon lowercase) uchun [action] chaqiriladi. */
+    private inline fun forEachToken(text: String, action: (String) -> Unit) {
+        var i = 0
+        val n = text.length
+        while (i < n) {
+            if (!isTokenChar(text[i])) { i++; continue }
+            var j = i + 1
+            while (j < n && j - i < 128 && isTokenChar(text[j])) j++
+            if (j - i >= 4) action(text.substring(i, j).lowercase())
+            i = j
+        }
+    }
+
+    private fun isTokenChar(c: Char): Boolean =
+        (c in 'a'..'z') || (c in 'A'..'Z') || (c in '0'..'9') ||
+            c == '.' || c == '_' || c == '/' || c == '-'
+
+    /** Faqat test uchun: tokenizator chiqishini regex-referens bilan solishtirish imkoni. */
+    @androidx.annotation.VisibleForTesting
+    internal fun tokensOf(text: String): List<String> {
+        val out = ArrayList<String>()
+        forEachToken(text) { out.add(it) }
+        return out
     }
 
     /** Декодированные XOR-сигнатуры с лейблами. Декодируется один раз, кэшируется. */
@@ -141,11 +247,28 @@ object ObfuscatedSignatures {
         return list
     }
 
+    // PERF (qizish — 2026-07-09, qurilmada am profile bilan o'lchangan): avval har sig uchun
+    // text.contains(sig, ignoreCase=true) chaqirilardi — bu HAR BELGI uchun
+    // Character.toUpperCase/toLowerCase qiladi va 8MB matnni 10+ marta aylanib chiqadi
+    // (profilda regionMatches+to*Case eng issiq joy edi). Endi matn BIR marta lowercase
+    // qilinadi, sig'lar oldindan lowercase keshlanadi → oddiy (case-siz) indexOf.
+    // Sig'lar ASCII — amaliy detektsiya o'zgarmaydi (farq faqat ekzotik Unicode
+    // case-fold burchaklarida: masalan Kelvin U+212A, dotted İ — DEX IoC uchun ahamiyatsiz).
+    @Volatile private var loweredSigCache: List<Pair<String, String>>? = null
+
+    private fun loweredSignatures(): List<Pair<String, String>> {
+        loweredSigCache?.let { return it }
+        val list = decryptedSignatures().map { (sig, label) -> sig.lowercase() to label }
+        loweredSigCache = list
+        return list
+    }
+
     /** Поиск декодированных сигнатур в строке. Возвращает найденные family-метки. */
     fun matchDecrypted(text: String): List<String> {
         val found = mutableSetOf<String>()
-        for ((sig, label) in decryptedSignatures()) {
-            if (text.contains(sig, ignoreCase = true)) {
+        val lowered = text.lowercase()
+        for ((sigLower, label) in loweredSignatures()) {
+            if (lowered.contains(sigLower)) {
                 found.add(label)
             }
         }

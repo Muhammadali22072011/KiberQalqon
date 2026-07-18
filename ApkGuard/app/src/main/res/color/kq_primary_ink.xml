@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Color state list backed by `?attr/kqPrimaryInk` (v4 design –primary-ink):
+  dark-on-soft text color that follows the selected accent. See kq_primary.xml.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/kqPrimaryInk" />
+</selector>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экранов Splash + выбор языка.
+     Заголовок и названия языков намеренно одинаковы в обеих локалях:
+     экран показывается ДО выбора языка, текст двуязычный по дизайну. -->
+<resources>
+    <string name="kq4_lang_title">Tilni tanlang · Выберите язык</string>
+    <string name="kq4_lang_uzbek">O\'zbekcha</string>
+    <string name="kq4_lang_russian">Русский</string>
+</resources>

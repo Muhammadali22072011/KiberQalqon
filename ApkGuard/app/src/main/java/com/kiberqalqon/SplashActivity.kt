@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
@@ -16,7 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.kiberqalqon.databinding.ActivitySplashBinding
+import com.uzguard.databinding.ActivitySplashBinding
 
 /**
  * Splash Screen с логотипом и запросом разрешений.
@@ -44,15 +44,17 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
+            // v4: gradient fon ?attr/kqPrimary/2 dan quriladi — foydalanuvchi tanlagan
+            // aksent splash'da ham to'g'ri ko'rinishi uchun temani inflate'dan OLDIN qo'yamiz.
+            try { ThemeHelper.applyAccent(this) } catch (_: Throwable) {}
             binding = ActivitySplashBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
-            // Mono eyebrow takes the form "TELEFON HIMOYASI · V {versionName}"
-            // (matches the design's Splash subtitle exactly).
+            // v4 dizayn: mono tagline endi doimiy "MILLIY KIBER HIMOYA" (layoutda).
+            // Versiya faqat yashirin tvVersion'da qoladi (long-press diagnostika).
             val versionName = try {
                 packageManager.getPackageInfo(packageName, 0).versionName
             } catch (e: Exception) { null } ?: "7.5"
-            binding.tvSubtitle.text = getString(R.string.splash_subtitle, versionName)
             binding.tvVersion.text = getString(R.string.splash_version, versionName)
 
             // Long-press on the (hidden) version pill still opens diagnostics so the
@@ -69,48 +71,20 @@ class SplashActivity : AppCompatActivity() {
             binding.tvVersion.setOnLongClickListener(diagOpener)
             binding.tvSubtitle.setOnLongClickListener(diagOpener)
 
-            // Fade-in: shield → wordmark → eyebrow. Mirrors the design's `fade-in`
-            // entrance (CSS @keyframes fadeIn, 280ms).
-            safeAnim { AnimationHelper.fadeIn(binding.ivLogo, duration = 800) }
-            safeAnim { AnimationHelper.fadeIn(binding.tvAppName, duration = 800, delay = 300) }
-            safeAnim { AnimationHelper.fadeIn(binding.tvSubtitle, duration = 800, delay = 600) }
-
-            // Two pulsing rings around the shield (second one offset by 700ms per design).
-            safeAnim {
-                val pulse = android.view.animation.AnimationUtils
-                    .loadAnimation(this, R.anim.kq_pulse_ring)
-                binding.pulseRing1.startAnimation(pulse)
-            }
-            binding.pulseRing2.postDelayed({
-                safeAnim {
-                    val pulse = android.view.animation.AnimationUtils
-                        .loadAnimation(this, R.anim.kq_pulse_ring)
-                    binding.pulseRing2.startAnimation(pulse)
-                }
-            }, 700)
-
-            // Three load dots, staggered by 150ms per design (`animationDelay: i*0.15s`).
-            val dots = listOf(binding.loadDot1, binding.loadDot2, binding.loadDot3)
-            dots.forEachIndexed { i, dot ->
-                dot.postDelayed({
-                    safeAnim {
-                        val a = android.view.animation.AnimationUtils
-                            .loadAnimation(this, R.anim.kq_load_dot)
-                        dot.startAnimation(a)
-                    }
-                }, (i * 150).toLong())
-            }
+            playEntrance()
 
             Handler(Looper.getMainLooper()).postDelayed({
                 if (!isFinishing && !isDestroyed) {
                     try {
-                        checkPermissions()
+                        // Ruxsat allaqachon bor bo'lsa — chiroyli chiqish animatsiyasi
+                        // bilan marshrutlaymiz; bo'lmasa dialogni animatsiyasiz ko'rsatamiz.
+                        if (hasStoragePermission()) playExitThenRoute() else checkPermissions()
                     } catch (e: Throwable) {
                         android.util.Log.e("SplashActivity", "checkPermissions crashed", e)
                         try { goToMainActivity() } catch (_: Throwable) { finish() }
                     }
                 }
-            }, 1500)
+            }, 2000)
         } catch (e: Throwable) {
             android.util.Log.e("SplashActivity", "onCreate crashed", e)
             try { goToMainActivity() } catch (_: Throwable) { finish() }
@@ -121,6 +95,95 @@ class SplashActivity : AppCompatActivity() {
         try { block() } catch (e: Throwable) {
             android.util.Log.w("SplashActivity", "anim failed", e)
         }
+    }
+
+    /**
+     * v4 «Milliy Kiber Himoya» kirish xoreografiyasi (screens1.jsx → Splash):
+     *   0ms    LogoDisc yumshoq overshoot bilan kiradi (scale .8 → 1)
+     *   0ms    pulsar halqa №1 (scale+alpha, cheksiz); №2 +800ms (dizayn: delay .8s)
+     *   250ms  "UZGUARD" wordmark pastdan ko'tariladi
+     *   450ms  mono "MILLIY KIBER HIMOYA" pastdan ko'tariladi
+     *   600ms  3 ta load-nuqta (stagger 160ms — dizayn: i*.16s)
+     */
+    private fun playEntrance() {
+        // LogoDisc: yumshoq bounce-in (dizaynning fade'iga yaqin, biroz jonliroq).
+        safeAnim {
+            binding.logoDisc.alpha = 0f
+            binding.logoDisc.scaleX = 0.8f
+            binding.logoDisc.scaleY = 0.8f
+            binding.logoDisc.animate()
+                .alpha(1f).scaleX(1f).scaleY(1f)
+                .setDuration(600)
+                .setInterpolator(android.view.animation.OvershootInterpolator(1.2f))
+                .start()
+        }
+
+        // Pulsar halqalar (ikkinchisi 800ms kechikish bilan — dizayndagidek).
+        safeAnim {
+            binding.pulseRing1.startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(this, R.anim.kq_pulse_ring)
+            )
+        }
+        binding.pulseRing2.postDelayed({
+            safeAnim {
+                binding.pulseRing2.startAnimation(
+                    android.view.animation.AnimationUtils.loadAnimation(this, R.anim.kq_pulse_ring)
+                )
+            }
+        }, 800)
+
+        // Wordmark: pastdan yumshoq ko'tarilib kiradi.
+        safeAnim {
+            binding.tvAppName.translationY = 24f
+            binding.tvAppName.animate()
+                .alpha(1f).translationY(0f)
+                .setStartDelay(250).setDuration(550)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+        }
+
+        // Mono tagline: biroz keyinroq.
+        safeAnim {
+            binding.tvSubtitle.translationY = 16f
+            binding.tvSubtitle.animate()
+                .alpha(1f).translationY(0f)
+                .setStartDelay(450).setDuration(550)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+        }
+
+        // Load-nuqtalar (stagger 160ms — dizayn: animationDelay i*.16s).
+        val dots = listOf(binding.loadDot1, binding.loadDot2, binding.loadDot3)
+        dots.forEachIndexed { i, dot ->
+            dot.postDelayed({
+                safeAnim {
+                    dot.startAnimation(
+                        android.view.animation.AnimationUtils.loadAnimation(this, R.anim.kq_load_dot)
+                    )
+                }
+            }, (600 + i * 160).toLong())
+        }
+    }
+
+    /**
+     * Chiqish: markaziy kolonna biroz kattalashib so'nadi, ornament/nuqtalar so'nadi,
+     * so'ng marshrut. FAQAT ruxsat allaqachon bor bo'lganda chaqiriladi — dialog
+     * ko'rsatiladigan yo'lda ekran joyida qoladi.
+     */
+    private fun playExitThenRoute() {
+        if (routed || isFinishing) return
+        safeAnim {
+            binding.contentColumn.animate()
+                .alpha(0f).scaleX(1.08f).scaleY(1.08f)
+                .setDuration(240)
+                .setInterpolator(android.view.animation.AccelerateInterpolator())
+                .start()
+            binding.starsBox.animate().alpha(0f).setDuration(240).start()
+            binding.loadDots.animate().alpha(0f).setDuration(240).start()
+        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            try { checkPermissions() } catch (_: Throwable) { goToMainActivity() }
+        }, 250)
     }
 
     private fun checkPermissions() {
@@ -156,10 +219,18 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
+    // UX-14 fix: tashqi sozlamalardan grantsiz qaytishda onActivityResult ham,
+    // onResume ham dialog ochishga urinardi — ikkita ustma-ust, yopib bo'lmas dialog
+    // paydo bo'lardi. Bitta jonli dialogni kuzatamiz: ochiq bo'lsa qayta ochmaymiz.
+    private var permissionDialog: AlertDialog? = null
+
     private fun requestStoragePermission() {
+        if (permissionDialog?.isShowing == true) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11+ - запрашиваем MANAGE_EXTERNAL_STORAGE
-            AlertDialog.Builder(this)
+            // Android 11+ - запрашиваем MANAGE_EXTERNAL_STORAGE.
+            // UX-14 fix: "Chiqish" tugmasi qo'shildi — ilgari Android 11+ da rad etgan
+            // foydalanuvchi uchun chiqish yo'li yo'q edi.
+            permissionDialog = AlertDialog.Builder(this)
                 .setTitle(getString(R.string.splash_storage_title))
                 .setMessage(getString(R.string.splash_storage_message))
                 .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
@@ -172,6 +243,7 @@ class SplashActivity : AppCompatActivity() {
                         startActivityForResult(intent, PERMISSION_REQUEST_CODE)
                     }
                 }
+                .setNegativeButton(getString(R.string.btn_exit)) { _, _ -> finish() }
                 .setCancelable(false)
                 .show()
         } else {
@@ -209,7 +281,8 @@ class SplashActivity : AppCompatActivity() {
                 checkPermissions()
             } else {
                 // Ruxsat berilmadi — tushuntirib, qayta urinish / chiqish taklif qilamiz.
-                AlertDialog.Builder(this)
+                if (permissionDialog?.isShowing == true) return
+                permissionDialog = AlertDialog.Builder(this)
                     .setTitle(getString(R.string.permission_needed))
                     .setMessage(getString(R.string.splash_storage_denied_message))
                     .setPositiveButton(getString(R.string.splash_retry)) { _, _ ->
@@ -230,11 +303,18 @@ class SplashActivity : AppCompatActivity() {
             PERMISSION_REQUEST_CODE -> {
                 if (hasStoragePermission()) {
                     checkPermissions()
-                } else {
-                    requestStoragePermission()
                 }
+                // Grant yo'q bo'lsa BU YERDA dialog ochmaymiz — keyin keladigan onResume
+                // baribir checkPermissions'ni chaqiradi (UX-14: ikki dialog fix'i).
             }
         }
+    }
+
+    override fun onDestroy() {
+        // Window leak bo'lmasin — activity yopilayotganda ochiq dialogni yopamiz.
+        try { permissionDialog?.dismiss() } catch (_: Throwable) {}
+        permissionDialog = null
+        super.onDestroy()
     }
 
     /** Birinchi onResume — fade-in animatsiyasi paytida true. */

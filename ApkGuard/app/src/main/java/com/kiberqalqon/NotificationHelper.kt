@@ -1,10 +1,11 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -15,7 +16,7 @@ import java.io.File
  *
  * Pochemu 4 kanala: na Android 8+ sound/vibration nastroyki kanala IMMUTABLE posle
  * pervogo sozdaniya — polzovatel' menyaet ih tol'ko vruchnuyu cherez sistemnye
- * sozlamalar. Chtoby nastroyki KiberQalqon'a (switchSound / switchVibration) real'no
+ * sozlamalar. Chtoby nastroyki UzGuard'a (switchSound / switchVibration) real'no
  * rabotali, dlya kazhdoy kombinacii (s/v) zaranee sozdaem otdel'nyy kanal.
  * V runtime vybiraem nuzhnyy kanal po Config.isSoundEnabled / isVibrationEnabled.
  *
@@ -33,6 +34,12 @@ object NotificationHelper {
     private const val CH_SOUND = "apk_scan_sound"
     private const val CH_VIBRATE = "apk_scan_vibrate"
     private const val CH_FULL = "apk_scan_full"
+
+    // Yangilik/e'lon bildirishnomalari uchun ALOHIDA kanal — xavfsizlik alertlaridan
+    // ajralib tursin (IMPORTANCE_DEFAULT: tovush bor, lekin lock ekran ustida o'zi
+    // ochilmaydi). Foydalanuvchi faqat shu kanalni o'chirib, tahdid alertlarini
+    // qoldira oladi.
+    private const val CH_NEWS = "uzguard_news"
 
     /** Backward-compat: starye vyzovy createChannel() — perenapravlyaem na createChannels. */
     fun createChannel(context: Context) = createChannels(context)
@@ -94,6 +101,16 @@ object NotificationHelper {
                 vibrationPattern = longArrayOf(0, 500, 250, 500)
             }
         )
+
+        // Yangiliklar — past bosim (DEFAULT): tovush bor, heads-up majburiy emas. Tahdid
+        // alertlaridan alohida — foydalanuvchi shu kanalni o'chirsa, viruslar haqida
+        // bildirishnomalar baribir keladi.
+        mgr.createNotificationChannel(
+            NotificationChannel(CH_NEWS, context.getString(R.string.kq4_news_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.kq4_news_channel_desc)
+            }
+        )
     }
 
     /** Vybiraem kanal po tekushchim user-prefs. */
@@ -135,9 +152,13 @@ object NotificationHelper {
             putExtra("apk_name", apkFile.name)
         }
 
+        // Har fayl uchun unikal id/requestCode — aks holda ekran qulf/o'chiq paytida
+        // topilgan ikkinchi xavfli APK birinchisining bildirishnomasini (777) va uning
+        // PendingIntent extras'ini almashtirib yuborardi (birinchi tahdid ko'rinmay qolardi).
+        val rc = apkFile.absolutePath.hashCode() and 0x7FFFFFFF
         val pendingIntent = PendingIntent.getActivity(
             context,
-            101,
+            rc,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -152,10 +173,12 @@ object NotificationHelper {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setFullScreenIntent(pendingIntent, true)
+            // Android 14+ (API 34): FSI ruxsati bo'lmasa tizim oynani o'zi ochmaydi —
+            // ruxsat holatini aniq uzatamiz; ruxsatsiz ham PRIORITY_MAX heads-up keladi.
+            .setFullScreenIntent(pendingIntent, VersionCompat.canUseFullScreenIntent(context))
         applyLegacyPrefs(context, builder)
 
-        NotificationManagerCompat.from(context).notify(777, builder.build())
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
     }
 
     /**
@@ -188,27 +211,34 @@ object NotificationHelper {
             putExtra("verdict", "DANGER")
             putExtra("reason", reason)
         }
+        // Har karantinga olingan fayl uchun unikal id/requestCode — aks holda ketma-ket
+        // karantinga olingan bir nechta fayl bir-birining bildirishnomasini (7100) almashtirib
+        // yuborardi (oldingi "o'chirildi" xabari yo'qolardi).
+        val rc = (originalPath ?: fileName).hashCode() and 0x7FFFFFFF
         val pi = PendingIntent.getActivity(
-            context, 7100, openIntent,
+            context, rc, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val builder = NotificationCompat.Builder(context, channelFor(context))
             .setSmallIcon(R.drawable.ic_shield)
-            .setContentTitle("🛡️ Virus o'chirildi")
-            .setContentText("$fileName — avtomatik karantinga olindi")
+            .setContentTitle(context.getString(R.string.kq4_notif_quar_title))
+            .setContentText(context.getString(R.string.kq4_notif_quar_text, fileName))
             .setStyle(NotificationCompat.BigTextStyle().bigText(
-                "$fileName fayli xavfli deb topildi va avtomatik o'chirildi (karantin).\n\n" +
-                    "Sabab: ${reason.take(200)}\n\n" +
-                    "Agar bu xato bo'lsa, 7 kun ichida tiklash mumkin."
+                context.getString(R.string.kq4_notif_quar_big, fileName, reason.take(200))
             ))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(pi)
-            // Lock ekran ustida ko'rinishi uchun (Android 12 — full-screen intent auto-grant).
-            .setFullScreenIntent(pi, true)
+            // Lock ekran ustida o'zi ochilishi uchun. MUHIM: Android 14+ (API 34) FSI ruxsatini
+            // oddiy ilovalardan oldi — canUseFullScreenIntent=false bo'lsa tizim buni oddiy
+            // heads-up'ga tushiradi (oyna o'zi ochilmaydi), shuning uchun ruxsat bor-yo'qligini
+            // ANIQ uzatamiz (PRIORITY_MAX + CATEGORY_ALARM tufayli baribir baland heads-up keladi).
+            .setFullScreenIntent(pi, VersionCompat.canUseFullScreenIntent(context))
         applyLegacyPrefs(context, builder)
-        NotificationManagerCompat.from(context).notify(7100, builder.build())
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
+        // Tunda (ekran o'chiq/qulf) topilgan tahdid — uyg'otuvchi sirena (o'zi gate qiladi).
+        try { AlarmSiren.blast(context) } catch (_: Throwable) {}
     }
 
     /**
@@ -243,13 +273,18 @@ object NotificationHelper {
             .setAutoCancel(true)
             .setContentIntent(pi)
             // Full-screen intent: lock screen ustida ko'rinadi, telefon ochilsa
-            // tizim avtomatik ravishda uninstall dialogini ochadi.
-            .setFullScreenIntent(pi, true)
+            // tizim avtomatik ravishda uninstall dialogini ochadi (FSI ruxsati bo'lsa;
+            // Android 14+ da ruxsatsiz — oddiy heads-up + "O'chirish" tugmasi).
+            .setFullScreenIntent(pi, VersionCompat.canUseFullScreenIntent(context))
             // Ko'rinadigan "O'chirish" tugmasi — foydalanuvchi butun bildirishnomani emas,
             // to'g'ridan-to'g'ri tugmani bosib uninstall dialogini ochadi.
             .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), pi)
+        // Topilgan zararli ilovaning O'Z ikonkasini ko'rsatamiz — foydalanuvchi qaysi ilova ekanini yuzidan taniydi.
+        installedAppIcon(context, pkg)?.let { builder.setLargeIcon(it) }
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(pkg.hashCode() and 0x7FFFFFFF, builder.build())
+        // O'rnatilgan ilova endi xavfli + telefon uxlab yotgan bo'lsa — uyg'otuvchi sirena.
+        try { AlarmSiren.blast(context) } catch (_: Throwable) {}
     }
 
     /**
@@ -298,12 +333,50 @@ object NotificationHelper {
             .setContentIntent(pi)
             // setFullScreenIntent ATAYLAB CHAQIRILMAYDI — aks holda Activity avtomatik
             // ochilib, batch scan paytida bir nechta Activity stack'da to'planadi.
+        // APK fayl ichidagi ilova ikonkasini ko'rsatamiz (soxta bank/ilova ikonkasi ko'zga tashlanadi).
+        apkFileIcon(context, apkFile.absolutePath)?.let { builder.setLargeIcon(it) }
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(rc, builder.build())
+        // Xavfli fayl + telefon uxlab yotgan bo'lsa — uyg'otuvchi sirena (AlarmSiren gate qiladi).
+        if (verdict == ScanResult.Verdict.DANGER) {
+            try { AlarmSiren.blast(context) } catch (_: Throwable) {}
+        }
     }
 
+    /** Drawable → Bitmap (bildirishnoma largeIcon uchun). Vektor/adaptiv ikonkalarni ham chizadi. */
+    private fun drawableToBitmap(d: android.graphics.drawable.Drawable?): android.graphics.Bitmap? {
+        if (d == null) return null
+        return try {
+            val bd = d as? android.graphics.drawable.BitmapDrawable
+            if (bd?.bitmap != null) return bd.bitmap
+            val w = d.intrinsicWidth.takeIf { it > 0 } ?: 96
+            val h = d.intrinsicHeight.takeIf { it > 0 } ?: 96
+            val bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
+            val c = android.graphics.Canvas(bmp)
+            d.setBounds(0, 0, c.width, c.height)
+            d.draw(c)
+            bmp
+        } catch (_: Throwable) { null }
+    }
+
+    /** O'rnatilgan ilovaning ikonkasi (paket bo'yicha) — topilgan virusni yuzidan ko'rsatish uchun. */
+    private fun installedAppIcon(context: Context, pkg: String): android.graphics.Bitmap? = try {
+        drawableToBitmap(context.packageManager.getApplicationIcon(pkg))
+    } catch (_: Throwable) { null }
+
+    /** APK fayl ICHIDAGI ilova ikonkasi (hali o'rnatilmagan fayl uchun; soxta bank-ikonkasi ko'rinadi). */
+    private fun apkFileIcon(context: Context, apkPath: String): android.graphics.Bitmap? = try {
+        val pm = context.packageManager
+        val pi = pm.getPackageArchiveInfo(apkPath, 0)
+        pi?.applicationInfo?.let { ai ->
+            ai.sourceDir = apkPath
+            ai.publicSourceDir = apkPath
+            drawableToBitmap(ai.loadIcon(pm))
+        }
+    } catch (_: Throwable) { null }
+
     /**
-     * Foydalanuvchi qurilmasi (Xiaomi/MIUI/Huawei va h.k.) KiberQalqon jarayonini
+     * Foydalanuvchi qurilmasi (Xiaomi/MIUI/Huawei va h.k.) UzGuard jarayonini
      * o'ldirgan bo'lsa, qaytib kelganida bu eslatma ko'rsatiladi. Tap → SettingsActivity
      * (yoki to'g'ridan-to'g'ri OEM autostart ekrani) ochiladi.
      */
@@ -373,6 +446,42 @@ object NotificationHelper {
     }
 
     /**
+     * Haftalik xulosa bildirishnomasi — WeeklyReportWorker tomonidan ~20:00 da, haftada
+     * bir marta yuboriladi. Tahdid emas, ma'lumot xarakteridagi xabar (welcome bilan bir xil
+     * shablon): PRIORITY_DEFAULT, full-screen intent yo'q. Tap → ScanHistoryActivity
+     * (statistika ekrani), u yerda haftalik grafik va tahdid tarixi ko'rinadi.
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showWeeklyReportNotification(
+        context: Context,
+        scanned: Int,
+        blocked: Int,
+        quarantined: Int
+    ) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val openIntent = Intent(context, ScanHistoryActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = PendingIntent.getActivity(
+            context, 7004, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.kq4_weekly_notif_title))
+            .setContentText(context.getString(R.string.kq4_weekly_notif_text, scanned, blocked))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(
+                context.getString(R.string.kq4_weekly_notif_big, scanned, blocked, quarantined)
+            ))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(7004, builder.build())
+    }
+
+    /**
      * SD-02: SecurityGuard ilovani to'xtatishdan OLDIN sababни узбекча tushuntiradi. Avval
      * jim killProcess bo'lardi — root/kastom-proshivkali legit foydalanuvchi (O'zbek bozorida ko'p)
      * ilova "sababsiz yo'qolib" ketganini ko'rardi (sindi deb o'ylaydi). Bildirishnoma тизим
@@ -387,11 +496,11 @@ object NotificationHelper {
             createChannels(context)
             // Перепакетлаш/имзо мос эмас = қатъий бузилиш; қолганлари = муҳит (root/эмулятор).
             val tamper = reason == "signature" || reason == "tamper"
-            val title = "KiberQalqon ishga tushmadi"
+            val title = context.getString(R.string.kq4_notif_secblock_title)
             val text = if (tamper) {
-                "Ilova buzib ochilgan (qayta paketlangan) bo'lishi mumkin — xavfsizlik uchun to'xtatildi."
+                context.getString(R.string.kq4_notif_secblock_tamper)
             } else {
-                "Qurilmada root yoki o'zgartirilgan tizim aniqlandi — himoya bu muhitda ishlay olmaydi."
+                context.getString(R.string.kq4_notif_secblock_env)
             }
             val builder = NotificationCompat.Builder(context, channelFor(context))
                 .setSmallIcon(R.drawable.ic_shield)
@@ -463,21 +572,18 @@ object NotificationHelper {
         )
         val builder = NotificationCompat.Builder(context, channelFor(context))
             .setSmallIcon(R.drawable.ic_shield)
-            .setContentTitle("⚠️ Ilova ekran ustidan nazoratni oldi")
-            .setContentText("$appLabel — Accessibility yoqildi. Banker troyanlari shunday qiladi.")
+            .setContentTitle(context.getString(R.string.kq4_notif_a11y_title))
+            .setContentText(context.getString(R.string.kq4_notif_a11y_text, appLabel))
             .setStyle(NotificationCompat.BigTextStyle().bigText(
-                "$appLabel ($pkg) Accessibility xizmatini yoqdi — endi u ekraningizni o'qiy oladi, " +
-                    "tugmalarni o'zi bosa oladi va bank ilovalari ustidan nazorat qila oladi.\n\n" +
-                    "Agar buni SIZ bilib yoqmagan bo'lsangiz — darhol o'chiring (banker bo'lishi mumkin).\n" +
-                    "Bosing: Accessibility sozlamalari → xizmatni o'chiring."
+                context.getString(R.string.kq4_notif_a11y_big, appLabel, pkg)
             ))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(piOpen)
-            .setFullScreenIntent(piOpen, true)
-            .addAction(R.drawable.ic_shield, "Accessibility sozlamalari", piOpen)
-            .addAction(R.drawable.ic_trash, "O'chirish", piUninstall)
+            .setFullScreenIntent(piOpen, VersionCompat.canUseFullScreenIntent(context))
+            .addAction(R.drawable.ic_shield, context.getString(R.string.kq4_notif_a11y_action), piOpen)
+            .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), piUninstall)
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(("a11y_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
     }
@@ -508,23 +614,270 @@ object NotificationHelper {
         )
         val builder = NotificationCompat.Builder(context, channelFor(context))
             .setSmallIcon(R.drawable.ic_shield)
-            .setContentTitle("⚠️ Ilova bildirishnomalarni o'qiy oladi")
-            .setContentText("$appLabel — bildirishnomalarga kirish oldi. OTP kodlar xavf ostida.")
+            .setContentTitle(context.getString(R.string.kq4_notif_notifacc_title))
+            .setContentText(context.getString(R.string.kq4_notif_notifacc_text, appLabel))
             .setStyle(NotificationCompat.BigTextStyle().bigText(
-                "$appLabel ($pkg) bildirishnomalarni o'qish huquqini oldi — endi u bank va " +
-                    "Telegram push'laridagi bir martalik kodlarni (OTP) ko'ra oladi. Bankerlar " +
-                    "SMS ruxsatisiz aynan shunday o'g'irlaydi.\n\n" +
-                    "Agar buni SIZ bilib bermagan bo'lsangiz — darhol o'chiring.\n" +
-                    "Bosing: bildirishnoma kirish sozlamalari → ruxsatni olib tashlang."
+                context.getString(R.string.kq4_notif_notifacc_big, appLabel, pkg)
             ))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(piOpen)
-            .setFullScreenIntent(piOpen, true)
-            .addAction(R.drawable.ic_shield, "Sozlamalar", piOpen)
-            .addAction(R.drawable.ic_trash, "O'chirish", piUninstall)
+            .setFullScreenIntent(piOpen, VersionCompat.canUseFullScreenIntent(context))
+            .addAction(R.drawable.ic_shield, context.getString(R.string.kq4_notif_notifacc_action), piOpen)
+            .addAction(R.drawable.ic_trash, context.getString(R.string.uninstall_app), piUninstall)
         applyLegacyPrefs(context, builder)
         NotificationManagerCompat.from(context).notify(("notif_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
     }
+
+    /**
+     * Panel joylagan yangi e'lon (yangilik) bildirishnomasi — [NewsNotifier] fonда
+     * aniqlaganda chiqaradi. Tahdid EMAS: alohida [CH_NEWS] kanali, past bosim, ovoz
+     * foydalanuvchi sozlamalaridan emas, kanal default'idan.
+     *
+     * Rasm ([image]) — chaqiruvchi (IO thread) [NewsImages] orqali oldindan yuklab beradi;
+     * bo'lsa BigPictureStyle (kengaytirilganda to'liq rasm), bo'lmasa BigTextStyle (matn).
+     * Tap → [NewsActivity] (to'liq e'lonlar ro'yxati).
+     *
+     * Notification ID e'lon id'sidan keladi — bir e'lon ikki marta push qilinsa ham
+     * stack'da bittagina ko'rinadi (yangilanadi, dublikat emas).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showNewsNotification(context: Context, item: NewsStore.Item, image: Bitmap?) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+
+        val openIntent = Intent(context, NewsActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val rc = ("news_${item.id}").hashCode() and 0x7FFFFFFF
+        val pi = PendingIntent.getActivity(
+            context, rc, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // critical → biroz balandroq (heads-up ehtimoli), qolgani DEFAULT.
+        val priority = if (item.level == "critical") NotificationCompat.PRIORITY_HIGH
+        else NotificationCompat.PRIORITY_DEFAULT
+
+        val body = item.body.ifBlank { context.getString(R.string.kq4_news_notif_default_body) }
+
+        val builder = NotificationCompat.Builder(context, CH_NEWS)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(item.title)
+            .setContentText(body)
+            .setPriority(priority)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+
+        if (image != null) {
+            builder.setLargeIcon(image)
+            builder.setStyle(
+                NotificationCompat.BigPictureStyle()
+                    .bigPicture(image)
+                    .bigLargeIcon(null as Bitmap?)   // kengaytirilganda large icon takrorlanmasin
+                    .setBigContentTitle(item.title)
+                    .setSummaryText(body.take(120))
+            )
+        } else {
+            builder.setStyle(NotificationCompat.BigTextStyle().bigText(body))
+        }
+
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
+    }
+
+    /**
+     * Masofaviy boshqaruv ilovasi (AnyDesk/TeamViewer/...) topilganda ogohlantirish.
+     * Tap → SideloadAuditActivity (u masofaviy ilovalarni ham ko'rsatadi va o'chirishga yo'l ochadi).
+     * Bu ilovalarni AVTOMATIK o'chirmaymiz — ular qonuniy bo'lishi mumkin, faqat ogohlantiramiz.
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showRemoteAccessNotification(context: Context, brands: List<String>) {
+        if (brands.isEmpty()) return
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val intent = Intent(context, SideloadAuditActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = PendingIntent.getActivity(
+            context, "remote_access".hashCode(), intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val names = brands.distinct().joinToString(", ")
+        val body = context.getString(R.string.notif_remote_access_body, names)
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_remote_access_title))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(REMOTE_ACCESS_NOTIF_ID, builder.build())
+    }
+
+    /**
+     * Ochiq (parolsiz) Wi-Fi tarmog'iga ulanilganda ogohlantirish (MITM xavfi).
+     * Har SSID uchun bir marta ([WifiGuard] dedublaydi).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showOpenWifiNotification(context: Context, ssid: String) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val body = context.getString(R.string.notif_open_wifi_body, ssid)
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_open_wifi_title))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(
+            ("wifi_$ssid").hashCode() and 0x7FFFFFFF, builder.build()
+        )
+    }
+
+    /**
+     * Bildirishnomadagi (Telegram/SMS) havola [LinkScanner] tomonidan XAVFLI deb topilganda
+     * foydalanuvchini ogohlantirish. Tap → LinkCheckActivity (to'liq sabab + tekshirish).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showPhishingLinkNotification(context: Context, url: String, host: String?) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val intent = LinkCheckActivity.intent(context, url).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val rc = ("phish_$url").hashCode() and 0x7FFFFFFF
+        val pi = PendingIntent.getActivity(
+            context, rc, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val shown = host ?: url
+        val body = context.getString(R.string.notif_phish_link_body, shown)
+        val builder = NotificationCompat.Builder(context, channelFor(context))
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_phish_link_title))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        applyLegacyPrefs(context, builder)
+        NotificationManagerCompat.from(context).notify(rc, builder.build())
+    }
+
+    /**
+     * O'rnatilgan (sideload) ilova YANGILANGANDA — "tekshirildi" informatsion bildirishnoma.
+     * Jim kanal (CH_NEWS, IMPORTANCE_DEFAULT) — heads-up/sirena YO'Q, oddiy xabar. Tap → ilova
+     * ma'lumotlari ekrani. Faqat SAFE yangilanish uchun (DANGER/SUSPICIOUS o'z alertini beradi).
+     */
+    @Suppress("NAME_SHADOWING")
+    fun showAppUpdatedNotification(context: Context, pkg: String, appLabel: String) {
+        val context = LocaleHelper.apply(context)
+        createChannels(context)
+        val infoIntent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = android.net.Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val pi = PendingIntent.getActivity(
+            context, ("upd_$pkg").hashCode() and 0x7FFFFFFF, infoIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, CH_NEWS)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(context.getString(R.string.notif_app_updated_title, appLabel))
+            .setContentText(context.getString(R.string.notif_app_updated_body))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        NotificationManagerCompat.from(context).notify(("upd_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
+    }
+
+    /**
+     * Admin (egasi) xabari — paneldan qurilmaga 1:1 xabar (message buyrug'i). SMS'siz yetkazish.
+     * Jim kanal (CH_NEWS). Tap → ilova ochiladi. Title/body serverdan keladi (allaqachon qisqartirilgan).
+     */
+    fun showAdminMessageNotification(context: Context, title: String, body: String) {
+        val ctx = LocaleHelper.apply(context)
+        createChannels(ctx)
+        val open = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = if (open != null) PendingIntent.getActivity(
+            ctx, 0x0A11, open, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        ) else null
+        val builder = NotificationCompat.Builder(ctx, CH_NEWS)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(title.ifBlank { "Admin xabari" })
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        if (pi != null) builder.setContentIntent(pi)
+        NotificationManagerCompat.from(ctx).notify(0x0A11, builder.build())
+    }
+
+    /**
+     * Qurilma "yo'qolgan"/"buzilgan" deb belgilangan (flag) — barqaror, katta bosimli, o'chmaydigan
+     * ogohlantirish. MDM emas: faqat ko'rinadigan e'lon (masofaviy qulflash/o'chirish yo'q).
+     */
+    fun showDeviceFlagNotification(context: Context, state: String, note: String) {
+        val ctx = LocaleHelper.apply(context)
+        createChannels(ctx)
+        val title = if (state == "lost") "⚠️ Bu qurilma yo'qolgan deb belgilangan"
+                    else "⚠️ Bu qurilma xavf ostida deb belgilangan"
+        val text = if (note.isNotBlank()) note
+                   else "Administrator bu qurilmani belgiladi. IT xonasiga / ega bilan bog'laning."
+        val builder = NotificationCompat.Builder(ctx, CH_FULL)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setOngoing(true)
+            .setAutoCancel(false)
+        NotificationManagerCompat.from(ctx).notify(DEVICE_FLAG_NOTIF_ID, builder.build())
+    }
+
+    /** Flag olib tashlanganda barqaror ogohlantirishni tozalaydi. */
+    fun clearDeviceFlagNotification(context: Context) {
+        try { NotificationManagerCompat.from(context).cancel(DEVICE_FLAG_NOTIF_ID) } catch (_: Throwable) {}
+    }
+
+    /**
+     * Ilova YANGILANISHda xavfli qobiliyat oldi (manifest-diff): masalan yangi SMS o'qish
+     * huquqi / accessibility / device-admin, yoki targetSdk pasayishi. "Yaxshi ilova N+1
+     * versiyada zararli bo'ldi" (supply-chain) vektoriga qarshi ogohlantirish. Tap → ilova ma'lumotlari.
+     */
+    fun showCapabilityGainNotification(context: Context, pkg: String, appLabel: String, deltas: List<String>) {
+        if (deltas.isEmpty()) return
+        val ctx = LocaleHelper.apply(context)
+        createChannels(ctx)
+        val infoIntent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = android.net.Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val pi = PendingIntent.getActivity(
+            ctx, ("capg_$pkg").hashCode() and 0x7FFFFFFF, infoIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val text = "$appLabel yangilanishda yangi huquq oldi:\n• " + deltas.take(5).joinToString("\n• ")
+        val builder = NotificationCompat.Builder(ctx, CH_VIBRATE)
+            .setSmallIcon(R.drawable.ic_shield)
+            .setContentTitle("⚠️ Ilova yangilanishda huquq oldi")
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+        NotificationManagerCompat.from(ctx).notify(("capg_$pkg").hashCode() and 0x7FFFFFFF, builder.build())
+    }
+
+    private const val DEVICE_FLAG_NOTIF_ID = 0x0F1A
+    private const val REMOTE_ACCESS_NOTIF_ID = 0x0F51
 }

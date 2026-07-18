@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
-import { canRead } from '../lib/auth.js';
+import { canRead, checkAdminSecret } from '../lib/auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
@@ -45,6 +45,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const sb = db();
 
+  // ?audit=1 → panel amallari jurnali (admin_audit_log, migratsiya 15) — FAQAT EGASI.
+  // Alohida funksiya emas (Vercel Hobby 12-funksiya limiti) — threats?feed=1 uslubida branch.
+  if (req.query.audit === '1') {
+    if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
+    const { data, error } = await sb
+      .from('admin_audit_log')
+      .select('id, at, actor, action, detail, ip')
+      .order('at', { ascending: false })
+      .limit(200);
+    if (error) { console.error(`[stats] audit db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+    return res.status(200).json({ ok: true, audit: data ?? [] });
+  }
+
   // ?perf=1 → tekshiruv tezligi (scan-perf shu yerga birlashtirildi: Vercel Hobby 12-funksiya
   // limitidan oshib ketmaslik uchun). Panel "Tekshiruv tezligi" widjeti `/api/stats?perf=1` chaqiradi.
   if (req.query.perf === '1') {
@@ -77,6 +90,84 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })),
     };
     return res.status(200).json({ ok: true, perf });
+  }
+
+  // ?series=1 → oxirgi 14 kunlik trend (skanlar/kun, verdict bo'yicha) + tizim salomatligi.
+  // Alohida funksiya EMAS (Vercel Hobby 12-funksiya limiti) — stats?perf=1 uslubidagi branch.
+  // Migratsiyasiz: xom `scans` qatorlarini (scanned_at, verdict) o'qib, JS'da kun bo'yicha
+  // guruhlaymiz. Bo'sh kunlar ham 0 bilan chiqadi (grafik uzuq bo'lmasligi uchun).
+  if (req.query.series === '1') {
+    const DAYS = 14;
+    const since = new Date(Date.now() - (DAYS - 1) * 24 * 60 * 60 * 1000);
+    since.setUTCHours(0, 0, 0, 0);
+    const { data: rows, error: serr } = await sb
+      .from('scans')
+      .select('scanned_at, verdict')
+      .gte('scanned_at', since.toISOString())
+      .order('scanned_at', { ascending: true })
+      .limit(20000);
+    if (serr) { console.error(`[stats] series db error: ${serr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+    type Day = { day: string; total: number; danger: number; suspicious: number; safe: number };
+    const buckets = new Map<string, Day>();
+    for (let i = 0; i < DAYS; i++) {
+      const key = new Date(since.getTime() + i * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      buckets.set(key, { day: key, total: 0, danger: 0, suspicious: 0, safe: 0 });
+    }
+    for (const r of (rows ?? []) as Array<{ scanned_at?: string | null; verdict?: string | null }>) {
+      if (!r.scanned_at) continue;
+      const b = buckets.get(r.scanned_at.slice(0, 10));
+      if (!b) continue;
+      b.total++;
+      if (r.verdict === 'danger') b.danger++;
+      else if (r.verdict === 'suspicious') b.suspicious++;
+      else if (r.verdict === 'safe') b.safe++;
+    }
+    const series = [...buckets.values()];
+
+    // Tizim salomatligi kartasi: oqim yangiligi (oxirgi skan) + oxirgi qurilma aloqasi.
+    // db_ok — bu javob qaytdi degani (yuqoridagi so'rovlar muvaffaqiyatli).
+    const [lastScan, lastDev] = await Promise.all([
+      sb.from('scans').select('scanned_at').order('scanned_at', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('devices').select('last_seen').order('last_seen', { ascending: false }).limit(1).maybeSingle(),
+    ]);
+    const health = {
+      db_ok: true,
+      last_scan_at: (lastScan.data as { scanned_at?: string } | null)?.scanned_at ?? null,
+      last_device_seen: (lastDev.data as { last_seen?: string } | null)?.last_seen ?? null,
+    };
+    return res.status(200).json({ ok: true, series, health });
+  }
+
+  // ?weekly=1 → oxirgi 7 kunlik yig'ma hisobot (panel "Haftalik hisobot" + Telegram yetkazish
+  // uchun). Alohida funksiya EMAS (Vercel Hobby 12-funksiya limiti) — stats?series=1 uslubidagi
+  // branch. Global yig'indi + eng ko'p uchragan tahdid oilalari. FAQAT EGASI.
+  if (req.query.weekly === '1') {
+    if (!checkAdminSecret(req)) return res.status(403).json({ ok: false, error: 'faqat egasi' });
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const [total, danger, susp, safe, devs, fams] = await Promise.all([
+      sb.from('scans').select('*', { count: 'exact', head: true }).gte('scanned_at', since),
+      sb.from('scans').select('*', { count: 'exact', head: true }).eq('verdict', 'danger').gte('scanned_at', since),
+      sb.from('scans').select('*', { count: 'exact', head: true }).eq('verdict', 'suspicious').gte('scanned_at', since),
+      sb.from('scans').select('*', { count: 'exact', head: true }).eq('verdict', 'safe').gte('scanned_at', since),
+      sb.from('scans').select('device_id').gte('scanned_at', since).not('device_id', 'is', null).limit(20000),
+      sb.from('threats').select('family, app_label, seen_count').gte('last_seen', since).order('seen_count', { ascending: false }).limit(10),
+    ]);
+    const activeDevices = new Set(((devs.data ?? []) as Array<{ device_id: string }>).map((r) => r.device_id)).size;
+    const topThreats = ((fams.data ?? []) as Array<{ family?: string | null; app_label?: string | null; seen_count?: number }>)
+      .map((t) => ({ name: t.family || t.app_label || '—', count: t.seen_count ?? 0 }));
+    return res.status(200).json({
+      ok: true,
+      weekly: {
+        since,
+        total: total.count ?? 0,
+        danger: danger.count ?? 0,
+        suspicious: susp.count ?? 0,
+        safe: safe.count ?? 0,
+        active_devices: activeDevices,
+        top_threats: topThreats,
+      },
+    });
   }
 
   const { data, error } = await sb.from('v_stats_today').select('*').single();

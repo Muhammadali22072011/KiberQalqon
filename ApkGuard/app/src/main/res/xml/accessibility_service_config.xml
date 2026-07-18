@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Jonli o'rnatish qalqoni (InstallShieldService) konfiguratsiyasi.
+
+  packageNames — FAQAT tizim o'rnatuvchilari bilan cheklangan: shu tufayli xizmat
+  boshqa hech qanday ilova ekranini ko'rmaydi (maxfiylik + batareya tejaladi), faqat
+  "O'rnatasizmi?" oynasini kuzatadi. canRetrieveWindowContent — oynadagi paket nomini
+  o'qish uchun; flagReportViewIds — "Bekor" tugmasini topish uchun (zaxira yo'l, asosiy
+  yo'l GLOBAL_ACTION_BACK).
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagRetrieveInteractiveWindows|flagReportViewIds"
+    android:canRetrieveWindowContent="true"
+    android:isAccessibilityTool="true"
+    android:notificationTimeout="100"
+    android:description="@string/install_shield_a11y_desc"
+    android:packageNames="com.samsung.android.packageinstaller,com.google.android.packageinstaller,com.android.packageinstaller,com.miui.packageinstaller,com.huawei.packageinstaller,com.vivo.packageinstaller,com.oppo.packageinstaller,com.coloros.packageinstaller,p.android.packageinstaller" />

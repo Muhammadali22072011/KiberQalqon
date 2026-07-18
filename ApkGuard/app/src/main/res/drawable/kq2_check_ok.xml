@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Score-kartadagi ✓ doira (mockup2 .chk i): safe-bg fon. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/kq_safe_bg" />
+</shape>

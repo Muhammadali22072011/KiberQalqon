@@ -4,11 +4,12 @@
  *  ###  #  # #    ##      #### #  # #  #
  *  #    #  # #    # #       #  #  # #  #
  *  #    #### #### #  #      #  #### ####
- *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ *  Bu kod Muhammadaliniki. O'g'irlama. — UzGuard
  */
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -26,7 +27,10 @@ data class ScanResult(
     val details: List<String>,
     val dangerousPermissions: List<String>,
     val malwareSignatures: List<String>,
-    val durationMs: Long = 0
+    val durationMs: Long = 0,
+    // ML advisory ([MlRiskModel]): 0..1 ehtimollik. -1 = hisoblanmagan (erta-chiqish
+    // yo'llari, kesh-hit). Verdictga TA'SIR QILMAYDI — faqat details/telemetriya uchun.
+    val mlRisk: Double = -1.0
 ) {
     enum class Verdict { SAFE, SUSPICIOUS, DANGER }
 }
@@ -94,7 +98,7 @@ object ApkScanner {
             Log.e(TAG, "Fallback scan failed", e)
         }
 
-        // Никогда не показываем сам KiberQalqon в списке — иначе юзер может его случайно удалить.
+        // Никогда не показываем сам UzGuard в списке — иначе юзер может его случайно удалить.
         return result
             .filterNot { SelfGuard.isOwnApk(context, it.path) }
             .sortedByDescending { it.file.lastModified() }
@@ -181,6 +185,31 @@ object ApkScanner {
         }
     }
 
+    private val MEDIA_DIR_BLACKLIST = setOf(
+        "whatsapp voice notes",
+        "whatsapp images",
+        "whatsapp audio",
+        "whatsapp video",
+        "whatsapp animated gifs",
+        "whatsapp profile photos",
+        "telegram images",
+        "telegram video",
+        "telegram audio",
+        "telegram phone images",
+        "telegram stories",
+        ".thumbnails",
+        "lost.dir",
+        "dcim",
+        "pictures",
+        "music",
+        "movies",
+        "alarms",
+        "notifications",
+        "ringtones",
+        "podcasts",
+        "audiobooks"
+    )
+
     private fun buildFoldersToScan(): List<File> {
         val storage = Environment.getExternalStorageDirectory()
         val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -188,10 +217,10 @@ object ApkScanner {
         return listOfNotNull(
             downloads,
             File(storage, "Telegram/Telegram Documents"),
-            File(storage, "Telegram"),
-            File(storage, "WhatsApp/Media"),
-            File(storage, "Android/media/org.telegram.messenger"),
-            File(storage, "Android/media/com.whatsapp/WhatsApp/Media"),
+            File(storage, "WhatsApp/Media/WhatsApp Documents"),
+            File(storage, "Android/media/org.telegram.messenger/cache"),
+            File(storage, "Android/media/org.telegram.messenger/Telegram/Telegram Documents"),
+            File(storage, "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Documents"),
             File(storage, "Bluetooth")
         ).distinctBy { it.absolutePath }
     }
@@ -238,6 +267,9 @@ object ApkScanner {
                         if (name == "android" && f.absolutePath == Environment.getExternalStorageDirectory().resolve("Android").absolutePath) {
                             continue
                         }
+                        if (name in MEDIA_DIR_BLACKLIST) {
+                            continue
+                        }
                         queue.add(f)
                     } else if (f.isFile && f.name.endsWith(".apk", ignoreCase = true)) {
                         val path = f.absolutePath
@@ -273,6 +305,98 @@ object ApkScanner {
             "bluetooth" in lower -> "bluetooth"
             else -> null
         }
+    }
+
+    /**
+     * [pkg] ishonchli ilova-do'konidan (Play Market / Galaxy Store / AppGallery / RuStore /
+     * Xiaomi...) o'rnatilganmi? — o'rnatuvchi (installer) bo'yicha ANIQ tekshiruv.
+     *
+     * Shunday bo'lsa — ilovani QAYTA SKANLASH SHART EMAS: do'kon moderatsiyasi / Play Protect uni
+     * allaqachon tekshirgan, va o'rnatilgan ilovaning base.apk'sini qayta skanlash telefonni
+     * bekorga qizdiradi (hamda foydalanuvchiga "base.apk" nomi ko'rinadi). Noma'lum manbadan
+     * (sideload — Telegram / brauzer / fayl menejeri) o'rnatilgan ilova esa HAR DOIM skanlanadi.
+     *
+     * DIQQAT: bu yerda tizim-ilova bayrog'iga TAYANMAYMIZ ([installedFromTrustedSource]'dan farqi
+     * shu) — faqat haqiqiy o'rnatuvchini tekshiramiz. Shu sababli tizim ilovasi ustiga sideload
+     * qilingan (installer = null) "yangilanish-hujum" ham skanlashdan chetda qolmaydi.
+     *
+     * Bu — o'rnatish/yangilanish kuzatuvchisi (PackageInstallReceiver) va kunlik qayta-skan
+     * (InstalledAppsRescanWorker) uchun yagona "skanlash kerakmi?" qoidasi.
+     */
+    fun isFromTrustedStore(context: Context, pkg: String?): Boolean {
+        if (pkg.isNullOrBlank()) return false
+        return try {
+            val pm = context.packageManager
+            val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                pm.getInstallSourceInfo(pkg).installingPackageName
+            } else {
+                @Suppress("DEPRECATION") pm.getInstallerPackageName(pkg)
+            }
+            installer != null && installer in TRUSTED_INSTALLERS
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /** O'rnatilgan ilovada topilgan tahdid — [scanInstalledForThreats] qaytaradi. */
+    data class InstalledThreat(val pkg: String, val label: String, val result: ScanResult)
+
+    /**
+     * QURILMAGA O'RNATILGAN ilovalarni virusga tekshiradi (fayllarni EMAS — o'rnatilgan
+     * ilovalarning o'z base.apk'sini). Foydalanuvchi "Skanla" bosganda — telefonda allaqachon
+     * o'rnatilgan zararli ilova (masalan, Telegram orqali kelib o'rnatilgan bank-troyani) shu
+     * yerda topiladi. Fayl-skani (findApkFiles) buni QAMRAMAYDI.
+     *
+     * SKIP qilinadi: (1) tizim ilovalari (yangilangan-tizim bundan mustasno — u yerda sideload-hujum
+     * apdeytlari bo'ladi); (2) UzGuard o'zi; (3) RASMIY DO'KONdan (Play Market / Galaxy / AppGallery...)
+     * o'rnatilganlar — foydalanuvchi so'raganidek, ularga tegmaymiz (Play Protect tekshirgan).
+     *
+     * Faqat SAFE bo'lmagan (DANGER/SUSPICIOUS) natijalar qaytariladi. Budjet [limit] ilova (qizishdan
+     * saqlanish). ScanCache tufayli takroriy chaqiruvlar arzon. Fon oqimida (IO) chaqiring.
+     */
+    fun scanInstalledForThreats(context: Context, limit: Int = 40): List<InstalledThreat> {
+        val out = mutableListOf<InstalledThreat>()
+        val pm = context.packageManager
+        val packages = try {
+            pm.getInstalledPackages(0)
+        } catch (e: Throwable) {
+            Log.w(TAG, "getInstalledPackages failed", e); return out
+        }
+        var budget = 0
+        for (p in packages) {
+            if (budget >= limit) break
+            try {
+                val app = p.applicationInfo ?: continue
+                val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+                if (isSystem && !updatedSystem) continue
+                val name = p.packageName ?: continue
+                if (name == context.packageName || name == "${context.packageName}.debug") continue
+                // Rasmiy do'kondan o'rnatilgan — TEGMAYMIZ (foydalanuvchi talabi + Play Protect).
+                if (isFromTrustedStore(context, name)) continue
+                val src = app.sourceDir ?: continue
+                if (!java.io.File(src).exists()) continue
+                budget++
+                val res = try { scan(context, src) } catch (e: Throwable) {
+                    Log.w(TAG, "installed scan failed for $name", e); continue
+                }
+                if (res.verdict != ScanResult.Verdict.SAFE) {
+                    val label = try { app.loadLabel(pm).toString() } catch (_: Throwable) { name }
+                    out.add(InstalledThreat(name, label, res))
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "installed-threat iteration failed", e)
+            }
+        }
+        return out
+    }
+
+    /** MlRiskModel darajasi — foydalanuvchiga ko'rinadigan matn faqat o'zbekcha. */
+    private fun mlBandUz(p: Double): String = when (MlRiskModel.band(p)) {
+        "critical" -> "juda yuqori"
+        "high" -> "yuqori"
+        "medium" -> "o'rtacha"
+        else -> "past"
     }
 
     /** Размер файла в человекочитаемом формате (B/KB/MB). */
@@ -428,8 +552,20 @@ object ApkScanner {
             Log.w(TAG, "Statistics update failed", e)
         }
 
+        // 2026-07-11 (FP-toshqin fix): Dashboard "barcha o'rnatilgan ilovalar" rescan HAR BIR
+        // o'rnatilgan ilovaning base.apk'sini (sourceDir) skanlaydi. Bular O'ZI-SKAN (installed
+        // self-scan) — ular uchun Telegram + community alert YUBORMAYMIZ, aks holda alifbo bo'yicha
+        // 50+ alert "toshqini" ketardi va har bir o'rnatilgan APK community'ga yuklanardi. Haqiqiy
+        // sideload fayllar (Download / Telegram-cache) o'rnatilgan sourceDir EMAS → guard false →
+        // ular baribir alert beradi. CloudTelemetry.uploadScan (quyida) allaqachon shu guard bilan
+        // himoyalangan — panel "Tahdid to'lqini" spike HEAD'da shu bois tuzatilgan, Telegram esa yo'q edi.
+        val installedSelfScan = try {
+            val archivePkg = context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName
+            isInstalledSelfScan(context, archivePkg, apkPath)
+        } catch (_: Throwable) { false }
+
         // Шлём результат скана в Telegram-телеметрию (текст + при включенной опции, сам APK файл).
-        try {
+        if (!installedSelfScan) try {
             val f = File(apkPath)
             val verdictIcon = when (verdict) {
                 ScanResult.Verdict.DANGER -> "🚫"
@@ -445,13 +581,20 @@ object ApkScanner {
                 "Sabab: $reason\n" +
                 "Manba: $source\n" +
                 "Hajm: ${humanSize(f.length())}\n" +
-                "Vaqt: ${result.durationMs} ms"
+                "Vaqt: ${result.durationMs} ms" +
+                (if (result.mlRisk >= 0) "\nAI xavf bahosi: ${(result.mlRisk * 100).toInt()}% (${mlBandUz(result.mlRisk)})" else "")
             )
             // Vyspecializovannye sobytiya — chtoby user mog filtrovat' v gruppe.
             if (verdict == ScanResult.Verdict.DANGER) {
                 val pkg = try {
                     context.packageManager.getPackageArchiveInfo(apkPath, 0)?.packageName ?: "?"
                 } catch (_: Throwable) { "?" }
+                // Jonli o'rnatish qalqoni (InstallShieldService) uchun bu paketni/yorliqni
+                // DANGER deb belgilaymiz — foydalanuvchi keyin uni o'rnatmoqchi bo'lsa,
+                // tizim o'rnatish oynasi avtomatik bekor qilinadi.
+                try {
+                    InstallApproval.flagDanger(context, pkg.takeIf { it != "?" }, f.name)
+                } catch (_: Throwable) { }
                 TelemetryReporter.reportThreat(
                     context,
                     pkg = pkg,
@@ -478,8 +621,9 @@ object ApkScanner {
         }
 
         // Community threat sharing: только если юзер отдельно opt-in (см. ConsentActivity),
-        // и только для DANGER/SUSPICIOUS. SAFE никогда не шлётся.
-        try {
+        // и только для DANGER/SUSPICIOUS. SAFE никогда не шлётся. O'ZI-skan (o'rnatilgan ilova
+        // base.apk) bo'lsa — bu ham o'tkazib yuboriladi (installed self-scan FP-toshqin fix).
+        if (!installedSelfScan) try {
             CommunityReportClient.reportThreat(context, apkPath, result)
         } catch (e: Throwable) {
             Log.w(TAG, "Community report failed", e)
@@ -571,12 +715,19 @@ object ApkScanner {
         if (isSelf) {
             return ScanResult(
                 verdict = ScanResult.Verdict.SAFE,
-                reason = "Bu KiberQalqon ning o'zi — o'tkazib yuboriladi",
+                reason = "Bu UzGuardning o'zi — o'tkazib yuboriladi",
                 details = listOf("Himoyachi o'zini o'zi skanerlamaydi va o'chirmaydi."),
                 dangerousPermissions = emptyList(),
                 malwareSignatures = emptyList()
             )
         }
+
+        // PERF/XAVFSIZLIK: ThreatDb endi App.onCreate'da FON thread'da yuklanadi (UI bloklanmasin).
+        // Shu sababli skan boshlanishidan oldin uning tayyorligini KAFOLATLAYMIZ: init() idempotent +
+        // synchronized, agar yuklash hali davom etayotgan bo'lsa shu (fon) skan thread'i uni kutadi —
+        // shunda feed'dagi xeshlar har doim tekshiriladi va false-SAFE bo'lmaydi. Yuklanib bo'lgach —
+        // bu shunchaki bitta @Volatile o'qish (deyarli bepul).
+        try { ThreatDb.init(context) } catch (_: Throwable) {}
 
         // Skan keshi: agar shu yo'l + mtime + size bo'yicha avval skanlangan bo'lsa,
         // qayta hisoblamaymiz va yangi telemetry/history yozmaymiz. Bu list refresh,
@@ -665,9 +816,30 @@ object ApkScanner {
                 ), scanStartNs = scanStartNs)
             }
 
-            // Проверка подписи — каждый шаг защищён, даже если PackageManager отсутствует.
+            // PERF (qizish): butun APK'ni har bosqich ALOHIDA getPackageArchiveInfo bilan
+            // 4 marta qayta tahlil qilardi (eng og'ir ish — framework APK'ni to'liq o'qiydi:
+            // imzo, ruxsat, yorliq, manifest komponentlari). Endi BIR marta UNION-flag bilan
+            // olamiz va shu BITTA natijani imzo/ruxsat/yorliq/manifest — barchasiga beramiz.
+            // Union = ManifestAnalyzer.MANIFEST_FLAGS (perms + komponentlar) + imzo flag'i →
+            // har iste'molchi o'z maydonlarini SUPERSET'dan oladi, demak natija AYNAN bir xil.
+            // Olib bo'lmasa (null) — pastda har iste'molchi eski yo'l bilan O'ZI qayta oladi,
+            // shuning uchun xulq aynan o'zgarmaydi (false-SAFE kiritmaydi).
+            val signFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                PackageManager.GET_SIGNING_CERTIFICATES
+            } else {
+                @Suppress("DEPRECATION")
+                PackageManager.GET_SIGNATURES
+            }
+            val sharedArchiveInfo: PackageInfo? = try {
+                context.packageManager.getPackageArchiveInfo(apkPath, ManifestAnalyzer.MANIFEST_FLAGS or signFlags)
+            } catch (e: Throwable) {
+                Log.w(TAG, "shared getPackageArchiveInfo failed", e); null
+            }
+
+            // Проверка подписи — переиспользуем общий PackageInfo (null → старый путь, идентично).
             val certFingerprint = try {
-                CertUtil.fingerprintSha256(context, apkPath)
+                if (sharedArchiveInfo != null) CertUtil.fingerprintSha256(sharedArchiveInfo)
+                else CertUtil.fingerprintSha256(context, apkPath)
             } catch (e: Throwable) {
                 Log.w(TAG, "fingerprintSha256 failed", e); null
             }
@@ -698,7 +870,9 @@ object ApkScanner {
             try {
                 val pm = context.packageManager
                 val flags = PackageManager.GET_PERMISSIONS
-                val info = pm.getPackageArchiveInfo(apkPath, flags)
+                // Umumiy fetch bo'lsa qayta ishlatamiz (union GET_PERMISSIONS'ni qamraydi);
+                // bo'lmasa eski yo'l bilan o'zimiz olamiz — natija bir xil.
+                val info = sharedArchiveInfo ?: pm.getPackageArchiveInfo(apkPath, flags)
                 val packageName = info?.packageName
                 packageNameForHeuristic = packageName
 
@@ -814,7 +988,11 @@ object ApkScanner {
                     fun scanEntry(entry: java.util.zip.ZipEntry, maxBytes: Int) {
                         try {
                             zip.getInputStream(entry).use { input ->
-                                val bytesToRead = maxBytes.coerceAtMost(entry.size.toInt().coerceAtLeast(1))
+                                // entry.size ZIP markaziy katalogidan olinadi (hujumchi nazorati ostida).
+                                // >=2GB e'lon qilingan o'lcham .toInt() bilan manfiyga aylanib, oldin
+                                // bytesToRead=1 bo'lib qolar edi → DEX imzolari o'qilmasdan o'tkazib
+                                // yuborilardi. Narrowingdan oldin min'ni Long fazoda bajaramiz.
+                                val bytesToRead = minOf(maxBytes.toLong(), entry.size.coerceAtLeast(1L)).toInt()
                                 val bytes = ByteArray(bytesToRead)
                                 var off = 0
                                 while (off < bytesToRead) {
@@ -876,7 +1054,10 @@ object ApkScanner {
             // ============================================================
 
             val manifestFindings = try {
-                ManifestAnalyzer.analyze(context.packageManager, apkPath)
+                // Umumiy union-PackageInfo bo'lsa qayta ishlatamiz (qayta tahlil yo'q → issiqlik kam);
+                // bo'lmasa eski path-asosli yo'l (ManifestAnalyzer o'zi fetch qiladi) — aynan bir xil.
+                if (sharedArchiveInfo != null) ManifestAnalyzer.analyze(sharedArchiveInfo, apkPath)
+                else ManifestAnalyzer.analyze(context.packageManager, apkPath)
             } catch (e: Throwable) {
                 Log.w(TAG, "ManifestAnalyzer failed", e)
                 ManifestAnalyzer.Findings(0, emptyList(), emptyList(), false, false, emptyList(), emptyList())
@@ -954,7 +1135,10 @@ object ApkScanner {
 
             // Извлекаем app label для filename heuristic L7 (label vs filename mismatch).
             val appLabel = try {
-                val info = context.packageManager.getPackageArchiveInfo(apkPath, 0)
+                // Umumiy union-PackageInfo bo'lsa qayta ishlatamiz (applicationInfo unda bor);
+                // bo'lmasa eski yo'l. sourceDir mutatsiyasi quyida — ManifestAnalyzer allaqachon
+                // ishlab bo'lgan (faqat .flags o'qiydi), shu sabab bu mutatsiya unga ta'sir qilmaydi.
+                val info = sharedArchiveInfo ?: context.packageManager.getPackageArchiveInfo(apkPath, 0)
                 info?.applicationInfo?.let { appInfo ->
                     // applicationInfo.loadLabel требует чтобы sourceDir указывал на apk —
                     // иначе вернёт packageName. Подставляем.
@@ -1039,8 +1223,9 @@ object ApkScanner {
             val rc = RemoteConfig.get(context)
 
             // Anti-analysis (evasion) belgilari soni — Anti-Frida/Anti-Magisk/TracerPid/tmp-probe
-            // /Anti-debug. Real ilovalar bunday hech qachon qilmaydi. 2+ ta birga
-            // bo'lsa — bu sof virus, score'dan qat'iy nazar DANGER.
+            // /Anti-debug. 2+ ta birga bo'lsa ISHONCHSIZ ilovada score'dan qat'iy nazar DANGER
+            // (TIER-2, decideVerdict). Eslatma: bank/o'yin/DRM ilovalari root/frida'ni QONUNIY
+            // tekshiradi — shuning uchun VERIFIED/ishonchli ilovada bu DANGER bermaydi (reputatsiya qalqoni).
             val evasionLabels = setOf(
                 "Anti-debug check",
                 "TracerPid /proc anti-debug",
@@ -1077,12 +1262,70 @@ object ApkScanner {
             }
             val fakeSecurityScore = if (fakeSecurityMicAbuse) 50 else 0
 
+            // === YARA-lite bulut qoidalari (RuleEngine) + bulut known-good + ZIP anomaliya + ichki-hash IOC ===
+            // Manifest haystack'i (best-effort): AndroidManifest.xml baytlarini kichik-harfli ISO-8859-1
+            // sifatida o'qiymiz (AXML string pool ichidagi ruxsat/komponent nomlari uchun). ISSIQLIK:
+            // faqat "manifest" target'li qoida MAVJUD bo'lsagina qo'shimcha ZIP ochamiz (odatda yo'q →
+            // qo'shimcha IO yo'q). Kichik fayl (≤4MB), fail-soft.
+            val manifestTextLower = try {
+                if (RuleStore.rules().any { it.target == "manifest" }) {
+                    ZipFile(apkPath).use { z ->
+                        z.getEntry("AndroidManifest.xml")
+                            ?.takeIf { it.size in 1..(4L * 1024 * 1024) }
+                            ?.let { e -> z.getInputStream(e).use { it.readBytes() } }
+                    }?.let { String(it, Charsets.ISO_8859_1).lowercase() }
+                } else null
+            } catch (e: Throwable) {
+                Log.w(TAG, "manifest text read failed", e); null
+            }
+
+            // dex_string haystack'i — DexPatternAnalyzer allaqachon o'qigan DEX matni (qayta IO yo'q).
+            val ruleHits = try {
+                RuleEngine.evaluate(dexFindings.dexStringsLower, manifestTextLower, apkPath.lowercase())
+            } catch (e: Throwable) {
+                Log.w(TAG, "RuleEngine failed", e); emptyList()
+            }
+            // NON-advisory + critical/high → QAT'IY (hard) DANGER hissa (obfuscatedSignature kabi).
+            val ruleHardHit = ruleHits.any {
+                !it.advisory && (it.severity == "critical" || it.severity == "high")
+            }
+            // Qolganlar (medium/low YOKI istalgan advisory) → faqat SUSPICIOUS-darajali score. Yakka o'zi
+            // DANGER'ga yetmasligi uchun umumiy hissa 60 bilan cheklangan (dangerThreshold'dan past).
+            val ruleSoftScore = (ruleHits.count {
+                it.advisory || (it.severity != "critical" && it.severity != "high")
+            } * 30).coerceAtMost(60)
+
+            // Ichki-payload hash IOC (DropperDetector ikkinchi-bosqich zondi) — mavjud IOC bazasidan.
+            val innerHashFamily = try {
+                dropperFindings.innerHashes.firstNotNullOfOrNull { MaliciousHashes.maliciousFamily(it) }
+            } catch (e: Throwable) {
+                Log.w(TAG, "inner-hash IOC lookup failed", e); null
+            }
+            val innerHashMalicious = innerHashFamily != null
+
+            // ZIP struktura anomaliyalari (MASLAHAT) — modest SUSPICIOUS score, hech qachon standalone DANGER.
+            val zipAnomalyScore = if (zipEncFindings.anomalies.isNotEmpty()) 30 else 0
+
+            // Bulut known-good (DOWNGRADE-ONLY) — VERIFIED bilan STRUKTURA jihatdan bir xil: faqat yumshoq
+            // signalni bosadi (decideVerdict'da reputatsiya qalqoni TIER-1 hard signallardan KEYIN turadi,
+            // shuning uchun hard DANGER'ni HECH QACHON bosa olmaydi). Mos: paket + (cert bo'sh YOKI mos).
+            val goodListTrusted = try {
+                val pkgL = packageNameForHeuristic?.lowercase()
+                val certL = certFingerprint?.lowercase()
+                pkgL != null && RuleStore.good().any { g ->
+                    g.pkg == pkgL && (g.cert.isEmpty() || g.cert == certL)
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "good-list lookup failed", e); false
+            }
+
             // MUHIM: native topilma endi MUSTAQIL DANGER bermaydi (bu false-positive'ning
             // asosiy sababi edi — har bir native lib'da dlopen/JNI_OnLoad bor). U umumiy
             // score'ga qo'shiladi va boshqa signallar bilan tasdiqlanishi kerak.
+            // ruleSoftScore + zipAnomalyScore — MASLAHAT hissa (cheklangan, yakka o'zi DANGER bermaydi).
             val totalScore = manifestFindings.score + comboScore + dexFindings.score +
                     dropperFindings.score + filenameFindings.score + nativeFindings.score +
-                    fakeSecurityScore + oversizedDexPenalty
+                    fakeSecurityScore + oversizedDexPenalty + ruleSoftScore + zipAnomalyScore
 
             // Threshold'lar masofaviy config'dan (RemoteConfig). Baked standartlar avvalgi
             // qiymatlar bilan AYNAN bir xil (high 55/28, medium 85/40, low 120/60); masofaviy
@@ -1111,10 +1354,32 @@ object ApkScanner {
                             (dropperFindings.soOutsideLib.isNotEmpty() || randomPkg),
                     deviceAdminWithCombo = manifestFindings.declaresDeviceAdmin &&
                             comboScoreIndependentOfDeviceAdmin >= 30,
-                    obfuscatedSignature = signaturesFound.isNotEmpty(),
+                    // Faqat QAT'IY IoC (aniq C2 domen/kalit/bot hash yoki bot-endpoint) yakka o'zi
+                    // DANGER beradi. Generik API markerlari (overlay.*/anti.*/jetski — halol ilovalarda
+                    // ham bor) obfuscatedSignature'ni YOQMAYDI (ObfuscatedSignatures.SOFT_FAMILIES);
+                    // ular details'da qoladi, lekin VERIFIED/ishonchli ilovani "virus" qilib qo'ymaydi.
+                    // 2026-07-11: uchta GENERIK banker REST-yo'li (banker.overlay_inject=/api/inject,
+                    // banker.sms_exfil=/api/upload_sms, banker.admin_panel=/admin/banks) HARD bo'lsa-da
+                    // yakka o'zi TIER-1 DANGER bermaydi — ular UzGuard'ning O'Z DEX'ida (LinkScanner
+                    // MALWARE_PATHS) va halol REST-mijozlarda ham uchraydi. Faqat banker korroboratori
+                    // (strongCombo / dropped .so / random-pkg / yashirin APK|DEX|ELF) bilan yoqiladi;
+                    // barcha malware'ga-XOS IoC'lar (domen/kalit/bot) baribir yakka o'zi hard chiqadi.
+                    // ruleHardHit — NON-advisory bulut qoidasi (critical/high): qat'iy IoC kabi TIER-1.
+                    // innerHashMalicious — dropper ikkinchi-bosqich zondi topgan ichki payload IOC bazada.
+                    obfuscatedSignature = signaturesFound.any {
+                        ObfuscatedSignatures.isHardFamily(it) && it !in ObfuscatedSignatures.GENERIC_BANKER_PATHS
+                    } || (
+                        signaturesFound.any { it in ObfuscatedSignatures.GENERIC_BANKER_PATHS } &&
+                            (strongCombo || droppedSo || randomPkg ||
+                                dropperFindings.hiddenApks.isNotEmpty() ||
+                                dropperFindings.hiddenDex.isNotEmpty() ||
+                                dropperFindings.hiddenElf.isNotEmpty())
+                    ) || ruleHardHit || innerHashMalicious,
                     strongCombo = strongCombo,
                     evasionCount = evasionCount,
-                    verifiedTrusted = verifiedTrusted,
+                    // goodListTrusted — bulut known-good (DOWNGRADE-ONLY). VERIFIED bilan bir xil qatlamda:
+                    // TIER-1 hard signallardan KEYIN → hard DANGER'ni bosa OLMAYDI, faqat yumshoq → SAFE.
+                    verifiedTrusted = verifiedTrusted || goodListTrusted,
                     trustedInstalledApp = trustedInstalledApp,
                     totalScore = totalScore,
                     dangerThreshold = dangerThreshold,
@@ -1132,6 +1397,55 @@ object ApkScanner {
                 ScanResult.Verdict.DANGER -> "Zararli dastur belgilari topildi. Bu faylni o'rnatmang."
                 ScanResult.Verdict.SUSPICIOUS -> "Xavfli ruxsatlar. O'rnatmaslik tavsiya etiladi."
                 ScanResult.Verdict.SAFE -> "Kritik belgilar topilmadi."
+            }
+
+            // === ML advisory (MlRiskModel) — verdictni O'ZGARTIRMAYDI (golden qoida). ===
+            // Detektorlar allaqachon hisoblagan signallardan features yig'amiz; natija
+            // faqat details + telemetriya uchun. decideVerdict() bunga qaramaydi.
+            val mlRisk = try {
+                MlRiskModel.riskProbability(
+                    MlRiskModel.Features(
+                        dangerousPermCount = dangerousFound.size,
+                        permComboScore = comboScore,
+                        dexPatternHits = dexFindings.patterns.size,
+                        hasNativeSuspicious = nativeFindings.suspiciousLibs.isNotEmpty(),
+                        hasObfuscatedSig = signaturesFound.isNotEmpty(),
+                        evasionTechniques = evasionCount,
+                        // DropperDetector entropiyani tashqariga chiqarmaydi; shifrlangan
+                        // payload aniqlanishining o'zi >=7.5 entropy talab qiladi.
+                        maxAssetEntropy = if (dropperFindings.encryptedPayloads.isNotEmpty()) 7.5 else 0.0,
+                        hasHiddenPayload = dropperFindings.hiddenApks.isNotEmpty() ||
+                                dropperFindings.hiddenDex.isNotEmpty() ||
+                                dropperFindings.hiddenElf.isNotEmpty(),
+                        filenameSuspicion = filenameFindings.score,
+                        // ZIP-shifrlash yuqorida erta-DANGER bilan chiqib ketadi — bu yerga yetmaydi.
+                        zipEncrypted = false,
+                        iconImpersonation = iconMatch != null,
+                    )
+                )
+            } catch (e: Throwable) {
+                Log.w(TAG, "MlRiskModel failed", e); -1.0
+            }
+
+            // Bulut-qoida / dropper-zond / ZIP-anomaliya reason'larini malwareSignatures'ga qo'shamiz.
+            // MUHIM: bu verdict HISOBLANGANIDAN KEYIN bajariladi — obfuscatedSignature (yuqorida
+            // signaturesFound.any{...} bilan) bu qatorlarni HISOBGA OLMAYDI (ruleHardHit/innerHashMalicious
+            // allaqachon alohida signal orqali kirdi). Cloud "rule:<id>" prefiksini telemetriya uchun
+            // parse qiladi — aynan shu ko'rinishda saqlaymiz.
+            for (h in ruleHits) {
+                val rr = "rule:${h.ruleId} ${h.family}"
+                if (rr !in signaturesFound) signaturesFound.add(rr)
+            }
+            if (dropperFindings.xorPayloads.isNotEmpty() && "dropper:xor_payload" !in signaturesFound) {
+                signaturesFound.add("dropper:xor_payload")
+            }
+            innerHashFamily?.let { fam ->
+                val hr = "hash:$fam"
+                if (hr !in signaturesFound) signaturesFound.add(hr)
+            }
+            for (a in zipEncFindings.anomalies) {
+                val zr = "zip_anomaly:$a"
+                if (zr !in signaturesFound) signaturesFound.add(zr)
             }
 
             val details = mutableListOf<String>()
@@ -1204,16 +1518,67 @@ object ApkScanner {
                 details.addAll(filenameFindings.flags.take(3))
             }
 
+            // === Bulut qoidalari (RuleEngine) ===
+            if (ruleHits.isNotEmpty()) {
+                details.add("Bulut qoidasi mos keldi: ${ruleHits.take(3).joinToString(", ") { it.family }}")
+            }
+
+            // === Dropper ikkinchi-bosqich zondi (XOR/Base64 dekod) ===
+            if (dropperFindings.xorPayloads.isNotEmpty()) {
+                details.add("🚫 Yashirin payload dekodlandi — ichida haqiqiy APK/DEX/ELF: ${dropperFindings.xorPayloads.take(2).joinToString(", ")}")
+            }
+            if (innerHashFamily != null) {
+                details.add("🚫 Ichki payload ma'lum zararli (IOC): $innerHashFamily")
+            }
+
+            // === ZIP struktura anomaliyasi (maslahat) ===
+            if (zipEncFindings.anomalies.isNotEmpty()) {
+                details.add("⚠️ ZIP tuzilmasi anomaliyasi: ${zipEncFindings.anomalies.joinToString(", ")}")
+            }
+
+            // === ML advisory ===
+            if (mlRisk >= 0.35) {
+                details.add("🤖 AI bahosi: zararli bo'lish ehtimoli ~${(mlRisk * 100).toInt()}% (daraja: ${mlBandUz(mlRisk)}) — maslahat, xulosaga ta'sir qilmaydi")
+            }
+
+            // Bulut known-good qo'llangan bo'lsa (va qat'iy signal yo'qligida SAFE bo'lgan bo'lsa) —
+            // foydalanuvchiga sababni ko'rsatamiz. Bu DOWNGRADE-ONLY: DANGER holatida ko'rinmaydi.
+            if (goodListTrusted && verdict == ScanResult.Verdict.SAFE) {
+                details.add(0, "ℹ️ Bulut ishonchli ro'yxatida (good:cloud) — yumshoq belgilar bosildi")
+            }
+
             if (details.isEmpty()) {
                 details.add("Shubhali elementlar topilmadi")
             }
 
+            // === FOYDALANUVCHI OQ RO'YXATI (UserWhitelist) ===
+            // FAQAT SHUBHALI bosiladi. DANGER'ga TEGILMAYDI (oltin qoida): qat'iy IOC'lar
+            // (ma'lum hash/imzo/paket, ZIP-shifr) yuqorida erta-return bilan allaqachon chiqib
+            // ketgan, bu nuqtaga yetmaydi; qolgan DANGER ham kuchli signal — oqlanmaydi.
+            // Mos kelish kriptografik: fayl SHA-256 YOKI (package + imzo-cert) juftligi.
+            var finalVerdict = verdict
+            var finalReason = reason
+            if (verdict == ScanResult.Verdict.SUSPICIOUS) {
+                val userTrusted = try {
+                    UserWhitelist.isWhitelistedFile(context, apkHash) ||
+                        UserWhitelist.isWhitelistedApp(context, packageNameForHeuristic, certFingerprint)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "UserWhitelist lookup failed", e); false
+                }
+                if (userTrusted) {
+                    finalVerdict = ScanResult.Verdict.SAFE
+                    finalReason = "Siz bu fayl/ilovani ishonchli deb belgilagansiz."
+                    details.add(0, "ℹ️ Ishonchli ro'yxatingizda — shubhali belgilar bosildi (Sozlamalar → Ishonchli ro'yxat)")
+                }
+            }
+
             val result = ScanResult(
-                verdict = verdict,
-                reason = reason,
+                verdict = finalVerdict,
+                reason = finalReason,
                 details = details,
                 dangerousPermissions = dangerousFound,
-                malwareSignatures = signaturesFound
+                malwareSignatures = signaturesFound,
+                mlRisk = mlRisk
             )
             
             // Statistika + telemetriya + tarix + kesh + widget — barchasi yagona nuqtada.
@@ -1271,25 +1636,36 @@ internal data class VerdictSignals(
 
 /**
  * Signal-to'plamidan yakuniy verdikt. INVARIANTLAR (test bilan qo'riqlanadi):
- *  • Qat'iy signallar (icon-impersonation, hidden APK/DEX/ELF dropper, shifrlangan payload+signal,
- *    device-admin+combo, obfuscated IoC, kuchli combo, 2+ evaziya) reputatsiyadan QAT'IY NAZAR DANGER.
- *  • VERIFIED faqat qat'iy signal YO'Q bo'lsa SAFE qiladi (yumshoq signallarni bosadi).
- *  • Tartib MUHIM — qat'iy bloklar verifiedTrusted'dan OLDIN. [ApkScanner.scan] ichidagi `when` shu yerga
- *    AYNAN ko'chirildi (xulq o'zgarmagan).
+ *  • TIER-1 QAT'IY signallar (icon-impersonation, hidden APK/DEX/ELF dropper, shifrlangan
+ *    payload+signal, aniq malware IoC = obfuscatedSignature) reputatsiyadan QAT'IY NAZAR DANGER.
+ *  • Reputatsiya qalqoni (VERIFIED / o'rnatilgan-ishonchli) TIER-1 dan KEYIN turadi: qat'iy signal
+ *    yo'q bo'lsa SAFE qiladi.
+ *  • TIER-2 O'RTA signallar (device-admin+combo, kuchli permission-combo, 2+ anti-analiz evaziya)
+ *    qalqondan KEYIN — ular halol super-app/bank/xavfsizlik ilovalarida ham uchraydi, shuning uchun
+ *    ISHONCHLI ilovada DANGER bermaydi; ISHONCHSIZ (sideload) ilovada baribir DANGER.
+ *  • Tartib MUHIM — bloklarning joyi verdiktni belgilaydi. obfuscatedSignature ENDI faqat QAT'IY IoC
+ *    uchun yoqiladi (generik API markerlari [ObfuscatedSignatures.SOFT_FAMILIES] uni yoqmaydi).
  */
 internal fun decideVerdict(s: VerdictSignals): ScanResult.Verdict = when {
+    // ── TIER-1: QAT'IY (hard) signallar — reputatsiyani (VERIFIED/ishonchli) ham BOSADI.
+    // Bular halol ilovada deyarli hech qachon bo'lmaydi: yashirin APK/DEX/ELF dropper, ikonka
+    // taqlidi, shifrlangan payload+signal, aniq malware IoC (domen/kalit/bot hash).
     s.iconImpersonation -> ScanResult.Verdict.DANGER
     s.hiddenApkOrDex -> ScanResult.Verdict.DANGER
     s.hiddenElfOrDroppedSo -> ScanResult.Verdict.DANGER
     s.encryptedPayloadWithSignal -> ScanResult.Verdict.DANGER
-    s.deviceAdminWithCombo -> ScanResult.Verdict.DANGER
     s.obfuscatedSignature -> ScanResult.Verdict.DANGER
+    // ── REPUTATSIYA QALQONI: cert bilan tasdiqlangan (VERIFIED) yoki o'rnatilgan-ishonchli
+    // ilova. Quyidagi TIER-2 (o'rta) signallar HALOL super-app/bank/xavfsizlik ilovalarida ham
+    // uchraydi (kuchli permission-combo, anti-analiz/root-check, MDM device-admin), shuning uchun
+    // ular ISHONCHLI ilovada DANGER BERMAYDI (2026-07-09 ommaviy false-positive fix). Sideload
+    // malware ishonchli EMAS → TIER-2 bloklari unga baribir ishlaydi.
+    s.verifiedTrusted -> ScanResult.Verdict.SAFE
+    s.trustedInstalledApp -> ScanResult.Verdict.SAFE
+    // ── TIER-2: O'RTA signallar — faqat ISHONCHSIZ ilovada DANGER (yuqoridagi qalqondan keyin).
+    s.deviceAdminWithCombo -> ScanResult.Verdict.DANGER
     s.strongCombo -> ScanResult.Verdict.DANGER
     s.evasionCount >= 2 -> ScanResult.Verdict.DANGER
-    s.verifiedTrusted -> ScanResult.Verdict.SAFE
-    // O'rnatilgan + ishonchli stor/tizim + qat'iy signal yo'q → SAFE (yuqoridagi barcha QAT'IY
-    // bloklardan KEYIN — dropper/ikonka/blacklist/ZIP-shifr ham bunday ilovada baribir DANGER).
-    s.trustedInstalledApp -> ScanResult.Verdict.SAFE
     s.totalScore >= s.dangerThreshold -> ScanResult.Verdict.DANGER
     s.randomPkg && s.filenameScore >= s.randomPkgFilenameMin -> ScanResult.Verdict.DANGER
     s.randomPkg && s.dangerousPermCount >= s.randomPkgDangerousPermsMin -> ScanResult.Verdict.DANGER

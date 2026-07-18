@@ -3,7 +3,7 @@
 
 📱 APK ФАЙЛ:
 ------------
-Путь: KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+Путь: UzGuard\app\build\outputs\apk\debug\app-debug.apk
 Размер: 7.47 МБ
 Дата: 08.02.2026 01:01
 Версия: 7.2

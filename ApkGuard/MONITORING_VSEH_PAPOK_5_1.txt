@@ -80,13 +80,13 @@ ApkScanner.findApkFiles():
 📱 НОВЫЙ APK:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 
 🚀 УСТАНОВКА:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Удали старую версию KiberQalqon
+1. Удали старую версию UzGuard
 2. Установи новый APK
 3. Дай разрешения
 4. Включи "Фоновая защита"
@@ -121,7 +121,7 @@ adb logcat | grep "MultiPathObserver\|ImprovedApkObserver"
 ✅ "APK ready: file.apk, showing notification"
 
 
-✅ ТЕПЕРЬ KIBERQALQON ПЕРЕХВАТЫВАЕТ ВСЁ! 🛡️🔥
+✅ ТЕПЕРЬ UZGUARD ПЕРЕХВАТЫВАЕТ ВСЁ! 🛡️🔥
    • Telegram ✅
    • WhatsApp ✅
    • Downloads ✅

@@ -4,11 +4,11 @@
 
 ---
 
-# KiberQalqon - Android Antivirus Project
+# UzGuard - Android Antivirus Project
 
 ## 📱 Описание проекта
 
-KiberQalqon - это Android приложение-антивирус для защиты от вредоносных APK файлов. Приложение автоматически сканирует скачанные APK файлы, определяет опасные и удаляет их.
+UzGuard - это Android приложение-антивирус для защиты от вредоносных APK файлов. Приложение автоматически сканирует скачанные APK файлы, определяет опасные и удаляет их.
 
 ## 🛠️ Технологии
 
@@ -26,10 +26,10 @@ KiberQalqon - это Android приложение-антивирус для за
 ## 📂 Структура проекта
 
 ```
-KiberQalqon/
+UzGuard/
 ├── app/
 │   ├── src/main/
-│   │   ├── java/com/kiberqalqon/
+│   │   ├── java/com/uzguard/
 │   │   │   ├── MainActivity.kt          # Главный экран
 │   │   │   ├── AutoScanActivity.kt      # Полноэкранное сканирование
 │   │   │   ├── ApkScanner.kt            # Детектор вирусов
@@ -142,7 +142,7 @@ class ApkFileObserver(private val context: Context, path: File)
 **Пример дизайна:**
 ```
 ┌─────────────────────────────────┐
-│  🛡️ KiberQalqon                   │
+│  🛡️ UzGuard                   │
 │                                 │
 │     ╭─────────────╮             │
 │     │  СПИДОМЕТР  │             │

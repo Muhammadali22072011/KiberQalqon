@@ -15,6 +15,10 @@
          Запрашивается явно в SplashActivity → откроется системный экран "Доступ ко всем файлам". -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
+    <!-- Shizuku: разрешение на использование API Shizuku (v23+). Даёт возможность
+         удалять файлы из чужой /Android/data песочницы под uid=shell (без root). -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+
     <!-- Android 13+ (API 33+): гранулированные media-разрешения. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
@@ -28,6 +32,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- QR-skaner (havola tekshiruvi): kamera FAQAT QrScanActivity ochilganda so'raladi.
+         required=false — kamerasiz qurilmalarda ham ilova o'rnatiladi (QR funksiyasi yashiriladi). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Geo-monitoring: qurilma o'z aniq joylashuvini markaziy xaritaga yuboradi.
          FAQAT "Jamoatchilik xavfsizligi" opt-in yoqilgan bo'lsa so'raladi va yuboriladi
@@ -79,7 +88,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KiberQalqon"
+        android:theme="@style/Theme.UzGuard"
         android:requestLegacyExternalStorage="true"
         android:preserveLegacyExternalStorage="true"
         tools:targetApi="31">
@@ -89,7 +98,7 @@
         <activity
             android:name=".LanguageSelectActivity"
             android:exported="true"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -103,26 +112,26 @@
         <activity
             android:name=".SplashActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait" />
         
         <!-- Главный экран -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
 
         <activity
             android:name=".OnboardingActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
 
         <!-- Mandatory consent screen — ToS + Privacy Policy. Pokazyvayetsya pered
              pervym zapuskom MainActivity. Bez yavnogo soglasiya app ne idet dal'she. -->
         <activity
             android:name=".ConsentActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:label="Foydalanish shartlari"
             android:screenOrientation="portrait"
             android:excludeFromRecents="false" />
@@ -130,11 +139,11 @@
         <activity
             android:name=".ScanHistoryActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
 
         <!-- Диагностика: открывается из SplashActivity (long-press на версии).
              Никаких особых тем — нативный белый фон, чтобы экран показался ВСЕГДА,
-             даже если KiberQalqon тема упала. -->
+             даже если UzGuard тема упала. -->
         <activity
             android:name=".DiagnosticsActivity"
             android:exported="false" />
@@ -143,7 +152,7 @@
         <activity
             android:name=".HiddenThreatsActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
 
         <activity
             android:name=".TelemetrySettingsActivity"
@@ -153,36 +162,92 @@
         <activity
             android:name=".ScanResultActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- v4: skan natijasidan ochiladigan «So'ralgan ruxsatlar» batafsil ekrani. -->
+        <activity
+            android:name=".PermissionsDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard" />
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Xavfsizlik balli (0–100) — qurilma holati + "100 gacha yetkaz". -->
+        <activity
+            android:name=".SecurityScoreActivity"
+            android:exported="false"
+            android:label="Xavfsizlik balli"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- "Bu xabar firibgarlikmi?" — matn (SMS/Telegram) firibgarlik signallarini oflayn tekshirish.
+             exported=false: matn ShareUrlReceiverActivity (URL topilmasa) yoki ilova ichidan uzatiladi. -->
+        <activity
+            android:name=".ScamMessageActivity"
+            android:exported="false"
+            android:label="Xabar tekshiruvi"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- 30 soniyalik tekshiruv — mavjud himoya tekshiruvlarini bitta ustada birlashtiradi. -->
+        <activity
+            android:name=".CheckupWizardActivity"
+            android:exported="false"
+            android:label="Tez tekshiruv"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Himoya qulfi — himoyani o'chirish/Sozlamalardan oldin PIN. -->
+        <activity
+            android:name=".PinLockActivity"
+            android:exported="false"
+            android:label="Himoya qulfi"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Oila qalqoni — guruh a'zolarining himoya-holatini ko'rish (masofaviy tuzatish yo'q). -->
+        <activity
+            android:name=".FamilyGuardActivity"
+            android:exported="false"
+            android:label="Oila qalqoni"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- "Nimadan himoya qila olmaymiz" — halol cheklovlar ekrani. -->
+        <activity
+            android:name=".LimitsActivity"
+            android:exported="false"
+            android:label="Himoya chegaralari"
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Play'dan tashqari o'rnatilgan ilovalar auditi (+ masofaviy boshqaruv ilovalari). -->
+        <activity
+            android:name=".SideloadAuditActivity"
+            android:exported="false"
+            android:label="Play'dan tashqari ilovalar"
+            android:theme="@style/Theme.UzGuard" />
 
         <!-- UX-01: Karantin ekrani — tiklash/butunlay o'chirish (Dashboard "Karantin" plitkasidan). -->
         <activity
             android:name=".QuarantineActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
 
         <activity
             android:name=".ReportProblemActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
 
         <!-- Boshqaruv paneli (admin) — veb-panelni ilova ichida WebView orqali ochadi.
              exported=false: tashqi intent bilan ochib bo'lmaydi. -->
         <activity
             android:name=".AdminPanelActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait" />
 
         <!-- Himoya holati — kirishda barcha ruxsat/sozlamalarni ko'rsatadi. -->
         <activity
             android:name=".ProtectionStatusActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait" />
 
         <!-- Окно предупреждения - поверх всех окон.
@@ -192,7 +257,7 @@
         <activity
             android:name=".AutoScanActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:showWhenLocked="true"
@@ -203,17 +268,110 @@
         <activity
             android:name=".DashboardNewActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon" />
+            android:theme="@style/Theme.UzGuard" />
+
+        <!-- Havola tekshiruvchi — Telegram/SMS'dan kelgan URL'ni offline tahlil qiladi. -->
+        <activity
+            android:name=".LinkCheckActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait" />
+
+        <!-- Yangiliklar — bulut e'lonlari to'liq ro'yxati (dashboard karuseli → Hammasi). -->
+        <activity
+            android:name=".NewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait" />
+
+        <!-- HAVOLA QALQONI (link interceptor): foydalanuvchi UzGuard'ni standart havola
+             ochuvchi qilib tanlasa, har bir tashqi http(s) havola AVVAL shu ko'rinmas Activity'ga
+             keladi — LinkScanner tekshiradi, xavfsiz bo'lsa brauzerga uzatadi, xavfli bo'lsa
+             LinkBlockActivity'ni ko'rsatadi. exported=true (tashqi VIEW intent ushlanadi), lekin
+             u faqat URL'ni tahlil qiladi — apk_path injeksiyasiga o'rin yo'q. Translucent + sof
+             Activity (AppCompat EMAS) — ShareUrlReceiverActivity bilan bir xil sabab. -->
+        <activity
+            android:name=".LinkGuardActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+        </activity>
+
+        <!-- Havola blok ekrani — SHUBHALI/XAVFLI havolada saytni ochmasdan logo+ogohlantirish
+             ko'rsatadi. exported=false: faqat LinkGuardActivity ichki intent bilan ochadi. -->
+        <activity
+            android:name=".LinkBlockActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait" />
+
+        <!-- O'z-o'zini yangilash tasdiq oynasi (bildirishnomadan ochiladi). Ko'rinmas
+             (translucent) + sof Activity. exported=false: faqat ichki PendingIntent. -->
+        <activity
+            android:name=".SelfUpdateActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
+        <!-- QR-skaner — kamera orqali QR o'qiydi va ichidagi havolani tekshiruvga uzatadi. -->
+        <activity
+            android:name=".QrScanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait" />
+
+        <!-- «Guruhga qo'shilish» — kod/QR bilan guruhga kiradi. exported=true: guruh QR'i
+             uzguard://join?code=XXXX chuqur havolasi bilan tashqi kameradan ham ochilsin.
+             singleTop — takroriy havola yangi nusxa yaratmaydi (onNewIntent kodni to'ldiradi). -->
+        <activity
+            android:name=".GroupJoinActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait">
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="uzguard" android:host="join" />
+            </intent-filter>
+        </activity>
+
+        <!-- Soxta bank ilovalari auditi — bank brendiga taqlid qiluvchi ilovalarni topadi. -->
+        <activity
+            android:name=".BankGuardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait" />
+
+        <!-- Ruxsatlar rentgeni — o'rnatilgan ilovalarni xavfli ruxsat kombinatsiyalari bo'yicha baholaydi. -->
+        <activity
+            android:name=".PermissionXrayActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait" />
 
         <!-- Birinchi to'liq tekshiruv — odin raz srazu posle Onboarding,
              pokazyvayet vse opasnye APK na ustroystve s knopkami "O'chirish". -->
         <activity
             android:name=".InitialScanActivity"
             android:exported="false"
-            android:theme="@style/Theme.KiberQalqon"
+            android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait" />
 
-        <!-- Приёмник Share/Open: "Поделиться → KiberQalqon" из Telegram, файл-менеджера,
+        <!-- Приёмник Share/Open: "Поделиться → UzGuard" из Telegram, файл-менеджера,
              браузера и т.п. + перехват "Open with..." для любого APK перед установкой.
              Сама эта Activity невидимая — копирует APK в cacheDir и запускает AutoScanActivity. -->
         <activity
@@ -224,7 +382,7 @@
             android:excludeFromRecents="true"
             android:noHistory="true">
 
-            <!-- "Поделиться → KiberQalqon" из любого приложения. -->
+            <!-- "Поделиться → UzGuard" из любого приложения. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -232,7 +390,7 @@
             </intent-filter>
 
             <!-- "Открыть с помощью..." когда юзер тапает APK в файл-менеджере, Telegram, браузере.
-                 Так KiberQalqon станет одной из опций — юзер выберет нас вместо PackageInstaller,
+                 Так UzGuard станет одной из опций — юзер выберет нас вместо PackageInstaller,
                  мы просканируем и только потом разрешим установку. -->
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.VIEW" />
@@ -252,7 +410,7 @@
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
                 <!-- UX (past): Android PatternMatcher'da `.*` ochko'z emas — `.*\.apk` nomda
-                     QO'SHIMCHA nuqta bo'lsa (app-1.2.3.apk, kiberqalqon-1749...apk) MOS KELMAYDI.
+                     QO'SHIMCHA nuqta bo'lsa (app-1.2.3.apk, uzguard-1749...apk) MOS KELMAYDI.
                      Shu sabab nuqta darajalari bo'yicha bir necha pattern beramiz. -->
                 <data android:pathPattern=".*\\.apk" />
                 <data android:pathPattern=".*\\..*\\.apk" />
@@ -260,6 +418,22 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.apk" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.apk" />
                 <data android:host="*" />
+            </intent-filter>
+        </activity>
+
+        <!-- "Ulashish → UzGuard" matn (text/plain) uchun: Telegram/SMS/brauzerdan havolani
+             ulashganda URL'ni ushlaб, LinkCheckActivity'ga uzatadi. Ko'rinmas (translucent) —
+             EXTRA_TEXT'dan birinchi URL'ni olib darhol yopiladi. -->
+        <activity
+            android:name=".ShareUrlReceiverActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 
@@ -287,8 +461,18 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <!-- Shizuku ContentProvider — принимает биндер от сервиса Shizuku.
+             Обязателен для работы shizuku-api. -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
         <!-- Doimiy himoya foreground service'i — App.onCreate'da ishga tushadi
-             va to'xtatilmaguncha status bar'da "KIBER QALQON faol" yozuvini
+             va to'xtatilmaguncha status bar'da "UZGUARD faol" yozuvini
              ko'rsatib turadi. Android 14+ uchun specialUse property kerak. -->
         <service
             android:name=".ProtectionService"
@@ -300,11 +484,10 @@
         </service>
 
         <!-- TAJRIBAVIY (opt-in, default OFF): DNS-sinkhole VPN — ma'lum C2 domenlarini bloklaydi.
-             HOZIRCHA O'CHIRILGAN (deactivated): hech qayerda ulanmagan (settings toggle + VpnService.prepare
-             oqimi hali yo'q), shuning uchun manifestdan ham olib qo'yildi — yoqib bo'lmaydigan service
-             keraksiz hujum yuzasi (attack surface) bo'lib qolmasligi uchun. Manbаа (VpnFilterService.kt)
-             saqlanadi va fail-open qilib mustahkamlandi; opt-in UI tayyor bo'lgach, quyidagi blokni
-             qayta yoqing.
+             Settings'dagi toggle orqali yoqiladi (VpnService.prepare oqimi SettingsActivity'da).
+             Domenlar: baked IOC to'plami + bulut feed'i (ThreatDb, api/threats?feed=1).
+             Fail-open: upstream DNS ketma-ket ishlamasa VPN o'zini O'CHIRADI — filtr buzilsa
+             ham internet hech qachon bloklanib qolmaydi. -->
         <service
             android:name=".VpnFilterService"
             android:exported="false"
@@ -313,8 +496,6 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
-        -->
-        <!-- /VpnFilterService (o'chirilgan) -->
 
         <service
             android:name=".PhishingNotificationService"
@@ -325,7 +506,24 @@
             </intent-filter>
         </service>
 
-        <!-- Bosh ekran widget'i — KiberQalqon himoyasi holatini ko'rsatadi.
+        <!-- Jonli o'rnatish qalqoni (3-rubej): tizim o'rnatuvchisi "O'rnatasizmi?" oynasini
+             kuzatadi va tasdiqlanmagan/DANGER APK uchun avtomatik "Bekor" bosadi. Config
+             faqat o'rnatuvchi paketlar bilan cheklangan (maxfiylik+batareya). Foydalanuvchi
+             tizimda yoqmaguncha ishlamaydi (Android 13+ "cheklangan sozlamalar"). -->
+        <service
+            android:name=".InstallShieldService"
+            android:exported="true"
+            android:label="@string/install_shield_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- Bosh ekran widget'i — UzGuard himoyasi holatini ko'rsatadi.
              updatePeriodMillis=0 (xml/kq_widget_info.xml): periodic update yo'q,
              biz scan tugagach KqWidgetProvider.refreshAll() chaqiramiz. -->
         <receiver
@@ -357,5 +555,11 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <!-- NewsAlarmReceiver: ekran O'CHIQ / Doze paytida ham yangilikni tekshirish uchun
+             AlarmManager (setAndAllowWhileIdle) uyg'otadi. Faqat o'zimiz chaqiramiz. -->
+        <receiver
+            android:name=".NewsAlarmReceiver"
+            android:exported="false" />
     </application>
 </manifest>

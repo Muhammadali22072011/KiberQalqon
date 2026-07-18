@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.ComponentName
 import android.content.Context
@@ -29,7 +29,7 @@ import android.util.Log
  *  3) Activity topilmasa (eski telefonda Activity nomi boshqacha bo'lsa),
  *     standart Android battery optimization screeniga tushib qoladi.
  *
- * Foydalanuvchi MIUI Security Center → Autostart'ga tushganida, "KIBER QALQON"
+ * Foydalanuvchi MIUI Security Center → Autostart'ga tushganida, "UZGUARD"
  * ro'yxatidan topib qo'lda yoqishi kerak. Buni avtomatik qila olmaymiz — Android
  * OEM'ga sigorta sifatida bunday API bermagan.
  */
@@ -96,37 +96,37 @@ object OemAutostartGuide {
     fun instructions(oem: Oem = detect()): String = when (oem) {
         Oem.XIAOMI_MIUI ->
             "MIUI Security Center ochiladi:\n" +
-            "1. Ro'yxatda \"KIBER QALQON\"ni toping\n" +
+            "1. Ro'yxatda \"UZGUARD\"ni toping\n" +
             "2. Avtoyoqishni (Autostart) YOQING\n" +
             "3. Orqaga qaytib, Battery sozlamasida \"No restrictions\" tanlang\n" +
-            "4. Recents ekrandan KiberQalqon kartochkasini past tortib qulflang"
+            "4. Recents ekrandan UzGuard kartochkasini past tortib qulflang"
         Oem.HUAWEI, Oem.HONOR ->
             "Huawei/Honor Phone Manager ochiladi:\n" +
-            "1. \"App launch\" ro'yxatida KIBER QALQON'ni toping\n" +
+            "1. \"App launch\" ro'yxatida UZGUARD'ni toping\n" +
             "2. Auto-managed'ni o'chirib, Manual rejimga o'tkazing\n" +
             "3. Auto-launch + Secondary launch + Run in background — UCHALA SI YOQILGAN bo'lsin"
         Oem.OPPO ->
             "Oppo/Realme Security ochiladi:\n" +
-            "1. \"Auto-launch\" ro'yxatida KIBER QALQON'ni YOQING\n" +
-            "2. Settings → Battery → KiberQalqon → \"Allow background activity\""
+            "1. \"Auto-launch\" ro'yxatida UZGUARD'ni YOQING\n" +
+            "2. Settings → Battery → UzGuard → \"Allow background activity\""
         Oem.VIVO ->
             "Vivo iManager ochiladi:\n" +
-            "1. \"Auto-start manager\"da KIBER QALQON YOQILGAN bo'lsin\n" +
+            "1. \"Auto-start manager\"da UZGUARD YOQILGAN bo'lsin\n" +
             "2. \"High background power consumption\"da ham yoqing"
         Oem.ONEPLUS ->
             "OnePlus battery sozlamasi ochiladi:\n" +
-            "1. \"Battery optimization\"da KIBER QALQON \"Don't optimize\"\n" +
-            "2. Recent apps'da KiberQalqon'ni qulflang"
+            "1. \"Battery optimization\"da UZGUARD \"Don't optimize\"\n" +
+            "2. Recent apps'da UzGuard'ni qulflang"
         Oem.SAMSUNG ->
             "Samsung battery sozlamasi ochiladi:\n" +
-            "1. \"Background usage limits\"da KIBER QALQON'ni \"Never sleeping apps\" ro'yxatiga qo'shing\n" +
+            "1. \"Background usage limits\"da UZGUARD'ni \"Never sleeping apps\" ro'yxatiga qo'shing\n" +
             "2. App Power Management'da \"Adaptive battery\"dan istisno qiling"
         Oem.MEIZU ->
             "Meizu Security ochiladi:\n" +
-            "1. \"Background management\"da KIBER QALQON'ni \"Allow\""
+            "1. \"Background management\"da UZGUARD'ni \"Allow\""
         Oem.ASUS ->
             "ASUS Mobile Manager:\n" +
-            "1. \"Auto-start manager\"da KIBER QALQON YOQILGAN bo'lsin"
+            "1. \"Auto-start manager\"da UZGUARD YOQILGAN bo'lsin"
         Oem.NOKIA, Oem.OTHER ->
             "Standart Android sozlamasida \"Don't optimize\" tanlang."
     }
@@ -264,15 +264,15 @@ object OemAutostartGuide {
             "3. \"Notification on lock screen\" — YOQING"
         Oem.OPPO ->
             "ColorOS \"Floating windows\":\n" +
-            "1. KIBER QALQON uchun \"Floating window\"ni YOQING\n" +
+            "1. UZGUARD uchun \"Floating window\"ni YOQING\n" +
             "2. \"Display on Lock screen\" — YOQING"
         Oem.VIVO ->
             "Vivo \"Floating window\":\n" +
-            "1. KIBER QALQON uchun \"Floating window\" — YOQING\n" +
+            "1. UZGUARD uchun \"Floating window\" — YOQING\n" +
             "2. \"Display on lock screen\" ham YOQING"
         Oem.MEIZU ->
             "Meizu \"Background floating window\":\n" +
-            "1. KIBER QALQON — YOQING"
+            "1. UZGUARD — YOQING"
         else ->
             "Standart Android \"Display over other apps\" ruxsatini bering."
     }
@@ -412,20 +412,20 @@ object OemAutostartGuide {
     private const val KEY_OEM_GUIDE_DISMISSED = "oem_guide_dismissed"
 
     fun wasShown(context: Context): Boolean =
-        context.getSharedPreferences("kiberqalqon_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
             .getBoolean(KEY_OEM_GUIDE_SHOWN, false)
 
     fun markShown(context: Context) {
-        context.getSharedPreferences("kiberqalqon_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_OEM_GUIDE_SHOWN, true).apply()
     }
 
     fun isDismissed(context: Context): Boolean =
-        context.getSharedPreferences("kiberqalqon_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
             .getBoolean(KEY_OEM_GUIDE_DISMISSED, false)
 
     fun setDismissed(context: Context, dismissed: Boolean) {
-        context.getSharedPreferences("kiberqalqon_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_OEM_GUIDE_DISMISSED, dismissed).apply()
     }
 }

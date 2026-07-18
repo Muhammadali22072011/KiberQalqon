@@ -1,4 +1,4 @@
-# 🎨 ПРОМПТ ДЛЯ СОЗДАНИЯ ЛОГОТИПА KIBERQALQON
+# 🎨 ПРОМПТ ДЛЯ СОЗДАНИЯ ЛОГОТИПА UZGUARD
 
 Используй этот промпт в DALL-E, Midjourney, Stable Diffusion или других AI генераторах изображений:
 
@@ -7,7 +7,7 @@
 ## 📱 Промпт на английском (для DALL-E / Midjourney):
 
 ```
-Create a modern mobile app icon for "KiberQalqon" - an Android antivirus application.
+Create a modern mobile app icon for "UzGuard" - an Android antivirus application.
 
 Design requirements:
 - Main element: Shield with a checkmark or Android robot inside
@@ -34,7 +34,7 @@ Output: High resolution, transparent background, PNG format
 ## 🇷🇺 Промпт на русском (для русских генераторов):
 
 ```
-Создай современную иконку мобильного приложения "KiberQalqon" - антивирус для Android.
+Создай современную иконку мобильного приложения "UzGuard" - антивирус для Android.
 
 Требования к дизайну:
 - Основной элемент: Щит с галочкой или роботом Android внутри

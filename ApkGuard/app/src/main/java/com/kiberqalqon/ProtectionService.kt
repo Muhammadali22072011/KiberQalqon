@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,7 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.Environment
 import android.os.IBinder
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -19,12 +21,13 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * Doimiy himoya foreground service'i.
  *
  * Status bar'da har doim ko'rinib turuvchi bildirishnoma:
- * "🛡️ KIBER QALQON faol · Telefoningiz himoyalangan"
+ * "🛡️ UZGUARD faol · Telefoningiz himoyalangan"
  *
  * Bu — foydalanuvchiga eng kuchli signal: "himoya ishlayapti". Hech qanday
  * sozlama o'zgartirmasdan, ilovani o'rnatib ochish bilan darhol shu yozuv
@@ -55,16 +58,20 @@ class ProtectionService : Service() {
     // Tezkor poll loop bir martagina ishga tushadi (onStartCommand bir necha bor chaqirilsa ham).
     @Volatile private var fastLoopStarted = false
 
+    // Wi-Fi straj: ochiq (parolsiz) tarmoqqa ulanishni kuzatib, MITM xavfidan ogohlantiradi.
+    private var wifiCallback: android.net.ConnectivityManager.NetworkCallback? = null
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         ensureChannel(this)
         startFileWatcher()
         startFastScanLoop()
+        startWifiWatch()
         val notification = buildNotification(this)
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                // Android 14+: foreground service type kerak. KiberQalqon antivirus
+                // Android 14+: foreground service type kerak. UzGuard antivirus
                 // bo'lgani uchun SPECIAL_USE eng yaqin kategoriya (DATA_SYNC ham bo'ladi
                 // lekin biz hech narsa sync qilmaymiz — special_use to'g'riroq).
                 startForeground(
@@ -95,8 +102,44 @@ class ProtectionService : Service() {
             android.util.Log.w(TAG, "stopWatching failed", t)
         }
         fileObserver = null
+        try {
+            wifiCallback?.let {
+                (getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager)
+                    ?.unregisterNetworkCallback(it)
+            }
+        } catch (_: Throwable) {}
+        wifiCallback = null
         try { serviceScope.cancel() } catch (_: Throwable) {}
         // Service o'lgan bo'lsa, OS qayta tiklaydi (START_STICKY tufayli).
+    }
+
+    /**
+     * Wi-Fi tarmoq o'zgarishini kuzatadi: ochiq (parolsiz) tarmoqqa ulanilganda
+     * [WifiGuard] MITM xavfidan bir marta ogohlantiradi. Bir marta ro'yxatga olinadi
+     * (onStartCommand takror chaqirilsa ham — wifiCallback != null bo'lsa o'tkazamiz).
+     */
+    private fun startWifiWatch() {
+        if (wifiCallback != null) return
+        try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+                ?: return
+            val req = android.net.NetworkRequest.Builder()
+                .addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI)
+                .build()
+            val cb = object : android.net.ConnectivityManager.NetworkCallback() {
+                override fun onCapabilitiesChanged(
+                    network: android.net.Network,
+                    caps: android.net.NetworkCapabilities
+                ) {
+                    try { WifiGuard.onWifiCapabilities(applicationContext, caps) } catch (_: Throwable) {}
+                }
+            }
+            cm.registerNetworkCallback(req, cb)
+            wifiCallback = cb
+            android.util.Log.d(TAG, "Wi-Fi guard watcher registered")
+        } catch (t: Throwable) {
+            android.util.Log.w(TAG, "startWifiWatch failed", t)
+        }
     }
 
     /**
@@ -151,26 +194,102 @@ class ProtectionService : Service() {
             // Sovuq startda (ребут/обновление/рестарт сервиса) I/O sekin — 800ms butun ro'yxatga
             // yetmay, eng ESKI fayllar (MediaStore DATE_MODIFIED DESC oxiri) seed'ga tushmasdi va
             // keyingi pollda "yangi" deb ochilib ketardi. To'liq listing tugaguncha seed qilamiz.
+            //
+            // MUHIM (flood tuzatuvi): SEED'ni FAQAT "Barcha fayllarga ruxsat" (hasFileScanAccess)
+            // bor bo'lganda qilamiz. Aks holda service ruxsatsiz ishga tushsa (MainActivity/
+            // SettingsActivity toggle-ON ni hasFileScanAccess tekshirmasdan start chaqiradi, yoki
+            // ребут paytida MediaStore hali tayyor emas) — findApkFiles deyarli bo'sh qaytadi va
+            // seenPaths bo'sh qoladi. Keyin foydalanuvchi ruxsat bersa, seenPaths eski (bo'sh)
+            // holida qolgani uchun keyingi pollda qurilmadagi HAMMA eski APK "yangi" deb topilib,
+            // AutoScanActivity oynalari + GuardWorker'lar toshib ketardi. Shuning uchun dostup
+            // holatini kuzatamiz va yo'q→bor o'tishida seenPaths ni tozalab QAYTA seed qilamiz.
+            var seeded = false
+            var lastAccess = false
             try {
-                if (Config.isBackgroundEnabled(applicationContext)) {
+                if (Config.isBackgroundEnabled(applicationContext) &&
+                    VersionCompat.hasFileScanAccess(applicationContext)) {
                     val initial = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = SEED_SCAN_BUDGET_MS)
                         .filter { it.file.exists() }
                     NewApkDetector.seed(
                         initial.map { NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified()) },
                         seenPaths,
                     )
+                    seeded = true
+                    lastAccess = true
                 }
             } catch (t: Throwable) {
                 android.util.Log.w(TAG, "seed scan failed", t)
             }
 
+            // PERF (qizish): qimmat MediaStore + rekursiv obhodni FAQAT kuzatilayotgan
+            // papkalardan biri o'zgargan bo'lsa (yoki har FORCE_FULL_FIND_MS da bir marta
+            // zaxira sifatida) bajaramiz. Hech narsa o'zgarmaganda — 9 ta arzon
+            // dir.lastModified() stat, butun xotira obhodi O'RNIGA. Bu — ekran ochiq turganda
+            // har 45s da butun xotirani skanlash sababli telefon qizishini bartaraf etadi.
+            // Real-vaqt aniqlash baribir inotify (MultiPathFileObserver) + 30 daqiqalik
+            // GuardWorker zimmasida, shu sabab o'tkazib yuborilgan obhod hech narsani yo'qotmaydi.
+            var lastDirSig = ""
+            var lastFullFindAt = 0L
             while (isActive) {
                 // Adaptiv interval: ekran ochiq bo'lsa tez-tez, aks holda kamdan-kam —
                 // shunda fon'da telefon qizimaydi (eski qat'iy 1s loop asosiy qizish sababi edi).
                 val interactive = isScreenInteractiveAndUnlocked(applicationContext)
                 delay(if (interactive) POLL_INTERVAL_ACTIVE_MS else POLL_INTERVAL_IDLE_MS)
+
+                // Yangiliklar (panel e'lonlari) — fon-SKANDAN MUSTAQIL, alohida coroutine'da
+                // (NewsNotifier ichida 3 daqiqalik throttle + dedup). FAQAT ekran OCHIQ bo'lganda
+                // shu yerdan tekshiramiz: foydalanuvchi telefonni ishlatyapti → yangi e'lon
+                // ~3 daqiqada keladi (FCM/Google'siz "deyarli real-vaqt"). Ekran O'CHIQ bo'lsa
+                // BU YERDA TEKSHIRMAYMIZ — Doze'da yetkazish NewsAlarmReceiver (siyrak, ~40 daq)
+                // zimmasida; shunda telefon stolda yotganda behuda uyg'onmaydi va qizimaydi
+                // (idle nagrev/batareya sababi shu takror tekshiruv edi). isBackgroundEnabled
+                // gate'idan OLDIN — yangiliklar fon-skan o'chiq bo'lsa ham keladi.
+                if (interactive) {
+                    serviceScope.launch {
+                        try { NewsNotifier.checkAndNotify(applicationContext) } catch (_: Throwable) {}
+                    }
+                }
+
                 try {
                     if (!Config.isBackgroundEnabled(applicationContext)) continue
+
+                    // Fayl-dostupi holatini kuzatamiz: yo'q→bor ga o'tsa (yoki service ruxsatsiz
+                    // ishga tushib hali umuman seed qilinmagan bo'lsa) — seenPaths ni tozalab QAYTA
+                    // seed qilamiz, so'ng shu iteratsiyani o'tkazamiz. Aks holda endigina ko'rinadigan
+                    // bo'lgan eski APK'lar "yangi" deb topilib, oynalar/worker'lar toshib ketardi.
+                    val access = VersionCompat.hasFileScanAccess(applicationContext)
+                    if (access && (!seeded || !lastAccess)) {
+                        try {
+                            seenPaths.clear()
+                            val reseed = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = SEED_SCAN_BUDGET_MS)
+                                .filter { it.file.exists() }
+                            NewApkDetector.seed(
+                                reseed.map { NewApkDetector.PathStamp(it.file.absolutePath, it.file.lastModified()) },
+                                seenPaths,
+                            )
+                            seeded = true
+                            lastAccess = true
+                            // O'zgarish-imzosini ham reset qilamiz — keyingi iteratsiya toza boshlansin.
+                            lastDirSig = ""
+                            lastFullFindAt = SystemClock.elapsedRealtime()
+                            android.util.Log.d(TAG, "Re-seeded after file access became available")
+                        } catch (t: Throwable) {
+                            android.util.Log.w(TAG, "re-seed after access grant failed", t)
+                        }
+                        continue
+                    }
+                    lastAccess = access
+
+                    // Arzon o'zgarish-detektori: kuzatilayotgan papkalar mtime imzosi o'zgarmagan
+                    // bo'lsa (va zaxira to'liq-obhod vaqti yetmagan bo'lsa) — qimmat obhodni
+                    // O'TKAZAMIZ. Yangi APK papkaga tushganda katalog mtime'si o'zgaradi → obhod.
+                    val nowMs = SystemClock.elapsedRealtime()
+                    val sig = quickDirSignature(applicationContext)
+                    val forceFull = nowMs - lastFullFindAt >= FORCE_FULL_FIND_MS
+                    if (sig == lastDirSig && !forceFull) continue
+                    lastDirSig = sig
+                    lastFullFindAt = nowMs
+
                     val list = ApkScanner.findApkFiles(applicationContext, timeBudgetMs = FAST_SCAN_BUDGET_MS)
                         .filter { it.file.exists() }
                     val stamps = list.map {
@@ -268,6 +387,51 @@ class ProtectionService : Service() {
         }
     }
 
+    /**
+     * Kuzatilayotgan yuklab-olish papkalarining arzon "o'zgarish imzosi" — har birining
+     * lastModified() qiymati. Papkaga yangi fayl qo'shilsa/o'chsa katalog mtime'si o'zgaradi,
+     * shuning uchun imzo o'zgargandagina qimmat to'liq obhod (MediaStore + rekursiv yurish)
+     * qilamiz. 9 ta File.stat — butun xotira obhodidan ming barobar arzon, shu sabab ekran
+     * ochiq turganda telefon endi qizimaydi.
+     */
+    private fun quickDirSignature(ctx: Context): String {
+        return try {
+            val ext = Environment.getExternalStorageDirectory() ?: return ""
+            val dirs = mutableListOf<File>()
+            val downloadDir = File(ext, "Download")
+            dirs.add(downloadDir)
+            if (downloadDir.exists()) {
+                val subs = downloadDir.listFiles()
+                if (subs != null) {
+                    for (sub in subs) {
+                        if (sub.isDirectory) {
+                            dirs.add(sub)
+                        }
+                    }
+                }
+            }
+            dirs.add(File(ext, "Telegram/Telegram Documents"))
+            dirs.add(File(ext, "WhatsApp/Media/WhatsApp Documents"))
+            dirs.add(File(ext, "Android/media/org.telegram.messenger/cache"))
+            dirs.add(File(ext, "Android/media/org.telegram.messenger/Telegram/Telegram Documents"))
+            dirs.add(File(ext, "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Documents"))
+            dirs.add(File(ext, "Bluetooth"))
+            // DCIM va xotira-ildizi — bu yerga ham APK saqlanishi mumkin. Bu faqat mtime
+            // o'qish (stat), papkani OBHOD QILMAYDI — arzon, lekin poll shu joydagi yangi
+            // APK'ni ~45s ichida ilg'aydi (5 daq FORCE_FULL kutmasdan).
+            dirs.add(File(ext, "DCIM"))
+            dirs.add(ext)
+
+            val sb = StringBuilder(160)
+            for (d in dirs) {
+                if (d.exists()) sb.append(d.name).append(d.lastModified()).append('|')
+            }
+            sb.toString()
+        } catch (_: Throwable) {
+            ""
+        }
+    }
+
     companion object {
         private const val TAG = "ProtectionService"
         private const val CHANNEL_ID = "kq_protection_status"
@@ -288,8 +452,25 @@ class ProtectionService : Service() {
          *     FileObserver + 15 daqiqalik GuardWorker + ekran ochilishidagi bir martalik
          *     skan baribir qamrab oladi.
          */
-        private const val POLL_INTERVAL_ACTIVE_MS = 12_000L
-        private const val POLL_INTERVAL_IDLE_MS = 90_000L
+        // PERF (qizish): bu poll — ZAXIRA yo'l. Real-vaqt aniqlash MultiPathFileObserver
+        // (inotify) + 15 daqiqalik GuardWorker + ekran ochilishidagi bir martalik skan
+        // zimmasida. Shuning uchun oraliqni uzaytirdik: ekran ochiq bo'lganda har 12s da
+        // butun xotirani skanlash (≈5 obhod/min, 24/7) protsessorni isitardi. Endi 45s
+        // (≈1.3 obhod/min) — inotify o'tkazib yuborgan kamdan-kam holat uchun ham yetarlicha
+        // tez, lekin issiqlik ~73% kamayadi. Idle (ekran o'chiq/qulflangan — APK o'rnatib
+        // bo'lmaydi) — yanada kamdan-kam.
+        private const val POLL_INTERVAL_ACTIVE_MS = 45_000L
+        // Idle (ekran o'chiq/qulflangan — APK o'rnatib bo'lmaydi): 10 daqiqa. Tunda telefon
+        // stolda turganda kamroq uyg'onadi → batareya kam tugaydi. Fon karantini baribir
+        // har siklda ishlaydi (presentNewApks → GuardWorker), faqat siyrakroq.
+        private const val POLL_INTERVAL_IDLE_MS = 600_000L
+
+        /**
+         * mtime imzosi o'zgarmagan bo'lsa ham, kamida shu oraliqda bir marta to'liq obhod
+         * qilamiz (zaxira: ba'zi OEM fayl tizimlarida katalog mtime'si yangi fayl
+         * qo'shilganda yangilanmasligi mumkin).
+         */
+        private const val FORCE_FULL_FIND_MS = 5 * 60_000L
 
         /**
          * Bitta poll iteratsiyasi uchun vaqt byudjeti. Eng kichik oraliq (active)dan
@@ -329,7 +510,7 @@ class ProtectionService : Service() {
         /** Status matnini yangilash (scan tugagach yoki sozlama o'zgargach). */
         fun refresh(context: Context) {
             try {
-                // BG-02: fon himoyasi O'CHIRILGAN bo'lsa "KIBER QALQON faol" bildirishnomasini
+                // BG-02: fon himoyasi O'CHIRILGAN bo'lsa "UZGUARD faol" bildirishnomasini
                 // TIKLAMAYMIZ — aks holda foydalanuvchi himoyani o'chirgach ham har skandан keyin
                 // belgi qayta paydo bo'lib, "o'chirdim-ku" degan holatga zid yolg'on ko'rsatardi.
                 if (!Config.isBackgroundEnabled(context)) return
@@ -351,7 +532,7 @@ class ProtectionService : Service() {
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW,
             ).apply {
-                description = "KiberQalqon doimiy himoya holati"
+                description = "UzGuard doimiy himoya holati"
                 setShowBadge(false)
                 enableVibration(false)
                 setSound(null, null)
@@ -375,7 +556,7 @@ class ProtectionService : Service() {
             val statusText = computeStatusText(context)
             val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_shield)
-                .setContentTitle("KIBER QALQON faol")
+                .setContentTitle("UZGUARD faol")
                 .setContentText(statusText)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(statusText))
                 .setPriority(NotificationCompat.PRIORITY_LOW)

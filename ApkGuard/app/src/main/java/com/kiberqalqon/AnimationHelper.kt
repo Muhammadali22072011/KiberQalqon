@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

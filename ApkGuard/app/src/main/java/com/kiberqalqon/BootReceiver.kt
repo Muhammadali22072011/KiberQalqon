@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,7 +7,7 @@ import android.util.Log
 
 /**
  * Manifest-registered receiver. BOOT_COMPLETED dlya nego — edinstvennoe sobytie,
- * kotoroe gosudarstvenno garantirovano dostavlyaetsya dazhe esli process KiberQalqon
+ * kotoroe gosudarstvenno garantirovano dostavlyaetsya dazhe esli process UzGuard
  * ne podnyat. My ispol'zuem ego dlya:
  *  1) Otpravit' event v Telegram chto telefon perezagruzilsya.
  *  2) Razbudit' WorkManager — chtoby HeartbeatWorker/GuardWorker prishli v dvizhenie
@@ -78,6 +78,13 @@ class BootReceiver : BroadcastReceiver() {
             GuardWorker.schedulePeriodic(app)
         } catch (e: Throwable) {
             Log.w(TAG, "GuardWorker schedule failed", e)
+        }
+        // Reboot alarmlarni tozalaydi — yangilik uyg'otish zanjirini qayta boshlaymiz
+        // (ekran o'chiq / Doze'da ham e'lon yetib kelishi uchun).
+        try {
+            NewsNotifier.scheduleNext(app)
+        } catch (e: Throwable) {
+            Log.w(TAG, "news alarm schedule failed", e)
         }
     }
 

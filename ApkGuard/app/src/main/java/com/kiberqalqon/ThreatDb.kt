@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.util.Log
@@ -39,6 +39,7 @@ object ThreatDb {
     private val fileHashes = java.util.concurrent.ConcurrentHashMap<String, String>()   // sha256(apk fayl) -> oila
     private val certHashes = java.util.concurrent.ConcurrentHashMap<String, String>()    // sha256(sertifikat) -> oila
     private val packages = java.util.concurrent.ConcurrentHashMap<String, String>()      // package name (lowercase) -> oila (faqat bulut feed)
+    private val domains = java.util.concurrent.ConcurrentHashMap<String, String>()       // host (lowercase, sans-trailing-dot) -> oila (faqat bulut feed; URL/link checker uchun)
 
     /** assets'dagi bazani xotiraga yuklaydi. Idempotent, thread-safe, hech qachon throw qilmaydi. */
     fun init(context: Context) {
@@ -105,6 +106,17 @@ object ThreatDb {
     }
 
     /**
+     * Host (domen) bulut feed'da bo'lsa — oila nomi, aks holda null.
+     * Null-safe; kalitlar kichik harfda va trailing nuqtasiz saqlanadi
+     * (`example.com.` == `example.com`). [MaliciousDomains] buni curated ro'yxatdan
+     * keyin fallback sifatida chaqiradi.
+     */
+    fun domainFamily(host: String?): String? {
+        if (host.isNullOrBlank()) return null
+        return domains[host.lowercase().trimEnd('.')]
+    }
+
+    /**
      * Bulutdan ([CloudBlacklist]) kelgan yozuvlarni qo'shadi. Qo'lda kiritilgan baza
      * ([MaliciousHashes]/[MaliciousPackages]) BIRINCHI tekshiriladi — bu feed fallback,
      * shuning uchun bulut yozuvi qo'lda kiritilganni "yenga" olmaydi. Thread-safe (ConcurrentHashMap).
@@ -124,9 +136,27 @@ object ThreatDb {
         return changed
     }
 
+    /**
+     * Bulutdan ([CloudBlacklist]) kelgan domen yozuvlarini qo'shadi. Bu [mergeCloud] bilan bir xil
+     * o'zgarish-aniqlash uslubida: `put()` avvalgi qiymatni qaytaradi, yangi kalit (null) yoki
+     * boshqa oila bo'lsa — baza o'zgargan. Faqat haqiqiy o'zgarishda `true` qaytaradi (ScanCache'ni
+     * keraksiz invalidate qilmaslik uchun). Kalitlar kichik harf + trailing nuqtasiz normallashtiriladi.
+     * Thread-safe (ConcurrentHashMap), hech qachon throw qilmaydi.
+     */
+    fun mergeCloudDomains(cloudDomains: Map<String, String>): Boolean {
+        var changed = false
+        for ((d, fam) in cloudDomains) {
+            val key = d.lowercase().trimEnd('.')
+            if (key.isNotEmpty() && domains.put(key, fam) != fam) changed = true
+        }
+        Log.i(TAG, "after cloud domain merge: domains=${domains.size} changed=$changed")
+        return changed
+    }
+
     /** Diagnostika uchun: yuklangan yozuvlar soni. */
     fun fileHashCount(): Int = fileHashes.size
     fun certHashCount(): Int = certHashes.size
     fun packageCount(): Int = packages.size
+    fun domainCount(): Int = domains.size
     fun isLoaded(): Boolean = loaded
 }

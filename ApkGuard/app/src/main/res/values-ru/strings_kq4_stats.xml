@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 Stats ekrani — ruscha tarjima. -->
+<resources>
+    <!-- Stat-карточки -->
+    <string name="kq4_stats_scanned_files">Проверено файлов</string>
+    <string name="kq4_stats_found_removed">Найдено и удалено</string>
+
+    <!-- Карточка графика -->
+    <string name="kq4_stats_daily_checks">Проверки за день</string>
+    <string name="kq4_stats_week">Неделя</string>
+
+    <!-- Дни недели (Пн..Вс) -->
+    <string name="kq4_stats_day_mon">Пн</string>
+    <string name="kq4_stats_day_tue">Вт</string>
+    <string name="kq4_stats_day_wed">Ср</string>
+    <string name="kq4_stats_day_thu">Чт</string>
+    <string name="kq4_stats_day_fri">Пт</string>
+    <string name="kq4_stats_day_sat">Сб</string>
+    <string name="kq4_stats_day_sun">Вс</string>
+
+    <!-- Категории -->
+    <string name="kq4_stats_threat_types">Какие угрозы найдены</string>
+    <string name="kq4_stats_cat_bank">Кража банковских данных</string>
+    <string name="kq4_stats_cat_dropper">Скрытая загрузка</string>
+    <string name="kq4_stats_cat_sms">Поддельные SMS</string>
+    <string name="kq4_stats_cat_other">Другое</string>
+
+    <!-- Список найденных файлов -->
+    <string name="kq4_stats_found_files">Найденные файлы</string>
+    <string name="kq4_stats_src_download">Загрузки</string>
+    <string name="kq4_stats_src_share">Передача файла</string>
+    <string name="kq4_stats_src_scan">Сканер</string>
+</resources>

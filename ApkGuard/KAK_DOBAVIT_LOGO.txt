@@ -11,11 +11,11 @@
 1. Переименуй logo.png в ic_launcher.png
 
 2. Скопируй в эти папки:
-   KiberQalqon/app/src/main/res/mipmap-mdpi/ic_launcher.png
-   KiberQalqon/app/src/main/res/mipmap-hdpi/ic_launcher.png
-   KiberQalqon/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-   KiberQalqon/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-   KiberQalqon/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+   UzGuard/app/src/main/res/mipmap-mdpi/ic_launcher.png
+   UzGuard/app/src/main/res/mipmap-hdpi/ic_launcher.png
+   UzGuard/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+   UzGuard/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+   UzGuard/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
 3. Пересобери проект:
    ZAPUSK_S_JAVA21.bat
@@ -34,7 +34,7 @@ https://romannurik.github.io/AndroidAssetStudio/icons-launcher.html
    - Shape: Square
    - Background: Transparent
 4. Скачай ZIP
-5. Распакуй в KiberQalqon/app/src/main/res/
+5. Распакуй в UzGuard/app/src/main/res/
 
 ═══════════════════════════════════════════════════════════════
 
@@ -53,7 +53,7 @@ https://romannurik.github.io/AndroidAssetStudio/icons-launcher.html
 
 📂 СТРУКТУРА ПАПОК:
 
-KiberQalqon/app/src/main/res/
+UzGuard/app/src/main/res/
 ├── mipmap-mdpi/
 │   └── ic_launcher.png (48x48)
 ├── mipmap-hdpi/
@@ -115,7 +115,7 @@ Elapsed time: 3s
 продолжай там понимаешь там!
 
 Kiro
-Понял! Давай посмотрю, что у нас есть и что нужно доделать или улучшить в KiberQalqon.
+Понял! Давай посмотрю, что у нас есть и что нужно доделать или улучшить в UzGuard.
 
 Read file(s)
 
@@ -187,13 +187,13 @@ ck=true' is experimental.                           The current default is 'fals
 
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
 
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
 
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
 
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:168:66 Parameter 'isDangerous' is never used                             w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:168:66 Parameter 'isDangerous' is never used                             w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
 
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ScanResultActivity.kt:29:30 'getSerializableExtra(String!): Serializable?' is deprecated. Deprecated in Java                                     
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ScanResultActivity.kt:29:30 'getSerializableExtra(String!): Serializable?' is deprecated. Deprecated in Java                                     
 
 BUILD SUCCESSFUL in 23s
 
@@ -201,7 +201,7 @@ BUILD SUCCESSFUL in 23s
 
 🎉 BUILD SUCCESSFUL!
 
-Создал новый современный логотип для KiberQalqon:
+Создал новый современный логотип для UzGuard:
 
 🎨 Новый логотип:
 
@@ -227,7 +227,7 @@ BUILD SUCCESSFUL in 23s
 
 Новый APK с красивым логотипом:
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установите на телефон - теперь у приложения будет красивая современная иконка со щитом и галочкой в голубо-зеленых тонах!
 
@@ -366,18 +366,18 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:169:39 Expecting ')'       e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:169:39 Unexpected tokens (use ';' to separate expressions on the same line)    e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:172:26 Expecting 'catch' or 'finally'                                          e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:175:23 Expecting ')'       e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:175:23 Unexpected tokens (use ';' to separate expressions on the same line)    e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:224:6 Expecting 'catch' or 'finally'                                           e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:225:2 Missing '}           e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:169:31 Unresolved reference: catch                                             e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:169:38 Unresolved reference: e                                                 e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:175:15 Unresolved reference: catch                                             e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:175:22 Unresolved reference: e                                                 e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:176:72 Unresolved reference: e                                                 
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:169:39 Expecting ')'       e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:169:39 Unexpected tokens (use ';' to separate expressions on the same line)    e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:172:26 Expecting 'catch' or 'finally'                                          e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:175:23 Expecting ')'       e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:175:23 Unexpected tokens (use ';' to separate expressions on the same line)    e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:224:6 Expecting 'catch' or 'finally'                                           e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:225:2 Missing '}           e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:169:31 Unresolved reference: catch                                             e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:169:38 Unresolved reference: e                                                 e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:175:15 Unresolved reference: catch                                             e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:175:22 Unresolved reference: e                                                 e: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:176:72 Unresolved reference: e                                                 
 > Task :app:compileDebugKotlin FAILED
 
 FAILURE: Build failed with an exception.
@@ -425,10 +425,10 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:58:22 Parameter 'context' is never used                                        w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:179:66 Parameter 'isDangerous' is never used                             
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:58:22 Parameter 'context' is never used                                        w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:179:66 Parameter 'isDangerous' is never used                             
 BUILD SUCCESSFUL in 20s
 38 actionable tasks: 5 executed, 33 up-to-date
 🎉 Отлично! Сборка успешна! Теперь создам краткую инструкцию:
@@ -438,7 +438,7 @@ Created
 CHTO_SDELANO.txt
 
 
-Отлично! Полностью оптимизировал KiberQalqon. Вот что сделано:
+Отлично! Полностью оптимизировал UzGuard. Вот что сделано:
 
 ✅ Все проблемы исправлены!
 Главные исправления:
@@ -463,7 +463,7 @@ Try-catch везде
 Максимум 10 файлов за раз
 Продолжение при ошибках
 Новый APK готов:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установите командой: ZAPUSK_NA_TELEFONE.bat
 
@@ -478,7 +478,7 @@ Kiro
 Вижу проблему! Приложение показывает белый экран - ничего не работает. Давай проверю логи и найду ошибку:
 
 Command
-adb logcat -d | Select-String -Pattern "kiberqalqon|AndroidRuntime|FATAL" -Context 2,2 | Select-Object -Last 50
+adb logcat -d | Select-String -Pattern "uzguard|AndroidRuntime|FATAL" -Context 2,2 | Select-Object -Last 50
 adb : Имя "adb" не распознано как имя командлета, ф
 ункции, файла сценария или выполняемой программы. П 
 роверьте правильность написания имени, а также нали 
@@ -559,11 +559,11 @@ FAILURE: Build failed with an exception.
 * What went wrong:
 Execution failed for task ':app:clean'.
 > java.io.IOException: Unable to delete directory 'C
-:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б ╤В╨░╤Е╨╗╨╕╨╗\KiberQalqon\app\build'                              Failed to delete some children. This might happe
+:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б ╤В╨░╤Е╨╗╨╕╨╗\UzGuard\app\build'                              Failed to delete some children. This might happe
 n because a process has files open or has its working directory set in the target directory.                - C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б
- ╤В╨░╤Е╨╗╨╕╨╗\KiberQalqon\app\build\outputs\apk\debug      - C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б
- ╤В╨░╤Е╨╗╨╕╨╗\KiberQalqon\app\build\outputs\apk            - C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б
- ╤В╨░╤Е╨╗╨╕╨╗\KiberQalqon\app\build\outputs            
+ ╤В╨░╤Е╨╗╨╕╨╗\UzGuard\app\build\outputs\apk\debug      - C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б
+ ╤В╨░╤Е╨╗╨╕╨╗\UzGuard\app\build\outputs\apk            - C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б
+ ╤В╨░╤Е╨╗╨╕╨╗\UzGuard\app\build\outputs            
 * Try:
 > Run with --stacktrace option to get the stack trac
 e.                                                  > Run with --info or --debug option to get more log 
@@ -585,14 +585,14 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:mergeDebugResources
 C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б ╤В╨░╤
-Е╨╗╨╕╨╗\KiberQalqon\app\src\main\res\values-uz\strings.xml:126:4: Multiple substitutions specified in non-positional format of string resource string/notif_stats. Did you mean to add the formatted="false" attribute?                                                
+Е╨╗╨╕╨╗\UzGuard\app\src\main\res\values-uz\strings.xml:126:4: Multiple substitutions specified in non-positional format of string resource string/notif_stats. Did you mean to add the formatted="false" attribute?                                                
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:58:22 Parameter 'context' is never used                                        w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:179:66 Parameter 'isDangerous' is never used                             w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ScanResultActivity.kt:29:30 'getSerializableExtra(String!): Serializable?' is deprecated. Deprecated in Java                                     
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:58:22 Parameter 'context' is never used                                        w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:179:66 Parameter 'isDangerous' is never used                             w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ScanResultActivity.kt:29:30 'getSerializableExtra(String!): Serializable?' is deprecated. Deprecated in Java                                     
 BUILD SUCCESSFUL in 27s
 38 actionable tasks: 38 executed
 Отлично! Сборка успешна. Теперь нужно исправить ошибку в strings.xml (узбекский):
@@ -689,13 +689,13 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:mergeDebugResources FAILED
 ERROR: C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤
-Б ╤В╨░╤Е╨╗╨╕╨╗\KiberQalqon\app\src\main\res\values-uz\strings.xml: Resource and asset merger: Found item String/notif_safe_desc more than one time             
+Б ╤В╨░╤Е╨╗╨╕╨╗\UzGuard\app\src\main\res\values-uz\strings.xml: Resource and asset merger: Found item String/notif_safe_desc more than one time             
 FAILURE: Build failed with an exception.
 
 * What went wrong:
 Execution failed for task ':app:mergeDebugResources'
 .                                                   > C:\Users\Muhammadali\Desktop\╨░╨┐╨║ ╨▓╨╕╤А╤Г╤Б ╤В╨
-░╤Е╨╗╨╕╨╗\KiberQalqon\app\src\main\res\values-uz\strings.xml: Error: Found item String/notif_safe_desc more than one time                                      
+░╤Е╨╗╨╕╨╗\UzGuard\app\src\main\res\values-uz\strings.xml: Error: Found item String/notif_safe_desc more than one time                                      
 * Try:
 > Run with --stacktrace option to get the stack trac
 e.                                                  > Run with --info or --debug option to get more log 
@@ -750,7 +750,7 @@ ISPRAVLENO.txt
 Дубликаты в strings.xml → Удалены
 
 📱 Новый APK готов:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установите командой: ZAPUSK_NA_TELEFONE.bat
 
@@ -810,7 +810,7 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkFileObserver.kt:18:5 'constructor FileObserver(String!, Int)' is deprecated. Deprecated in Java                                               
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkFileObserver.kt:18:5 'constructor FileObserver(String!, Int)' is deprecated. Deprecated in Java                                               
 BUILD SUCCESSFUL in 19s
 38 actionable tasks: 9 executed, 29 up-to-date
 Отлично! Сборка успешна! Теперь создам инструкцию и обновлю документацию:
@@ -896,7 +896,7 @@ FINALNAYA_VERSIYA.txt
 Скачиваешь APK → СРАЗУ выскакивает окно с анализом на глазах
 Видишь результат с цветом (красный/оранжевый/зелёный)
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -966,7 +966,7 @@ FileObserver работает в фоне
 Анализ на глазах 2 секунды
 Результат с цветом (красный/оранжевый/зелёный)
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1001,7 +1001,7 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
 BUILD SUCCESSFUL in 17s
 38 actionable tasks: 5 executed, 33 up-to-date
 Отлично! Сборка успешна. Теперь создам финальную инструкцию:
@@ -1035,7 +1035,7 @@ isFile, exists, canRead для каждого файла
 Нажимаешь "FIND AND CHECK APK" → ⚡ Результат за 0.5-1 секунду!
 Скачиваешь APK → СРАЗУ выскакивает окно с анализом
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1114,7 +1114,7 @@ AVTOMATICHESKOE_SKANIROVANIE.txt
 Показывает уведомление со звуком
 Видишь итог на экране
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1150,9 +1150,9 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:213:66 Parameter 'isDangerous' is never used                             
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java     w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:213:66 Parameter 'isDangerous' is never used                             
 BUILD SUCCESSFUL in 18s
 38 actionable tasks: 5 executed, 33 up-to-date
 Отлично! Сборка успешна. Теперь создам финальную инструкцию:
@@ -1187,7 +1187,7 @@ Try-catch на всех уровнях
 "❌ Faylni o'chirish uchun ruxsat yo'q" - нет разрешения
 "❌ Xatolik: [сообщение]" - другая ошибка
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1199,7 +1199,7 @@ Elapsed time: 1m 32s
 смотри там понимаеш там Я СКАЧАЛ АПК ТАМ ПОНИМАЕШЬ ТАМ но там повер приленеи не вышло там понимаешь тапм 
 
 Kiro
-Понял! Скачал APK файл, но полноэкранное окно KiberQalqon НЕ ВЫШЛО. Проблема в том, что FileObserver не работает или не запускается. Нужно проверить и исправить FileObserver:
+Понял! Скачал APK файл, но полноэкранное окно UzGuard НЕ ВЫШЛО. Проблема в том, что FileObserver не работает или не запускается. Нужно проверить и исправить FileObserver:
 
 Read file(s)
 
@@ -1283,7 +1283,7 @@ adb logcat | grep ApkFileObserver
 Скачай любой APK
 Через 2 секунды выскочит окно! ✅
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1351,7 +1351,7 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
 BUILD SUCCESSFUL in 16s
 38 actionable tasks: 5 executed, 33 up-to-date
 Created
@@ -1374,7 +1374,7 @@ Documents
 Рекурсивно до 2 уровней
 Максимум 30 файлов
 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка:
 ZAPUSK_NA_TELEFONE.bat
@@ -1420,7 +1420,7 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
 BUILD SUCCESSFUL in 19s
 38 actionable tasks: 5 executed, 33 up-to-date
 🎉 Отлично! Исправлено! Теперь:
@@ -1430,7 +1430,7 @@ BUILD SUCCESSFUL in 19s
 Пользователь сам нажимает кнопку "FIND AND CHECK APK"
 FileObserver работает - при скачивании APK выскочит окно
 ✅ Версия 2.9 - Без зависаний!
-Новый APK: KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+Новый APK: UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1491,7 +1491,7 @@ BUILD SUCCESSFUL in 19s
 ✅ Быстрый поиск в Downloads
 ✅ FileObserver для новых APK
 ✅ Ручное сканирование по кнопке
-Новый APK: KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+Новый APK: UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1520,7 +1520,7 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:58:22 Parameter 'context' is never used                                        
 BUILD SUCCESSFUL in 17s
 38 actionable tasks: 5 executed, 33 up-to-date
 Отлично! Теперь пересоберу:
@@ -1549,7 +1549,7 @@ BUILD SUCCESSFUL in 9s
 
 Максимум 20 файлов - не перегружает
 
-Новый APK: KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+Новый APK: UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1626,7 +1626,7 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:88:22 Parameter 'context' is never used                                        
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:88:22 Parameter 'context' is never used                                        
 BUILD SUCCESSFUL in 17s
 38 actionable tasks: 5 executed, 33 up-to-date
 🎉 Отлично! Сделал первую часть - улучшенный детектор вирусов!
@@ -1642,7 +1642,7 @@ BUILD SUCCESSFUL in 17s
 Поиск везде:
 
 Downloads, Telegram, WhatsApp, Bluetooth
-Новый APK: KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+Новый APK: UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 Установка: ZAPUSK_NA_TELEFONE.bat
 
@@ -1665,7 +1665,7 @@ PROMPT_DLY_CHATGPT.md
 Отлично! Создал подробный промпт для ChatGPT!
 
 ✅ Готово!
-Файл: KiberQalqon/PROMPT_DLY_CHATGPT.md
+Файл: UzGuard/PROMPT_DLY_CHATGPT.md
 
 Что в нём:
 
@@ -1686,7 +1686,7 @@ ChatGPT даст конкретные решения с кодом для все
 
 Credits used: 1.16
 Elapsed time: 49s
-Ниже — практичный план апгрейда KiberQalqon (с кодом), с учётом реальных ограничений Android: полностью “перехватить установку APK до установки” обычным приложением нельзя — это роль системного package verifier (проверяющего установку) и доступна только системным/привилегированным компонентам. (irq5.io) Но можно сделать почти такой же UX: надёжно находить новые APK + сканировать до нажатия “Установить” + показывать full-screen/heads-up предупреждение.
+Ниже — практичный план апгрейда UzGuard (с кодом), с учётом реальных ограничений Android: полностью “перехватить установку APK до установки” обычным приложением нельзя — это роль системного package verifier (проверяющего установку) и доступна только системным/привилегированным компонентам. (irq5.io) Но можно сделать почти такой же UX: надёжно находить новые APK + сканировать до нажатия “Установить” + показывать full-screen/heads-up предупреждение.
 
 1) Надёжный “перехват” установки APK: что реально возможно
 
@@ -1704,7 +1704,7 @@ Elapsed time: 49s
 
 Сканировать после установки (чтобы поймать установку из “неизвестного места”) через PACKAGE_ADDED — это уже после, но полезно как “второй контур”.
 
-Сделать KiberQalqon “открывалкой APK” (чтобы пользователь открывал APK через вас):
+Сделать UzGuard “открывалкой APK” (чтобы пользователь открывал APK через вас):
 
 intent-filter на application/vnd.android.package-archive → вы появляетесь в выборе “Открыть с помощью”
 
@@ -1734,7 +1734,7 @@ class DownloadsApkObserver(     private val context: Context,     private val sc
 
 3.3 Показываем full-screen/heads-up вместо “прямого открытия Activity”
 
-fun showScanAlert(context: Context, apkUri: Uri, fileName: String) {     val intent = Intent(context, AutoScanActivity::class.java).apply {         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP         data = apkUri         putExtra("name", fileName)     }     val pi = PendingIntent.getActivity(         context, 101, intent,         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE     )      val notification = NotificationCompat.Builder(context, "scan")         .setSmallIcon(R.drawable.ic_shield)         .setContentTitle("KiberQalqon")         .setContentText("Найден APK: $fileName")         .setPriority(NotificationCompat.PRIORITY_HIGH)         .setCategory(NotificationCompat.CATEGORY_ALARM)         .setAutoCancel(true)         .setContentIntent(pi)         .setFullScreenIntent(pi, true) // где возможно — откроет полноэкранно         .build()      NotificationManagerCompat.from(context).notify(777, notification) } 
+fun showScanAlert(context: Context, apkUri: Uri, fileName: String) {     val intent = Intent(context, AutoScanActivity::class.java).apply {         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP         data = apkUri         putExtra("name", fileName)     }     val pi = PendingIntent.getActivity(         context, 101, intent,         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE     )      val notification = NotificationCompat.Builder(context, "scan")         .setSmallIcon(R.drawable.ic_shield)         .setContentTitle("UzGuard")         .setContentText("Найден APK: $fileName")         .setPriority(NotificationCompat.PRIORITY_HIGH)         .setCategory(NotificationCompat.CATEGORY_ALARM)         .setAutoCancel(true)         .setContentIntent(pi)         .setFullScreenIntent(pi, true) // где возможно — откроет полноэкранно         .build()      NotificationManagerCompat.from(context).notify(777, notification) } 
 
 Manifest:
 
@@ -1929,8 +1929,8 @@ ck=true' is experimental.                           The current default is 'fals
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ImprovedApkFileObserver.kt:23:5 'constructor FileObserver(String!, Int)' is deprecated. Deprecated in Java                                       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
-╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ImprovedApkFileObserver.kt:32:18 This declaration is in a preview state and can be changed in a backwards-incompatible manner with a best-effort migration. Its usage should be marked with '@kotlinx.coroutines.FlowPreview' or '@OptIn(kotlinx.coroutines.FlowPreview::class)' if you accept the drawback of relying on preview API                            
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ImprovedApkFileObserver.kt:23:5 'constructor FileObserver(String!, Int)' is deprecated. Deprecated in Java                                       w: file:///C:/Users/Muhammadali/Desktop/╨░╨┐╨║%20╨▓╨
+╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ImprovedApkFileObserver.kt:32:18 This declaration is in a preview state and can be changed in a backwards-incompatible manner with a best-effort migration. Its usage should be marked with '@kotlinx.coroutines.FlowPreview' or '@OptIn(kotlinx.coroutines.FlowPreview::class)' if you accept the drawback of relying on preview API                            
 BUILD SUCCESSFUL in 22s
 38 actionable tasks: 9 executed, 29 up-to-date
 🎉 Отлично! Сборка успешна! Создам финальный документ:
@@ -1948,7 +1948,7 @@ NotificationHelper - high-priority с fullScreenIntent
 SpeedometerView - кастомный спидометр на Canvas
 Улучшенный детектор - 40+ сигнатур
 📱 Новый APK:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 🚀 Установка:
 ZAPUSK_NA_TELEFONE.bat
@@ -1960,7 +1960,7 @@ Elapsed time: 2m
 сделай промпт для создание лого иам 
 
 Kiro
-Отлично! Создам промпт для генерации логотипа KiberQalqon:
+Отлично! Создам промпт для генерации логотипа UzGuard:
 
 Created
 
@@ -1969,7 +1969,7 @@ PROMPT_DLY_LOGO.md
 
 🎨 Готово! Создал подробный промпт для генерации логотипа!
 
-✅ Файл: KiberQalqon/PROMPT_DLY_LOGO.md
+✅ Файл: UzGuard/PROMPT_DLY_LOGO.md
 Что в нём:
 
 📱 Промпт на английском (для DALL-E/Midjourney)
@@ -2017,7 +2017,7 @@ Checking if logo.png exists in the project root
 Открой https://romannurik.github.io/AndroidAssetStudio/icons-launcher.html
 Загрузи logo.jpg
 Скачай ZIP
-Распакуй в KiberQalqon/app/src/main/res/
+Распакуй в UzGuard/app/src/main/res/
 Пересобери: ZAPUSK_S_JAVA21.bat
 Или скажи - я могу помочь скопировать логотип в нужные папки! 🎨
 
@@ -2083,7 +2083,7 @@ if (Test-Path "logo.jpg") {
     Write-Host "❌ logo.jpg не найден"
 }
 PS C:\Users\Muhammadali\Desktop\апк
- вирус тахлил\KiberQalqon> if (Test-Path "logo.jpg") {                   >>     foreach ($folder in $folders
+ вирус тахлил\UzGuard> if (Test-Path "logo.jpg") {                   >>     foreach ($folder in $folders
 ) {                                >>         Copy-Item "logo.jpg" "ap
 p\src\main\res\$folder\ic_launcher.png" -Force                        >>         Write-Host "✅ Скопирова
 но в $folder"                      >>     }
@@ -2133,7 +2133,7 @@ BUILD SUCCESSFUL in 9s
 ✅ Скопировал logo.jpg как ic_launcher.png во все папки
 ✅ Пересобрал проект
 📱 Новый APK с твоим логотипом:
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 🚀 Установка:
 ZAPUSK_NA_TELEFONE.bat
@@ -2163,7 +2163,7 @@ if (Test-Path $apkPath) {
 # Проверяем логи сборки
 Write-Host "`nПроверяю логи..."
  логи сборки                       PS C:\Users\Muhammadali\Desktop\апк
- вирус тахлил\KiberQalqon> Write-Host "`nПроверяю логи..."               
+ вирус тахлил\UzGuard> Write-Host "`nПроверяю логи..."               
 Command
 
 # Пробуем установить через adb
@@ -2173,7 +2173,7 @@ adb devices
 Write-Host "`nПробую установить APK..."
 adb install -r "app\build\outputs\apk\debug\app-debug.apk"
 PS C:\Users\Muhammadali\Desktop\апк
- вирус тахлил\KiberQalqon> adb install -r "app\build\outputs\apk\debug\app-debug.apk"                       adb : Имя "adb" не распознано как 
+ вирус тахлил\UzGuard> adb install -r "app\build\outputs\apk\debug\app-debug.apk"                       adb : Имя "adb" не распознано как 
 имя командлета, функции, файла сце 
 нария или выполняемой программы. П 
 роверьте правильность написания им 
@@ -2241,11 +2241,11 @@ $env:PATH="C:\Java\jdk-21\jdk-21.0.10+7\bin;$env:PATH"
 
 Write-Host "`n✅ Готово!"
 Write-Host "`nТеперь:"
-Write-Host "1. Удали старую версию KiberQalqon с телефона"
+Write-Host "1. Удали старую версию UzGuard с телефона"
 Write-Host "2. Скопируй новый APK на телефон"
 Write-Host "3. Установи"
 PS C:\Users\Muhammadali\Desktop\апк
- вирус тахлил\KiberQalqon> Write-Host "3. Установи"                      3. Установи
+ вирус тахлил\UzGuard> Write-Host "3. Установи"                      3. Установи
 Отлично! Создал скрипт ISPRAVIT_USTANOVKU.bat.
 
 🔧 Что делать:
@@ -2255,7 +2255,7 @@ PS C:\Users\Muhammadali\Desktop\апк
 Дождись пересборки
 На телефоне:
 
-УДАЛИ старую версию KiberQalqon (это важно!)
+УДАЛИ старую версию UzGuard (это важно!)
 Скопируй новый app-debug.apk на телефон
 Установи
 Проблема "Приложение не установлено" обычно из-за конфликта подписей между старой и новой версией. После удаления старой версии всё установится! 🚀
@@ -2292,15 +2292,15 @@ FAILURE: Build failed with an exception.
 
 Execution failed for task ':app:clean'.
 
-> java.io.IOException: Unable to delete directory 'C:\Users\Muhammadali\Desktop\апк вирус тахлил\KiberQalqon\app\build'
+> java.io.IOException: Unable to delete directory 'C:\Users\Muhammadali\Desktop\апк вирус тахлил\UzGuard\app\build'
 
     Failed to delete some children. This might happen because a process has files open or has its working directory set in the target directory.
 
-    - C:\Users\Muhammadali\Desktop\апк вирус тахлил\KiberQalqon\app\build\outputs\apk\debug
+    - C:\Users\Muhammadali\Desktop\апк вирус тахлил\UzGuard\app\build\outputs\apk\debug
 
-    - C:\Users\Muhammadali\Desktop\апк вирус тахлил\KiberQalqon\app\build\outputs\apk
+    - C:\Users\Muhammadali\Desktop\апк вирус тахлил\UzGuard\app\build\outputs\apk
 
-    - C:\Users\Muhammadali\Desktop\апк вирус тахлил\KiberQalqon\app\build\outputs
+    - C:\Users\Muhammadali\Desktop\апк вирус тахлил\UzGuard\app\build\outputs
 
 * Try:
 
@@ -2326,7 +2326,7 @@ BUILD FAILED in 8s
 
 ВАЖНО:
 
-1. Удали старую версию KiberQalqon с телефона
+1. Удали старую версию UzGuard с телефона
 
 2. Скопируй новый APK на телефон
 
@@ -2347,13 +2347,13 @@ d.overridePathCheck=true' is experimental.                            The curren
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:88:22 Parameter 'context' is never used       w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java         w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/AutoScanActivity.kt:213:66 Parameter 'isDangerous' is never used                               w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ImprovedApkFileObserver.kt:23:5 'constructor FileObserver(String!, Int)' is deprecated. Deprecated in Java                        w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ImprovedApkFileObserver.kt:32:18 This declaration is in a preview state and can be changed in a backwards-incompatible manner with a best-effort migration. Its usage should be marked with '@kotlinx.coroutines.FlowPreview' or '@OptIn(kotlinx.coroutines.FlowPreview::class)' if you accept the drawback of relying on preview API               w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ScanResultActivity.kt:29:30 'getSerializableExtra(String!): Serializable?' is deprecated. Deprecated in Java                      
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:88:22 Parameter 'context' is never used       w: file:///C:/Users/Muhammadali/Des
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:36:44 'FLAG_SHOW_WHEN_LOCKED: Int' is deprecated. Deprecated in Java       w: file:///C:/Users/Muhammadali/Des
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:37:44 'FLAG_TURN_SCREEN_ON: Int' is deprecated. Deprecated in Java         w: file:///C:/Users/Muhammadali/Des
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/AutoScanActivity.kt:213:66 Parameter 'isDangerous' is never used                               w: file:///C:/Users/Muhammadali/Des
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ImprovedApkFileObserver.kt:23:5 'constructor FileObserver(String!, Int)' is deprecated. Deprecated in Java                        w: file:///C:/Users/Muhammadali/Des
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ImprovedApkFileObserver.kt:32:18 This declaration is in a preview state and can be changed in a backwards-incompatible manner with a best-effort migration. Its usage should be marked with '@kotlinx.coroutines.FlowPreview' or '@OptIn(kotlinx.coroutines.FlowPreview::class)' if you accept the drawback of relying on preview API               w: file:///C:/Users/Muhammadali/Des
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ScanResultActivity.kt:29:30 'getSerializableExtra(String!): Serializable?' is deprecated. Deprecated in Java                      
 BUILD SUCCESSFUL in 31s
 38 actionable tasks: 38 executed   
 🎉 Отлично! Сборка успешна! Теперь создам инструкцию:
@@ -2371,10 +2371,10 @@ RESHENIE_PROBLEMY_USTANOVKI.txt
 
 На телефоне:
 
-Настройки → Приложения → KiberQalqon → УДАЛИТЬ
+Настройки → Приложения → UzGuard → УДАЛИТЬ
 Потом: 2. Скопируй новый APK на телефон 3. Установи
 
-Новый APK с твоим логотипом: KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+Новый APK с твоим логотипом: UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 После удаления старой версии всё установится! 🚀✨
 
@@ -2386,7 +2386,7 @@ Elapsed time: 1m 21s
 Kiro
 Ого! Вижу проблему! Приложение определяет САМО СЕБЯ (app-debug.apk) как ОПАСНОЕ и не даёт установить! 😄
 
-Это значит детектор работает слишком хорошо! Нужно добавить исключение для самого KiberQalqon:
+Это значит детектор работает слишком хорошо! Нужно добавить исключение для самого UzGuard:
 
 Accepted edits to
 
@@ -2403,7 +2403,7 @@ d.overridePathCheck=true' is experimental.                            The curren
 
 > Task :app:compileDebugKotlin
 w: file:///C:/Users/Muhammadali/Des
-ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/KiberQalqon/app/src/main/java/com/kiberqalqon/ApkScanner.kt:88:22 Parameter 'context' is never used       
+ktop/╨░╨┐╨║%20╨▓╨╕╤А╤Г╤Б%20╤В╨░╤Е╨╗╨╕╨╗/UzGuard/app/src/main/java/com/uzguard/ApkScanner.kt:88:22 Parameter 'context' is never used       
 BUILD SUCCESSFUL in 18s
 38 actionable tasks: 5 executed, 33
  up-to-date                        

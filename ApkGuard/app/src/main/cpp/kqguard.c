@@ -9,7 +9,8 @@
  * tomonidagi metod nomlarini o'zgartirsa ham bog'lash (binding) buzilmaydi.
  *
  * Bu yerda MAXFIY SIR YO'Q (sirlar Shield orqali Secrets.kt'da). KQ_EXPECTED_SIG —
- * ochiq imzo-xeshi, build vaqtida -D bilan beriladi (CMakeLists.txt).
+ * ochiq imzo-xesh(lar), vergul bilan ajratilgan to'plam (SD-01: sideload + Play
+ * App Signing), build vaqtida -D bilan beriladi (CMakeLists.txt).
  */
 #include <jni.h>
 #include <string.h>
@@ -49,8 +50,26 @@ static jboolean nAntiDebug(JNIEnv *e, jclass c) {
 }
 
 /*
+ * SD-01: KQ_EXPECTED_SIG — VERGUL bilan ajratilgan ruxsat etilgan imzolar TO'PLAMI
+ * (sideload release.keystore + kelajakda Play App Signing serti). Bo'sh segmentlar
+ * e'tiborga olinmaydi. 1 = mos keldi.
+ */
+static int kq_sig_matches(const char *got) {
+    const char *p = KQ_EXPECTED_SIG;
+    size_t got_len = strlen(got);
+    while (*p) {
+        const char *end = p;
+        while (*end && *end != ',') end++;
+        size_t len = (size_t) (end - p);
+        if (len > 0 && len == got_len && strncasecmp(got, p, len) == 0) return 1;
+        p = (*end == ',') ? end + 1 : end;
+    }
+    return 0;
+}
+
+/*
  * Imzo tekshiruvi. Kotlin SecurityGuard hisoblagan imzo SHA-256'sini (UPPERCASE hex,
- * cert DER baytlaridan) uzatadi. Native ichidagi kutilgan qiymat bilan solishtiradi.
+ * cert DER baytlaridan) uzatadi. Native ichidagi kutilgan to'plam bilan solishtiradi.
  * Qaytaradi: JNI_TRUE = NOTO'G'RI (mos kelmadi) — isSignatureInvalid semantikasi.
  * Aniq tasdiqlay olmasa (kalit yo'q / null / mos emas) → JNI_TRUE (himoya tomon).
  */
@@ -59,7 +78,7 @@ static jboolean nSigInvalid(JNIEnv *e, jclass c, jstring hexIn) {
     if (KQ_EXPECTED_SIG[0] == 0) return JNI_TRUE; /* sozlanmagan → tasdiqlay olmaymiz */
     if (hexIn == NULL) return JNI_TRUE;
     const char *got = (*e)->GetStringUTFChars(e, hexIn, NULL);
-    int bad = (got == NULL) || (strcasecmp(got, KQ_EXPECTED_SIG) != 0);
+    int bad = (got == NULL) || !kq_sig_matches(got);
     if (got) (*e)->ReleaseStringUTFChars(e, hexIn, got);
     return bad ? JNI_TRUE : JNI_FALSE;
 }
@@ -68,7 +87,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     (void) reserved;
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_6) != JNI_OK) return -1;
-    jclass cls = (*env)->FindClass(env, "com/kiberqalqon/NativeBridge");
+    jclass cls = (*env)->FindClass(env, "com/uzguard/NativeBridge");
     if (!cls) return -1;
     static const JNINativeMethod methods[] = {
         {"nPing",       "()Z",                   (void *) nPing},

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UzGuard — dizayn v3 «Milliy Light» · BARCHA sahifalar</title>
+<style>
+  :root{
+    --anor:#C2143D; --anor2:#E11D48; --anor-deep:#8E0E2C; --anor-soft:#FBE9EE;
+    --bg:#F7F1EB; --card:#FFFFFF; --line:#EEE6DE;
+    --ink:#23180F; --mut:#8C7F74; --mut2:#B5A99E;
+    --safe:#27AE60; --safe-soft:#E5F3E8;
+    --warn:#E8A03C; --warn-soft:#FBEFD8;
+    --danger:#D74536; --danger-soft:#F7DCD7;
+    --feruz:#2D9CB8; --feruz-soft:#DCEEF1;
+    --zafar:#CC9442; --zafar-soft:#F4E8D2;
+    --sh:0 10px 26px rgba(35,24,15,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:#EDE4DB;color:var(--ink);min-height:100vh;padding:44px 20px;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  h1{font-size:22px;font-weight:800}
+  .sub{color:#7d6f63;font-size:14px;margin-bottom:26px;text-align:center;max-width:780px;line-height:1.55}
+  .stage{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;max-width:1900px}
+  .col{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .cap{font-size:12.5px;color:#7d6f63;letter-spacing:.6px;text-transform:uppercase;font-weight:800}
+
+  /* ── Telefon ───────────────────────────────────────────────── */
+  .phone{width:302px;height:644px;border-radius:42px;background:var(--bg);
+    border:1px solid #d9cec4;box-shadow:0 28px 60px rgba(35,24,15,.25),inset 0 0 0 6px #fff;
+    padding:13px 11px;position:relative;overflow:hidden}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);
+    width:108px;height:21px;background:#1c130c;border-radius:0 0 14px 14px;z-index:9}
+  .scr{height:100%;border-radius:31px;overflow:hidden;position:relative;background:var(--bg)}
+
+  /* ── Anor egri sarlavha (curved header) ────────────────────── */
+  .hdr{position:relative;background:linear-gradient(140deg,var(--anor2) 0%,var(--anor) 45%,var(--anor-deep) 100%);
+    border-radius:0 0 28px 28px;padding:42px 18px 20px;color:#fff;overflow:hidden}
+  .hdr .orn{position:absolute;font-size:120px;opacity:.07;right:-22px;top:-26px;pointer-events:none}
+  .hdr .orn2{position:absolute;font-size:60px;opacity:.08;left:-14px;bottom:-18px;pointer-events:none}
+  .hdr-row{display:flex;align-items:center;position:relative;z-index:2}
+  .hdr-row .tx{flex:1}
+  .hdr-row .hi{font-size:16.5px;font-weight:800}
+  .hdr-row .dt{font-size:10.5px;opacity:.85;margin-top:2px}
+  .hbtn{width:32px;height:32px;border-radius:12px;background:rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;font-size:13px;margin-left:7px;
+    border:1px solid rgba(255,255,255,.22)}
+  .hbtn.lang{font-size:9.5px;font-weight:800;letter-spacing:.5px}
+
+  .body{padding:0 14px 96px}
+
+  /* ── Status karta (header ustiga chiqadi) ──────────────────── */
+  .float{margin-top:-14px;position:relative;z-index:3}
+  .card{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:14px}
+  .status{display:flex;gap:12px;align-items:center}
+  .shield{width:62px;height:62px;border-radius:50%;background:var(--safe-soft);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:28px;
+    box-shadow:inset 0 0 0 2px rgba(39,174,96,.25)}
+  .shield.bad{background:var(--danger-soft);box-shadow:inset 0 0 0 2px rgba(215,69,54,.3)}
+  .status .st{flex:1}
+  .status .st b{font-size:16.5px;color:var(--safe);display:block}
+  .status .st b.bad{color:var(--danger)}
+  .status .st span{font-size:10.5px;color:var(--mut);display:block;margin-top:2px;line-height:1.45}
+  .ball{margin-top:10px}
+  .ball .br{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-bottom:5px}
+  .ball .br b{color:var(--ink)}
+  .track{height:7px;border-radius:5px;background:#F1E9E1;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--safe),#3ec97b)}
+  .ministats{display:flex;margin-top:12px;border-top:1px dashed var(--line);padding-top:11px}
+  .ministats div{flex:1;text-align:center}
+  .ministats b{font-size:15px;display:block}
+  .ministats span{font-size:8.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+  .ministats .d b{color:var(--danger)} .ministats .w b{color:var(--warn)}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:12px;
+    padding:14px;border:none;border-radius:16px;color:#fff;font-size:14.5px;font-weight:800;
+    background:linear-gradient(140deg,var(--anor2),var(--anor-deep));
+    box-shadow:0 12px 24px rgba(194,20,61,.35);letter-spacing:.2px}
+  .cta.o{background:#fff;color:var(--ink);box-shadow:none;border:1.5px solid var(--line);font-weight:700}
+  .cta.dngr{background:linear-gradient(140deg,#E2574A,#B5301F)}
+
+  .sect{display:flex;align-items:baseline;justify-content:space-between;margin:16px 3px 9px}
+  .sect b{font-size:14.5px;font-weight:800}
+  .sect a{font-size:11px;color:var(--anor);font-weight:800;text-decoration:none}
+
+  /* ── Tezkor amallar (dumaloq) ──────────────────────────────── */
+  .quick{display:flex;justify-content:space-between;padding:0 6px}
+  .q{display:flex;flex-direction:column;align-items:center;gap:6px;width:58px}
+  .q .qi{width:52px;height:52px;border-radius:19px;background:var(--card);box-shadow:var(--sh);
+    display:flex;align-items:center;justify-content:center;font-size:21px}
+  .q span{font-size:9.5px;color:var(--mut);font-weight:700}
+
+  /* ── Modullar 2×2 ──────────────────────────────────────────── */
+  .mods{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mod{background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:12px}
+  .mod .mi{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .mi.a{background:var(--anor-soft)} .mi.s{background:var(--safe-soft)}
+  .mi.f{background:var(--feruz-soft)} .mi.z{background:var(--zafar-soft)}
+  .mod b{display:block;font-size:11.5px;margin-top:8px}
+  .mod .ms{display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--mut);margin-top:3px;font-weight:600}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--safe)}
+  .dot.w{background:var(--warn)}
+
+  /* ── Ro'yxat qatorlari ─────────────────────────────────────── */
+  .row{display:flex;align-items:center;gap:10px;padding:10px 2px}
+  .row+.row{border-top:1px solid #F4EDE6}
+  .ric{width:36px;height:36px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+  .ric.d{background:var(--danger-soft)} .ric.w{background:var(--warn-soft)}
+  .ric.s{background:var(--safe-soft)} .ric.a{background:var(--anor-soft)}
+  .ric.n{background:#F4EDE6} .ric.f{background:var(--feruz-soft)}
+  .rt{flex:1;min-width:0}
+  .rt b{display:block;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rt span{font-size:9.5px;color:var(--mut)}
+  .sev{font-size:8.5px;font-weight:800;letter-spacing:.4px;border-radius:8px;padding:4px 8px;flex:none}
+  .sev.c{background:var(--danger-soft);color:#9C2718}
+  .sev.h{background:var(--warn-soft);color:#7A5318}
+  .sev.ok{background:var(--safe-soft);color:#1E7A40}
+  .arr{color:var(--mut2);font-size:17px;flex:none}
+
+  /* ── Switch ────────────────────────────────────────────────── */
+  .sw{width:36px;height:21px;border-radius:999px;background:var(--safe);position:relative;flex:none}
+  .sw:after{content:"";position:absolute;top:2.5px;right:2.5px;width:16px;height:16px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .sw.off{background:#E2D8CE} .sw.off:after{right:auto;left:2.5px}
+
+  /* ── Haftalik chart ────────────────────────────────────────── */
+  .week{display:flex;align-items:flex-end;gap:6px;height:54px;margin-top:4px}
+  .week i{flex:1;border-radius:5px 5px 3px 3px;background:#F1E9E1}
+  .week i.g{background:linear-gradient(180deg,#3ec97b,var(--safe))}
+  .week i.r{background:linear-gradient(180deg,#E2574A,var(--danger))}
+  .days{display:flex;gap:6px;margin-top:6px}
+  .days span{flex:1;text-align:center;font-size:8.5px;color:var(--mut2);font-weight:700}
+  .digest{font-size:10px;color:var(--mut);margin-top:9px}
+
+  /* ── Yangilik karta ────────────────────────────────────────── */
+  .news{background:linear-gradient(135deg,var(--anor-soft),#fff 70%);border-radius:18px;box-shadow:var(--sh);
+    padding:13px;display:flex;gap:10px;align-items:flex-start}
+  .news .ni{width:36px;height:36px;border-radius:13px;background:#fff;box-shadow:var(--sh);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:16px}
+  .news b{font-size:11.5px;display:block}
+  .news span{font-size:9.8px;color:var(--mut);line-height:1.5;display:block;margin-top:3px}
+
+  /* ── Pastki nav: oq panel + markaziy anor kvadrat ──────────── */
+  .nav{position:absolute;left:0;right:0;bottom:0;height:66px;z-index:8;background:#fff;
+    border-radius:24px 24px 0 0;box-shadow:0 -8px 26px rgba(35,24,15,.10);
+    display:flex;align-items:center;justify-content:space-around;padding:0 10px}
+  .nav .it{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;
+    color:var(--mut2);font-weight:700;width:48px}
+  .nav .it .gi{font-size:17px;line-height:1}
+  .nav .it.on{color:var(--anor)}
+  .scanbtn{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:9;
+    width:56px;height:56px;border-radius:20px;
+    background:linear-gradient(140deg,var(--anor2),var(--anor-deep));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;
+    box-shadow:0 12px 24px rgba(194,20,61,.4),0 0 0 5px var(--bg);font-size:20px}
+  .scanbtn span{font-size:7.5px;font-weight:800;letter-spacing:.6px}
+  .navgap{width:56px;flex:none}
+
+  /* ── Splash ────────────────────────────────────────────────── */
+  .splash{height:100%;background:linear-gradient(160deg,var(--anor2) 0%,var(--anor) 45%,var(--anor-deep) 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;overflow:hidden}
+  .splash .star{position:absolute;opacity:.08;font-size:150px;top:-30px;right:-40px}
+  .splash .star2{position:absolute;opacity:.07;font-size:90px;bottom:30px;left:-20px}
+  .plate{width:108px;height:108px;border-radius:32px;background:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 22px 50px rgba(0,0,0,.3)}
+  .plate svg{width:72px;height:72px}
+  .splash h3{font-size:22px;font-weight:800;margin-top:18px;letter-spacing:.4px}
+  .splash p{font-size:11px;opacity:.85;margin-top:5px}
+  .dots{display:flex;gap:7px;margin-top:26px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4)}
+  .dots i:first-child{background:#fff}
+  .splash .foot{position:absolute;bottom:22px;font-size:9px;opacity:.7;letter-spacing:1px}
+
+  /* ── Ruxsatlar ─────────────────────────────────────────────── */
+  .prog{display:flex;gap:6px;justify-content:center;margin:6px 0 16px}
+  .prog i{width:30px;height:5px;border-radius:3px;background:#E8DED4}
+  .prog i.on{background:var(--anor)}
+  .h2{font-size:20px;font-weight:800}
+  .lead{font-size:11.5px;color:var(--mut);line-height:1.55;margin-top:5px}
+  .perm{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:18px;
+    box-shadow:var(--sh);padding:13px;margin-top:10px}
+  .perm .pi{width:42px;height:42px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .perm .pt{flex:1}
+  .perm .pt b{font-size:12px;display:block}
+  .perm .pt span{font-size:9.8px;color:var(--mut);line-height:1.4;display:block;margin-top:2px}
+  .ok{width:24px;height:24px;border-radius:50%;background:var(--safe-soft);color:var(--safe);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none}
+  .todo{width:24px;height:24px;border-radius:50%;border:2px solid var(--anor);color:var(--anor);
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex:none}
+
+  /* ── Skaner disk ───────────────────────────────────────────── */
+  .disc{width:172px;height:172px;border-radius:50%;margin:14px auto 0;position:relative;
+    background:conic-gradient(var(--anor2) 0 25%,#F1E2D9 25% 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 16px 36px rgba(194,20,61,.18)}
+  .disc:before{content:"";position:absolute;inset:10px;border-radius:50%;background:#fff;
+    box-shadow:inset 0 4px 14px rgba(35,24,15,.06)}
+  .disc .in{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .disc .in .em{font-size:38px}
+  .disc .in b{font-size:11px;letter-spacing:.4px;color:var(--mut)}
+  .strip{display:flex;gap:9px;margin-top:14px}
+  .strip .s{flex:1;background:var(--card);border-radius:15px;box-shadow:var(--sh);padding:10px 6px;text-align:center}
+  .strip .s b{display:block;font-size:16px}
+  .strip .s span{font-size:8.3px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+
+  /* ── Natija (danger) ───────────────────────────────────────── */
+  .vhdr{background:linear-gradient(150deg,#E2574A,#B5301F);border-radius:0 0 28px 28px;
+    padding:46px 18px 22px;color:#fff;text-align:center;position:relative;overflow:hidden}
+  .vhdr .orn{position:absolute;font-size:120px;opacity:.08;right:-24px;top:-22px}
+  .vhdr .vi{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);margin:0 auto;
+    display:flex;align-items:center;justify-content:center;font-size:30px;border:2px solid rgba(255,255,255,.35)}
+  .vhdr b{display:block;font-size:18px;margin-top:10px;letter-spacing:.4px}
+  .vhdr span{font-size:10.5px;opacity:.9;display:block;margin-top:3px}
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .chip{font-size:9px;font-weight:800;border-radius:8px;padding:4px 9px;background:var(--danger-soft);color:#9C2718}
+  .chip.n{background:#F4EDE6;color:var(--mut)}
+
+  /* ── Sozlamalar qo'shimcha ─────────────────────────────────── */
+  .seg{display:flex;background:#F1E9E1;border-radius:13px;padding:3px;margin-top:8px}
+  .seg div{flex:1;text-align:center;font-size:10.5px;padding:7px 0;border-radius:11px;color:var(--mut);font-weight:700}
+  .seg .on{background:#fff;color:var(--ink);box-shadow:0 3px 8px rgba(35,24,15,.1)}
+  .acc{display:flex;gap:8px;margin-top:10px}
+  .acc div{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;color:var(--mut);font-weight:700}
+  .acc i{width:28px;height:28px;border-radius:50%}
+  .acc .on{color:var(--ink)}
+  .foot{text-align:center;font-size:9px;color:var(--mut2);margin-top:14px;letter-spacing:.8px;font-weight:700}
+</style>
+</head>
+<body>
+  <h1>UzGuard — dizayn v3 · «Milliy Light»</h1>
+  <div class="sub">Butunlay boshqa yo'nalish: <b>yorug', iliq, milliy</b> — krem fon, anor-gradient egri sarlavha,
+  oq yumshoq kartalar, rangli ikonkalar. Zamonaviy o'zbek fintech-ilovalar uslubida (Click/Payme darajasi).
+  <b>Barcha 9 sahifa</b> chizilgan — splash'dan sozlamalargacha.</div>
+
+  <div class="stage">
+
+    <!-- ════════ 1: SPLASH ════════ -->
+    <div class="col">
+      <div class="cap">1 · Splash</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="splash">
+          <div class="star">✦</div><div class="star2">✦</div>
+          <div class="plate">
+            <svg viewBox="0 0 512 512"><path d="M256 40 L432 104 V252 C432 360 352 432 256 474 C160 432 80 360 80 252 V104 Z" fill="#C2143D"/><circle cx="256" cy="296" r="78" fill="#FBE9EE"/><g fill="#C2143D"><circle cx="256" cy="262" r="13"/><circle cx="224" cy="288" r="12"/><circle cx="288" cy="288" r="12"/><circle cx="240" cy="320" r="13"/><circle cx="272" cy="320" r="13"/></g><path d="M236 218 L256 196 L276 218 Z" fill="#27AE60"/></svg>
+          </div>
+          <h3>UzGuard</h3>
+          <p>Telefoningiz milliy himoyachisi</p>
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="foot" style="position:absolute;color:#fff">NAVOIY · O‘ZBEKISTON 🇺🇿</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 2: RUXSATLAR ════════ -->
+    <div class="col">
+      <div class="cap">2 · Ruxsatlar (kirish)</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:46px">
+          <div class="prog"><i class="on"></i><i class="on"></i><i></i></div>
+          <div class="h2">Himoyani yoqamiz 🛡️</div>
+          <div class="lead">Faqat 2 ta ruxsat kerak. Har birini bosib yoqing — qolganini keyin so‘raymiz.</div>
+
+          <div class="perm">
+            <div class="pi" style="background:var(--anor-soft)">📁</div>
+            <div class="pt"><b>Fayllarni ko‘rish</b><span>Yuklangan APK fayllarni topish uchun</span></div>
+            <div class="ok">✓</div>
+          </div>
+          <div class="perm">
+            <div class="pi" style="background:var(--feruz-soft)">🔔</div>
+            <div class="pt"><b>Bildirishnomalar</b><span>Xavf topilganda darhol ogohlantirish</span></div>
+            <div class="ok">✓</div>
+          </div>
+          <div class="perm">
+            <div class="pi" style="background:var(--zafar-soft)">⚙️</div>
+            <div class="pt"><b>Fonda ishlash</b><span>Telefon o‘chiq bo‘lsa ham himoya qiladi</span></div>
+            <div class="todo">+</div>
+          </div>
+
+          <div style="font-size:10px;color:var(--mut);text-align:center;margin-top:12px">
+            Ruxsatlar faqat himoya uchun ishlatiladi. Ma’lumotlar telefonda qoladi 🔒
+          </div>
+          <button class="cta" style="margin-top:14px">Davom etish</button>
+          <div style="text-align:center;font-size:10.5px;color:var(--mut);margin-top:10px;font-weight:700">Keyinroq</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 3: ASOSIY ════════ -->
+    <div class="col">
+      <div class="cap">3 · Asosiy</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="hdr">
+          <div class="orn">✦</div><div class="orn2">✦</div>
+          <div class="hdr-row">
+            <div class="tx">
+              <div class="hi">Assalomu alaykum! 👋</div>
+              <div class="dt">10-iyun, chorshanba</div>
+            </div>
+            <div class="hbtn lang">UZ</div>
+            <div class="hbtn">🔔</div>
+          </div>
+        </div>
+
+        <div class="body">
+          <div class="card float">
+            <div class="status">
+              <div class="shield">🛡️</div>
+              <div class="st">
+                <b>Himoyalangan</b>
+                <span>Bugun 14 ta fayl tekshirildi · 0 xavf<br>oxirgi skan: 14 daqiqa oldin</span>
+              </div>
+            </div>
+            <div class="ball">
+              <div class="br"><span>Xavfsizlik bali</span><b>92 / 100</b></div>
+              <div class="track"><i style="width:92%"></i></div>
+            </div>
+            <div class="ministats">
+              <div><b>312</b><span>Tekshirildi</span></div>
+              <div class="d"><b>7</b><span>Bloklandi</span></div>
+              <div class="w"><b>2</b><span>Karantin</span></div>
+            </div>
+          </div>
+
+          <button class="cta">🔍 Tekshirish</button>
+
+          <div class="sect"><b>Tezkor amallar</b></div>
+          <div class="quick">
+            <div class="q"><div class="qi">📥</div><span>Yuklamalar</span></div>
+            <div class="q"><div class="qi">🗂️</div><span>Karantin</span></div>
+            <div class="q"><div class="qi">📰</div><span>Yangilik</span></div>
+            <div class="q"><div class="qi">🩺</div><span>Tashxis</span></div>
+          </div>
+
+          <div class="sect"><b>Himoya modullari</b><a href="#">Boshqarish →</a></div>
+          <div class="mods">
+            <div class="mod"><div class="mi s">⚡</div><b>Real-time himoya</b><div class="ms"><span class="dot"></span>Yoqilgan</div></div>
+            <div class="mod"><div class="mi f">🔄</div><b>Avto-skan 24/7</b><div class="ms"><span class="dot"></span>Yoqilgan</div></div>
+            <div class="mod"><div class="mi a">☁️</div><b>Bulut baza</b><div class="ms"><span class="dot"></span>Bugun yangilandi</div></div>
+            <div class="mod"><div class="mi z">✉️</div><b>Telegram qalqon</b><div class="ms"><span class="dot w"></span>O‘chiq</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it on"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdid</div>
+          <div class="navgap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="scanbtn">🔍<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 3b: ASOSIY davomi ════════ -->
+    <div class="col">
+      <div class="cap">3b · Asosiy — pastki seksiyalar</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:44px">
+          <div class="sect" style="margin-top:0"><b>So‘nggi tahdidlar</b><a href="#">Hammasi →</a></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric d">🦠</div><div class="rt"><b>RASMLAR (18).apk</b><span>Telegram · 2 soat oldin</span></div><div class="sev c">XAVFLI</div></div>
+            <div class="row"><div class="ric w">⚠️</div><div class="rt"><b>VIDEO_2026.apk</b><span>Yuklamalar · kecha</span></div><div class="sev h">SHUBHALI</div></div>
+          </div>
+
+          <div class="sect"><b>Yangiliklar</b></div>
+          <div class="news">
+            <div class="ni">📣</div>
+            <div>
+              <b>Yangi «toy taklifnoma» APK to‘lqini</b>
+              <span>Telegramda tarqalmoqda — tanish yuborsa ham APK ochmang. UzGuard avtomatik bloklaydi.</span>
+            </div>
+          </div>
+
+          <div class="sect"><b>Haftalik faollik</b></div>
+          <div class="card">
+            <div class="week">
+              <i class="g" style="height:32%"></i><i class="g" style="height:58%"></i><i class="r" style="height:84%"></i>
+              <i class="g" style="height:44%"></i><i class="g" style="height:64%"></i><i class="g" style="height:26%"></i><i class="r" style="height:100%"></i>
+            </div>
+            <div class="days"><span>Du</span><span>Se</span><span>Cho</span><span>Pa</span><span>Ju</span><span>Sh</span><span>Ya</span></div>
+            <div class="digest">Bu hafta: <b>124 skan</b> · <b style="color:var(--danger)">3 tahdid bloklandi</b></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it on"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdid</div>
+          <div class="navgap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="scanbtn">🔍<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 4: SKANER ════════ -->
+    <div class="col">
+      <div class="cap">4 · Skaner</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:46px">
+          <div class="h2">Skaner</div>
+          <div class="lead">Yuklamalar, Telegram va xotira tekshiriladi</div>
+
+          <div class="disc">
+            <div class="in"><div class="em">🔍</div><b>BOSHLASH</b></div>
+          </div>
+          <div style="text-align:center;font-size:10px;color:var(--mut);margin-top:10px">
+            O‘rtacha 20–40 soniya · oxirgi skan 14 daq oldin
+          </div>
+
+          <div class="strip">
+            <div class="s"><b>14</b><span>APK topildi</span></div>
+            <div class="s"><b style="color:var(--danger)">1</b><span>Xavfli</span></div>
+            <div class="s"><b style="color:var(--safe)">13</b><span>Toza</span></div>
+          </div>
+
+          <div class="sect"><b>Topilgan fayllar</b><a href="#">Yangilash</a></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric n">📦</div><div class="rt"><b>Telegram.apk</b><span>Yuklamalar · 64 MB</span></div><div class="sev ok">TOZA</div></div>
+            <div class="row"><div class="ric d">🦠</div><div class="rt"><b>RASMLAR (18).apk</b><span>Telegram · 4.2 MB</span></div><div class="sev c">XAVFLI</div></div>
+            <div class="row"><div class="ric n">📦</div><div class="rt"><b>eImzo_v4.apk</b><span>Yuklamalar · 18 MB</span></div><div class="sev ok">TOZA</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdid</div>
+          <div class="navgap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="scanbtn" style="box-shadow:0 12px 28px rgba(194,20,61,.55),0 0 0 5px var(--bg)">🔍<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 5: SKAN NATIJASI ════════ -->
+    <div class="col">
+      <div class="cap">5 · Skan natijasi (xavf)</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="vhdr">
+          <div class="orn">⚠</div>
+          <div class="vi">🦠</div>
+          <b>XAVF ANIQLANDI!</b>
+          <span>Bu fayl bank ma’lumotlaringizni o‘g‘irlashi mumkin</span>
+        </div>
+
+        <div class="body">
+          <div class="card float">
+            <div class="row" style="padding:4px 0">
+              <div class="ric d">📦</div>
+              <div class="rt"><b>RASMLAR (18).apk</b><span>Telegram orqali kelgan · 4.2 MB</span></div>
+            </div>
+            <div class="chiprow">
+              <div class="chip">Ajina.Banker</div>
+              <div class="chip">SMS o‘g‘irlash</div>
+              <div class="chip n">Soxta rasm</div>
+            </div>
+          </div>
+
+          <div class="sect"><b>Nega xavfli?</b></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric d">✉️</div><div class="rt"><b>SMS larni o‘qiydi</b><span>Bank kodlarini ushlab oladi</span></div></div>
+            <div class="row"><div class="ric d">🎭</div><div class="rt"><b>O‘zini rasm qilib ko‘rsatadi</b><span>Aslida — o‘rnatish dasturi</span></div></div>
+            <div class="row"><div class="ric w">📡</div><div class="rt"><b>Xorijiy serverga ulanadi</b><span>Ma’lumot yuborish kanali</span></div></div>
+          </div>
+
+          <button class="cta dngr" style="margin-top:14px">🗂️ Karantinga olish</button>
+          <button class="cta o" style="margin-top:8px">Butunlay o‘chirish</button>
+          <div style="text-align:center;font-size:10px;color:var(--mut);margin-top:10px;font-weight:700">
+            Bu xato deb o‘ylaysizmi? <span style="color:var(--anor)">Xabar bering</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 6: TAHDIDLAR ════════ -->
+    <div class="col">
+      <div class="cap">6 · Tahdidlar markazi</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:46px">
+          <div class="h2">Tahdidlar</div>
+          <div class="lead">Bloklangan, karantindagi va tarixdagi xavflar</div>
+
+          <div class="strip" style="margin-top:12px">
+            <div class="s"><b style="color:var(--danger)">7</b><span>Bloklangan</span></div>
+            <div class="s"><b style="color:var(--warn)">2</b><span>Karantinda</span></div>
+            <div class="s"><b>312</b><span>Tekshirildi</span></div>
+          </div>
+
+          <div class="card" style="margin-top:10px">
+            <div class="row" style="padding:2px 0">
+              <div class="ric w">🗂️</div>
+              <div class="rt"><b>Karantin</b><span>2 fayl izolyatsiyada · tiklash yoki o‘chirish</span></div>
+              <div class="arr">›</div>
+            </div>
+          </div>
+
+          <div class="sect"><b>Faollik · 7 kun</b></div>
+          <div class="card">
+            <div class="week" style="height:62px">
+              <i class="g" style="height:32%"></i><i class="g" style="height:58%"></i><i class="r" style="height:84%"></i>
+              <i class="g" style="height:44%"></i><i class="g" style="height:64%"></i><i class="g" style="height:26%"></i><i class="r" style="height:100%"></i>
+            </div>
+            <div class="days"><span>Du</span><span>Se</span><span>Cho</span><span>Pa</span><span>Ju</span><span>Sh</span><span>Ya</span></div>
+          </div>
+
+          <div class="sect"><b>Virus oilalari</b></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric d">🏦</div><div class="rt"><b>Ajina.Banker</b><span>Bank-o‘g‘ri troyani</span></div><div class="sev c">4 ta</div></div>
+            <div class="row"><div class="ric d">🎯</div><div class="rt"><b>RoundRift</b><span>Dropper</span></div><div class="sev c">2 ta</div></div>
+            <div class="row"><div class="ric w">✉️</div><div class="rt"><b>SMS-Stealer</b><span>SMS o‘g‘irlovchi</span></div><div class="sev h">1 ta</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it on"><span class="gi">🛡️</span>Tahdid</div>
+          <div class="navgap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="scanbtn">🔍<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 7: KARANTIN ════════ -->
+    <div class="col">
+      <div class="cap">7 · Karantin</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:46px">
+          <div class="h2">Karantin 🗂️</div>
+          <div class="lead">Xavfli fayllar shu yerda qulflangan — zarar yetkaza olmaydi. Tiklash yoki butunlay o‘chirish mumkin.</div>
+
+          <div class="card" style="margin-top:12px">
+            <div class="row" style="padding:2px 0">
+              <div class="ric d">🦠</div>
+              <div class="rt"><b>RASMLAR (18).apk</b><span>Ajina.Banker · 2 kun oldin · 4.2 MB</span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="cta o" style="margin:0;padding:9px;font-size:11px;flex:1">↩︎ Tiklash</button>
+              <button class="cta dngr" style="margin:0;padding:9px;font-size:11px;flex:1;box-shadow:none">🗑 O‘chirish</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:10px">
+            <div class="row" style="padding:2px 0">
+              <div class="ric w">⚠️</div>
+              <div class="rt"><b>VIDEO_2026.apk</b><span>Shubhali · kecha · 11 MB</span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="cta o" style="margin:0;padding:9px;font-size:11px;flex:1">↩︎ Tiklash</button>
+              <button class="cta dngr" style="margin:0;padding:9px;font-size:11px;flex:1;box-shadow:none">🗑 O‘chirish</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px;background:var(--safe-soft);box-shadow:none">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="font-size:20px">💡</div>
+              <div style="font-size:10px;color:#1E7A40;line-height:1.5;font-weight:600">
+                Karantindagi fayl ishga tusha olmaydi. Agar fayl sizniki bo‘lsa — «Tiklash»dan oldin ishonchingiz komil bo‘lsin.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 8: HIMOYA ════════ -->
+    <div class="col">
+      <div class="cap">8 · Himoya markazi</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:46px">
+          <div class="h2">Himoya</div>
+          <div class="lead">Qatlamlar, qurilma ilovalari va vositalar</div>
+
+          <div class="sect" style="margin-top:12px"><b>Himoya qatlamlari</b></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric s">⚡</div><div class="rt"><b>Real-time himoya</b><span>Yangi APK darhol tekshiriladi</span></div><div class="sw"></div></div>
+            <div class="row"><div class="ric a">🗑️</div><div class="rt"><b>Avto-o‘chirish</b><span>Xavfli fayl darhol karantinga</span></div><div class="sw"></div></div>
+            <div class="row"><div class="ric f">✉️</div><div class="rt"><b>Telegram qalqon</b><span>Phishing-havola ogohlantirishi</span></div><div class="sw off"></div></div>
+            <div class="row"><div class="ric z">☁️</div><div class="rt"><b>Baza avto-yangilash</b><span>Bulutdan yangi imzolar</span></div><div class="sw"></div></div>
+          </div>
+
+          <div class="sect"><b>Qurilma ilovalari</b><a href="#">62 ta →</a></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric f">✈️</div><div class="rt"><b>Telegram</b><span>Play Market</span></div><div class="sev ok">ISHONCHLI</div></div>
+            <div class="row"><div class="ric n">🏦</div><div class="rt"><b>Click Up</b><span>Play Market</span></div><div class="sev ok">ISHONCHLI</div></div>
+            <div class="row"><div class="ric w">❓</div><div class="rt"><b>UzCard Pro</b><span>Sideload — qo‘lda o‘rnatilgan</span></div><div class="sev h">TEKSHIRISH</div></div>
+          </div>
+
+          <div class="sect"><b>Vositalar</b></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric s">🧾</div><div class="rt"><b>Himoya holati va ruxsatlar</b></div><div class="arr">›</div></div>
+            <div class="row"><div class="ric a">🕵️</div><div class="rt"><b>Yashirin tahdidlar skaneri</b></div><div class="arr">›</div></div>
+            <div class="row"><div class="ric f">🩺</div><div class="rt"><b>Diagnostika</b></div><div class="arr">›</div></div>
+            <div class="row"><div class="ric z">📨</div><div class="rt"><b>Muammo haqida xabar</b></div><div class="arr">›</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdid</div>
+          <div class="navgap"></div>
+          <div class="it on"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="scanbtn">🔍<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ 9: SOZLAMALAR ════════ -->
+    <div class="col">
+      <div class="cap">9 · Sozlamalar</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="padding-top:46px">
+          <div class="h2">Sozlamalar</div>
+          <div class="lead">Ko‘rinish, til va maxfiylik</div>
+
+          <div class="sect" style="margin-top:12px"><b>Ko‘rinish</b></div>
+          <div class="card">
+            <div style="font-size:10.5px;color:var(--mut);font-weight:700">MAVZU</div>
+            <div class="seg"><div class="on">☀️ Yorug‘</div><div>🌙 Tun</div></div>
+            <div style="font-size:10.5px;color:var(--mut);font-weight:700;margin-top:13px">BREND RANGI</div>
+            <div class="acc">
+              <div class="on"><i style="background:linear-gradient(140deg,#E11D48,#8E0E2C);box-shadow:0 0 0 2.5px #fff,0 0 0 4px #C2143D"></i>Anor</div>
+              <div><i style="background:#2D9CB8"></i>Feruz</div>
+              <div><i style="background:#CC9442"></i>Zafaron</div>
+            </div>
+          </div>
+
+          <div class="sect"><b>Til</b></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric a">🇺🇿</div><div class="rt"><b>O‘zbekcha</b></div><div class="ok">✓</div></div>
+            <div class="row"><div class="ric n">🇷🇺</div><div class="rt"><b>Русский</b></div><div class="arr">›</div></div>
+          </div>
+
+          <div class="sect"><b>Maxfiylik</b></div>
+          <div class="card" style="padding:4px 13px">
+            <div class="row"><div class="ric s">🤝</div><div class="rt"><b>Jamoaviy himoya</b><span>Anonim namuna ulashish</span></div><div class="sw"></div></div>
+            <div class="row"><div class="ric f">📜</div><div class="rt"><b>Maxfiylik siyosati</b></div><div class="arr">›</div></div>
+            <div class="row"><div class="ric z">🛡️</div><div class="rt"><b>Boshqaruv paneli</b></div><div class="arr">›</div></div>
+          </div>
+
+          <div class="foot">UZGUARD v8.0 · NAVOIY 🇺🇿</div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdid</div>
+          <div class="navgap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it on"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="scanbtn">🔍<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+  </div>
+</body>
+</html>

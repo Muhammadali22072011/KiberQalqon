@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 Settings: faol segment tugmasi — primary pilyulya (44×36). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="?attr/kqPrimary" />
+    <corners android:radius="999dp" />
+</shape>

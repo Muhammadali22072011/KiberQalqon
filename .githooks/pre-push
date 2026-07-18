@@ -1,0 +1,45 @@
+#!/bin/sh
+# UzGuard pre-push guard — push'dan OLDIN kompilyatsiyani mahalliy tekshiradi.
+#
+# Nega: mahalliy to'liq `assembleDebug` RAM yetmasligidan yiqiladi, shu sabab yagona
+# gejt sekin CI (2.5 daq) edi va oddiy kompilyatsiya xatosi (masalan "Val cannot be
+# reassigned" shadowing) faqat push'dan keyin ko'rinardi. Bu hook shuni push'dan OLDIN,
+# offline ilib oladi:
+#   1) Cloud TypeScript (tsc) — mahalliy ISHONCHLI ishlaydi, BARCHA cloud xatosini bloklaydi.
+#   2) Android Kotlin compile — FAQAT :app:compileDebugKotlin (og'ir dex/R8/NDK'siz → yengil,
+#      odatda RAM yetadi). Kompilyatsiya xatosi push'ni bloklaydi.
+#
+# Yoqish (bir marta):   git config core.hooksPath .githooks
+# Android compile'ni o'tkazish (RAM yetmasa):   export KQ_SKIP_ANDROID=1
+# Butun hook'ni o'tkazish (favqulodda):         git push --no-verify
+
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+
+# --- 1) Cloud TypeScript (bloklovchi) ---------------------------------------
+if [ -f "$ROOT/ApkGuard/cloud/package.json" ]; then
+  echo "[pre-push] cloud tsc tekshiruvi…"
+  if ! ( cd "$ROOT/ApkGuard/cloud" && npm run -s typecheck ); then
+    echo "[pre-push] ❌ TypeScript xatosi — push TO'XTATILDI. Tuzating yoki: git push --no-verify"
+    exit 1
+  fi
+  echo "[pre-push] ✓ cloud tsc toza"
+fi
+
+# --- 2) Android Kotlin compile (bloklovchi, o'tkazsa bo'ladi) ----------------
+if [ "$KQ_SKIP_ANDROID" = "1" ]; then
+  echo "[pre-push] ⏭ android compile o'tkazildi (KQ_SKIP_ANDROID=1) — CI tekshiradi"
+elif [ -x "$ROOT/ApkGuard/gradlew" ]; then
+  echo "[pre-push] android :app:compileDebugKotlin (yengil — dex/R8/NDK yo'q)…"
+  if ! ( cd "$ROOT/ApkGuard" && ./gradlew --no-daemon -q :app:compileDebugKotlin ); then
+    echo "[pre-push] ❌ Kotlin kompilyatsiya xatosi — push TO'XTATILDI."
+    echo "           (Agar RAM yetmay yiqilgan bo'lsa: export KQ_SKIP_ANDROID=1 — CI baribir tekshiradi.)"
+    exit 1
+  fi
+  echo "[pre-push] ✓ android Kotlin toza"
+else
+  echo "[pre-push] ⏭ gradlew topilmadi — android o'tkazildi"
+fi
+
+echo "[pre-push] ✅ hammasi toza — push davom etadi"
+exit 0

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — Splash + Til tanlash ekranlari satrlari.
+     Til ekrani matni ataylab ikki tilda (foydalanuvchi hali til tanlamagan). -->
+<resources>
+    <string name="kq4_lang_title">Tilni tanlang · Выберите язык</string>
+    <string name="kq4_lang_uzbek">O\'zbekcha</string>
+    <string name="kq4_lang_russian">Русский</string>
+    <string name="kq4_lang_ru_code" translatable="false">RU</string>
+</resources>

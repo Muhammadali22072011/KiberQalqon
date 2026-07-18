@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash to'liq ekran anor-gradient foni (screens1.jsx → Splash, CSS 165deg primary→primary-2).
+  kq4_splash_bg.xml o'rniga: u android:angle="270" ishlatadi — GradientDrawable FAQAT 45 ga
+  karrali burchaklarni qabul qiladi, aks holda inflate'da XmlPullParserException
+  ("'angle' attribute to be a multiple of 45") otiladi va splash umuman chizilmay qolardi.
+  165deg CSS ≈ 270 (top→bottom) Android'da — eng yaqin qonuniy burchak.
+  ?attr/kqPrimary/2 — ThemeHelper.applyAccent setContentView'dan OLDIN qo'yiladi (SplashActivity).
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:angle="270" android:startColor="?attr/kqPrimary" android:endColor="?attr/kqPrimary2" />
+</shape>

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -10,7 +10,7 @@ import android.os.Build
 import android.widget.RemoteViews
 
 /**
- * Bosh ekran widget'i — KiberQalqon himoyasi holatini va oxirgi skan vaqtini
+ * Bosh ekran widget'i — UzGuard himoyasi holatini va oxirgi skan vaqtini
  * tezkor ko'rsatadi.
  *
  * Ikkita asosiy ko'rsatkich:

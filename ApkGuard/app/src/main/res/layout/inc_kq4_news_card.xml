@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dashboard "Yangiliklar" karuseli sahifasi (ViewPager2 → match_parent/match_parent shart).
+  Tuzilma: ixtiyoriy rasm (96dp, yo'q bo'lsa GONE) → tag (daraja) + sana → sarlavha → matn.
+  Rang/tag DashboardNewActivity'da NewsStore.Item.level bo'yicha qo'yiladi.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/KQ4.Card"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/kq4NewsImg"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:background="@color/kq_bg_sunken"
+            android:contentDescription="@string/kq4_news_image_cd"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- design .tag: pill, nuqta + daraja matni (Muhim/Ogohlantirish/Ma'lumot) -->
+                <LinearLayout
+                    android:id="@+id/kq4NewsTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:background="@drawable/kq4_tag_soft"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="10dp">
+
+                    <View
+                        android:id="@+id/kq4NewsTagDot"
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/kq4_dot"
+                        android:backgroundTint="@color/kq_ink_2" />
+
+                    <TextView
+                        android:id="@+id/kq4NewsTagText"
+                        style="@style/KQ4.Tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/kq4_news_level_info"
+                        android:textColor="@color/kq_ink_2"
+                        android:textSize="11.5sp" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/kq4NewsDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/onest_medium"
+                    android:textColor="@color/kq_ink_3"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/kq4NewsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/onest_bold"
+                android:letterSpacing="-0.01"
+                android:lineSpacingMultiplier="1.2"
+                android:maxLines="2"
+                android:textColor="@color/kq_ink"
+                android:textSize="15.5sp" />
+
+            <TextView
+                android:id="@+id/kq4NewsBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/onest_regular"
+                android:lineSpacingMultiplier="1.4"
+                android:maxLines="2"
+                android:textColor="@color/kq_ink_2"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

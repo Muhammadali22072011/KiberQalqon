@@ -39,7 +39,7 @@ echo ═════════════════════════
 echo.
 echo Адрес сервера: http://localhost:5000
 echo.
-echo В приложении KiberQalqon укажите в настройках:
+echo В приложении UzGuard укажите в настройках:
 echo   - Если телефон в той же сети: http://ВАШ_IP:5000
 echo   - Узнать ваш IP: ipconfig (найдите IPv4 адрес)
 echo.

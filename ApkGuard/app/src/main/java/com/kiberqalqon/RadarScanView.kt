@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.animation.ValueAnimator
 import android.content.Context

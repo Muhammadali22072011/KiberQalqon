@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Panel, PanelHead } from '../components/ui';
+import { usePoll } from '../hooks/usePoll';
+import { apiGet, type AppUpdateInfo } from '../lib/api';
 
 const SECURITY = [
   { icon: '🔑', title: 'Master kalit', text: 'ADMIN_SECRET hech qachon APK ichida emas — faqat panel kirishida ishlatiladi va brauzerda saqlanmaydi.' },
@@ -74,9 +76,41 @@ export default function Profile() {
                 </div>
               ))}
             </div>
+            <UpdateCard />
           </div>
         </Panel>
       </div>
     </>
+  );
+}
+
+/**
+ * Ilova yangilanishi holati: hozir telefonlarga qaysi versiya tarqatilayotganini
+ * ko'rsatadi (/api/config?app=1 → UPDATE_* env). Sozlanmagan bo'lsa — yo'riqnoma.
+ */
+function UpdateCard() {
+  const { data, loading } = usePoll(
+    () => apiGet<{ update: AppUpdateInfo | null; configVersion: number }>('/api/config?app=1'),
+    120000,
+  );
+  if (loading && !data) return null;
+  const u = data?.update;
+  return (
+    <div className={'note ' + (u ? 'ok' : '')} style={{ marginTop: 12, alignItems: 'flex-start' }}>
+      <span className="ni">📦</span>
+      {u ? (
+        <span>
+          <b style={{ color: 'var(--ink)' }}>Ilova yangilanishi faol.</b>{' '}
+          Telefonlarga tarqatilayotgan versiya: <b className="mono">build {u.versionCode}</b>{' '}
+          (config v{data?.configVersion}). Yangi telefonlar ochilganda «Yangi versiya chiqdi» oladi.
+        </span>
+      ) : (
+        <span>
+          <b style={{ color: 'var(--ink)' }}>Ilova yangilanishi sozlanmagan.</b>{' '}
+          Yangi versiya chiqarish: <span className="mono">scripts/publish_update.sh</span>{' '}
+          (UPDATE_* env + redeploy) — RUCHNYE_SHAGI_VLADELCA.md §7.
+        </span>
+      )}
+    </div>
   );
 }

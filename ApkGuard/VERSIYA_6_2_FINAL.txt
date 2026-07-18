@@ -14,7 +14,7 @@
 📱 ТЕКУЩИЙ APK (версия 6.1):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 (Версия 6.2 не собралась из-за ошибки XML, но исправления готовы)
 
@@ -35,7 +35,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 Проблема: Дублируется </resources> в конце файла
 
 Решение:
-1. Открой KiberQalqon/app/src/main/res/values-uz/strings.xml
+1. Открой UzGuard/app/src/main/res/values-uz/strings.xml
 2. Удали лишний </resources> в конце
 3. Должен быть только ОДИН </resources> в самом конце
 4. Пересобери: ZAPUSK_S_JAVA21.bat

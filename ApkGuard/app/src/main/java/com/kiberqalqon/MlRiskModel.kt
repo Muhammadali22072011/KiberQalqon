@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Yengil "zero-day" ehtimollik modeli — detektorlar allaqachon hisoblagan signallar ustidan

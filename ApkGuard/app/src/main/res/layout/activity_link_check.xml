@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v4 dizayn «Havola tekshirgich» (link checker). Telegram/SMS/QR'dan kelgan havolani
+  offline evristika bilan baholaydi. Ikki rejim: extra "url" bilan ochilsa darhol skan,
+  yoki qo'lda yopishtirib "Tekshirish".
+
+  LinkCheckActivity.kt IDlari: btnBack, kq4_input, btnPaste, btnCheck, cardBanner,
+  bannerIconAv, bannerIcon, tvBannerVerdict, tvBannerReason, tvCheckedUrl, secReasons,
+  reasonsCard, reasonsContainer, hintCard.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="30dp">
+
+        <!-- ═══ Sarlavha qatori ═══ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/kq4_icon_btn"
+                android:contentDescription="@string/kq4_back"
+                android:padding="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic4_back"
+                app:tint="@color/kq_ink" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/KQ4.Eyebrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kq4_link_eyebrow" />
+
+                <TextView
+                    style="@style/KQ4.HTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/kq4_link_title"
+                    android:textSize="22sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ═══ Kirish (havolani yopishtirish) ═══ -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/KQ4.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/KQ4.SecTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/kq4_link_input_label"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/kq4_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/kq4_input"
+                    android:fontFamily="@font/ssmono_medium"
+                    android:gravity="top|start"
+                    android:hint="@string/kq4_link_input_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri|textMultiLine"
+                    android:lines="2"
+                    android:maxLines="4"
+                    android:minHeight="60dp"
+                    android:padding="14dp"
+                    android:textColor="@color/kq_ink"
+                    android:textColorHint="@color/kq_ink_3"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPaste"
+                        style="@style/KQ4.Button.Soft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:minHeight="52dp"
+                        android:text="@string/kq4_link_paste"
+                        app:icon="@drawable/ic4_file"
+                        app:iconSize="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCheck"
+                        style="@style/KQ4.Button.Primary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:minHeight="52dp"
+                        android:text="@string/kq4_link_check"
+                        android:textSize="16sp"
+                        app:icon="@drawable/ic4_search"
+                        app:iconSize="19dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══ Verdikt banneri (default gone, skan natijasida ko'rinadi) ═══ -->
+        <LinearLayout
+            android:id="@+id/cardBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/kq4_card_safe"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:id="@+id/bannerIconAv"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/kq4_av_safe">
+
+                <ImageView
+                    android:id="@+id/bannerIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic4_shield_check"
+                    app:tint="@color/kq_safe" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvBannerVerdict"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/onest_extrabold"
+                    android:text="@string/kq4_safe"
+                    android:textColor="@color/kq_safe_ink"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvBannerReason"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="@font/onest_medium"
+                    android:lineSpacingMultiplier="1.35"
+                    android:textColor="@color/kq_safe_ink"
+                    android:textSize="13.5sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ═══ Tekshirilgan URL (mono) ═══ -->
+        <TextView
+            android:id="@+id/tvCheckedUrl"
+            style="@style/KQ4.Mono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/kq4_card_sunken"
+            android:padding="12dp"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="12.5sp"
+            android:visibility="gone" />
+
+        <!-- ═══ Sabablar seksiyasi (nega xavfli) ═══ -->
+        <LinearLayout
+            android:id="@+id/secReasons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/KQ4.SecTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:paddingHorizontal="2dp"
+                android:text="@string/kq4_link_reasons_title"
+                android:textSize="15sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/reasonsCard"
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/reasonsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ═══ Maslahat kartasi (Telegram/SMS havolasini yopishtiring) ═══ -->
+        <LinearLayout
+            android:id="@+id/hintCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/kq4_card_sunken"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_message"
+                app:tint="@color/kq_ink_3" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="13dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/onest_regular"
+                android:lineSpacingMultiplier="1.4"
+                android:text="@string/kq4_link_hint"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

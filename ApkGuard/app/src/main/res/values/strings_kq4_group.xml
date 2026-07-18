@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Guruhga qo'shilish» (GroupJoinActivity) + dashboard guruh kartasi satrlari.
+  Foydalanuvchi kod/QR bilan guruhga qo'shiladi, ism/familiya/telefonini kiritadi.
+-->
+<resources>
+    <!-- Dashboard karta -->
+    <string name="kq4_group_join_title">Guruhga qo\'shilish</string>
+    <string name="kq4_group_join_sub">Kod yoki QR bilan qo\'shiling</string>
+    <string name="kq4_group_joined_sub">✓ Guruhdasiz</string>
+
+    <!-- Ekran sarlavhasi -->
+    <string name="kq4_group_eyebrow">GURUH</string>
+    <string name="kq4_group_title">Guruhga qo\'shilish</string>
+
+    <!-- Joriy guruh -->
+    <string name="kq4_group_current">Siz guruhdasiz</string>
+    <string name="kq4_group_current_fmt">Siz guruhdasiz: %1$s</string>
+
+    <!-- Kod / QR -->
+    <string name="kq4_group_code_label">Guruh kodi</string>
+    <string name="kq4_group_code_hint">Masalan: NAVOIY7</string>
+    <string name="kq4_group_scan">Skanerlash</string>
+
+    <!-- Ma'lumotlar -->
+    <string name="kq4_group_you_label">Ma\'lumotlaringiz</string>
+    <string name="kq4_group_first_hint">Ism</string>
+    <string name="kq4_group_last_hint">Familiya</string>
+    <string name="kq4_group_phone_hint">Telefon (+998…)</string>
+    <string name="kq4_group_privacy">Bu ma\'lumot faqat guruh egasiga ko\'rinadi.</string>
+    <string name="kq4_group_join_btn">Guruhga qo\'shilish</string>
+
+    <!-- Holat / natija -->
+    <string name="kq4_group_sending">Yuborilmoqda…</string>
+    <string name="kq4_group_ok">«%1$s» guruhiga qo\'shildingiz</string>
+    <string name="kq4_group_err_code">Kod noto\'g\'ri yoki topilmadi</string>
+    <string name="kq4_group_err_fields">Barcha maydonlarni to\'ldiring</string>
+    <string name="kq4_group_err_net">Internet yo\'q — qayta urining</string>
+    <string name="kq4_group_err_generic">Qo\'shilib bo\'lmadi</string>
+    <string name="kq4_group_err_unconfigured">Bulut sozlanmagan</string>
+</resources>

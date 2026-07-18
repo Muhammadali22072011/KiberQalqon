@@ -3,13 +3,13 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 ✅ ЧТО ТЕСТИРОВАТЬ:
 -------------------
 
 1. ОТКРЫТИЕ DASHBOARD:
-   ✓ Открой KiberQalqon
+   ✓ Открой UzGuard
    ✓ Нажми кнопку 📊 в правом верхнем углу
    ✓ Должен открыться экран Dashboard
    ✓ Проверь что всё загружается без ошибок

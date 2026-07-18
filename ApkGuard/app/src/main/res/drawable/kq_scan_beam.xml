@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gorizontal "skaner nuri" — chetlari shaffof, markazi oq. Splash'da qalqon
+     ustidan tepadan pastga suzib o'tadi (translationY kodda animatsiyalanadi). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:startColor="#00FFFFFF"
+        android:centerColor="#E6FFFFFF"
+        android:endColor="#00FFFFFF"
+        android:type="linear" />
+    <corners android:radius="2dp" />
+</shape>

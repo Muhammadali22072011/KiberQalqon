@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Yangilik (e'lon) bildirishnomalari — NotificationHelper CH_NEWS kanali + NewsNotifier.
+     O'zbekcha (default). -->
+<resources>
+    <!-- Bildirishnoma kanali nomi/tavsifi (tizim sozlamalarida ko'rinadi) -->
+    <string name="kq4_news_channel_name">Yangiliklar</string>
+    <string name="kq4_news_channel_desc">Yangi e\'lonlar va xabarlar</string>
+
+    <!-- E'lon matni bo'sh bo'lsa ko'rsatiladigan standart matn -->
+    <string name="kq4_news_notif_default_body">Yangi e\'lon — ochish uchun bosing</string>
+</resources>

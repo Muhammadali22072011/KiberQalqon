@@ -1,5 +1,5 @@
 # ============================================================
-# KiberQalqon — native himoya kutubxonasi (libkqguard.so).
+# UzGuard — native himoya kutubxonasi (libkqguard.so).
 #
 # Vazifasi: eng oson "patch qilinadigan" Kotlin tekshiruvlarini (imzo, anti-debug)
 # nativega ko'chirish. .so'ni reverse qilish DEX'dan ancha qiyin, shuning uchun
@@ -7,8 +7,9 @@
 #
 # DIQQAT: bu yerda HECH QANDAY maxfiy sir yo'q. Tarmoq sirlari Shield orqali
 # BuildConfig'da (Secrets.kt). Bu yerdagi KQ_EXPECTED_SIG — release imzo
-# sertifikatining SHA-256'i, u OCHIQ qiymat (APK'dan baribir hisoblab olsa
-# bo'ladi); build vaqtida -D orqali beriladi, qo'lda literal sifatida emas.
+# sertifikat(lar)ining SHA-256'i, VERGUL bilan ajratilgan to'plam bo'lishi mumkin
+# (SD-01: sideload kalit + Play App Signing serti). OCHIQ qiymat (APK'dan baribir
+# hisoblab olsa bo'ladi); build vaqtida -D orqali beriladi, qo'lda literal emas.
 # ============================================================
 cmake_minimum_required(VERSION 3.22.1)
 project(kqguard C)

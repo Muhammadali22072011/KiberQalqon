@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../lib/supabase.js';
 import { canManageNews, canRead, checkAdminSecret, checkDeviceSecret } from '../lib/auth.js';
+import { audit } from '../lib/audit.js';
 
 // Yangiliklar / e'lonlar — panel bosh sahifasidagi lenta + APK bosh ekrani.
 //   GET  → o'qish: panel (x-admin-secret) YOKI qurilma (x-device-secret).
@@ -18,15 +19,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     // O'qish: kirgan panel foydalanuvchisi (egasi yoki admin) YOKI qurilma (APK,
     // x-device-secret). E'lonlar hamma uchun — APK bosh ekranda lentani ko'rsatadi.
-    if (!canRead(req) && !checkDeviceSecret(req)) {
+    const admin = canRead(req);
+    if (!admin && !checkDeviceSecret(req)) {
       return res.status(401).json({ ok: false, error: 'auth' });
     }
-    const { data, error } = await sb
+
+    // Panel (admin) — HAMMA e'lonni group_id bilan ko'radi (guruh yorlig'ini ko'rsatish uchun).
+    // Qurilma — ?g=<join_code> yuboradi: global (group_id null) + O'Z guruhi e'lonlari. Guruhga
+    // yo'naltirish butun flotni spamlamaslik uchun (alert charchashiga qarshi). Kod noto'g'ri/yo'q
+    // bo'lsa — faqat global e'lonlar (fail-soft, qurilma buzilmaydi).
+    let base = sb
       .from('news')
-      .select('id, title, body, level, image_url, pinned, created_at')
+      .select('id, title, body, level, image_url, pinned, group_id, created_at')
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(100);
+
+    if (!admin) {
+      let gid: string | null = null;
+      const code = typeof req.query.g === 'string' ? req.query.g.trim().toUpperCase().slice(0, 16) : '';
+      if (code) {
+        const { data: g } = await sb.from('device_groups').select('id').eq('join_code', code).maybeSingle();
+        gid = g?.id ?? null;
+      }
+      base = gid ? base.or(`group_id.is.null,group_id.eq.${gid}`) : base.is('group_id', null);
+    }
+
+    const { data, error } = await base;
     if (error) { console.error(`[news] list db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
     return res.status(200).json({ ok: true, news: data ?? [] });
   }
@@ -39,20 +58,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const action = String(b.action ?? '');
 
     if (action === 'create') {
-      const title = String(b.title ?? '').trim();
+      // Uzunlik chegarasi: cheksiz sarlavha/matn har qurilmada keshlanib (NewsStore),
+      // TextView'da ochilganda UI'ni qotirardi. Mijoz ham himoya uchun qisqartiradi.
+      const title = String(b.title ?? '').trim().slice(0, 300);
       if (!title) return res.status(400).json({ ok: false, error: 'sarlavha kerak' });
-      const body = String(b.body ?? '').trim();
+      const body = String(b.body ?? '').trim().slice(0, 8000);
       const lvl = String(b.level ?? 'info');
       const level = LEVELS.includes(lvl) ? lvl : 'info';
-      // Faqat http(s) havola — javascript:/data: kabi xavfli URI'larni rad etamiz.
+      // FAQAT https havola — mijozlar ham https'sizini tashlaydi (cleartext bloklangan),
+      // shuning uchun http:// ni DB'ga ham kiritmaymiz (aks holda telefonда rasm ko'rinmasdi,
+      // panelда ko'rinardi — jim nomuvofiqlik). javascript:/data: kabi URI'lar ham rad etiladi.
       const rawImg = String(b.image_url ?? '').trim();
-      const image_url = /^https?:\/\//i.test(rawImg) ? rawImg : null;
+      const image_url = /^https:\/\//i.test(rawImg) ? rawImg : null;
+      // group_id — ixtiyoriy guruh yo'nalishi (uuid). null/yaroqsiz → global e'lon (hamma qurilma).
+      const gidRaw = typeof b.group_id === 'string' ? b.group_id.trim() : '';
+      const group_id = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(gidRaw) ? gidRaw : null;
       const { data, error } = await sb
         .from('news')
-        .insert({ title, body, level, image_url })
-        .select('id, title, body, level, image_url, pinned, created_at')
+        .insert({ title, body, level, image_url, group_id })
+        .select('id, title, body, level, image_url, pinned, group_id, created_at')
         .single();
       if (error) { console.error(`[news] create db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'news_create', `${data?.id ?? '?'}: ${title.slice(0, 80)}`);
       return res.status(200).json({ ok: true, item: data });
     }
 
@@ -63,6 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!id) return res.status(400).json({ ok: false, error: 'id kerak' });
       const { error } = await sb.from('news').delete().eq('id', id);
       if (error) { console.error(`[news] delete db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'news_delete', id);
       return res.status(200).json({ ok: true });
     }
 
@@ -73,12 +101,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!id) return res.status(400).json({ ok: false, error: 'id kerak' });
       const { error } = await sb.from('news').update({ pinned: Boolean(b.pinned) }).eq('id', id);
       if (error) { console.error(`[news] toggle_pin db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+      await audit(req, 'news_pin', `${id} → ${Boolean(b.pinned)}`);
       return res.status(200).json({ ok: true });
     }
 
     // Rasmni serverda Supabase Storage'ga yuklab, ochiq https havola qaytaramiz.
     // Brauzer SERVICE_KEY ko'rmaydi — yuklash shu yerda (serverda) bo'ladi. Qaytgan
-    // https havola create action'dagi /^https?:\/\// filtridan o'tadi.
+    // https havola create action'dagi /^https:\/\// filtridan o'tadi.
     if (action === 'upload_image') {
       const dataUrl = String(b.data ?? '');
       const m = /^data:(image\/(?:png|jpe?g|gif|webp));base64,([a-z0-9+/=\s]+)$/i.exec(dataUrl);

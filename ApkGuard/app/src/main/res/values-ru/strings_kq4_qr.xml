@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экрана QR-сканера («Проверка QR-кода»). -->
+<resources>
+    <string name="kq4_qr_eyebrow">БЕЗОПАСНОСТЬ QR</string>
+    <string name="kq4_qr_title">Проверка QR-кода</string>
+    <string name="kq4_qr_instruction">Наведите рамку на QR-код — если это ссылка, мы проверим её безопасность.</string>
+    <string name="kq4_qr_scanning">Сканирование…</string>
+
+    <!-- Разрешение камеры -->
+    <string name="kq4_qr_perm_title">Нужен доступ к камере</string>
+    <string name="kq4_qr_perm_body">Камера используется только для чтения QR-кода. Снимки не сохраняются и никуда не отправляются.</string>
+    <string name="kq4_qr_perm_grant">Разрешить</string>
+    <string name="kq4_qr_perm_denied">Доступ к камере не предоставлен. Вы можете включить его вручную в настройках.</string>
+    <string name="kq4_qr_perm_open_settings">Открыть настройки</string>
+
+    <!-- Камера недоступна -->
+    <string name="kq4_qr_no_camera">На этом устройстве не найдена камера — QR-код отсканировать нельзя.</string>
+
+    <!-- Результат: не ссылка -->
+    <string name="kq4_qr_not_url_title">QR-код прочитан</string>
+    <string name="kq4_qr_not_url">Этот QR-код не является ссылкой. Распознан следующий текст:</string>
+    <string name="kq4_qr_close">Закрыть</string>
+</resources>

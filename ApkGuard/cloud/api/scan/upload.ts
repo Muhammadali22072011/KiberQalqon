@@ -68,6 +68,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // scan_duration_ms — ishonchsiz JSON'dan; chegaralanmagan/manfiy qiymat int ustunini
   // buzishi mumkin. 0..600000 ms (0..10 daqiqa) oralig'iga clamp qilamiz (risk_score kabi).
   const scanDurationMs = Math.max(0, Math.min(600000, Math.round(Number(b.scan_duration_ms) || 0)));
+  // reasons — ishonchsiz JSON'dan; jsonb ustun bo'lgani uchun bare string ham qabul qilinadi.
+  // classify() ichida .join() chaqiriladi → string kelsa TypeError → butun yuklash 500 bilan
+  // yiqilib, DANGER alert va threat yozuvi KETMAY qolardi. Bir marta massivga aylantiramiz
+  // (#24/#43 kirish-qattiqlash falsafasi) va hamma joyda shuni ishlatamiz.
+  const reasons: string[] = Array.isArray(b.reasons) ? b.reasons.map(String) : [];
 
   const sb = db();
 
@@ -137,7 +142,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       verdict: b.verdict,
       risk_score: risk,
       scan_duration_ms: scanDurationMs,
-      reasons: b.reasons ?? [],
+      reasons,
       perms: b.perms ?? [],
     })
     .select('id')
@@ -145,6 +150,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (scanErr) {
     console.error(`[upload] scan insert db error: ${scanErr.message}`);
     return res.status(500).json({ ok: false, error: 'scan insert' });
+  }
+
+  // Qoida-sifati sikli: mijoz YARA-lite qoidasi ishlaganda reasons ichida "rule:<rule_id>"
+  // yuboradi. Har bir ishlashni rule_hits'ga yozamiz → panel FP-paneli (v_rule_stats) qaysi
+  // qoida ko'p ishlaydi / rad etiladi (dismissed) ni ko'rsatadi va egasi paneldan "mute" qiladi.
+  // FAIL-SOFT: jadval yo'q bo'lsa (migratsiya ishlamagan) — faqat log.
+  try {
+    const ruleIds = Array.from(new Set(
+      reasons
+        .map((r) => { const m = /(?:^|[^a-z0-9_])rule:([a-z0-9_]{2,40})/i.exec(r); return m ? m[1].toLowerCase() : null; })
+        .filter((x): x is string => x !== null),
+    ));
+    if (ruleIds.length) {
+      const hits = ruleIds.map((rid) => ({ rule_id: rid, device_id: dev.id, apk_hash: b.apk_hash.toLowerCase(), verdict: b.verdict }));
+      const { error: rhErr } = await sb.from('rule_hits').insert(hits);
+      if (rhErr) console.error(`[upload] rule_hits insert: ${rhErr.message}`);
+    }
+  } catch (e) {
+    console.error(`[upload] rule_hits exception: ${(e as Error).message}`);
   }
 
   // Xavfli/shubhali bo'lsa — qurilma APK namunasini Storage'ga yuklashi uchun
@@ -161,7 +185,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       p_hash: b.apk_hash.toLowerCase(),
       p_package: b.package_name ?? null,
       p_label: b.app_label ?? null,
-      p_category: classify(b.reasons ?? []),
+      p_category: classify(reasons),
       p_severity: severity,
     });
     // Avval xato e'tiborsiz qoldirilardi — agar upsert_threat RPC bo'lmasa yoki
@@ -192,7 +216,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       package_name: b.package_name ?? null,
       apk_hash: b.apk_hash,
       verdict: b.verdict,
-      reasons: b.reasons ?? [],
+      reasons,
       device_name: dev.name,
     });
 
@@ -209,6 +233,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       })
     );
+  }
+
+  // #9: DANGER "to'lqini" — qisqa oynada ko'p xavfli topilsa, egaga per-threat alertdan
+  // TASHQARI alohida agregat ogohlantirish (kampaniya boshlanganini bir qarashda ko'rsatadi).
+  // alert_state (migratsiya 16) bilan throttle qilinadi — spam bo'lmaydi. Fail-soft: xato →
+  // faqat log, yuklash natijasiga ta'sir qilmaydi.
+  if (b.verdict === 'danger') {
+    try {
+      const WIN_MIN = Number(process.env.SPIKE_WINDOW_MIN) || 15;
+      const MIN_CNT = Number(process.env.SPIKE_MIN) || 5;
+      const THROTTLE_MIN = Number(process.env.SPIKE_THROTTLE_MIN) || 30;
+      const since = new Date(Date.now() - WIN_MIN * 60000).toISOString();
+      const { count } = await sb
+        .from('scans')
+        .select('*', { count: 'exact', head: true })
+        .eq('verdict', 'danger')
+        .gte('scanned_at', since);
+      const n = count ?? 0;
+      if (n >= MIN_CNT) {
+        const { data: st } = await sb.from('alert_state').select('last_at').eq('key', 'danger_spike').maybeSingle();
+        const lastMs = st?.last_at ? new Date(st.last_at).getTime() : 0;
+        if (Date.now() - lastMs > THROTTLE_MIN * 60000) {
+          // Avval throttle'ni yangilaymiz (yuborish sekin bo'lsa ham ikkinchi so'rov spam qilmasin).
+          await sb.from('alert_state').upsert({ key: 'danger_spike', last_at: new Date().toISOString() }, { onConflict: 'key' });
+          const text = `🚨 *Tahdid to'lqini*\nOxirgi ${WIN_MIN} daqiqada *${n} ta* xavfli aniqlandi — odatdagidan ko'p.\nPanel orqali tekshiring.`;
+          const admins = adminChatIds();
+          await Promise.all(admins.map((chatId) => sendMessage(chatId, text, { parseMode: 'Markdown' })));
+        }
+      }
+    } catch (e) {
+      console.error(`[upload] spike check failed: ${(e as Error).message}`);
+    }
   }
 
   return res.status(200).json({ ok: true, scan_id: scan?.id, sample_upload: sampleUpload });

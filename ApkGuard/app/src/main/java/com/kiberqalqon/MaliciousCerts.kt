@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Blacklist цифровых подписей известных малварных групп.

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Single row inside the "Bugungi topilmalar" card on the dashboard.
-  Mirrors §3.3 li-row: 44dp danger icon tile + filename/family stack + sev chip.
+  v4 dizayn .li satri — "Bugun bloklangan" kartasi ichidagi bitta yozuv
+  (screens1.jsx → Dashboard → THREATS.map):
+  av 48dp (danger/warn/safe) + nom/sub + o'ngda tag (nuqta + Xavfli/Shubhali).
+  Rang/ikon/tag DashboardNewActivity.bindThreatRow() da verdict bo'yicha qo'yiladi.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,62 +14,77 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="14dp">
+    android:paddingHorizontal="15dp"
+    android:paddingVertical="14dp">
 
     <FrameLayout
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:background="@drawable/kq_icon_tile_danger">
+        android:id="@+id/avThreat"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/kq4_av_danger">
 
         <ImageView
+            android:id="@+id/ivThreatIcon"
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_gravity="center"
             android:contentDescription="@null"
-            android:src="@drawable/ic_virus"
-            app:tint="@color/kq_danger_ink" />
+            android:src="@drawable/ic4_file"
+            app:tint="@color/kq_danger" />
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="13dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvThreatName"
+            style="@style/KQ4.RowTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:text="RASMLAR (18).apk"
-            android:textColor="@color/kq_ink"
-            android:textSize="14.5sp"
-            android:textStyle="bold" />
+            android:text="@string/kq4_dash_empty_title" />
 
         <TextView
             android:id="@+id/tvThreatSub"
-            android:layout_width="wrap_content"
+            style="@style/KQ4.RowSub"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:fontFamily="monospace"
-            android:text="Ajina.Banker · Telegram · 12 daq oldin"
-            android:textColor="@color/kq_ink_3"
-            android:textSize="11sp" />
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/kq4_dash_empty_sub" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvThreatSev"
+    <!-- design .tag danger: pill h30, nuqta 7dp + 12.5sp/700 matn -->
+    <LinearLayout
+        android:id="@+id/tagThreat"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/kq_sev_crit"
-        android:fontFamily="monospace"
-        android:letterSpacing="0.08"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
-        android:text="@string/kq_sev_crit"
-        android:textColor="@color/kq_danger_ink"
-        android:textSize="10sp"
-        android:textStyle="bold" />
+        android:layout_height="30dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/kq4_tag_danger"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <View
+            android:id="@+id/tagThreatDot"
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:background="@drawable/kq4_dot"
+            android:backgroundTint="@color/kq_danger_ink" />
+
+        <TextView
+            android:id="@+id/tvThreatSev"
+            style="@style/KQ4.Tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:text="@string/kq4_danger"
+            android:textColor="@color/kq_danger_ink" />
+    </LinearLayout>
 </LinearLayout>

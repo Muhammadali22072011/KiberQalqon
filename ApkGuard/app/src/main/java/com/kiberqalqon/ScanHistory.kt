@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import androidx.core.content.edit
@@ -13,7 +13,7 @@ import org.json.JSONObject
  */
 object ScanHistory {
 
-    private const val PREFS = "kiberqalqon_history"
+    private const val PREFS = "uzguard_history"
     private const val KEY = "entries"
     private const val MAX_ENTRIES = 200
 
@@ -30,25 +30,30 @@ object ScanHistory {
     )
 
     fun add(context: Context, entry: Entry) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val arr = readArray(prefs.getString(KEY, null))
-        val obj = JSONObject().apply {
-            put("ts", entry.timestamp)
-            put("name", entry.apkName)
-            put("path", entry.apkPath)
-            put("verdict", entry.verdict.name)
-            put("reason", entry.reason)
-            put("explanation", JSONArray(entry.explanationKeys))
-            put("source", entry.source ?: "")
+        // Атомарный read-modify-write: параллельные сканы (batch/GuardWorker + ручной)
+        // иначе перетирают историю друг друга и теряют записи (в т.ч. реальный DANGER).
+        synchronized(ScanHistory) {
+            val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val arr = readArray(prefs.getString(KEY, null))
+            val obj = JSONObject().apply {
+                put("ts", entry.timestamp)
+                put("name", entry.apkName)
+                put("path", entry.apkPath)
+                put("verdict", entry.verdict.name)
+                put("reason", entry.reason)
+                put("explanation", JSONArray(entry.explanationKeys))
+                put("source", entry.source ?: "")
+            }
+            // Новые записи в начало; LRU-эвикция в хвосте.
+            val newArr = JSONArray()
+            newArr.put(obj)
+            for (i in 0 until arr.length()) {
+                if (newArr.length() >= MAX_ENTRIES) break
+                newArr.put(arr.getJSONObject(i))
+            }
+            // commit() под локом — окно записи детерминировано.
+            prefs.edit(commit = true) { putString(KEY, newArr.toString()) }
         }
-        // Новые записи в начало; LRU-эвикция в хвосте.
-        val newArr = JSONArray()
-        newArr.put(obj)
-        for (i in 0 until arr.length()) {
-            if (newArr.length() >= MAX_ENTRIES) break
-            newArr.put(arr.getJSONObject(i))
-        }
-        prefs.edit { putString(KEY, newArr.toString()) }
     }
 
     fun all(context: Context): List<Entry> {

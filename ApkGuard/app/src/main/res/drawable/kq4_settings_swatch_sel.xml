@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 Settings: tanlangan aksent kartochkasi — surface-2 fon + 1.5dp primary ramka, r18. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/kq_surface_2" />
+    <stroke android:width="1.5dp" android:color="?attr/kqPrimary" />
+    <corners android:radius="18dp" />
+</shape>

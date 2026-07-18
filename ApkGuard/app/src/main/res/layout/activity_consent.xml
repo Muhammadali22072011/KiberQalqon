@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Foydalanish shartlari + Maxfiylik siyosati — KiberQalqon §3 palette.
+  Foydalanish shartlari + Maxfiylik siyosati — v4 «Milliy Kiber Himoya» dizayni.
 
   ConsentActivity inflates this layout, then populates tvTermsBody / tvPrivacyBody
   with the long Uzbek text strings stored in code. In first-run mode the bottom
@@ -8,184 +8,182 @@
   from Settings) only btnClose is shown.
 
   Stable hooks the Activity expects:
-    btnBack, tvTermsBody, tvPrivacyBody,
+    btnBack, tvScreenTitle, tvHeaderTitle, contentCol, tvTermsBody, tvPrivacyBody,
     cardConsent, cbTerms, cbPrivacy, cbCommunity, btnAccept, btnDecline, btnClose
 -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/kq_bg">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/kq_bg"
-        android:elevation="0dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp">
-
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/kq_icon_btn"
-                android:contentDescription="Back"
-                android:padding="10dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_arrow_back"
-                app:tint="@color/kq_ink" />
-
-            <TextView
-                android:id="@+id/tvScreenTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:text="@string/terms_breadcrumb"
-                android:textColor="@color/kq_ink"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="220dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:paddingBottom="260dp">
 
         <LinearLayout
+            android:id="@+id/contentCol"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp">
+            android:paddingStart="18dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="30dp">
 
-            <!-- Brand header card -->
+            <!-- Sarlavha qatori: icon-btn back + eyebrow + h-title -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/kq_profile_card"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:orientation="horizontal">
 
-                <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/kq_brand_tile">
-
-                    <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="@null"
-                        android:src="@drawable/kq_shield_mark_white" />
-                </FrameLayout>
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/kq4_icon_btn"
+                    android:contentDescription="@string/kq4_back"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic4_back"
+                    app:tint="@color/kq_ink" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvHeaderTitle"
+                        style="@style/KQ4.Eyebrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/terms_intro_title"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:text="@string/kq4_misc_doc_eyebrow" />
 
                     <TextView
+                        android:id="@+id/tvScreenTitle"
+                        style="@style/KQ4.HTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.1"
-                        android:text="@string/terms_last_update"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_ink_3"
-                        android:textSize="10.5sp" />
+                        android:layout_marginTop="6dp"
+                        android:text="@string/terms_breadcrumb"
+                        android:textSize="24sp" />
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Brand header card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card.Flat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <FrameLayout
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/kq4_circle_white">
+
+                        <ImageView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/kq_logo_anor" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvHeaderTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/onest_bold"
+                            android:letterSpacing="-0.01"
+                            android:text="@string/terms_intro_title"
+                            android:textColor="@color/kq_ink"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            style="@style/KQ4.Mono"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/terms_last_update"
+                            android:textAllCaps="true"
+                            android:textSize="10.5sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- ╔════ TERMS ════╗ -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/terms_section_terms"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:layout_marginBottom="9dp"
+                android:text="@string/terms_section_terms" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card.Flat"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/tvTermsBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/onest_regular"
                     android:lineSpacingMultiplier="1.5"
                     android:padding="16dp"
-                    android:textColor="@color/kq_ink"
+                    android:textColor="@color/kq_ink_2"
                     android:textIsSelectable="true"
-                    android:textSize="13sp" />
+                    android:textSize="13.5sp" />
             </com.google.android.material.card.MaterialCardView>
 
             <!-- ╔════ PRIVACY ════╗ -->
             <TextView
+                style="@style/KQ4.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="22dp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.12"
-                android:text="@string/terms_section_privacy"
-                android:textAllCaps="true"
-                android:textColor="@color/kq_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:layout_marginBottom="9dp"
+                android:text="@string/terms_section_privacy" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card.Flat"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/tvPrivacyBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/onest_regular"
                     android:lineSpacingMultiplier="1.5"
                     android:padding="16dp"
-                    android:textColor="@color/kq_ink"
+                    android:textColor="@color/kq_ink_2"
                     android:textIsSelectable="true"
-                    android:textSize="13sp" />
+                    android:textSize="13.5sp" />
             </com.google.android.material.card.MaterialCardView>
 
             <Space
@@ -195,18 +193,16 @@
     </androidx.core.widget.NestedScrollView>
 
     <!-- ╔════ STICKY BOTTOM BAR ════╗
-         Visible only on first launch; holds 3 mandatory checkboxes + Accept/Decline. -->
+         Visible only on first launch; holds 3 checkboxes + Accept/Decline. -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardConsent"
+        style="@style/KQ4.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_margin="12dp"
-        app:cardBackgroundColor="@color/kq_bg_elev"
-        app:cardCornerRadius="22dp"
         app:cardElevation="8dp"
-        app:strokeColor="@color/kq_hairline_strong"
-        app:strokeWidth="1dp">
+        app:strokeColor="@color/kq_hairline_strong">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -219,6 +215,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/kq_primary"
+                android:fontFamily="@font/onest_regular"
                 android:paddingStart="6dp"
                 android:text="@string/consent_terms_chk"
                 android:textColor="@color/kq_ink"
@@ -229,6 +226,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/kq_primary"
+                android:fontFamily="@font/onest_regular"
                 android:paddingStart="6dp"
                 android:text="@string/consent_privacy_chk"
                 android:textColor="@color/kq_ink"
@@ -239,6 +237,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/kq_primary"
+                android:fontFamily="@font/onest_regular"
                 android:paddingStart="6dp"
                 android:text="@string/consent_community_chk"
                 android:textColor="@color/kq_ink"
@@ -252,32 +251,25 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDecline"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/KQ4.Button.Ghost"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
+                    android:minHeight="50dp"
                     android:text="@string/consent_reject"
-                    android:textAllCaps="false"
-                    android:textColor="@color/kq_ink"
-                    android:textSize="13sp"
-                    app:cornerRadius="999dp"
-                    app:strokeColor="@color/kq_hairline_strong"
-                    app:strokeWidth="1dp" />
+                    android:textSize="14sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAccept"
+                    style="@style/KQ4.Button.Primary"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1.4"
                     android:enabled="false"
+                    android:minHeight="50dp"
                     android:text="@string/consent_accept"
-                    android:textAllCaps="false"
-                    android:textColor="@color/kq_on_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/kq_primary"
-                    app:cornerRadius="999dp" />
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -286,21 +278,15 @@
          opened from Settings via openForReview()). Activity toggles visibility. -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnClose"
+        style="@style/KQ4.Button.Primary"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_margin="20dp"
+        android:layout_margin="18dp"
+        android:minHeight="58dp"
         android:text="@string/btn_close"
-        android:textAllCaps="false"
-        android:textColor="@color/kq_on_primary"
-        android:textSize="14sp"
-        android:textStyle="bold"
+        android:textSize="17sp"
         android:visibility="gone"
-        app:backgroundTint="@color/kq_primary"
-        app:cornerRadius="999dp"
-        app:icon="@drawable/ic_check_simple"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconSize="18dp"
-        app:iconTint="@color/kq_on_primary" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        app:icon="@drawable/ic4_check"
+        app:iconSize="19dp" />
+</FrameLayout>

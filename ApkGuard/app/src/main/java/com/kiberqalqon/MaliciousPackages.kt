@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 /**
  * Blacklist po package name. Eto vtoroy uroven' posle [MaliciousHashes]: esli

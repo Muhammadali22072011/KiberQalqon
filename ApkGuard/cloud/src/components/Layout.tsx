@@ -7,14 +7,17 @@ import { hms } from '../lib/format';
 import { exportAllToExcel } from '../lib/exportExcel';
 import { useToast } from './Toast';
 
-// Egasi va admin — ikkalasi ham hamma bo'limni ko'radi.
+// Egasi va admin — ikkalasi ham hamma bo'limni ko'radi; "Jurnal" FAQAT EGADA
+// (ownerOnly bayrog'i — server ham /api/stats?audit=1 ni 403 bilan himoyalaydi).
 const NAV = [
   { to: '/app', end: true, icon: '📊', label: 'Bosh sahifa' },
   { to: '/app/map', icon: '🗺️', label: 'Geo xarita' },
   { to: '/app/feed', icon: '📡', label: 'Jonli oqim' },
   { to: '/app/threats', icon: '🧬', label: 'Tahdidlar' },
   { to: '/app/devices', icon: '📱', label: 'Qurilmalar' },
+  { to: '/app/groups', icon: '👥', label: 'Guruhlar' },
   { to: '/app/news', icon: '📰', label: "E'lonlar" },
+  { to: '/app/audit', icon: '📜', label: 'Jurnal', ownerOnly: true },
   { to: '/app/profile', icon: '👤', label: 'Profil' },
 ] as const;
 
@@ -24,12 +27,14 @@ const TITLES: Record<string, { sub: string; title: string }> = {
   '/app/feed': { sub: 'Real vaqt', title: 'Jonli tahdidlar oqimi' },
   '/app/threats': { sub: 'Tahlil', title: 'Eng faol tahdidlar' },
   '/app/devices': { sub: 'Qurilmalar', title: 'Himoyalangan qurilmalar' },
+  '/app/groups': { sub: 'Segmentatsiya', title: 'Qurilma guruhlari' },
   '/app/news': { sub: 'E‘lonlar · lenta', title: 'Yangiliklar' },
+  '/app/audit': { sub: 'Xavfsizlik auditi', title: 'Amallar jurnali' },
   '/app/profile': { sub: 'Hisob', title: 'Profil va xavfsizlik' },
 };
 
 export default function Layout() {
-  const { logout } = useAuth();
+  const { logout, isOwner } = useAuth();
   const { show } = useToast();
   const nav = useNavigate();
   const loc = useLocation();
@@ -81,8 +86,8 @@ export default function Layout() {
     };
   }, []);
 
-  // Egasi va admin — ikkalasi ham hamma bo'limni ko'radi.
-  const items = NAV;
+  // Egasi va admin — ikkalasi ham hamma bo'limni ko'radi; ownerOnly faqat egada.
+  const items = NAV.filter((n) => !('ownerOnly' in n && n.ownerOnly) || isOwner);
   const showNews = true;
 
   const news = usePoll(
@@ -96,7 +101,7 @@ export default function Layout() {
   ), [news.data, seenAt]);
   const badge = unread > 99 ? '99+' : String(unread);
 
-  const head = TITLES[loc.pathname] || { sub: 'KiberQalqon', title: 'Panel' };
+  const head = TITLES[loc.pathname] || { sub: 'UzGuard', title: 'Panel' };
 
   const doLogout = () => { logout(); nav('/'); };
 
@@ -105,7 +110,7 @@ export default function Layout() {
       <aside className="sidebar">
         <div className="side-brand">
           <div className="logo">🛡</div>
-          <div className="brand"><b>KiberQalqon</b><small>Cloud panel</small></div>
+          <div className="brand"><b>UzGuard</b><small>Cloud panel</small></div>
         </div>
         <nav className="side-nav">
           {items.map((n) => (

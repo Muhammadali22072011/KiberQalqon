@@ -1,4 +1,4 @@
-# KiberQalqon — Design System
+# UzGuard — Design System
 
 ## 🎨 Цветовая палитра
 

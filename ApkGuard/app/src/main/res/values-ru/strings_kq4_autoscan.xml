@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — строки экрана AutoScan (русский перевод). -->
+<resources>
+    <!-- Фаза сканирования -->
+    <string name="kq4_as_checking">ПРОВЕРЯЕТСЯ</string>
+    <string name="kq4_as_new_file">Проверяется новый файл</string>
+    <string name="kq4_as_step1">Файл открывается</string>
+    <string name="kq4_as_step2">Проверка разрешений</string>
+    <string name="kq4_as_step3">Проверка банковской защиты</string>
+    <string name="kq4_as_step4">Поиск вредоносных признаков</string>
+
+    <!-- Результат — опасно -->
+    <string name="kq4_as_danger_title">Найден опасный файл!</string>
+    <string name="kq4_as_short_bank">Этот файл на самом деле пытается украсть деньги и пароль из вашего банковского приложения.</string>
+    <string name="kq4_as_short_dropper">При открытии этот файл скрытно загружает на телефон другие вредоносные программы.</string>
+    <string name="kq4_as_short_sms">Этот файл читает и крадёт ваши SMS-коды подтверждения — банковские коды.</string>
+    <string name="kq4_as_short_generic">Этот файл может нанести вред вашему телефону.</string>
+
+    <!-- Карточка «Что делает этот файл» -->
+    <string name="kq4_as_does_label">Что делает этот файл</string>
+    <string name="kq4_as_does_bankpass">Крадёт пароль банковского приложения</string>
+    <string name="kq4_as_does_sms">Читает SMS-коды подтверждения</string>
+    <string name="kq4_as_does_screen">Скрытно следит за вашим экраном</string>
+    <string name="kq4_as_does_hide">Прячет себя в телефоне</string>
+    <string name="kq4_as_does_download">Скрытно загружает программы на телефон</string>
+    <string name="kq4_as_does_remote">Управляет телефоном удалённо</string>
+    <string name="kq4_as_does_contacts">Читает ваши контакты</string>
+    <string name="kq4_as_does_calls">Следит за вашими звонками</string>
+
+    <!-- Обратный отсчёт авто-удаления -->
+    <string name="kq4_as_autodelete_in">Будет автоматически удалён через %1$d сек.</string>
+    <string name="kq4_as_deleting">Удаляется…</string>
+
+    <!-- Результат — безопасно -->
+    <string name="kq4_as_safe_title">Файл безопасен</string>
+    <string name="kq4_as_close">Закрыть</string>
+
+    <!-- Уже обезврежен в фоне -->
+    <string name="kq4_as_handled_title">Вирус найден и удалён</string>
+    <string name="kq4_as_handled_body">Файл %1$s признан опасным и автоматически удалён (карантин).</string>
+    <string name="kq4_as_handled_reason">Причина: %1$s</string>
+    <string name="kq4_as_handled_restore">Если это ошибка, файл можно восстановить в течение 7 дней.</string>
+</resources>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Havola blok ekrani (LinkBlockActivity) — SHUBHALI/XAVFLI havola ochilishidan oldin
+  saytни OCHMASDAN ko'rsatiladigan to'liq ekran ogohlantirishi. Doim qorong'i fon
+  (kq4_scan_bg). Badge rangi (danger/warn) Kotlin'da tintlanadi.
+
+  Barqaror id'lar: btnClose, imgLogo, badge, badgeIcon, tvTitle, tvSub, tvHost,
+  secReasons, tvReasonsLabel, reasonsContainer, btnClosePrimary, btnOpenAnyway.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/kq4_scan_bg">
+
+    <!-- Vertikal ustun: scroll (qolgan joyni egallaydi) + pastdagi tugmalar (doim ko'rinadi).
+         Ilgari tugmalar scroll ustiga QOPLANIB, uzun sabablar ro'yxatini pastга surib
+         ko'rsatib bo'lmasdi — endi ular alohida joylashadi, scroll to'liq ishlaydi. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingTop="72dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- UzGuard logosi -->
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginBottom="22dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/kq_logo_anor" />
+
+            <!-- 96dp doira badge (verdikt rangiga bo'yaladi) -->
+            <FrameLayout
+                android:id="@+id/badge"
+                android:layout_width="92dp"
+                android:layout_height="92dp"
+                android:background="@drawable/kq4_circle_danger">
+
+                <ImageView
+                    android:id="@+id/badgeIcon"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic4_shield_alert"
+                    app:tint="#FFFFFF" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="@font/onest_extrabold"
+                android:gravity="center"
+                android:letterSpacing="-0.02"
+                android:text="@string/kq4_block_danger_title"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+
+            <TextView
+                android:id="@+id/tvSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/onest_regular"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.45"
+                android:maxWidth="320dp"
+                android:text="@string/kq4_block_danger_sub"
+                android:textColor="#D1FFFFFF"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tvHost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:ellipsize="middle"
+                android:fontFamily="@font/kq4_mono"
+                android:gravity="center"
+                android:maxWidth="320dp"
+                android:singleLine="true"
+                android:textColor="#B3FFFFFF"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <!-- Sabablar -->
+            <LinearLayout
+                android:id="@+id/secReasons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/kq4_card_white07"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvReasonsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="@font/onest_semibold"
+                    android:letterSpacing="0.04"
+                    android:text="@string/kq4_link_reasons_title"
+                    android:textAllCaps="true"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="11sp" />
+
+                <LinearLayout
+                    android:id="@+id/reasonsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Pastki tugmalar — scroll ostida, alohida (qoplanmaydi). -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/kq4_scan_bg"
+        android:orientation="vertical"
+        android:paddingStart="22dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="26dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClosePrimary"
+            style="@style/KQ4.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="58dp"
+            android:text="@string/kq4_block_close"
+            android:textSize="17sp"
+            app:icon="@drawable/ic4_shield_check"
+            app:iconSize="20dp" />
+
+        <TextView
+            android:id="@+id/btnOpenAnyway"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/kq4_autoscan_btn_ghost"
+            android:fontFamily="@font/onest_bold"
+            android:gravity="center"
+            android:text="@string/kq4_block_open_anyway"
+            android:textColor="#99FFFFFF"
+            android:textSize="15sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Yopish (X) -->
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/kq4_autoscan_iconbtn"
+        android:contentDescription="@string/kq4_block_close"
+        android:padding="11dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic4_x"
+        app:tint="#B3FFFFFF" />
+</FrameLayout>

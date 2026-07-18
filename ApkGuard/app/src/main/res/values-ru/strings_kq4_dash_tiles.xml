@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 дизайн — плитки быстрой проверки на дашборде (Ссылка / QR). -->
+<resources>
+    <!-- Плитка проверки ссылки (URL) → LinkCheckActivity -->
+    <string name="kq4_dash_tile_link">Проверка ссылки</string>
+    <string name="kq4_dash_tile_link_sub">Проверьте подозрительные URL</string>
+
+    <!-- Плитка проверки QR-кода → QrScanActivity -->
+    <string name="kq4_dash_tile_qr">Проверка QR</string>
+    <string name="kq4_dash_tile_qr_sub">Проверьте QR-код на безопасность</string>
+</resources>

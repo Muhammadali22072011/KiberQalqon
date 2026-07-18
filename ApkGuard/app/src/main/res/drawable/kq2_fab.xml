@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Markaziy SKAN tugmasi (mockup2 .fab): anor-gradient doira.
+     Brend-konstanta — kq_cta_anor bilan bir xil gradient, light/dark bir xil. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:angle="270"
+                android:startColor="#E11D48"
+                android:endColor="#C2143D" />
+        </shape>
+    </item>
+</ripple>

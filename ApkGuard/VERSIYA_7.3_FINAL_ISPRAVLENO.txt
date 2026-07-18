@@ -3,7 +3,7 @@
 
 📱 ФАЙЛ APK:
 ------------
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 Размер: ~7.5 МБ
 Дата: 08.02.2026
 
@@ -24,7 +24,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
      * Красный - опасно
 
 3. ✅ ЛОГОТИП:
-   - Используется logo-kiberqalqon.jpg
+   - Используется logo-uzguard.jpg
    - Отображается на Splash Screen
    - Размер 120x120dp
    - Без tint (оригинальные цвета)
@@ -46,8 +46,8 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 🎨 SPLASH SCREEN:
 -----------------
 - Синий фон (#00BCD4)
-- Логотип logo-kiberqalqon.jpg (120x120dp)
-- Название "KIBERQALQON" (белый, 32sp)
+- Логотип logo-uzguard.jpg (120x120dp)
+- Название "UZGUARD" (белый, 32sp)
 - Подзаголовок "Himoya zararli APK fayllardan" (светло-голубой, 16sp)
 - Версия "Version 7.3" (полупрозрачный белый, 12sp)
 - Все элементы с анимацией fade in
@@ -57,7 +57,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 СВЕТЛАЯ ТЕМА:
 ┌─────────────────────────────────┐
-│  KIBERQALQON (голубой фон)        │
+│  UZGUARD (голубой фон)        │
 ├─────────────────────────────────┤
 │                                 │
 │  [Белая карточка]               │
@@ -72,7 +72,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 ТЁМНАЯ ТЕМА:
 ┌─────────────────────────────────┐
-│  KIBERQALQON (синий фон)          │
+│  UZGUARD (синий фон)          │
 ├─────────────────────────────────┤
 │                                 │
 │  [Тёмная карточка]              │
@@ -90,7 +90,7 @@ KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
 
 1. SPLASH SCREEN:
    ✓ Открой приложение
-   ✓ Должен показаться логотип logo-kiberqalqon.jpg
+   ✓ Должен показаться логотип logo-uzguard.jpg
    ✓ Внизу "Version 7.3"
    ✓ Всё плавно появляется
 

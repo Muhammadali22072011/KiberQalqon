@@ -12,6 +12,9 @@ Bezopasnost' (qo'shildi 2026-05-26):
 - LAN'ga e'lon qilingan endpoint'ga ruxsatsiz kirish endi 403 qaytaradi
 """
 import os
+import hmac
+import hashlib
+import time
 from datetime import datetime
 from functools import wraps
 from flask import Flask, request, send_from_directory, abort
@@ -53,6 +56,35 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# Qisqa muddatli, faylga bog'langan imzolangan yuklab-olish tokeni.
+# Brauzerdan bosib yuklab olish ishlashi uchun HTML havolalarga uzoq muddatli
+# API_KEY o'rniga shu token qo'yiladi — u faqat bitta faylga va bir necha
+# daqiqaga amal qiladi, shuning uchun loglarga/tarixga tushsa ham zarari cheklangan.
+DOWNLOAD_TOKEN_TTL = 300  # sekund
+
+
+def _make_download_token(filename, ttl=DOWNLOAD_TOKEN_TTL):
+    expiry = int(time.time()) + ttl
+    msg = f"{filename}:{expiry}".encode("utf-8")
+    sig = hmac.new(API_KEY.encode("utf-8"), msg, hashlib.sha256).hexdigest()
+    return f"{expiry}.{sig}"
+
+
+def _valid_download_token(filename, token):
+    if not token or "." not in token:
+        return False
+    expiry_str, _, sig = token.partition(".")
+    try:
+        expiry = int(expiry_str)
+    except ValueError:
+        return False
+    if expiry < int(time.time()):
+        return False
+    msg = f"{filename}:{expiry}".encode("utf-8")
+    expected = hmac.new(API_KEY.encode("utf-8"), msg, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, sig)
+
+
 @app.route("/upload", methods=["POST"])
 @require_api_key
 def upload():
@@ -91,19 +123,31 @@ def index():
         "<ul>",
     ]
     for f in files:
-        url = f"/download/{f}?token={API_KEY}"
+        # Uzoq muddatli API_KEY havolaga QO'YILMAYDI (u loglar/tarix/Referer orqali
+        # sizib chiqadi). O'rniga shu faylga bog'langan qisqa muddatli imzolangan token.
+        url = f"/download/{f}?dt={_make_download_token(f)}"
         lines.append(f"<li><a href='{url}'>{f}</a></li>")
     lines.append("</ul></body></html>")
     return "\n".join(lines)
 
 
 @app.route("/download/<filename>")
-@require_api_key
 def download(filename):
     # secure_filename garantiya beradi: hech qanday "../", absolute path yo'q
     safe = secure_filename(filename)
     if not safe or safe != filename or not safe.lower().endswith(".apk"):
         return "Forbidden", 403
+    # Auth: to'liq API kalit (header/Bearer/?token=) YOKI shu faylga bog'langan
+    # qisqa muddatli imzolangan token (?dt=). require_api_key'ni bu yerda
+    # dekorator sifatida ishlatmaymiz, chunki imzolangan tokenni ham qabul qilamiz.
+    provided = (
+        request.headers.get("X-Api-Key")
+        or (request.headers.get("Authorization", "").removeprefix("Bearer ").strip())
+        or request.args.get("token")
+    )
+    key_ok = bool(provided) and hmac.compare_digest(provided, API_KEY)
+    if not (key_ok or _valid_download_token(safe, request.args.get("dt"))):
+        return {"ok": False, "error": "unauthorized"}, 401
     full_path = os.path.join(UPLOAD_FOLDER, safe)
     if not os.path.isfile(full_path):
         return "Not found", 404

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UzGuard — dizayn v2 «Qalqon markazi» (mockup)</title>
+<style>
+  :root{
+    --anor:#E11D48; --anor-deep:#C2143D; --anor-soft:#2C141E;
+    --bg:#0E0E12; --card:#1A1A21; --card2:#22222B; --line:#2E2E38;
+    --ink:#F5F4F7; --mut:#9A9AA8; --mut2:#6E6E7C;
+    --safe:#39D27E; --safe-bg:#172F26;
+    --warn:#F59E0B; --warn-bg:#3C2C16;
+    --danger:#EF4444; --danger-bg:#3B1C21;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:radial-gradient(1100px 520px at 50% -8%, #2a1119 0%, #0a0a0d 60%);
+    color:#fff;min-height:100vh;padding:44px 20px;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  h1{font-size:22px;font-weight:800;letter-spacing:.3px}
+  .sub{color:var(--mut);font-size:14px;margin-bottom:26px;text-align:center;max-width:760px;line-height:1.5}
+  .stage{display:flex;gap:34px;flex-wrap:wrap;justify-content:center}
+  .col{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .cap{font-size:12.5px;color:var(--mut);letter-spacing:.6px;text-transform:uppercase;font-weight:700}
+
+  /* ── Telefon ramka ─────────────────────────────────────────── */
+  .phone{
+    width:302px;height:640px;border-radius:42px;background:var(--bg);
+    border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.55),inset 0 0 0 6px #000;
+    padding:14px 12px;position:relative;overflow:hidden;
+  }
+  .notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    width:110px;height:22px;background:#000;border-radius:0 0 14px 14px;z-index:9}
+  .scr{height:100%;border-radius:30px;overflow:hidden;position:relative;background:var(--bg)}
+  .body{position:absolute;inset:0;overflow:hidden;padding:36px 16px 96px}
+
+  /* ── Suzuvchi pastki nav + markaziy SKAN FAB ───────────────── */
+  .nav{
+    position:absolute;left:12px;right:12px;bottom:12px;height:62px;z-index:8;
+    background:rgba(28,28,36,.96);border:1px solid var(--line);border-radius:26px;
+    display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+    box-shadow:0 14px 30px rgba(0,0,0,.5);
+  }
+  .nav .it{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;
+    color:var(--mut2);width:46px}
+  .nav .it .gi{font-size:17px;line-height:1}
+  .nav .it.on{color:var(--anor)}
+  .fab{
+    position:absolute;left:50%;bottom:38px;transform:translateX(-50%);z-index:9;
+    width:58px;height:58px;border-radius:50%;
+    background:linear-gradient(180deg,var(--anor),var(--anor-deep));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 10px 24px rgba(225,29,72,.5),0 0 0 6px rgba(14,14,18,.9);
+    font-size:21px;
+  }
+  .fab span{font-size:8px;font-weight:800;letter-spacing:.6px;margin-top:1px}
+  .fab-gap{width:58px;flex:none}
+
+  /* ── Umumiy kartalar ───────────────────────────────────────── */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px}
+  .sect{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 8px}
+  .sect b{font-size:14.5px;font-weight:800}
+  .sect a{font-size:11.5px;color:var(--anor);font-weight:700;text-decoration:none}
+
+  /* ── EKRAN 1: ASOSIY ───────────────────────────────────────── */
+  .hello{display:flex;align-items:center;margin-bottom:14px}
+  .hello .tx{flex:1}
+  .hello .hi{font-size:17px;font-weight:800}
+  .hello .dt{font-size:11px;color:var(--mut);margin-top:2px}
+  .icbtn{width:34px;height:34px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:14px;margin-left:8px;color:var(--mut)}
+  .icbtn.lang{font-size:9.5px;font-weight:800;color:var(--ink);letter-spacing:.5px}
+
+  .score{display:flex;gap:14px;align-items:center}
+  .gauge{position:relative;width:118px;height:118px;flex:none}
+  .gauge .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .num b{font-size:30px;letter-spacing:-1px}
+  .gauge .num span{font-size:8.5px;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
+  .checks{flex:1;display:flex;flex-direction:column;gap:8px}
+  .chk{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--mut)}
+  .chk i{width:18px;height:18px;border-radius:50%;background:var(--safe-bg);color:var(--safe);
+    display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;flex:none}
+  .chk.off i{background:var(--warn-bg);color:var(--warn)}
+  .chk b{color:var(--ink);font-weight:600}
+  .score-foot{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .st-ok{font-size:13.5px;font-weight:800;color:var(--safe)}
+  .score-foot .ago{font-size:10.5px;color:var(--mut2);flex:1}
+  .ghost{font-size:11px;font-weight:700;color:var(--ink);border:1px solid var(--line);
+    border-radius:999px;padding:6px 12px;background:transparent}
+
+  .quick{display:flex;gap:8px;margin-top:4px}
+  .q{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px}
+  .q .qi{width:30px;height:30px;border-radius:11px;background:var(--anor-soft);
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .q span{font-size:9px;color:var(--mut);font-weight:600}
+
+  .mods{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mod{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:11px}
+  .mod .mi{font-size:16px}
+  .mod b{display:block;font-size:11.5px;margin-top:6px}
+  .mod .ms{display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--mut);margin-top:3px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--safe)}
+  .dot.w{background:var(--warn)}
+
+  .threat{display:flex;align-items:center;gap:10px;padding:9px 2px}
+  .threat+.threat{border-top:1px solid var(--line)}
+  .threat .ti{width:32px;height:32px;border-radius:11px;background:var(--danger-bg);
+    display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+  .threat .tt{flex:1;min-width:0}
+  .threat .tt b{display:block;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .threat .tt span{font-size:9.5px;color:var(--mut2)}
+  .sev{font-size:8.5px;font-weight:800;letter-spacing:.5px;border-radius:7px;padding:3px 7px}
+  .sev.c{background:var(--danger-bg);color:#F69A9A}
+  .sev.h{background:var(--warn-bg);color:#F8C575}
+
+  .news{display:flex;gap:10px;align-items:flex-start}
+  .news .ni{width:32px;height:32px;border-radius:11px;background:var(--anor-soft);
+    display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+  .news b{font-size:11.5px;display:block}
+  .news span{font-size:10px;color:var(--mut);line-height:1.45;display:block;margin-top:2px}
+
+  .week{display:flex;align-items:flex-end;gap:5px;height:46px;margin-top:6px}
+  .week i{flex:1;border-radius:4px 4px 2px 2px;background:var(--card2)}
+  .week i.hot{background:linear-gradient(180deg,var(--anor),var(--anor-deep))}
+  .digest{font-size:10px;color:var(--mut);margin-top:8px}
+
+  /* ── EKRAN 2: TAHDIDLAR ────────────────────────────────────── */
+  .h2t{font-size:19px;font-weight:800;margin:2px 2px 2px}
+  .h2s{font-size:11px;color:var(--mut);margin:0 2px 12px}
+  .sum{display:flex;gap:8px}
+  .sumtile{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:11px 10px}
+  .sumtile b{font-size:20px;display:block}
+  .sumtile span{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+  .sumtile.d b{color:var(--danger)} .sumtile.w b{color:var(--warn)}
+  .qcard{display:flex;align-items:center;gap:11px;margin-top:10px}
+  .qcard .qi2{width:38px;height:38px;border-radius:13px;background:var(--warn-bg);
+    display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+  .qcard .qt{flex:1}
+  .qcard .qt b{font-size:12.5px;display:block}
+  .qcard .qt span{font-size:10px;color:var(--mut)}
+  .arr{color:var(--mut2);font-size:16px}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:64px;margin-top:10px}
+  .bars i{flex:1;border-radius:4px;background:var(--card2)}
+  .bars i.hot{background:linear-gradient(180deg,var(--anor),var(--anor-deep))}
+  .days{display:flex;gap:6px;margin-top:5px}
+  .days span{flex:1;text-align:center;font-size:8.5px;color:var(--mut2);font-family:monospace}
+  .fam{margin-top:9px}
+  .fam .fr{display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:4px}
+  .fam .fr b{color:var(--ink)} .fam .fr span{color:var(--mut)}
+  .fbar{height:5px;border-radius:3px;background:var(--card2);overflow:hidden}
+  .fbar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--anor),var(--anor-deep))}
+
+  /* ── EKRAN 3: SKANER ───────────────────────────────────────── */
+  .cmd{background:linear-gradient(160deg,#23141b 0%,var(--card) 70%);border:1px solid var(--line);
+    border-radius:22px;padding:16px;position:relative;overflow:hidden}
+  .cmd:before{content:"✦";position:absolute;right:-6px;top:-14px;font-size:90px;color:rgba(225,29,72,.08)}
+  .cmd .ttl{font-size:15px;font-weight:800}
+  .cmd .sb{font-size:10.5px;color:var(--mut);margin-top:3px;line-height:1.5}
+  .cta{display:block;width:100%;margin-top:13px;padding:13px;border:none;border-radius:15px;
+    background:linear-gradient(180deg,var(--anor),var(--anor-deep));color:#fff;
+    font-size:14px;font-weight:800;letter-spacing:.3px;box-shadow:0 10px 22px rgba(225,29,72,.4)}
+  .strip{display:flex;gap:8px;margin-top:10px}
+  .strip .s{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:9px 6px;text-align:center}
+  .strip .s b{display:block;font-size:15px}
+  .strip .s span{font-size:8.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+  .file{display:flex;align-items:center;gap:10px;padding:9px 2px}
+  .file+.file{border-top:1px solid var(--line)}
+  .file .fi{width:32px;height:32px;border-radius:11px;background:var(--card2);
+    display:flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+  .file .ft{flex:1;min-width:0}
+  .file .ft b{display:block;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .file .ft span{font-size:9.5px;color:var(--mut2)}
+
+  /* ── EKRAN 4: HIMOYA ───────────────────────────────────────── */
+  .lay{display:flex;align-items:center;gap:11px;padding:10px 2px}
+  .lay+.lay{border-top:1px solid var(--line)}
+  .lay .li{width:34px;height:34px;border-radius:12px;background:var(--anor-soft);
+    display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+  .lay .lt{flex:1}
+  .lay .lt b{display:block;font-size:12px}
+  .lay .lt span{font-size:9.5px;color:var(--mut)}
+  .sw{width:34px;height:20px;border-radius:999px;background:var(--safe);position:relative;flex:none}
+  .sw:after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff}
+  .sw.off{background:var(--card2)} .sw.off:after{right:auto;left:2px;background:var(--mut2)}
+  .app{display:flex;align-items:center;gap:10px;padding:8px 2px}
+  .app+.app{border-top:1px solid var(--line)}
+  .app .ai{width:30px;height:30px;border-radius:10px;background:var(--card2);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:13px}
+  .app .at{flex:1;min-width:0}
+  .app .at b{display:block;font-size:11px}
+  .app .at span{font-size:9px;color:var(--mut2)}
+  .badge{font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:7px}
+  .badge.ok{background:var(--safe-bg);color:#8FE5B6}
+  .badge.sd{background:var(--warn-bg);color:#F8C575}
+
+  /* ── EKRAN 5: SOZLAMALAR ───────────────────────────────────── */
+  .seg{display:flex;background:var(--card2);border-radius:12px;padding:3px;margin-top:8px}
+  .seg div{flex:1;text-align:center;font-size:10.5px;padding:6px 0;border-radius:10px;color:var(--mut)}
+  .seg .on{background:linear-gradient(180deg,var(--anor),var(--anor-deep));color:#fff;font-weight:700}
+  .acc{display:flex;gap:8px;margin-top:10px}
+  .acc div{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;color:var(--mut)}
+  .acc i{width:26px;height:26px;border-radius:50%}
+  .acc .on{color:var(--ink);font-weight:700}
+</style>
+</head>
+<body>
+  <h1>UzGuard — dizayn v2 · «Qalqon markazi»</h1>
+  <div class="sub">Yangi tuzilma: suzuvchi nav + markaziy SKAN tugmasi · bosh ekranda yangi seksiyalar
+  (xavfsizlik bali, tezkor amallar, himoya modullari, jonli lenta, yangiliklar, haftalik faollik) ·
+  2 ta yangi ekran: <b>Tahdidlar markazi</b> va <b>Himoya markazi</b></div>
+
+  <div class="stage">
+
+    <!-- ════════ EKRAN 1: ASOSIY ════════ -->
+    <div class="col">
+      <div class="cap">1 · Asosiy</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body" style="overflow-y:hidden">
+          <div class="hello">
+            <div class="tx">
+              <div class="hi">Assalomu alaykum! 👋</div>
+              <div class="dt">10-iyun, chorshanba · Qurilma nazorat ostida</div>
+            </div>
+            <div class="icbtn lang">UZ</div>
+            <div class="icbtn">🔔</div>
+          </div>
+
+          <div class="card">
+            <div class="score">
+              <div class="gauge" data-score="92"><div class="num"><b>92</b><span>xavfsizlik bali</span></div></div>
+              <div class="checks">
+                <div class="chk"><i>✓</i><div><b>Real-time himoya</b></div></div>
+                <div class="chk"><i>✓</i><div><b>Baza yangilangan</b></div></div>
+                <div class="chk off"><i>!</i><div><b>Karantin: 2 fayl</b></div></div>
+              </div>
+            </div>
+            <div class="score-foot">
+              <div class="st-ok">HIMOYALANGAN</div>
+              <div class="ago">oxirgi skan: 14 daq oldin</div>
+              <button class="ghost">To‘liq skan</button>
+            </div>
+          </div>
+
+          <div class="sect"><b>Tezkor amallar</b></div>
+          <div class="quick">
+            <div class="q"><div class="qi">📥</div><span>Yuklamalar</span></div>
+            <div class="q"><div class="qi">🗂️</div><span>Karantin</span></div>
+            <div class="q"><div class="qi">📰</div><span>Yangiliklar</span></div>
+            <div class="q"><div class="qi">🩺</div><span>Tashxis</span></div>
+          </div>
+
+          <div class="sect"><b>Himoya modullari</b><a href="#">Boshqarish</a></div>
+          <div class="mods">
+            <div class="mod"><div class="mi">⚡</div><b>Real-time himoya</b><div class="ms"><span class="dot"></span>Yoqilgan</div></div>
+            <div class="mod"><div class="mi">🔄</div><b>Avto-skan 24/7</b><div class="ms"><span class="dot"></span>Yoqilgan</div></div>
+            <div class="mod"><div class="mi">☁️</div><b>Bulut baza</b><div class="ms"><span class="dot"></span>Bugun yangilandi</div></div>
+            <div class="mod"><div class="mi">✉️</div><b>Telegram qalqon</b><div class="ms"><span class="dot w"></span>O‘chiq</div></div>
+          </div>
+
+          <div class="sect"><b>So‘nggi tahdidlar</b><a href="#">Hammasi</a></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="threat"><div class="ti">🦠</div><div class="tt"><b>RASMLAR (18).apk</b><span>Telegram · 2 soat oldin</span></div><div class="sev c">XAVFLI</div></div>
+            <div class="threat"><div class="ti">⚠️</div><div class="tt"><b>VIDEO_2026.apk</b><span>Yuklamalar · kecha</span></div><div class="sev h">SHUBHALI</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it on"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdidlar</div>
+          <div class="fab-gap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="fab">📡<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ EKRAN 1b: ASOSIY (davomi) ════════ -->
+    <div class="col">
+      <div class="cap">1b · Asosiy — pastki seksiyalar</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body">
+          <div class="sect" style="margin-top:0"><b>Yangiliklar</b><a href="#">Lenta</a></div>
+          <div class="card news">
+            <div class="ni">📣</div>
+            <div>
+              <b>Yangi «toy taklifnoma» APK to‘lqini</b>
+              <span>Telegramda tarqalmoqda — tanish yuborsa ham APK ochmang. UzGuard bloklaydi.</span>
+            </div>
+          </div>
+
+          <div class="sect"><b>Haftalik faollik</b></div>
+          <div class="card">
+            <div class="week">
+              <i style="height:30%"></i><i style="height:55%"></i><i class="hot" style="height:80%"></i>
+              <i style="height:40%"></i><i style="height:62%"></i><i style="height:25%"></i><i class="hot" style="height:100%"></i>
+            </div>
+            <div class="days"><span>Du</span><span>Se</span><span>Cho</span><span>Pa</span><span>Ju</span><span>Sh</span><span>Ya</span></div>
+            <div class="digest">Bu hafta: <b style="color:var(--ink)">124 skan</b> · <b style="color:var(--danger)">3 tahdid bloklandi</b></div>
+          </div>
+
+          <div class="sect"><b>Himoya darajasi</b></div>
+          <div class="card" style="display:flex;gap:10px;align-items:center">
+            <div style="font-size:24px">🏅</div>
+            <div style="flex:1">
+              <b style="font-size:12px">Kuchli himoya</b>
+              <div style="font-size:9.5px;color:var(--mut);margin-top:2px">Barcha modullarni yoqsangiz — 100 ball</div>
+              <div class="fbar" style="margin-top:7px"><i style="width:92%"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it on"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdidlar</div>
+          <div class="fab-gap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="fab">📡<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ EKRAN 2: TAHDIDLAR ════════ -->
+    <div class="col">
+      <div class="cap">2 · Tahdidlar markazi (yangi)</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body">
+          <div class="h2t">Tahdidlar markazi</div>
+          <div class="h2s">Bloklangan, karantindagi va tarixdagi barcha xavflar</div>
+
+          <div class="sum">
+            <div class="sumtile d"><b>7</b><span>Bloklangan</span></div>
+            <div class="sumtile w"><b>2</b><span>Karantinda</span></div>
+            <div class="sumtile"><b>312</b><span>Tekshirildi</span></div>
+          </div>
+
+          <div class="card qcard">
+            <div class="qi2">🗂️</div>
+            <div class="qt"><b>Karantin</b><span>2 fayl xavfsiz izolyatsiyada · tiklash yoki o‘chirish</span></div>
+            <div class="arr">›</div>
+          </div>
+
+          <div class="sect"><b>Faollik · 7 kun</b></div>
+          <div class="card">
+            <div class="bars">
+              <i style="height:30%"></i><i style="height:55%"></i><i class="hot" style="height:85%"></i>
+              <i style="height:42%"></i><i style="height:60%"></i><i style="height:22%"></i><i class="hot" style="height:100%"></i>
+            </div>
+            <div class="days"><span>Du</span><span>Se</span><span>Cho</span><span>Pa</span><span>Ju</span><span>Sh</span><span>Ya</span></div>
+          </div>
+
+          <div class="sect"><b>Oilalar</b></div>
+          <div class="card">
+            <div class="fam"><div class="fr"><b>Ajina.Banker</b><span>4</span></div><div class="fbar"><i style="width:80%"></i></div></div>
+            <div class="fam"><div class="fr"><b>RoundRift</b><span>2</span></div><div class="fbar"><i style="width:40%"></i></div></div>
+            <div class="fam"><div class="fr"><b>SMS-Stealer</b><span>1</span></div><div class="fbar"><i style="width:20%"></i></div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it on"><span class="gi">🛡️</span>Tahdidlar</div>
+          <div class="fab-gap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="fab">📡<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ EKRAN 3: SKANER ════════ -->
+    <div class="col">
+      <div class="cap">3 · Skaner (markaziy tugmadan)</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body">
+          <div class="h2t">Skaner</div>
+          <div class="h2s">APK fayllarni qidirish va tekshirish</div>
+
+          <div class="cmd">
+            <div class="ttl">Qurilmani tekshirish</div>
+            <div class="sb">Yuklamalar, Telegram papkalari va xotira skan qilinadi. O‘rtacha 20–40 soniya.</div>
+            <button class="cta">▶ &nbsp;SKANNI BOSHLASH</button>
+          </div>
+
+          <div class="strip">
+            <div class="s"><b>14</b><span>APK topildi</span></div>
+            <div class="s"><b style="color:var(--danger)">1</b><span>Xavfli</span></div>
+            <div class="s"><b style="color:var(--safe)">13</b><span>Toza</span></div>
+          </div>
+
+          <div class="sect"><b>Topilgan fayllar</b><a href="#">Yangilash</a></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="file"><div class="fi">📦</div><div class="ft"><b>Telegram.apk</b><span>Yuklamalar · 64 MB</span></div><div class="badge ok">TOZA</div></div>
+            <div class="file"><div class="fi">🦠</div><div class="ft"><b>RASMLAR (18).apk</b><span>Telegram · 4.2 MB</span></div><div class="sev c">XAVFLI</div></div>
+            <div class="file"><div class="fi">📦</div><div class="ft"><b>eImzo_v4.apk</b><span>Yuklamalar · 18 MB</span></div><div class="badge ok">TOZA</div></div>
+            <div class="file"><div class="fi">📦</div><div class="ft"><b>Zoom_meet.apk</b><span>Bluetooth · 122 MB</span></div><div class="badge ok">TOZA</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdidlar</div>
+          <div class="fab-gap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="fab" style="box-shadow:0 10px 24px rgba(225,29,72,.7),0 0 0 6px rgba(14,14,18,.9)">📡<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ EKRAN 4: HIMOYA ════════ -->
+    <div class="col">
+      <div class="cap">4 · Himoya markazi (yangi)</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body">
+          <div class="h2t">Himoya markazi</div>
+          <div class="h2s">Qatlamlar, qurilma ilovalari va vositalar</div>
+
+          <div class="sect" style="margin-top:8px"><b>Himoya qatlamlari</b></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="lay"><div class="li">⚡</div><div class="lt"><b>Real-time himoya</b><span>Yangi APK darhol tekshiriladi</span></div><div class="sw"></div></div>
+            <div class="lay"><div class="li">🗑️</div><div class="lt"><b>Avto-o‘chirish</b><span>Xavfli fayl darhol karantinga</span></div><div class="sw"></div></div>
+            <div class="lay"><div class="li">✉️</div><div class="lt"><b>Telegram qalqon</b><span>Phishing-havolalar ogohlantirishi</span></div><div class="sw off"></div></div>
+            <div class="lay"><div class="li">☁️</div><div class="lt"><b>Baza avto-yangilash</b><span>Bulutdan yangi imzolar</span></div><div class="sw"></div></div>
+          </div>
+
+          <div class="sect"><b>Qurilma ilovalari</b><a href="#">62 ta</a></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="app"><div class="ai">✈️</div><div class="at"><b>Telegram</b><span>org.telegram.messenger</span></div><div class="badge ok">PLAY</div></div>
+            <div class="app"><div class="ai">🏦</div><div class="at"><b>Click Up</b><span>air.com.ssdsoftwaresolutions</span></div><div class="badge ok">PLAY</div></div>
+            <div class="app"><div class="ai">❓</div><div class="at"><b>UzCard Pro</b><span>com.fake.uzcard</span></div><div class="badge sd">SIDELOAD</div></div>
+          </div>
+
+          <div class="sect"><b>Vositalar</b></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="lay"><div class="li">🧾</div><div class="lt"><b>Himoya holati va ruxsatlar</b></div><div class="arr">›</div></div>
+            <div class="lay"><div class="li">🕵️</div><div class="lt"><b>Yashirin tahdidlar skaneri</b></div><div class="arr">›</div></div>
+            <div class="lay"><div class="li">🩺</div><div class="lt"><b>Diagnostika</b></div><div class="arr">›</div></div>
+            <div class="lay"><div class="li">📨</div><div class="lt"><b>Muammo haqida xabar</b></div><div class="arr">›</div></div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdidlar</div>
+          <div class="fab-gap"></div>
+          <div class="it on"><span class="gi">🧩</span>Himoya</div>
+          <div class="it"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="fab">📡<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+    <!-- ════════ EKRAN 5: SOZLAMALAR ════════ -->
+    <div class="col">
+      <div class="cap">5 · Sozlamalar</div>
+      <div class="phone"><div class="notch"></div><div class="scr">
+        <div class="body">
+          <div class="h2t">Sozlamalar</div>
+          <div class="h2s">Ko‘rinish, til va maxfiylik</div>
+
+          <div class="sect" style="margin-top:8px"><b>Ko‘rinish</b></div>
+          <div class="card">
+            <div style="font-size:11px;color:var(--mut)">Mavzu</div>
+            <div class="seg"><div>Yorug‘</div><div class="on">Tun</div></div>
+            <div style="font-size:11px;color:var(--mut);margin-top:12px">Brend rangi</div>
+            <div class="acc">
+              <div class="on"><i style="background:linear-gradient(180deg,#E11D48,#C2143D);box-shadow:0 0 0 2px #fff3"></i>Anor</div>
+              <div><i style="background:#2D9CB8"></i>Feruz</div>
+              <div><i style="background:#CC9442"></i>Zafaron</div>
+            </div>
+          </div>
+
+          <div class="sect"><b>Til</b></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="lay"><div class="lt"><b>O‘zbekcha</b></div><div style="color:var(--safe)">✓</div></div>
+            <div class="lay"><div class="lt"><b>Русский</b></div><div class="arr">›</div></div>
+          </div>
+
+          <div class="sect"><b>Maxfiylik</b></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="lay"><div class="li">🤝</div><div class="lt"><b>Jamoaviy himoya</b><span>Anonim namuna ulashish</span></div><div class="sw"></div></div>
+            <div class="lay"><div class="li">📜</div><div class="lt"><b>Maxfiylik siyosati</b></div><div class="arr">›</div></div>
+          </div>
+
+          <div style="text-align:center;font-size:9px;color:var(--mut2);margin-top:16px;font-family:monospace">
+            UZGUARD v8.0 · NAVOIY 🇺🇿
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="it"><span class="gi">🏠</span>Asosiy</div>
+          <div class="it"><span class="gi">🛡️</span>Tahdidlar</div>
+          <div class="fab-gap"></div>
+          <div class="it"><span class="gi">🧩</span>Himoya</div>
+          <div class="it on"><span class="gi">⚙️</span>Sozlama</div>
+        </div>
+        <div class="fab">📡<span>SKAN</span></div>
+      </div></div>
+    </div>
+
+  </div>
+
+<script>
+// Segmentli score-gauge: 48 ta tick, score % gacha yashil, qolgani kulrang.
+document.querySelectorAll('.gauge').forEach(g => {
+  const score = +g.dataset.score || 0;
+  const n = 48, r = 52, cx = 59, cy = 59;
+  for (let i = 0; i < n; i++) {
+    // -210°..+30° oralig'i (240° yoy), pastki o'rta ochiq qoladi
+    const a = (-210 + (240 / (n - 1)) * i) * Math.PI / 180;
+    const t = document.createElement('i');
+    const on = (i / n) * 100 < score;
+    t.style.cssText = `position:absolute;width:3px;height:11px;border-radius:2px;left:${cx + Math.cos(a) * r - 1.5}px;top:${cy + Math.sin(a) * r - 5.5}px;transform:rotate(${(a * 180 / Math.PI) + 90}deg);background:${on ? 'var(--safe)' : 'var(--card2)'};${on ? 'box-shadow:0 0 6px rgba(57,210,126,.45)' : ''}`;
+    g.appendChild(t);
+  }
+});
+</script>
+</body>
+</html>

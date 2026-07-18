@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Beruvchi lentadagi (ticker) bitta e'lon kartochkasi. NewsTickerAdapter buni
-  gorizontal RecyclerView ichiga inflate qiladi; lenta uzluksiz suriladi.
-    newsAccent     — chap chiziq, rang darajaga qarab (info/warning/critical)
+  Beruvchi lentadagi (ticker) bitta e'lon kartochkasi — v4 dizayn.
+  NewsTickerAdapter buni gorizontal RecyclerView ichiga inflate qiladi:
+    newsAccent     — chap chiziq, rang darajaga qarab (koddan: info/warning/critical)
     newsThumbCard  — kichik rasm (havola bo'lsa ko'rinadi; aks holda gone)
     newsItemTitle  — sarlavha (2 qator)
     newsItemBody   — qisqa matn (bo'sh bo'lsa gone)
@@ -11,6 +11,7 @@
 -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="264dp"
     android:layout_height="wrap_content"
     android:layout_marginVertical="2dp"
@@ -42,7 +43,7 @@
             android:layout_height="60dp"
             android:layout_marginStart="12dp"
             android:visibility="gone"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="14dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
@@ -66,11 +67,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:fontFamily="@font/onest_semibold"
+                android:letterSpacing="-0.01"
                 android:maxLines="2"
-                android:text="Sarlavha"
                 android:textColor="@color/kq_ink"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                tools:text="Sarlavha" />
 
             <TextView
                 android:id="@+id/newsItemBody"
@@ -78,20 +80,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:ellipsize="end"
+                android:fontFamily="@font/onest_regular"
                 android:maxLines="1"
                 android:text=""
-                android:textColor="@color/kq_ink_2"
-                android:textSize="12sp"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="12.5sp"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/newsItemDate"
+                style="@style/KQ4.Mono"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:fontFamily="monospace"
                 android:text=""
-                android:textColor="@color/kq_ink_3"
                 android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>

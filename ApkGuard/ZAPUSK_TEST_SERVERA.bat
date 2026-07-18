@@ -45,7 +45,7 @@ echo.
 echo 💻 Или на компьютере:
 echo    http://localhost:8000
 echo.
-echo 🛡️ Скачайте тестовые APK и проверьте работу KiberQalqon
+echo 🛡️ Скачайте тестовые APK и проверьте работу UzGuard
 echo.
 echo Для остановки нажмите Ctrl+C
 echo.

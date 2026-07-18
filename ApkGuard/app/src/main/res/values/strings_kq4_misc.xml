@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v4 dizayn — "boshqa" ekranlar satrlari (Consent, Welcome, Terms, Privacy,
+  ApkList, Diagnostics, TelemetrySettings, HiddenThreats).
+  Har bir kalitning ruscha tarjimasi values-ru/strings_kq4_misc.xml da.
+-->
+<resources>
+
+    <!-- ═══════ Umumiy (hujjat ekranlari) ═══════ -->
+    <string name="kq4_misc_doc_eyebrow">Hujjatlar</string>
+
+    <!-- ═══════ Consent (rozilik) ═══════ -->
+    <string name="kq4_misc_consent_review_title">Shartlar va maxfiylik siyosati</string>
+    <string name="kq4_misc_decline_title">Ishonchingiz komilmi?</string>
+    <string name="kq4_misc_decline_msg">Rad etsangiz, UzGuard ishlay olmaydi va ilovadan chiqasiz.\n\nE\'tibor bering: \"Jamoatchilik xavfsizligi\" ulashishi ham, Telegram telemetriya ham MAJBURIY EMAS — ular alohida, ixtiyoriy. Asosiy himoya (skaner, ogohlantirish) ularsiz ham to\'liq ishlaydi. Faqat Shartlar va Maxfiylik siyosatiga rozilik kerak.</string>
+    <string name="kq4_misc_decline_back">Qaytib o\'qish</string>
+    <string name="kq4_misc_decline_exit">Chiqish</string>
+
+    <!-- ═══════ Welcome ═══════ -->
+    <string name="kq4_misc_welcome_tagline">Telefoningizni himoya qiling</string>
+    <string name="kq4_misc_welcome_title">Xush kelibsiz</string>
+    <string name="kq4_misc_welcome_sub">Davom etish uchun ma\'lumotlaringizni kiriting</string>
+    <string name="kq4_misc_welcome_first_name">Ismingiz</string>
+    <string name="kq4_misc_welcome_last_name">Familiyangiz</string>
+    <string name="kq4_misc_welcome_agree">Men shartlar va maxfiylik siyosati bilan tanishdim</string>
+    <string name="kq4_misc_welcome_about">Loyiha haqida</string>
+    <string name="kq4_misc_welcome_footer" translatable="false">© 2026 · UZGUARD · O\'ZBEKISTON</string>
+
+    <!-- ═══════ Terms (foydalanish shartlari) ═══════ -->
+    <string name="kq4_misc_terms_s1">1 · Kirish</string>
+    <string name="kq4_misc_terms_s2">2 · Ilova maqsadi</string>
+    <string name="kq4_misc_terms_s2_body">UzGuard telefoningizni zararli APK fayllardan himoya qiladi:\n\n• Yuklab olingan APK fayllarni tekshiradi\n• Xavfli fayllarni bloklaydi va o\'chiradi\n• Fishing bildirishnomalarini aniqlaydi\n• Serverga xavfli fayllarni yuboradi (ixtiyoriy)</string>
+    <string name="kq4_misc_terms_s3">3 · Foydalanuvchi majburiyatlari</string>
+    <string name="kq4_misc_terms_s3_body">Siz quyidagilarni qilmaslikka majbursiz:\n\n• Ilovani noqonuniy maqsadlarda ishlatish\n• Ilova kodini o\'zgartirish yoki dekompilatsiya qilish\n• Ilovani boshqa shaxslarga sotish\n• Ilova orqali zararli dasturlar tarqatish</string>
+    <string name="kq4_misc_terms_s4">4 · Cheklovlar va javobgarlik</string>
+    <string name="kq4_misc_terms_s4_body">MUHIM: UzGuard 100% himoya kafolatini bermaydi. Ilova faqat ma\'lum xavflarni aniqlaydi.\n\nIshlab chiquvchilar javobgar emaslar:\n• Ma\'lumotlar yo\'qolishi\n• Qurilmaga zarar\n• Moliyaviy yo\'qotishlar\n• Uchinchi tomon xizmatlari</string>
+    <string name="kq4_misc_terms_s5">5 · Kerakli ruxsatlar</string>
+    <string name="kq4_misc_terms_s5_body">• Fayllar va media — APK topish uchun\n• Bildirishnomalar — fishing aniqlash uchun\n• Internet — serverga yuklash (ixtiyoriy)\n\nBu ruxsatlar faqat ilova funksiyalari uchun ishlatiladi.</string>
+    <string name="kq4_misc_terms_s6">6 · O\'zgarishlar</string>
+    <string name="kq4_misc_terms_s7">7 · Aloqa</string>
+    <string name="kq4_misc_terms_s7_body">Savollar yoki takliflar bo\'lsa, Sozlamalar → Yordam bo\'limi orqali murojaat qiling.</string>
+
+    <!-- ═══════ Privacy (maxfiylik siyosati) ═══════ -->
+    <string name="kq4_misc_privacy_intro">UzGuard sizning maxfiyligingizni jiddiy qabul qiladi. Ushbu siyosat qanday ma\'lumotlar yig\'ilishi va ishlatilishini tushuntiradi.</string>
+
+    <!-- ═══════ APK ro'yxati ═══════ -->
+    <string name="kq4_misc_eyebrow_scanner">Skaner</string>
+    <string name="kq4_misc_apk_list_sub">Yuklab olingan APK fayllar</string>
+
+    <!-- ═══════ Umumiy (misc ekranlar) ═══════ -->
+    <string name="kq4_misc_toast_copied">Nusxa olindi</string>
+
+    <!-- ═══════ Diagnostika ═══════ -->
+    <string name="kq4_misc_diag_eyebrow">Diagnostika</string>
+    <string name="kq4_misc_diag_title">Texnik holat</string>
+    <string name="kq4_misc_diag_btn_copy">📋 Nusxa olish</string>
+    <string name="kq4_misc_diag_btn_share">✉️ Yuborish</string>
+    <string name="kq4_misc_diag_btn_send_dev">📨 Dasturchiga yuborish (Telegram)</string>
+    <string name="kq4_misc_diag_btn_refresh">🔄 Yangilash</string>
+    <string name="kq4_misc_diag_btn_telemetry">🤖 Telegram telemetriya</string>
+    <string name="kq4_misc_diag_btn_hidden">🔍 Yashirin / o\'chmaydigan tahdidlar</string>
+    <string name="kq4_misc_diag_share_subject">UzGuard diagnostika</string>
+    <string name="kq4_misc_diag_send">Yuborish</string>
+    <string name="kq4_misc_diag_toast_share_fail">Yuborib bo\'lmadi: %1$s</string>
+    <string name="kq4_misc_diag_toast_no_channel">Telegram kanal sozlanmagan — boshqa usulda yuboring</string>
+    <string name="kq4_misc_diag_dev_title">Dasturchiga yuborish</string>
+    <string name="kq4_misc_diag_dev_msg">Izohingiz va shu ekrandagi diagnostika (qurilma, ruxsatlar, oxirgi xato) dasturchining Telegramiga yuboriladi.</string>
+    <string name="kq4_misc_diag_dev_hint">Muammoni qisqacha yozing (ixtiyoriy)</string>
+    <string name="kq4_misc_diag_toast_sending">Yuborilmoqda…</string>
+    <string name="kq4_misc_diag_toast_sent_ok">✅ Yuborildi. Rahmat!</string>
+    <string name="kq4_misc_diag_toast_sent_fail">❌ Yuborib bo\'lmadi. Internetni tekshiring.</string>
+
+    <!-- ═══════ Telegram telemetriya ═══════ -->
+    <string name="kq4_misc_tg_eyebrow">Telemetriya</string>
+    <string name="kq4_misc_tg_title">Telegram telemetriya</string>
+    <string name="kq4_misc_tg_intro">Barcha hodisalar (skaner, o\'rnatish, xato, crash) sizning Telegram guruhingizga yuboriladi.</string>
+    <string name="kq4_misc_tg_label_token">Bot tokeni (@BotFather dan):</string>
+    <string name="kq4_misc_tg_hint_token_ex" translatable="false">7234567890:AAGxx...</string>
+    <string name="kq4_misc_tg_label_chat">Guruh Chat ID (minus bilan, masalan -1001234567890):</string>
+    <string name="kq4_misc_tg_hint_chat_ex" translatable="false">-1001234567890</string>
+    <string name="kq4_misc_tg_check_enable">Telemetriyani yoqish (xabarlar yuborish)</string>
+    <string name="kq4_misc_tg_check_listen">🎧 Telegram\'dan komandalar qabul qilish</string>
+    <string name="kq4_misc_tg_hint_listen">(guruhda /start yozing — boshqaruv paneli chiqadi)</string>
+    <string name="kq4_misc_tg_check_send_apk">📤 Skanerdan keyin APK faylni guruhga yuborish</string>
+    <string name="kq4_misc_tg_hint_send_apk">(faqat xavfli/shubhali APK\'lar yuboriladi, 50MB gacha)</string>
+    <string name="kq4_misc_tg_btn_save">💾 Saqlash</string>
+    <string name="kq4_misc_tg_btn_test">🧪 Test xabar</string>
+    <string name="kq4_misc_tg_btn_panel">🎛 Boshqaruv panelini yuborish</string>
+    <string name="kq4_misc_tg_btn_autodetect">🤖 Chat ID\'ni avto-aniqlash</string>
+    <string name="kq4_misc_tg_btn_guide">❓ Qanday sozlash?</string>
+    <string name="kq4_misc_tg_toast_saved">Saqlandi</string>
+    <string name="kq4_misc_tg_toast_need_config">Avval token va chat_id kiriting</string>
+    <string name="kq4_misc_tg_toast_panel_sent">Panel guruhga yuborildi</string>
+    <string name="kq4_misc_tg_toast_need_token">Avval bot tokenni kiriting</string>
+    <string name="kq4_misc_tg_toast_searching">Qidirilmoqda… guruhga /start yozing</string>
+    <string name="kq4_misc_tg_toast_bad_token">Bot tokeni xato yoki bloklangan</string>
+    <string name="kq4_misc_tg_toast_found">Topildi: %1$s (%2$s)</string>
+    <string name="kq4_misc_tg_toast_not_found">Hech narsa topilmadi. Guruhga /start yozib qayta urinib ko\'ring.</string>
+    <string name="kq4_misc_tg_toast_test_sent">Test yuborildi — guruhda tekshiring</string>
+    <string name="kq4_misc_tg_guide_title">Telegram bot yaratish</string>
+    <string name="kq4_misc_tg_guide_body">1. Telegram → @BotFather toping\n2. /newbot bosib bot yarating, tokenni oling\n\n3. Yangi guruh yarating va botingizni qo\'shing\n\n4. Guruhga biror xabar yozing\n\n5. Brauzerda oching:\n   api.telegram.org/bot&lt;TOKEN&gt;/getUpdates\n   chat ni id ni oling (minus bilan)\n\n6. Bu yerga token va chat_id ni kiriting va Test bosing!</string>
+
+    <!-- ═══════ Yashirin tahdidlar ═══════ -->
+    <string name="kq4_misc_hidden_eyebrow">Chuqur tekshiruv</string>
+    <string name="kq4_misc_hidden_title">Yashirin tahdidlar</string>
+    <string name="kq4_misc_hidden_intro">Telefonda o\'rnatilgan, lekin ikonkasini yashirgan yoki o\'chirishga qarshilik qiladigan ilovalar. Agar ularni o\'zingiz bilib o\'rnatgan bo\'lsangiz — xavfsiz.</string>
+    <string name="kq4_misc_hidden_checking">Tekshirilmoqda…</string>
+    <string name="kq4_misc_hidden_none">✓ Yashirin yoki o\'chmaydigan tahdid topilmadi.</string>
+    <string name="kq4_misc_hidden_count">%1$d ta ko\'rib chiqishga arzigulik ilova:</string>
+    <string name="kq4_misc_hidden_reason">Sabab: %1$s</string>
+    <string name="kq4_misc_hidden_blacklist">Qora ro\'yxat: %1$s</string>
+    <string name="kq4_misc_hidden_sideload">Manba: Play Store EMAS (sideload)</string>
+    <string name="kq4_misc_hidden_dangerous_perms">Xavfli ruxsatlar: %1$d ta</string>
+    <string name="kq4_misc_hidden_act_admin">1) Administrator huquqini olib tashlash</string>
+    <string name="kq4_misc_hidden_hint_admin">Xavfsizlik → Qurilma administratorlari → \"%1$s\" dan belgini oling. So\'ng o\'chiring.</string>
+    <string name="kq4_misc_hidden_act_access">2) Accessibility\'ni o\'chirish</string>
+    <string name="kq4_misc_hidden_hint_access">Maxsus imkoniyatlar → \"%1$s\" xizmatini o\'chiring.</string>
+    <string name="kq4_misc_hidden_act_notif">Bildirishnoma kirishini o\'chirish</string>
+    <string name="kq4_misc_hidden_act_uninstall">🗑 O\'chirish (uninstall)</string>
+    <string name="kq4_misc_hidden_act_appinfo">Ilova haqida ma\'lumot</string>
+    <string name="kq4_misc_hidden_footer_title">Agar baribir o\'chmasa:</string>
+    <string name="kq4_misc_hidden_footer_body">• XAVFSIZ REJIM (Safe Mode): quvvat tugmasini bosib turing → \"Xavfsiz rejim\"ni tanlang. Unda barcha begona ilovalar (va ularning Accessibility) vaqtincha o\'chadi — o\'shanda bemalol o\'chiring.\n\n• Kompyuter orqali (ADB): USB-debug yoqing, telefonni ulang va buyruqni bajaring (&lt;paket&gt; o\'rniga yuqoridagi paket nomini qo\'ying):</string>
+    <string name="kq4_misc_hidden_adb_cmd" translatable="false">adb shell pm uninstall --user 0 &lt;paket&gt;</string>
+    <string name="kq4_misc_hidden_act_copy_adb">ADB buyrug\'idan nusxa olish</string>
+    <string name="kq4_misc_hidden_open_fail">Ochib bo\'lmadi: %1$s</string>
+    <string name="kq4_misc_hidden_trait_hidden_icon">ikonka yashirilgan</string>
+    <string name="kq4_misc_hidden_trait_admin">qurilma administratori (o\'chirishni bloklaydi)</string>
+    <string name="kq4_misc_hidden_trait_access">Accessibility nazorati</string>
+    <string name="kq4_misc_hidden_trait_notif">bildirishnomalarga kirish (OTP)</string>
+    <string name="kq4_misc_hidden_trait_blacklist">qora ro\'yxatda</string>
+</resources>

@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.os.Environment
@@ -15,14 +15,14 @@ import java.util.Locale
  *
  * Записывает stacktrace в два места (что доступнее в данный момент):
  *  1) files/crash_log.txt в каталоге приложения (всегда доступно)
- *  2) /sdcard/Download/kiberqalqon_crash.txt — если есть права (легко открыть через файл-менеджер)
+ *  2) /sdcard/Download/uzguard_crash.txt — если есть права (легко открыть через файл-менеджер)
  *
  * Потом ПРОБРАСЫВАЕТ исключение в дефолтный handler, чтобы Android корректно показал
  * "произошёл сбой" и не было ANR.
  */
 object CrashHandler {
 
-    private const val TAG = "KiberQalqonCrash"
+    private const val TAG = "UzGuardCrash"
 
     fun install(ctx: Context) {
         val app = ctx.applicationContext
@@ -57,7 +57,7 @@ object CrashHandler {
         val sw = StringWriter()
         PrintWriter(sw).use { pw ->
             val ts = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
-            pw.println("=== KiberQalqon CRASH @ $ts ===")
+            pw.println("=== UzGuard CRASH @ $ts ===")
             pw.println("Thread: ${thread.name}")
             pw.println("Android: ${android.os.Build.VERSION.RELEASE} (SDK ${android.os.Build.VERSION.SDK_INT})")
             pw.println("Device:  ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
@@ -85,7 +85,7 @@ object CrashHandler {
         try {
             val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             if (downloads != null) {
-                val out = File(downloads, "kiberqalqon_crash.txt")
+                val out = File(downloads, "uzguard_crash.txt")
                 out.appendText(text + "\n\n")
             }
         } catch (_: Throwable) { /* ignore */ }

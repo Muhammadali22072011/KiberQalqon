@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import androidx.core.content.edit
@@ -27,7 +27,7 @@ import java.security.MessageDigest
  */
 object ScanCache {
 
-    private const val PREFS = "kiberqalqon_scan_cache"
+    private const val PREFS = "uzguard_scan_cache"
     // v2 (2026-05): verdict-mantiqi qayta kalibrlandi (false-positive tuzatildi).
     // Versiya nomi o'zgartirildi → eski (noto'g'ri DANGER) keshlangan natijalar
     // tashlanadi. Aks holda allaqachon skanlangan legit ilovalar (Chrome, GMS...)
@@ -58,6 +58,26 @@ object ScanCache {
     private fun currentStamp(ctx: Context): String =
         "${BuildConfig.VERSION_CODE}:${Config.lastDatabaseUpdate(ctx)}"
 
+    /**
+     * PERF (qizish — 2026-06-18, qurilmada o'lchangan): avval get()/put() HAR chaqiruvda
+     * butun JSON'ni (500 yozuvgacha, har biri massivlar bilan) qayta parse qilardi. Skan
+     * keshi HIT bo'lganda ham — ya'ni hech narsa qayta skanlanmaganda — shu takror parse
+     * protsessorni band qilib, telefonni isitardi ("hammasi tekshirilgach ham qizardi"
+     * simptomi shu edi). Endi yozuvlar XOTIRADA (pathHash → Entry) bir marta yuklanadi:
+     * get() — O(1) map lookup, disk parse YO'Q. Diskka yozish faqat put()'da (yangi yoki
+     * o'zgargan fayl skanlanganda) bo'ladi. Bitta jarayon — SharedPreferences bilan
+     * sinxron qoladi; ScanCache best-effort (miss bo'lsa baribir qayta skan — false-SAFE yo'q).
+     */
+    @Volatile private var mem: LinkedHashMap<String, Entry>? = null
+
+    private fun ensureLoaded(ctx: Context): LinkedHashMap<String, Entry> {
+        mem?.let { return it }
+        val map = LinkedHashMap<String, Entry>()
+        for (e in loadAll(ctx)) map[e.pathHash] = e
+        mem = map
+        return map
+    }
+
     /** Faylga mos kesh yozuvi bo'lsa va mtime+size mos kelsa — ScanResult qaytar. */
     fun get(ctx: Context, apkPath: String): ScanResult? = synchronized(this) {
         val file = File(apkPath)
@@ -66,7 +86,7 @@ object ScanCache {
         val size = file.length()
         val hash = pathHash(apkPath)
 
-        val entry = loadAll(ctx).firstOrNull { it.pathHash == hash } ?: return null
+        val entry = ensureLoaded(ctx)[hash] ?: return null
         if (entry.mtime != mtime || entry.size != size) return null
         // Ta'riflar o'zgargan bo'lsa — keshni ishonchsiz deb bekor qilamiz (qayta skan).
         if (entry.stamp != currentStamp(ctx)) return null
@@ -108,19 +128,22 @@ object ScanCache {
             cachedAt = now
         )
 
-        val all = loadAll(ctx).toMutableList()
-        // Bir xil yo'l uchun eski yozuvni o'chir.
-        all.removeAll { it.pathHash == hash }
-        all.add(newEntry)
-        // Eng eskilarini olib tashlaymiz (cachedAt bo'yicha).
-        val trimmed = if (all.size > MAX_ENTRIES) {
-            all.sortedByDescending { it.cachedAt }.take(MAX_ENTRIES)
-        } else all
-        saveAll(ctx, trimmed)
+        val map = ensureLoaded(ctx)
+        // Bir xil yo'l uchun eski yozuvni o'chir (LinkedHashMap tartibi yangilansin → eng yangi oxirda).
+        map.remove(hash)
+        map[hash] = newEntry
+        // Eng eskilarini olib tashlaymiz (cachedAt bo'yicha) — MAX_ENTRIES dan oshsa.
+        if (map.size > MAX_ENTRIES) {
+            val keep = map.values.sortedByDescending { it.cachedAt }.take(MAX_ENTRIES)
+            map.clear()
+            for (e in keep) map[e.pathHash] = e
+        }
+        saveAll(ctx, map.values.toList())
     }
 
     /** Barcha keshni tozalash — masalan Settings → "Keshni tozalash" tugmasi uchun. */
     fun clear(ctx: Context): Unit = synchronized(this) {
+        mem = LinkedHashMap()
         prefs(ctx).edit { remove(KEY_ENTRIES) }
     }
 

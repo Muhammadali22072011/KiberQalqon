@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -72,7 +72,7 @@ class SystemStateReceiver : BroadcastReceiver() {
 
     companion object {
         private const val TAG = "SystemStateReceiver"
-        private const val PREFS = "kiberqalqon_sysstate"
+        private const val PREFS = "uzguard_sysstate"
         private const val KEY_LAST_SIM = "last_sim_operator"
         private fun simPrefs(ctx: Context): SharedPreferences =
             ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

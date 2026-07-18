@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import java.io.File
 
@@ -178,6 +178,26 @@ object FilenameHeuristic {
         "drive" to "com.google.android.apps.docs",
     )
 
+    /**
+     * O'z brendimiz (va tarixiy rebrand nomlari). Bu tokenlar soxta-brend (typosquat)
+     * tekshiruvidan chetlab o'tiladi — o'zimizning o'rnatgich/faylimiz boshqa brendning
+     * taqlidi deb belgilanmasin. Masalan "uzguard" ⟵Levenshtein-2⟶ "uzcard".
+     */
+    private val OWN_BRANDS: Set<String> = setOf(
+        "uzguard", "anorqalqon", "anor", "kiberqalqon", "qalqon",
+    )
+
+    /**
+     * Известные легитимные сегменты package name — их НЕ прогоняем через bigram-rarity,
+     * чтобы бренды вроде 'google' (go,oo,og,gl) / 'youtube' (yo,ut,tu,ub) не помечались как
+     * random dropper-имена. Дополняет расширенный COMMON_BIGRAMS второй линией защиты.
+     */
+    private val LEGIT_PACKAGE_SEGMENTS: Set<String> = setOf(
+        "google", "youtube", "android", "chrome", "gmail", "facebook",
+        "instagram", "whatsapp", "telegram", "messenger", "samsung",
+        "xiaomi", "huawei", "mobile", "apps", "docs", "service", "services",
+    )
+
     fun analyze(apkPath: String, packageName: String?, appLabel: String? = null): Findings {
         val filename = File(apkPath).name
         val flags = mutableListOf<String>()
@@ -220,6 +240,10 @@ object FilenameHeuristic {
         var brandHit: HardDanger.BrandImpersonation? = null
         for ((brand, expected) in KNOWN_BRANDS) {
             val (kind, matchedToken) = matchBrand(brand, tokens, rawName) ?: continue
+            // O'z brendimiz taqlid EMAS: "uzguard" tokeni "uzcard"dan Levenshtein-2 uzoqlikda →
+            // aks holda o'zimizning "uzguard-setup.apk" o'rnatgichimiz uzcard typosquat'i deb
+            // noto'g'ri belgilanardi (2026-07-09 panelda kuzatilgan). Rebrand nomlari ham kiritilgan.
+            if (matchedToken.lowercase() in OWN_BRANDS) continue
 
             val pkgOk = packageName?.lowercase()?.startsWith(expected.lowercase()) == true
             if (!pkgOk) {
@@ -268,6 +292,7 @@ object FilenameHeuristic {
         if (packageName != null) {
             val segs = packageName.split('.').filter { it.length >= 4 }
             for (seg in segs) {
+                if (seg.lowercase() in LEGIT_PACKAGE_SEGMENTS) continue
                 val rarity = bigramRarityScore(seg.lowercase())
                 if (rarity >= 0.55) {
                     score += 20
@@ -299,9 +324,54 @@ object FilenameHeuristic {
             if (tok.length !in (brand.length - 1)..(brand.length + 2)) continue
             if (tok == brand) return "exact" to tok
             val d = levenshtein(tok, brand, maxDistance = 2)
-            if (d in 1..2) return "typosquat" to tok
+            // FP-guard (HIGH): не считать typosquat'ом обычные слова ('payment'→payme,
+            // 'clicker'→click, 'signed'→signal). Иначе legit APK (даже signature-VERIFIED)
+            // получает мгновенный hard-DANGER до trust-shield'а в ApkScanner.
+            if (d in 1..2 && !isCommonWordNotTyposquat(tok, brand)) return "typosquat" to tok
         }
         return null
+    }
+
+    /** Общие английские суффиксы: 'click'+'er'='clicker', 'payme'+... — производные слова, не typosquat. */
+    private val COMMON_WORD_SUFFIXES: List<String> = listOf(
+        "s", "es", "ed", "er", "ers", "ing", "ment", "or", "ion", "nt", "al", "ly",
+    )
+
+    /**
+     * Небольшой словарь обычных слов (uz/ru/en), которые по Levenshtein ≤ 2 случайно совпадают
+     * с брендами, но НЕ являются typosquat'ом. Без этого guard'а legit-имена вроде
+     * 'payment'/'clicker'/'signed'/'quick'/'trick' давали hard-DANGER (2026-07-11 audit, HIGH).
+     */
+    private val COMMON_WORDS_NOT_BRANDS: Set<String> = setOf(
+        // payme-collisions
+        "payment", "payments", "payed", "payee",
+        // click-collisions
+        "clicker", "clicks", "clicked", "clicking", "quick", "trick", "tricks",
+        "thick", "brick", "bricks", "stick", "sticks", "flick", "slick", "chick",
+        "click", "clique",
+        // signal-collisions
+        "signed", "signage", "single", "singles", "signals", "signup",
+        // drive-collisions
+        "driver", "drivers", "drives", "driven", "derive", "prime", "pride", "price",
+        // asaka/soliq/mygov-collisions (короткие бренды) — обычные слова
+        "osaka", "alaska", "solid", "solim",
+        // общие app-слова
+        "receipt", "invoice", "message", "messages", "market", "wallet", "secure",
+        "browser", "gallery", "camera", "contact", "health", "credit", "update",
+        "updater", "installer", "manager", "player", "reader", "editor",
+    )
+
+    /**
+     * true, если tok — обычное слово / производное от бренда, а не typosquat.
+     *  1) tok = brand + общий суффикс (или brand = tok + суффикс) → производное слово.
+     *  2) tok ∈ словарь обычных слов.
+     */
+    private fun isCommonWordNotTyposquat(tok: String, brand: String): Boolean {
+        for (suf in COMMON_WORD_SUFFIXES) {
+            if (tok.length > brand.length && tok == brand + suf) return true
+            if (brand.length > tok.length && brand == tok + suf) return true
+        }
+        return tok in COMMON_WORDS_NOT_BRANDS
     }
 
     /**
@@ -415,6 +485,9 @@ object FilenameHeuristic {
         // Common in software/package names
         "an", "er", "ap", "pl", "ic", "io", "on", "ol", "ne", "et",
         "pa", "ge", "il", "us", "vi", "ad", "lo", "do", "ge", "in",
+        // Frequent bigrams in legit brand segments (google/youtube/… ) — bularsiz
+        // 'google' (go,oo,og,gl) va 'youtube' (yo,ut,tu,ub) random-like deb baholanardi.
+        "go", "oo", "og", "gl", "yo", "ut", "tu", "ub", "yt", "gm",
         // Common in Uzbek (latin orthography)
         "uz", "ng", "ek", "ar", "im", "ic", "an", "or", "il", "al",
         // Domain TLD patterns

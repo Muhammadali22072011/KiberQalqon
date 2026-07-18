@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
@@ -38,6 +38,55 @@ class GuardWorker(
 
     override suspend fun doWork(): Result {
         return try {
+            // Bulut qora ro'yxati (hash/paket/domen) muzlab qolmasin: ilova kunlab sovuq
+            // startsiz yashasa ham, panel qo'shgan yangi domen ≤30 daqiqada yetib keladi.
+            // isBackgroundEnabled'dan OLDIN — havola qalqoni fon-skan o'chiq bo'lsa ham ishlaydi.
+            // Fail-safe: oflayn/xato keshga tegmaydi.
+            //
+            // MUHIM: REAL-VAQT yo'lida (ProtectionService aniqlagan aniq APK = KEY_APK_PATHS)
+            // tarmoqqa CHIQMAYMIZ — skan issiq yo'li oflayn qolishi shart (yangi zararli faylni
+            // karantinlash sekin tarmoq tufayli ~25s kechikmasin). Feed allaqachon startda
+            // (App.onCreate loadCached/refresh) yuklangan; bu yerda faqat davriy/to'liq rejim yangilaydi.
+            val isRealtime = !inputData.getStringArray(KEY_APK_PATHS).isNullOrEmpty()
+            if (!isRealtime) {
+                try {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        CloudBlacklist.refreshIfStale(applicationContext)
+                    }
+                } catch (ce: kotlinx.coroutines.CancellationException) {
+                    throw ce  // bekor qilish yutilmasin — Worker to'xtatilsa skan davom etmasin
+                } catch (e: Throwable) {
+                    Log.w(TAG, "cloud blacklist refreshIfStale failed", e)
+                }
+                // Panel joylagan yangi e'lon (yangilik) bo'lsa — rasm bilan bildirishnoma.
+                // isBackgroundEnabled'dan OLDIN: yangiliklar fon-skan o'chiq bo'lsa ham keladi.
+                // Ichida 30 daqiqalik throttle + first-run seed + dedup bor; oflayn/xato no-op.
+                try {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        NewsNotifier.checkAndNotify(applicationContext)
+                    }
+                } catch (ce: kotlinx.coroutines.CancellationException) {
+                    throw ce
+                } catch (e: Throwable) {
+                    Log.w(TAG, "news notify check failed", e)
+                }
+                // Imzolangan config + ilova o'z yangilanishi ham DAVRIY tekshiriladi.
+                // Ilgari faqat App.onCreate'da edi — foreground service tufayli jarayon
+                // kunlab tirik qolsa sovuq start bo'lmaydi va "Yangi versiya chiqdi"
+                // bildirishnomasi hech qachon kelmasdi. RemoteConfig ichida 6 soatlik
+                // attempt-throttle bor; SelfUpdate har versionCode uchun bir marta ogohlantiradi.
+                try {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        RemoteConfig.refreshIfStale(applicationContext)
+                        SelfUpdate.checkAndNotify(applicationContext)
+                    }
+                } catch (ce: kotlinx.coroutines.CancellationException) {
+                    throw ce
+                } catch (e: Throwable) {
+                    Log.w(TAG, "periodic self-update check failed", e)
+                }
+            }
+
             if (!Config.isBackgroundEnabled(applicationContext)) {
                 return Result.success()
             }
@@ -54,6 +103,7 @@ class GuardWorker(
                     var uploaded = 0
                     var scanned = 0
                     for (p in explicitPaths) {
+                        if (isStopped) break  // Worker to'xtatilsa og'ir skanni davom ettirmaymiz (batareya/qizish)
                         val f = File(p)
                         if (!f.exists()) continue
                         val item = ApkItem(f, f.name, f.absolutePath, f.length())
@@ -78,7 +128,7 @@ class GuardWorker(
                         Log.e(TAG, "Full sweep find error", e); return Result.success()
                     }
 
-                    val prefs = applicationContext.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                    val prefs = applicationContext.getSharedPreferences("uzguard_checked", Context.MODE_PRIVATE)
                     // getStringSet() immutable Set qaytaradi — to'g'ridan-to'g'ri .add() qilsa crash.
                     val checked = HashSet<String>().apply {
                         addAll(prefs.getStringSet("checked_paths", emptySet()) ?: emptySet())
@@ -86,6 +136,7 @@ class GuardWorker(
                     var uploaded = 0
                     var scanned = 0
                     for (apk in apks) {
+                        if (isStopped) break  // Worker to'xtatilsa (batareya past bo'lib qolsa) qolgan APK'larni skanlamaymiz
                         if (!apk.file.exists()) continue
                         // Dedup path+mtime+size bo'yicha: avval faqat path edi → o'sha yo'ldagi YANGI
                         // (o'zgargan) APK qayta skanlanmasdan o'tib ketardi. mtime/size o'zgarsa — qayta skan.
@@ -106,8 +157,13 @@ class GuardWorker(
                             suspiciousAsPopup = recentlyDownloaded
                         )
                     }
-                    // Ro'yxat cheksiz o'smasligi uchun cheklaymiz.
-                    val capped = if (checked.size > 5000) checked.take(5000).toHashSet() else checked
+                    // Ro'yxat cheksiz o'smasligi uchun faqat mavjud fayllarni saqlab qolamiz.
+                    val stillExists = checked.filter { key ->
+                        try {
+                            File(pathOfKey(key)).exists()
+                        } catch (_: Throwable) { false }
+                    }
+                    val capped = if (stillExists.size > 2000) stillExists.take(2000).toHashSet() else stillExists.toHashSet()
                     prefs.edit().putStringSet("checked_paths", capped).apply()
 
                     // BG-04: bu yerda Config.markDatabaseUpdated() ATAYIN CHAQIRILMAYDI. Avval har 15
@@ -132,13 +188,14 @@ class GuardWorker(
                     // chiqardi (antivirusni o'chirishning #1 sababi). Endi "allaqachon ogohlantirilgan"
                     // to'plamini (path|mtime|size) saqlaymiz: o'sha fayl uchun qayta alert chiqmaydi,
                     // faqat YANGI (yoki o'zgargan) fayl ogohlantiradi. Skan baribir bajariladi.
-                    val prefs = applicationContext.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                    val prefs = applicationContext.getSharedPreferences("uzguard_checked", Context.MODE_PRIVATE)
                     val warned = HashSet<String>().apply {
                         addAll(prefs.getStringSet("unlock_warned", emptySet()) ?: emptySet())
                     }
                     val now = System.currentTimeMillis()
                     var uploaded = 0
                     for (item in list.take(10)) {
+                        if (isStopped) break  // Worker to'xtatilsa qolgan skanlarni to'xtatamiz
                         if (!item.file.exists()) continue
                         val result = try {
                             ApkScanner.scan(applicationContext, item.file.absolutePath)
@@ -157,12 +214,22 @@ class GuardWorker(
                             suppressAlerts = alreadyWarned
                         )
                     }
-                    val capped = if (warned.size > 5000) warned.take(5000).toHashSet() else warned
+                    // Faqat mavjud fayllarni saqlab qolamiz.
+                    val stillExistsWarned = warned.filter { key ->
+                        try {
+                            File(pathOfKey(key)).exists()
+                        } catch (_: Throwable) { false }
+                    }
+                    val capped = if (stillExistsWarned.size > 2000) stillExistsWarned.take(2000).toHashSet() else stillExistsWarned.toHashSet()
                     prefs.edit().putStringSet("unlock_warned", capped).apply()
                     Log.d(TAG, "Quick scan: ${list.size} found, uploaded=$uploaded")
                     Result.success(workDataOf("scanned" to list.size, "uploaded" to uploaded))
                 }
             }
+        } catch (ce: kotlinx.coroutines.CancellationException) {
+            // Worker to'xtatildi (bekor qilindi) — bu XATO emas. Ichki throw ce'lar shu yergacha
+            // yetib kelsin: bekor qilishni Result.failure()'ga aylantirib yutmaymiz, propagatsiya bo'lsin.
+            throw ce
         } catch (e: Exception) {
             Log.e(TAG, "Critical error in background worker", e)
             Result.failure()
@@ -178,6 +245,16 @@ class GuardWorker(
      * SUSPICIOUS — hech qachon avto-o'chirilmaydi, faqat popup. SAFE — faqat
      * [allowSafeNotification] (yangi yuklab olingan) bo'lsa bildirishnoma.
      */
+    /**
+     * checked_paths / unlock_warned kaliti "path|mtime|size" ko'rinishida. Fayl yo'li o'zida
+     * '|' belgisini saqlashi mumkin (ext4/f2fs'da ruxsat etilgan), shuning uchun oddiy
+     * substringBefore('|') yo'lni kesib yuborardi → mavjud fayl noto'g'ri "yo'q" deb chiqarilardi
+     * (BG-03 takror ogohlantirish qaytadi). Oxirgi ikki bo'lakni (size va mtime) tashlab yo'lni
+     * tiklaymiz — yo'lda '|' bo'lsa ham to'g'ri ishlaydi.
+     */
+    private fun pathOfKey(key: String): String =
+        key.substringBeforeLast('|').substringBeforeLast('|')
+
     private fun handleResult(
         item: ApkItem,
         result: ScanResult,
@@ -394,10 +471,10 @@ class GuardWorker(
         const val KEY_FULL_SWEEP = "full_sweep"
 
         /** Yagona periodik ish nomi. App.onCreate va BootReceiver SHU nomdan foydalanadi. */
-        const val UNIQUE_PERIODIC = "kiberqalqon_scan"
+        const val UNIQUE_PERIODIC = "uzguard_scan"
 
         /**
-         * Yagona 15 daqiqalik periodik GuardWorker (full_sweep=true). Avvalgi alohida
+         * Yagona 30 daqiqalik periodik GuardWorker (full_sweep=true). Avvalgi alohida
          * PeriodicCheckWorker o'rnida butun telefonni dedup bilan skanlaydi. App.onCreate
          * ham, BootReceiver ham shu yerdan chaqiradi — bitta unique nom, bitta zanjir.
          * UPDATE policy: mavjud o'rnatishlarda ham yangi full_sweep flag qo'llanadi.
@@ -408,7 +485,12 @@ class GuardWorker(
             val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)
                 .build()
-            val request = PeriodicWorkRequestBuilder<GuardWorker>(15, TimeUnit.MINUTES)
+            // PERF (qizish/batareya): to'liq xotira obhodi (FullPhoneScan) — og'ir ish.
+            // Avval har 15 daqiqada (batareyada ham) ishlardi. Real-vaqt aniqlash event-driven
+            // yo'l (FileObserver + PackageInstallReceiver + ProtectionService) zimmasida; bu
+            // periodik sweep faqat ilova o'lik bo'lganda tushgan fayllarni ushlaydigan zaxira,
+            // shuning uchun 30 daqiqa ham yetarli — uyg'onishlar soni ikki barobar kamayadi.
+            val request = PeriodicWorkRequestBuilder<GuardWorker>(30, TimeUnit.MINUTES)
                 .setInputData(workDataOf(KEY_FULL_SWEEP to true))
                 .setConstraints(constraints)
                 .build()
@@ -427,7 +509,7 @@ class GuardWorker(
          */
         private fun cancelLegacyPeriodic(context: Context) {
             try {
-                val sp = context.getSharedPreferences("kiberqalqon_checked", Context.MODE_PRIVATE)
+                val sp = context.getSharedPreferences("uzguard_checked", Context.MODE_PRIVATE)
                 if (sp.getBoolean("legacy_periodic_cancelled", false)) return
                 WorkManager.getInstance(context).cancelUniqueWork("periodic_apk_check")
                 sp.edit().putBoolean("legacy_periodic_cancelled", true).apply()

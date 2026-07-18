@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  E'lonning to'liq ko'rinishi. Lentadagi kartochka bosilganda MainActivity buni
-  AlertDialog ichida ko'rsatadi (oyna foni shaffof — burchaklar yumaloq ko'rinadi):
+  E'lonning to'liq ko'rinishi — v4 «Milliy Kiber Himoya» dizayni.
+  Lentadagi kartochka bosilganda MainActivity buni AlertDialog ichida ko'rsatadi
+  (oyna foni shaffof — burchaklar yumaloq ko'rinadi):
     newsDlgImage  — to'liq rasm (havola bo'lsa ko'rinadi)
-    newsDlgLevel  — daraja yorlig'i (E'lon / Ogohlantirish / Muhim)
+    newsDlgLevel  — daraja yorlig'i (E'lon / Ogohlantirish / Muhim) — rangi koddan
     newsDlgTitle / newsDlgDate / newsDlgBody — sarlavha, sana, matn
     newsDlgClose  — yopish (✕)
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="24dp">
 
     <com.google.android.material.card.MaterialCardView
+        style="@style/KQ4.Card.Flat"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/kq_bg_elev"
-        app:cardCornerRadius="22dp"
-        app:cardElevation="0dp"
-        app:strokeColor="@color/kq_hairline"
-        app:strokeWidth="1dp">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,34 +41,29 @@
 
                 <TextView
                     android:id="@+id/newsDlgLevel"
+                    style="@style/KQ4.Eyebrow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.12"
-                    android:text="E'lon"
-                    android:textAllCaps="true"
-                    android:textColor="@color/kq_primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
+                    tools:text="E'lon" />
 
                 <TextView
                     android:id="@+id/newsDlgTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Sarlavha"
+                    android:fontFamily="@font/onest_bold"
+                    android:letterSpacing="-0.01"
                     android:textColor="@color/kq_ink"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    tools:text="Sarlavha" />
 
                 <TextView
                     android:id="@+id/newsDlgDate"
+                    style="@style/KQ4.Mono"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:fontFamily="monospace"
                     android:text=""
-                    android:textColor="@color/kq_ink_3"
                     android:textSize="11sp" />
 
                 <ScrollView
@@ -84,10 +77,11 @@
                         android:id="@+id/newsDlgBody"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:lineSpacingMultiplier="1.4"
+                        android:fontFamily="@font/onest_regular"
+                        android:lineSpacingMultiplier="1.5"
                         android:text=""
                         android:textColor="@color/kq_ink_2"
-                        android:textSize="14sp" />
+                        android:textSize="14.5sp" />
                 </ScrollView>
             </LinearLayout>
         </LinearLayout>
@@ -95,15 +89,16 @@
 
     <TextView
         android:id="@+id/newsDlgClose"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:layout_gravity="top|end"
         android:layout_margin="12dp"
-        android:background="@drawable/kq_news_close_bg"
+        android:background="@drawable/kq4_icon_btn"
         android:clickable="true"
         android:focusable="true"
+        android:fontFamily="@font/onest_bold"
         android:gravity="center"
         android:text="✕"
         android:textColor="@color/kq_ink"
-        android:textSize="16sp" />
+        android:textSize="15sp" />
 </FrameLayout>

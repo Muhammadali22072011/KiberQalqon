@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Защита банка» (BankGuardActivity / BankAppAudit) — аудит поддельных банковских приложений.
+  Русская локаль. Оригинал (узбекская латиница) в values/strings_kq4_bankguard.xml.
+-->
+<resources>
+
+    <!-- Заголовок -->
+    <string name="kq4_bank_eyebrow">Защита</string>
+    <string name="kq4_bank_title">Защита банка</string>
+    <string name="kq4_bank_intro">Ищем среди приложений на вашем телефоне ПОДДЕЛЬНЫЕ программы, маскирующиеся под настоящие банковские и платёжные приложения. Такие подделки используют то же имя и иконку, чтобы украсть ваши пароли и SMS-коды.</string>
+
+    <!-- Строка статуса -->
+    <string name="kq4_bank_checking">Проверка приложений…</string>
+    <string name="kq4_bank_safe_status">Все приложения проверены</string>
+    <string name="kq4_bank_count">Найдено поддельных банковских приложений: %1$d</string>
+
+    <!-- Поддельная карточка -->
+    <string name="kq4_bank_fake_title">Поддельное банковское приложение</string>
+    <string name="kq4_bank_mimics">Маскируется под: %1$s</string>
+
+    <!-- Причины -->
+    <string name="kq4_bank_reason_label">Название похоже на настоящий банк, но пакет другой</string>
+    <string name="kq4_bank_reason_icon">Иконка почти идентична иконке настоящего банка</string>
+    <string name="kq4_bank_reason_notplay">Установлено не из Play Store — из недоверенного источника</string>
+    <string name="kq4_bank_reason_cert">Подпись не совпадает с официальной подписью банка</string>
+    <string name="kq4_bank_reason_typosquat">Имя пакета слишком близко к бренду банка (typosquat)</string>
+
+    <!-- Пустое состояние (чисто) -->
+    <string name="kq4_bank_none_title">Поддельные банковские приложения не найдены</string>
+    <string name="kq4_bank_none_body">Приложений, маскирующихся под настоящий банк, пока не обнаружено. Устанавливайте банковские приложения только из Play Store или с официального сайта банка.</string>
+
+    <!-- Состояние ошибки (проверка не выполнена — НЕ зелёное «чисто») -->
+    <string name="kq4_bank_failed_status">Не удалось проверить</string>
+    <string name="kq4_bank_failed_title">Не удалось завершить проверку</string>
+    <string name="kq4_bank_failed_body">Не удалось прочитать список приложений, поэтому результат ненадёжен. Пожалуйста, попробуйте ещё раз.</string>
+    <string name="kq4_bank_retry">Повторить</string>
+
+    <!-- Действия -->
+    <string name="kq4_bank_act_uninstall">Удалить приложение</string>
+    <string name="kq4_bank_act_appinfo">О приложении</string>
+    <string name="kq4_bank_open_fail">Не удалось открыть: %1$s</string>
+
+</resources>

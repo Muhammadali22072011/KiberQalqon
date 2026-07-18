@@ -79,7 +79,7 @@ fun shieldEnc(plain: String): String {
 }
 
 android {
-    namespace = "com.kiberqalqon"
+    namespace = "com.uzguard"
     compileSdk = 34
     // Native himoya kutubxonasi (libkqguard.so) NDK versiyasi. D: da, C:\Android\ndk\... junction.
     ndkVersion = "26.1.10909125"
@@ -90,8 +90,8 @@ android {
         applicationId = "com.kiberqalqon"
         minSdk = 24
         targetSdk = 34
-        versionCode = 80
-        versionName = "8.0"
+        versionCode = 87
+        versionName = "8.7"
         buildConfigField("String", "DEFAULT_SERVER_URL", "\"\"")
 
         // OPT-IN community threat sharing (dev's Telegram). Sirlar APK'da OCHIQ EMAS —
@@ -113,10 +113,14 @@ android {
             abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
 
-        // libkqguard.so build argumentlari. KQ_EXPECTED_SIG — release imzo sertifikati
+        // libkqguard.so build argumentlari. KQ_EXPECTED_SIG — release imzo sertifikat(lar)i
         // SHA-256'i (OCHIQ qiymat — APK'dan baribir hisoblab olsa bo'ladi), nativega
         // build vaqtida beriladi (qo'lda literal emas). SecurityGuard.kt'dagi Kotlin
-        // fallback qiymati bilan AYNAN bir xil bo'lishi shart.
+        // fallback to'plami bilan AYNAN bir xil bo'lishi shart.
+        // SD-01: Play App Signing yoqilganda Play Console → App Integrity'dagi
+        // "App signing key certificate" SHA-256'ini VERGUL orqali ikkinchi qiymat
+        // sifatida shu yerga (va SecurityGuard.kt ro'yxatiga) qo'shish SHART —
+        // aks holda Play'dan o'rnatilgan ilova o'zini o'ldiradi (boot-loop).
         externalNativeBuild {
             cmake {
                 arguments += listOf(
@@ -167,6 +171,15 @@ android {
             isShrinkResources = false
             applicationIdSuffix = ".debug"  // дебажная сборка ставится рядом с релизной
             versionNameSuffix = "-DEBUG"
+        }
+        // БЫСТРАЯ релизная сборка для проверки self-update: та же release-подпись и тот же
+        // applicationId (com.kiberqalqon), но БЕЗ R8 — собирается в разы быстрее. Для
+        // self-update важны лишь подпись-сертификат + пакет + versionCode; обфускация не
+        // нужна. На Play / в прод по-прежнему идёт `release` (с R8).
+        create("releasefast") {
+            initWith(getByName("release"))
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
@@ -226,6 +239,17 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+
+    // Shizuku — единственный способ удалить файл из чужой /Android/data песочницы
+    // без root (запускает rm под uid=shell). api = клиент, provider = ContentProvider
+    // для приёма биндера от сервиса Shizuku.
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
 
     testImplementation("junit:junit:4.13.2")
 }

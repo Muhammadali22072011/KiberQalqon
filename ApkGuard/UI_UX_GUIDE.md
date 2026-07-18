@@ -1,4 +1,4 @@
-# KiberQalqon — UI/UX Design Guide
+# UzGuard — UI/UX Design Guide
 
 ## 📱 Созданные Экраны
 

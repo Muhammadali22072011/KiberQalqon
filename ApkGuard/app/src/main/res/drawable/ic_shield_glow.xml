@@ -7,52 +7,52 @@
 
     <!-- Внешний glow слой 3 -->
     <path
-        android:fillColor="#1100B4D8"
+        android:fillColor="#11C2143D"
         android:pathData="M80,5L10,32v40c0,37 25.6,71.6 60,80 34.4,-8.4 60,-43 60,-80V32L80,5z"/>
 
     <!-- Внешний glow слой 2 -->
     <path
-        android:fillColor="#2200B4D8"
+        android:fillColor="#22C2143D"
         android:pathData="M80,10L16,36v37c0,33.8 23.4,65.4 54,73 30.6,-7.6 54,-39.2 54,-73V36L80,10z"/>
 
     <!-- Внешний glow слой 1 -->
     <path
-        android:fillColor="#3300B4D8"
+        android:fillColor="#33C2143D"
         android:pathData="M80,15L22,40v34c0,30.6 21.2,59.2 48,66 26.8,-6.8 48,-35.4 48,-66V40L80,15z"/>
 
     <!-- Основной щит светлый -->
     <path
-        android:fillColor="#48CAE4"
+        android:fillColor="#E11D48"
         android:pathData="M80,22L29,44v30c0,27.4 19.0,53 41,59 22.0,-6 41,-31.6 41,-59V44L80,22z"/>
 
     <!-- Щит средний -->
     <path
-        android:fillColor="#00B4D8"
+        android:fillColor="#C2143D"
         android:pathData="M80,28L35,48v27c0,24.6 17.0,47.6 36.5,53 19.5,-5.4 36.5,-28.4 36.5,-53V48L80,28z"/>
 
     <!-- Внутренний тёмный -->
     <path
-        android:fillColor="#0077B6"
+        android:fillColor="#8E0E2C"
         android:pathData="M80,35L42,52v23c0,21.0 14.5,40.6 31,45.2 16.5,-4.6 31,-24.2 31,-45.2V52L80,35z"/>
 
     <!-- Hex grid декор -->
     <path
-        android:fillColor="#48CAE4"
+        android:fillColor="#E11D48"
         android:fillAlpha="0.3"
         android:pathData="M70,60l5,-3l5,3l0,6l-5,3l-5,-3z"/>
     <path
-        android:fillColor="#48CAE4"
+        android:fillColor="#E11D48"
         android:fillAlpha="0.3"
         android:pathData="M85,60l5,-3l5,3l0,6l-5,3l-5,-3z"/>
     <path
-        android:fillColor="#48CAE4"
+        android:fillColor="#E11D48"
         android:fillAlpha="0.3"
         android:pathData="M77,75l5,-3l5,3l0,6l-5,3l-5,-3z"/>
 
     <!-- Большая галочка -->
     <path
-        android:fillColor="#39FF14"
-        android:strokeColor="#39FF14"
+        android:fillColor="#39D27E"
+        android:strokeColor="#39D27E"
         android:strokeWidth="2"
         android:pathData="M65,90l-10,-10l4,-4l6,6l20,-20l4,4z"/>
 </vector>

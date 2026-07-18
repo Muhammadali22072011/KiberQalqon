@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v4 dizayn — «Ruxsat rentgeni» (PermissionXrayActivity) satrlari (o'zbekcha). -->
+<resources>
+
+    <!-- ═══ Sarlavha + intro ═══ -->
+    <string name="kq4_xray_eyebrow">RUXSAT RENTGENI</string>
+    <string name="kq4_xray_title">Ruxsat rentgeni</string>
+    <string name="kq4_xray_intro">Telefoningizdagi ilovalar so\'ragan ruxsatlarni xavfli kombinatsiyalar bo\'yicha tekshiramiz. Yuqorida — eng xavfli ruxsat to\'plamiga ega ilovalar.</string>
+
+    <!-- ═══ Holatlar ═══ -->
+    <string name="kq4_xray_checking">Ilovalar tekshirilmoqda…</string>
+    <string name="kq4_xray_none">Xavfli ruxsat kombinatsiyasiga ega ilova topilmadi.</string>
+    <string name="kq4_xray_count">%1$d ta ilova diqqat talab qiladi</string>
+
+    <!-- ═══ Karta ═══ -->
+    <string name="kq4_xray_score_tag">Xavf: %1$d</string>
+    <string name="kq4_xray_no_combo">Alohida xavfli kombinatsiya topilmadi</string>
+    <string name="kq4_xray_sideload">Play Market\'dan tashqarida o\'rnatilgan</string>
+    <string name="kq4_xray_expand">Ruxsatlarni ko\'rish ▾</string>
+    <string name="kq4_xray_collapse">Yopish ▴</string>
+
+    <!-- ═══ Detal bo'limlari ═══ -->
+    <string name="kq4_xray_sec_crit">Eng xavfli ruxsatlar</string>
+    <string name="kq4_xray_sec_warn">E\'tibor bering</string>
+    <string name="kq4_xray_no_perms">Inson tilida tushuntiriladigan kritik ruxsat topilmadi.</string>
+
+    <!-- ═══ Tuzatish tugmalari ═══ -->
+    <string name="kq4_xray_act_appinfo">Ilova sozlamalari</string>
+    <string name="kq4_xray_act_a11y">Maxsus imkoniyatlarni tekshirish</string>
+    <string name="kq4_xray_open_fail">Sozlamalarni ochib bo\'lmadi</string>
+
+    <!-- ═══ X-ray'ga xos ruxsat izohlari (scanres'da yo'q bo'lganlari) ═══ -->
+    <string name="kq4_xray_perm_notif">Bildirishnomalarga kirish</string>
+    <string name="kq4_xray_perm_notif_s">Barcha bildirishnomalarni o\'qiydi — RECEIVE_SMS\'siz ham bank kodlarini o\'g\'irlaydi</string>
+    <string name="kq4_xray_perm_admin">Qurilma administratori</string>
+    <string name="kq4_xray_perm_admin_s">O\'zini o\'chirishdan himoya qiladi va telefonni qulflashi mumkin</string>
+    <string name="kq4_xray_perm_location">Aniq joylashuv</string>
+    <string name="kq4_xray_perm_location_s">Qayerda ekanligingizni aniq kuzatib boradi</string>
+
+</resources>

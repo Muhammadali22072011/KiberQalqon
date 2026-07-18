@@ -117,3 +117,13 @@
 -keepclasseswithmembernames,includedescriptorclasses class * {
     native <methods>;
 }
+
+# --- Shizuku ---
+# ShizukuDeleter Shizuku.newProcess'ni FAQAT reflection (getDeclaredMethod("newProcess"))
+# orqali chaqiradi. Bu metod hech qayerdan to'g'ridan-to'g'ri chaqirilmagani uchun R8 uni
+# release build'da o'CHIRADI yoki NOMINI o'zgartiradi → getDeclaredMethod NoSuchMethodException
+# tashlaydi → /Android/data virusni haqiqiy o'chirish jim ishlamay qoladi (debug/releasefast'da
+# ko'rinmaydi — u yerda minify o'chiq). Shu sabab Shizuku klasslarini butun saqlaymiz.
+-keep class rikka.shizuku.Shizuku { *; }
+-keep class rikka.shizuku.ShizukuRemoteProcess { *; }
+-dontwarn rikka.shizuku.**

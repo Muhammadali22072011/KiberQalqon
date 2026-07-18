@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.util.Log
 import java.io.RandomAccessFile
@@ -43,6 +43,15 @@ object ZipEncryptionDetector {
         val encryptedCount: Int,
         val totalEntries: Int,
         val sampleNames: List<String>,
+        /**
+         * MASLAHAT (advisory) struktura anomaliyalari — QAT'IY ZIP-shifrlash DANGER'idan ALOHIDA.
+         * Mumkin qiymatlar: "dup_entry" (bir xil nomli takroriy entry), "field_mismatch"
+         * (LFH ↔ CDH metod/o'lcham farqi), "name_mismatch" (LFH ↔ CDH fayl nomi farqi).
+         * Bular [ApkScanner]'da faqat MODEST SUSPICIOUS-darajali score qo'shadi — yakka o'zi
+         * hech qachon qat'iy DANGER bermaydi. FP guard'lar: APK Signing Block va zipalign
+         * padding (extra field) e'tiborsiz qoldiriladi.
+         */
+        val anomalies: List<String> = emptyList(),
     ) {
         val hasEncrypted: Boolean get() = encryptedCount > 0
         val fractionEncrypted: Double
@@ -64,6 +73,7 @@ object ZipEncryptionDetector {
         var cdEncrypted = 0
         var total = 0
         val sample = mutableListOf<String>()
+        var anomalies: List<String> = emptyList()
         try {
             RandomAccessFile(apkPath, "r").use { raf ->
                 val len = raf.length()
@@ -167,6 +177,10 @@ object ZipEncryptionDetector {
                     if (cdScanned > total) total = cdScanned
                     break  // valid EOCD topildi — qidiruvni to'xtatamiz
                 }
+
+                // Struktura anomaliyalari (MASLAHAT) — shifrlash DANGER'idan alohida, o'sha ochiq
+                // fayl deskriptorini qayta ishlatadi. Xatoga chidamli: null-list qaytmaydi.
+                anomalies = detectAnomalies(raf, len, maxHeaders)
             }
         } catch (e: Throwable) {
             Log.w(TAG, "ZIP scan failed", e)
@@ -175,7 +189,115 @@ object ZipEncryptionDetector {
             encryptedCount = maxOf(lfhEncrypted, cdEncrypted),
             totalEntries = total,
             sampleNames = sample,
+            anomalies = anomalies,
         )
+    }
+
+    /**
+     * MASLAHAT (advisory) struktura anomaliyalari — LFH ↔ CDH nomuvofiqligi va takroriy entry'lar.
+     * QAT'IY shifrlash tekshiruvidan MUTLAQO ALOHIDA; encryption→DANGER xatti-harakatiga tegmaydi.
+     *
+     * Yondashuv: central directory'ni topamiz, HAR CDH uchun uning local-header offset'iga (CDH+42)
+     * o'tib, LFH bilan solishtiramiz. Bu APK Signing Block'ni (v2/v3 imzolar oxirgi entry data'si
+     * bilan CD orasida yotadi — hech qanday CDH unga ishora qilmaydi) TABIIY ravishda chetlab o'tadi
+     * (FP guard #1). extra field (extraLen) UMUMAN solishtirilmaydi → zipalign padding anomaliya
+     * bermaydi (FP guard #2). Natija faqat MODEST advisory score — hech qachon standalone DANGER (#3).
+     *
+     * Aniqlanadigan holatlar:
+     *  (a) "dup_entry"     — bir xil nomdagi ikki entry (masalan ikkita classes.dex).
+     *  (b) "field_mismatch"— bir entry uchun LFH ↔ CDH metod yoki (data-descriptorsiz) o'lcham farqi.
+     *  (c) "name_mismatch" — CDH'dagi fayl nomi LFH'dagidan farq qiladi.
+     */
+    private fun detectAnomalies(raf: RandomAccessFile, len: Long, maxHeaders: Int): List<String> {
+        val out = LinkedHashSet<String>()
+        try {
+            // 1) Valid EOCD → CD offset'ini topamiz (analyze() bilan bir xil spoof-himoyali usul).
+            val tailSize = minOf(len, 65_557L).toInt()
+            if (tailSize < 22) return emptyList()
+            val tailStart = (len - tailSize).coerceAtLeast(0L)
+            raf.seek(tailStart)
+            val tail = ByteArray(tailSize)
+            raf.readFully(tail)
+            val eocdCandidates = findAllSubarray(tail, EOCD_SIG)
+            val sig = ByteArray(4)
+            var cdOffset = -1L
+            var cdSize = 0L
+            for (ci in eocdCandidates.indices.reversed()) {
+                val eocdOff = eocdCandidates[ci]
+                if (eocdOff + 20 > tail.size) continue
+                val cs = readUInt32LE(tail, eocdOff + 12)
+                val co = readUInt32LE(tail, eocdOff + 16)
+                if (co < 0 || co + 4 > len) continue
+                raf.seek(co)
+                if (raf.read(sig) != 4 || !sig.contentEquals(CDH_SIG)) continue
+                cdOffset = co
+                cdSize = cs
+                break
+            }
+            if (cdOffset < 0) return emptyList()
+
+            // 2) Har CDH'ni LFH bilan solishtiramiz.
+            val seenNames = HashSet<String>()
+            var cdPos = cdOffset
+            var scanned = 0
+            val cdEnd = (cdOffset + cdSize).coerceAtMost(len)
+            while (cdPos + 46 < cdEnd && scanned < maxHeaders) {
+                raf.seek(cdPos)
+                if (raf.read(sig) != 4 || !sig.contentEquals(CDH_SIG)) break
+                scanned++
+
+                raf.seek(cdPos + 8); val gpFlag = raf.readUnsignedShort16LE()
+                raf.seek(cdPos + 10); val cdMethod = raf.readUnsignedShort16LE()
+                raf.seek(cdPos + 20); val cdComp = raf.readUnsignedInt32LE()
+                raf.seek(cdPos + 24); val cdUncomp = raf.readUnsignedInt32LE()
+                raf.seek(cdPos + 28); val nameLen = raf.readUnsignedShort16LE()
+                val extraLen = raf.readUnsignedShort16LE()   // FP guard #2: SOLISHTIRILMAYDI
+                val commentLen = raf.readUnsignedShort16LE()
+                raf.seek(cdPos + 42); val lfhOffset = raf.readUnsignedInt32LE()
+
+                val cdName = readName(raf, cdPos + 46, nameLen)
+                if (cdName.isNotEmpty() && !seenNames.add(cdName)) out.add("dup_entry")
+
+                // LFH bilan solishtirish (offset ichkarida bo'lsa).
+                if (lfhOffset in 0..(len - 30)) {
+                    raf.seek(lfhOffset)
+                    if (raf.read(sig) == 4 && sig.contentEquals(LFH_SIG)) {
+                        raf.seek(lfhOffset + 8); val lfhMethod = raf.readUnsignedShort16LE()
+                        raf.seek(lfhOffset + 18); val lfhComp = raf.readUnsignedInt32LE()
+                        raf.seek(lfhOffset + 22); val lfhUncomp = raf.readUnsignedInt32LE()
+                        raf.seek(lfhOffset + 26); val lfhNameLen = raf.readUnsignedShort16LE()
+                        // extraLen (lfhOffset+28) O'QILMAYDI/SOLISHTIRILMAYDI — zipalign padding FP guard.
+                        val lfhName = readName(raf, lfhOffset + 30, lfhNameLen)
+
+                        if (cdName.isNotEmpty() && lfhName.isNotEmpty() && cdName != lfhName) {
+                            out.add("name_mismatch")
+                        }
+                        if (cdMethod != lfhMethod) out.add("field_mismatch")
+                        // GP-bit-3 (data descriptor) bo'lsa LFH o'lchamlari 0 — solishtirmaymiz.
+                        val hasDataDescriptor = (gpFlag and 0x0008) != 0
+                        if (!hasDataDescriptor && (cdComp != lfhComp || cdUncomp != lfhUncomp)) {
+                            out.add("field_mismatch")
+                        }
+                    }
+                }
+                cdPos += 46L + nameLen + extraLen + commentLen
+            }
+        } catch (e: Throwable) {
+            Log.w(TAG, "anomaly scan failed", e)
+        }
+        return out.toList()
+    }
+
+    /** [len] bayt nomni [off] pozitsiyadan o'qiydi (ISO-8859-1). Chegaradan tashqari → bo'sh. */
+    private fun readName(raf: RandomAccessFile, off: Long, len: Int): String {
+        if (len !in 1..1024) return ""
+        return try {
+            val nb = ByteArray(len)
+            raf.seek(off)
+            if (raf.read(nb) == len) String(nb, Charsets.ISO_8859_1) else ""
+        } catch (_: Throwable) {
+            ""
+        }
     }
 
     /**

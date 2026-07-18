@@ -1,9 +1,13 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -12,32 +16,39 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.kiberqalqon.databinding.ActivityInitialScanBinding
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import com.uzguard.databinding.ActivityInitialScanBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 /**
- * Birinchi to'liq telefon tekshiruvi. Pokazyvayetsya odin raz srazu posle
- * Onboarding — chtoby user uvidel chto KiberQalqon srazu real'no rabotayet
- * i kakie APK na ego telefone schitayutsya opasnymi.
+ * Birinchi to'liq telefon tekshiruvi — v4 «Milliy Kiber Himoya» dizayni
+ * (design_v4_extracted/screens3.jsx → InitialScan). Pokazyvayetsya odin raz srazu
+ * posle Onboarding.
  *
- *  Phase A — scanning:
+ *  Faza A — skan:
  *    FullPhoneScan.findAllApkFiles() v IO, potom ApkScanner.scan() po kazhdomu.
- *    Progress + tekushchiy fayl + counters obnovlyayutsya v real-time.
+ *    KqRingView (190dp, stroke 12, accent rang) + % + joriy fayl + hisoblagichlar
+ *    real vaqtda yangilanadi.
  *
- *  Phase B — results:
- *    Pokazyvaem tol'ko DANGER/SUSPICIOUS. Pustoy spisok → "Telefoningiz xavfsiz".
- *    Po kazhdoy stroke knopka O'chirish (cherez FileDeleter, kak v AutoScanActivity).
- *    "Hammasini o'chirish" — bulk delete (s confirm dialog).
- *    "Davom etish" → markirovat' kak done i pereyti na DashboardNewActivity.
+ *  Faza B — natija:
+ *    Faqat DANGER/SUSPICIOUS ko'rsatiladi: 80dp doira + "{N} ta xavfli fayl topildi"
+ *    + karta-ro'yxat (.li qatorlar: av 48dp + nom + manba·hajm + "Xavfli" tag).
+ *    Qator bosilsa — ScanResultActivity (batafsil + o'chirish).
+ *    "Hammasini o'chirish" — bulk delete (confirm dialog bilan, FileDeleter orqali).
+ *    "Asosiy ekranga o'tish" → done deb belgilab Dashboard/ProtectionStatus'ga.
  *
- * Skip link visible during scan — pozvolyaet propustit' esli user toropitsya.
+ * Skip skan paytida ko'rinadi — pozvolyaet propustit' esli user toropitsya.
  */
 class InitialScanActivity : AppCompatActivity() {
 
@@ -81,8 +92,13 @@ class InitialScanActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeHelper.applyAccent(this)
         binding = ActivityInitialScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // v4 Ring: stroke 12, rang — joriy aksent (?attr/kqPrimary), track default surface-2.
+        binding.scanRing.strokeWidthDp = 12f
+        binding.scanRing.ringColor = resolveAccentColor()
 
         // TTS engine'ni oldindan tayyorlaymiz — scan tugagach darhol gapirsin.
         VoiceVerdict.init(this)
@@ -91,6 +107,16 @@ class InitialScanActivity : AppCompatActivity() {
         binding.btnContinue.setOnClickListener { goToDashboard() }
         binding.btnDeleteAll.setOnClickListener { confirmDeleteAll() }
         // Skan onResume'da boshlanadi — avval "Barcha fayllarga ruxsat" tekshiriladi.
+    }
+
+    /** ?attr/kqPrimary (aksent overlay) → rang; topilmasa — kq_primary fallback. */
+    private fun resolveAccentColor(): Int {
+        val tv = TypedValue()
+        return if (theme.resolveAttribute(R.attr.kqPrimary, tv, true)) {
+            if (tv.resourceId != 0) ContextCompat.getColor(this, tv.resourceId) else tv.data
+        } else {
+            ContextCompat.getColor(this, R.color.kq_primary)
+        }
     }
 
     // Skan faqat BIR marta va faqat fayl ruxsati bo'lganda ishga tushadi.
@@ -118,15 +144,11 @@ class InitialScanActivity : AppCompatActivity() {
         if (askingAccess) return
         askingAccess = true
         AlertDialog.Builder(this)
-            .setTitle("Ruxsat kerak")
-            .setMessage(
-                "Telefon fayllarini (Yuklamalar, Telegram va boshqalar) tekshirish uchun " +
-                    "\"Barcha fayllarga ruxsat\" yoqilishi shart. Busiz skaner fayllarni " +
-                    "KO'RA OLMAYDI va xavfni topa olmaydi."
-            )
+            .setTitle(getString(R.string.permission_needed))
+            .setMessage(getString(R.string.kq4_is_perm_msg))
             .setCancelable(false)
-            .setPositiveButton("Ruxsat berish") { _, _ -> openManageStorage() }
-            .setNegativeButton("Keyinroq") { _, _ -> goToDashboard(markDone = false) }
+            .setPositiveButton(getString(R.string.grant)) { _, _ -> openManageStorage() }
+            .setNegativeButton(getString(R.string.btn_later)) { _, _ -> goToDashboard(markDone = false) }
             .setOnDismissListener { askingAccess = false }
             .show()
     }
@@ -134,10 +156,25 @@ class InitialScanActivity : AppCompatActivity() {
     private fun startScan() {
         if (scanStarted) return
         scanStarted = true
+        // Faza A boshlanishi: "fayllar qidirilmoqda" — uzun qidiruvda (ko'p faylli telefon)
+        // ekran "qotib qolgandek" ko'rinmasin. Ilgari bu yerda hech narsa yangilanmasdi va
+        // butun fayl tizimi obhod qilinguncha ekran 0% da turardi.
+        binding.tvCurrentFile.text = getString(R.string.kq4_is_searching)
+        binding.tvScanProgress.text = ""
         scope.launch {
             try {
                 val apks = withContext(Dispatchers.IO) {
-                    FullPhoneScan.findAllApkFiles(this@InitialScanActivity)
+                    // Tez yo'l: MediaStore indeksidan (yangi/katta telefonlarda ham darhol
+                    // topadi) + to'liq rekursiv yurish (endi vaqt byudjeti bilan — hech qachon
+                    // cheksiz osilmaydi). Yo'l bo'yicha dedup qilamiz.
+                    val fast = try {
+                        ApkScanner.findApkFiles(this@InitialScanActivity)
+                    } catch (_: Throwable) { emptyList<ApkItem>() }
+                    val deep = try {
+                        FullPhoneScan.findAllApkFiles(this@InitialScanActivity)
+                    } catch (_: Throwable) { emptyList<ApkItem>() }
+                    val seen = HashSet<String>(fast.size + deep.size)
+                    (fast + deep).filter { seen.add(it.path) }
                 }
                 if (apks.isEmpty()) {
                     presentResults()
@@ -147,38 +184,45 @@ class InitialScanActivity : AppCompatActivity() {
                 val total = apks.size
                 binding.tvFoundCount.text = total.toString()
 
-                for ((i, apk) in apks.withIndex()) {
-                    binding.tvCurrentFile.text = apk.name
-                    val pct = (i + 1) * 100 / total
-                    binding.tvScanProgress.text = "$pct%"
-
-                    val result = withContext(Dispatchers.IO) {
-                        try {
-                            ApkScanner.scan(this@InitialScanActivity, apk.path)
-                        } catch (e: Throwable) {
-                            android.util.Log.w("InitialScan", "scan failed: ${apk.path}", e)
-                            null
+                // OPTIMIZATSIYA: ilgari APK'lar BIRMA-BIR (ketma-ket) skanlanardi — ko'p faylli
+                // telefonda sekin va uzoq. Endi cheklangan PARALLEL (SCAN_CONCURRENCY ta bir
+                // vaqtda) — ~bir necha barobar tez. Cheksiz EMAS — loyihada qizish tarixi bor,
+                // shuning uchun bir vaqtda atigi 3 ta (qizishni nazoratda ushlaymiz).
+                var done = 0
+                for (chunk in apks.chunked(SCAN_CONCURRENCY)) {
+                    if (!isActive) break
+                    val scanned = withContext(Dispatchers.IO) {
+                        chunk.map { apk ->
+                            async {
+                                apk to try {
+                                    ApkScanner.scan(this@InitialScanActivity, apk.path)
+                                } catch (e: Throwable) {
+                                    android.util.Log.w("InitialScan", "scan failed: ${apk.path}", e)
+                                    null
+                                }
+                            }
+                        }.awaitAll()
+                    }
+                    for ((apk, result) in scanned) {
+                        done++
+                        binding.tvCurrentFile.text = apk.name
+                        val pct = done * 100 / total
+                        binding.tvScanProgress.text = "$pct%"
+                        binding.scanRing.setValue(pct.toFloat(), animate = false)
+                        val isThreat = result != null && result.verdict != ScanResult.Verdict.SAFE
+                        if (isThreat) {
+                            dangerous += DangerEntry(
+                                path = apk.path,
+                                filename = apk.name,
+                                sizeBytes = apk.sizeBytes,
+                                verdict = result!!.verdict,
+                                reason = result.reason,
+                            )
+                            binding.tvDangerCount.text = dangerous.size.toString()
                         }
+                        // Statistika ApkScanner.scan() ICHIDA sanaladi — bu yerda qayta emas.
                     }
-                    val isThreat = result != null && result.verdict != ScanResult.Verdict.SAFE
-                    if (isThreat) {
-                        dangerous += DangerEntry(
-                            path = apk.path,
-                            filename = apk.name,
-                            sizeBytes = apk.sizeBytes,
-                            verdict = result!!.verdict,
-                            reason = result.reason,
-                        )
-                        binding.tvDangerCount.text = dangerous.size.toString()
-                    }
-                    // Radar'ga ping: yashil = toza, qizil = xavfli/shubhali.
-                    binding.radarScan.addPing(isThreat = isThreat)
-                    // Statistika UZHE inkrementiruyetsya vnutri ApkScanner.scan() — vtoroy
-                    // raz zdes' ne nuzhno, inache kazhdyy fayl uchityvayetsya dvazhdy
-                    // (i Dashboard pokazyvayet udvoyennye chisla).
-
-                    // Yield UI thread so the pulse animation breathes.
-                    delay(20)
+                    yield() // animatsiya/UI nafas olsin
                 }
                 presentResults()
             } catch (e: Throwable) {
@@ -192,15 +236,9 @@ class InitialScanActivity : AppCompatActivity() {
         binding.layoutScanning.visibility = View.GONE
         binding.layoutResults.visibility = View.VISIBLE
         binding.btnSkip.visibility = View.GONE
-        binding.tvHeaderTitle.text = if (dangerous.isEmpty())
-            getString(R.string.is_header_safe) else getString(R.string.is_header_done)
-        binding.tvHeaderSub.text = if (dangerous.isEmpty())
-            getString(R.string.is_sub_no_threats)
-        else
-            getString(R.string.is_sub_threats_found, dangerous.size)
 
         if (dangerous.isEmpty()) {
-            renderEmptyState()
+            renderEmptyState(allDeleted = false)
             VoiceVerdict.speak(this, ScanResult.Verdict.SAFE)
         } else {
             renderDangerList()
@@ -208,200 +246,176 @@ class InitialScanActivity : AppCompatActivity() {
                 ScanResult.Verdict.DANGER else ScanResult.Verdict.SUSPICIOUS
             VoiceVerdict.speak(
                 this,
-                if (worst == ScanResult.Verdict.DANGER)
-                    "Ogohlantirish! ${dangerous.size} ta xavfli fayl aniqlandi."
-                else
-                    "Diqqat! ${dangerous.size} ta shubhali fayl topildi.",
+                getString(
+                    if (worst == ScanResult.Verdict.DANGER) R.string.kq4_is_tts_danger
+                    else R.string.kq4_is_tts_susp,
+                    dangerous.size,
+                ),
             )
         }
     }
 
-    private fun renderEmptyState() {
-        binding.summaryIconTile.setBackgroundResource(R.drawable.kq_icon_tile_safe)
-        binding.summaryIcon.setImageResource(R.drawable.ic_check_circle)
-        binding.summaryIcon.setColorFilter(getColor(R.color.kq_safe_ink))
-        binding.tvSummaryTitle.text = getString(R.string.is_summary_no_threat)
-        binding.tvSummarySub.text = getString(R.string.is_summary_no_threat_sub)
+    /**
+     * Toza holat: 80dp doira safe-soft + ic4_check_circle, karta ichida bo'sh-holat
+     * xabari. allDeleted=true — hammasi o'chirilgandan keyin (dizayndagi
+     * "Barcha xavfli fayllar o'chirildi"), false — boshidan hech narsa topilmagan.
+     */
+    private fun renderEmptyState(allDeleted: Boolean) {
+        binding.resultCircle.setBackgroundResource(R.drawable.kq4_circle_safe_soft)
+        binding.resultIcon.setImageResource(R.drawable.ic4_check_circle)
+        binding.resultIcon.imageTintList =
+            ColorStateList.valueOf(getColor(R.color.kq_safe))
+        binding.tvHeaderTitle.text = getString(R.string.is_header_safe)
+        binding.tvHeaderSub.text = getString(
+            if (allDeleted) R.string.is_all_deleted else R.string.is_sub_no_threats
+        )
+        binding.tvEmptyText.text = getString(
+            if (allDeleted) R.string.kq4_is_all_deleted else R.string.kq4_is_none_found
+        )
         binding.btnDeleteAll.visibility = View.GONE
-        binding.tvListHeader.visibility = View.GONE
         binding.dangerList.removeAllViews()
-        binding.btnContinue.text = getString(R.string.is_go_main)
+        binding.dangerList.visibility = View.GONE
+        binding.emptyState.visibility = View.VISIBLE
     }
 
+    /** Xavfli holat: 80dp doira danger-soft + ic4_shield_alert + ro'yxat + bulk delete. */
     private fun renderDangerList() {
-        binding.summaryIconTile.setBackgroundResource(R.drawable.kq_icon_tile_danger)
-        binding.summaryIcon.setImageResource(R.drawable.ic_alert_triangle)
-        binding.summaryIcon.setColorFilter(getColor(R.color.kq_danger_ink))
-        binding.tvSummaryTitle.text = getString(R.string.is_dangerous_found_count, dangerous.size)
-        binding.tvSummarySub.text = getString(R.string.is_recommend_delete)
+        binding.resultCircle.setBackgroundResource(R.drawable.kq4_circle_danger_soft)
+        binding.resultIcon.setImageResource(R.drawable.ic4_shield_alert)
+        binding.resultIcon.imageTintList =
+            ColorStateList.valueOf(getColor(R.color.kq_danger))
+        binding.tvHeaderTitle.text = getString(R.string.kq4_is_found_count, dangerous.size)
+        binding.tvHeaderSub.text = getString(R.string.is_recommend_delete)
         binding.btnDeleteAll.visibility = View.VISIBLE
-        binding.tvListHeader.visibility = View.VISIBLE
-        binding.btnContinue.text = getString(R.string.initial_scan_continue)
+        binding.emptyState.visibility = View.GONE
+        binding.dangerList.visibility = View.VISIBLE
+        populateRows()
+    }
 
+    /** Ro'yxatni to'liq qayta quradi — har o'chirishdan keyin divider'lar to'g'ri qoladi. */
+    private fun populateRows() {
         binding.dangerList.removeAllViews()
-        for (entry in dangerous) {
+        for ((i, entry) in dangerous.withIndex()) {
+            if (i > 0) binding.dangerList.addView(buildDivider())
             val row = buildDangerRow(entry)
             entry.rowView = row
             binding.dangerList.addView(row)
         }
     }
 
-    /** Single row card matching the §3.4 li-row style. */
+    /** .li qatorlar orasidagi 1px hairline (dizayndagi border-bottom). */
+    private fun buildDivider(): View = View(this).apply {
+        setBackgroundColor(getColor(R.color.kq_hairline))
+        layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dp(1).coerceAtLeast(1),
+        )
+    }
+
+    /**
+     * Dizayn .li qatori: av 48dp (kq4_av_danger + ic4_file) · nom (KQ4.RowTitle) +
+     * manba·hajm (KQ4.RowSub) · o'ngda tag "Xavfli"/"Shubhali". Bosilsa — batafsil
+     * (ScanResultActivity, u yerda o'chirish ham bor).
+     */
     private fun buildDangerRow(entry: DangerEntry): View {
-        val card = com.google.android.material.card.MaterialCardView(this).apply {
-            radius = dp(22).toFloat()
-            cardElevation = 0f
-            strokeWidth = dp(1)
-            setStrokeColor(getColor(R.color.kq_hairline))
-            setCardBackgroundColor(getColor(R.color.kq_bg_elev))
+        val danger = entry.verdict == ScanResult.Verdict.DANGER
+
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(15), dp(14), dp(15), dp(14))
+            isClickable = true
+            isFocusable = true
+            val tv = TypedValue()
+            theme.resolveAttribute(android.R.attr.selectableItemBackground, tv, true)
+            setBackgroundResource(tv.resourceId)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { topMargin = dp(10) }
-        }
-
-        val outer = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(14), dp(14), dp(14), dp(14))
-        }
-
-        // Top row: icon tile + filename + sub
-        val topRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.CENTER_VERTICAL
-        }
-
-        val iconTile = android.widget.FrameLayout(this).apply {
-            background = getDrawable(
-                if (entry.verdict == ScanResult.Verdict.DANGER)
-                    R.drawable.kq_icon_tile_danger
-                else R.drawable.kq_icon_tile_warn
             )
-            layoutParams = LinearLayout.LayoutParams(dp(44), dp(44))
+            setOnClickListener { openDetails(entry) }
         }
-        val iconImg = ImageView(this).apply {
-            setImageResource(R.drawable.ic_apk_box)
-            setColorFilter(
-                getColor(
-                    if (entry.verdict == ScanResult.Verdict.DANGER)
-                        R.color.kq_danger_ink
-                    else R.color.kq_warn_ink
-                )
+
+        // av 48dp r18: danger — danger_bg + kq_danger; suspicious — warn variant
+        val av = FrameLayout(this).apply {
+            setBackgroundResource(if (danger) R.drawable.kq4_av_danger else R.drawable.kq4_av_warn)
+            layoutParams = LinearLayout.LayoutParams(dp(48), dp(48))
+        }
+        av.addView(ImageView(this).apply {
+            setImageResource(R.drawable.ic4_file)
+            imageTintList = ColorStateList.valueOf(
+                getColor(if (danger) R.color.kq_danger else R.color.kq_warn)
             )
-            layoutParams = android.widget.FrameLayout.LayoutParams(dp(22), dp(22)).apply {
-                gravity = android.view.Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(dp(22), dp(22)).apply {
+                gravity = Gravity.CENTER
             }
-        }
-        iconTile.addView(iconImg)
+        })
 
         val textColumn = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                .apply { marginStart = dp(12) }
+                .apply { marginStart = dp(13) }
         }
 
-        val tvName = TextView(this).apply {
+        // .ttl — 600 15.5sp kq_ink
+        textColumn.addView(TextView(this).apply {
             text = entry.filename
+            typeface = ResourcesCompat.getFont(this@InitialScanActivity, R.font.onest_semibold)
             setTextColor(getColor(R.color.kq_ink))
-            textSize = 14.5f
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            textSize = 15.5f
+            letterSpacing = -0.01f
             ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
             isSingleLine = true
-        }
+        })
 
-        val tvSub = TextView(this).apply {
-            text = humanSize(entry.sizeBytes) + " · " + entry.path
+        // .sub — manba (papka nomi) · hajm, 13sp kq_ink_3
+        val folder = java.io.File(entry.path).parentFile?.name.orEmpty()
+        textColumn.addView(TextView(this).apply {
+            text = if (folder.isEmpty()) humanSize(entry.sizeBytes)
+            else "$folder · ${humanSize(entry.sizeBytes)}"
+            typeface = ResourcesCompat.getFont(this@InitialScanActivity, R.font.onest_regular)
             setTextColor(getColor(R.color.kq_ink_3))
-            textSize = 11.5f
-            typeface = android.graphics.Typeface.MONOSPACE
-            ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
+            textSize = 13f
+            ellipsize = android.text.TextUtils.TruncateAt.END
             isSingleLine = true
-            (layoutParams ?: LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            )).apply {
-                if (this is LinearLayout.LayoutParams) topMargin = dp(2)
-            }.also { layoutParams = it }
-        }
-
-        val sevChip = TextView(this).apply {
-            text = if (entry.verdict == ScanResult.Verdict.DANGER)
-                getString(R.string.kq_sev_crit) else getString(R.string.kq_sev_high)
-            background = getDrawable(
-                if (entry.verdict == ScanResult.Verdict.DANGER)
-                    R.drawable.kq_sev_crit else R.drawable.kq_sev_high
-            )
-            setTextColor(
-                getColor(
-                    if (entry.verdict == ScanResult.Verdict.DANGER)
-                        R.color.kq_danger_ink else R.color.kq_warn_ink
-                )
-            )
-            textSize = 10f
-            typeface = android.graphics.Typeface.MONOSPACE
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-            letterSpacing = 0.08f
-            setPadding(dp(8), dp(4), dp(8), dp(4))
-        }
-
-        textColumn.addView(tvName)
-        textColumn.addView(tvSub)
-        topRow.addView(iconTile)
-        topRow.addView(textColumn)
-        topRow.addView(sevChip)
-
-        // Bottom row: delete button + details button
-        val btnRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { topMargin = dp(12) }
+            ).apply { topMargin = dp(3) }
+        })
+
+        // tag danger/warn: pilyulya h30 + 7dp nuqta + matn 12.5sp 700
+        val inkColor = getColor(if (danger) R.color.kq_danger_ink else R.color.kq_warn_ink)
+        val tag = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setBackgroundResource(if (danger) R.drawable.kq4_tag_danger else R.drawable.kq4_tag_warn)
+            setPadding(dp(12), 0, dp(12), 0)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(30),
+            ).apply { marginStart = dp(10) }
         }
+        tag.addView(View(this).apply {
+            background = ContextCompat.getDrawable(this@InitialScanActivity, R.drawable.kq4_dot)
+            backgroundTintList = ColorStateList.valueOf(inkColor)
+            layoutParams = LinearLayout.LayoutParams(dp(7), dp(7))
+        })
+        tag.addView(TextView(this).apply {
+            text = getString(if (danger) R.string.kq4_danger else R.string.kq4_suspicious)
+            typeface = ResourcesCompat.getFont(this@InitialScanActivity, R.font.onest_bold)
+            setTextColor(inkColor)
+            textSize = 12.5f
+            letterSpacing = -0.01f
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply { marginStart = dp(7) }
+        })
 
-        val btnDelete = com.google.android.material.button.MaterialButton(this).apply {
-            text = getString(R.string.btn_delete)
-            isAllCaps = false
-            textSize = 13f
-            setTextColor(android.graphics.Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.kq_danger))
-            cornerRadius = dp(999)
-            setIconResource(R.drawable.ic_trash)
-            iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
-            iconSize = dp(16)
-            iconPadding = dp(6)
-            insetTop = 0
-            insetBottom = 0
-            layoutParams = LinearLayout.LayoutParams(0, dp(42), 2f)
-            setOnClickListener { attemptDelete(entry) }
-        }
-
-        val btnDetails = com.google.android.material.button.MaterialButton(
-            this,
-            null,
-            com.google.android.material.R.attr.materialButtonOutlinedStyle,
-        ).apply {
-            text = getString(R.string.btn_details)
-            isAllCaps = false
-            textSize = 13f
-            setTextColor(getColor(R.color.kq_ink))
-            cornerRadius = dp(999)
-            strokeColor = android.content.res.ColorStateList.valueOf(getColor(R.color.kq_hairline_strong))
-            strokeWidth = dp(1)
-            insetTop = 0
-            insetBottom = 0
-            layoutParams = LinearLayout.LayoutParams(0, dp(42), 1f)
-                .apply { marginStart = dp(8) }
-            setOnClickListener { openDetails(entry) }
-        }
-
-        btnRow.addView(btnDelete)
-        btnRow.addView(btnDetails)
-
-        outer.addView(topRow)
-        outer.addView(btnRow)
-        card.addView(outer)
-        return card
+        row.addView(av)
+        row.addView(textColumn)
+        row.addView(tag)
+        return row
     }
 
     private fun attemptDelete(entry: DangerEntry) {
@@ -424,11 +438,20 @@ class InitialScanActivity : AppCompatActivity() {
                         .show()
                 }
                 is FileDeleter.Result.SandboxedByOwner -> {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.is_sandboxed_owner, r.ownerPackage),
-                        Toast.LENGTH_LONG,
-                    ).show()
+                    // Tupik emas: Shizuku bilan haqiqatan o'chirishni taklif qilamiz.
+                    AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.sandboxed_dialog_title))
+                        .setMessage(getString(R.string.is_sandboxed_owner, r.ownerPackage))
+                        .setPositiveButton(getString(R.string.shizuku_real_delete)) { _, _ ->
+                            ShizukuSetup.promptRealDelete(this, entry.path) { deleted ->
+                                if (deleted) onItemDeleted(entry)
+                                else Toast.makeText(
+                                    this, getString(R.string.shizuku_not_deleted), Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                        .setNegativeButton(R.string.cancel, null)
+                        .show()
                 }
                 is FileDeleter.Result.Failed -> {
                     Toast.makeText(this, "❌ ${r.message}", Toast.LENGTH_LONG).show()
@@ -436,7 +459,11 @@ class InitialScanActivity : AppCompatActivity() {
             }
         } catch (e: Throwable) {
             android.util.Log.e("InitialScan", "delete failed", e)
-            Toast.makeText(this, "❌ Xatolik: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                getString(R.string.toast_error_generic, e.message ?: e.javaClass.simpleName),
+                Toast.LENGTH_LONG,
+            ).show()
         }
     }
 
@@ -472,18 +499,18 @@ class InitialScanActivity : AppCompatActivity() {
     }
 
     private fun onItemDeleted(entry: DangerEntry) {
-        entry.rowView?.let { binding.dangerList.removeView(it) }
         dangerous.remove(entry)
         // "Bloklandi" allaqachon skan paytida sanalgan (ApkScanner, DANGER) — bu yerda qayta emas.
-
-        binding.tvSummaryTitle.text = getString(R.string.is_dangerous_remaining_count, dangerous.size)
         binding.tvDangerCount.text = dangerous.size.toString()
 
         if (dangerous.isEmpty()) {
-            // Vse udaleny — perekhodim na safe-state.
-            renderEmptyState()
-            binding.tvHeaderTitle.text = getString(R.string.is_header_safe)
-            binding.tvHeaderSub.text = getString(R.string.is_all_deleted)
+            // Vse udaleny — perekhodim na safe-state (dizayn: check + "Barcha ... o'chirildi").
+            renderEmptyState(allDeleted = true)
+        } else {
+            binding.tvHeaderTitle.text =
+                getString(R.string.is_dangerous_remaining_count, dangerous.size)
+            // Qolgan ro'yxatni qayta quramiz — divider'lar to'g'ri joylashsin.
+            populateRows()
         }
     }
 
@@ -553,5 +580,11 @@ class InitialScanActivity : AppCompatActivity() {
     private fun humanSize(bytes: Long): String {
         val kb = bytes / 1024
         return if (kb < 1024) "$kb KB" else "%.1f MB".format(kb / 1024.0)
+    }
+
+    companion object {
+        // Bir vaqtda parallel skanlanadigan APK soni. 3 — sekvensialdan sezilarli tez,
+        // lekin cheklangan (qizishni nazoratda ushlaydi; loyihada qizish tarixi bor).
+        private const val SCAN_CONCURRENCY = 3
     }
 }

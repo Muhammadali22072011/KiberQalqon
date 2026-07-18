@@ -6,6 +6,7 @@ import { db } from '../../lib/supabase.js';
 import {
   clientKey, checkLocked, recordFailure, recordSuccess, warnWeakSecrets, looksLikePlaceholder,
 } from '../../lib/ratelimit.js';
+import { audit } from '../../lib/audit.js';
 
 // Veb-panelga kirish — IKKI xil odam uchun:
 //   • EGASI (dasturchi) — ADMIN_SECRET (master kalit) + ixtiyoriy TOTP. TO'LIQ huquq.
@@ -22,6 +23,10 @@ import {
 type Body = { secret?: string; otp?: string; login?: string; password?: string };
 
 function safeEq(a: string, b: string): boolean {
+  // Klient tanadagi maydon turini to'liq boshqaradi: string bo'lmasa (obyekt, massiv,
+  // son, boolean) Buffer.from(...) TypeError tashlaydi. Shu sabab noto'g'ri turni
+  // 500 emas, oddiy "mos kelmadi" (false) sifatida qaytaramiz.
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
   const ba = Buffer.from(a);
   const bb = Buffer.from(b);
   return ba.length === bb.length && timingSafeEqual(ba, bb);
@@ -44,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Admin (login+parol) kirishi — login yoki parol berilgan bo'lsa shu oqim.
   if (adminFlow) {
-    return loginAdmin(res, b, rlKey);
+    return loginAdmin(req, res, b, rlKey);
   }
 
   // Egasi (owner) kirishi — master sir (+2FA).
@@ -55,14 +60,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ ok: false, error: 'ADMIN_SECRET hali sozlanmagan (default qiymat)' });
   }
 
-  const secret = b.secret ?? '';
-  const otp = b.otp ?? '';
+  // Klient maydon turini boshqaradi — string bo'lmasa bo'sh deb qaraymiz
+  // (verifyTotpCounter otp'da .replace(...) chaqiradi, u string bo'lmasa tashlaydi).
+  const secret = typeof b.secret === 'string' ? b.secret : '';
+  const otp = typeof b.otp === 'string' ? b.otp : '';
 
   // Bir xil umumiy xato — qaysi maydon noto'g'ri ekanini oshkor qilmaymiz.
   const FAIL = { ok: false as const, error: "Kalit yoki kod noto'g'ri" };
 
   if (!safeEq(secret, expected)) {
     await recordFailure(rlKey);
+    await audit(req, 'login_fail', 'egasi oqimi: kalit notogri', 'anon');
     return res.status(401).json(FAIL);
   }
 
@@ -96,15 +104,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   await recordSuccess(rlKey);
+  await audit(req, 'login', 'egasi kirdi', 'owner');
   const { token, exp } = issueSession();
   return res.status(200).json({ ok: true, token, exp, level: 'owner', twofa: Boolean(totpSecret) });
 }
 
 // --- Bitta cheklangan ADMIN (login + parol) ----------------------------------
 // Hisob env'da: ADMIN_LOGIN va ADMIN_PASSWORD. Rol/baza yo'q — bitta hisob.
-async function loginAdmin(res: VercelResponse, b: Body, rlKey: string) {
-  const login = (b.login ?? '').trim();
-  const password = b.password ?? '';
+async function loginAdmin(req: VercelRequest, res: VercelResponse, b: Body, rlKey: string) {
+  // Klient maydon turini boshqaradi — string bo'lmasa bo'sh deb qaraymiz (.trim() tashlamasin).
+  const login = (typeof b.login === 'string' ? b.login : '').trim();
+  const password = typeof b.password === 'string' ? b.password : '';
   const FAIL = { ok: false as const, error: "Login yoki parol noto'g'ri" };
   if (!login || !password) {
     return res.status(400).json({ ok: false, error: 'Login va parol kerak' });
@@ -130,10 +140,12 @@ async function loginAdmin(res: VercelResponse, b: Body, rlKey: string) {
   const okPassword = safeEq(password, expPassword);
   if (!okLogin || !okPassword) {
     await recordFailure(rlKey);
+    await audit(req, 'login_fail', 'admin oqimi: login/parol notogri', 'anon');
     return res.status(401).json(FAIL);
   }
 
   await recordSuccess(rlKey);
+  await audit(req, 'login', 'admin kirdi', `admin:${login}`);
   const { token, exp } = issueAdminSession(login);
   return res.status(200).json({ ok: true, token, exp, level: 'admin', name: login });
 }

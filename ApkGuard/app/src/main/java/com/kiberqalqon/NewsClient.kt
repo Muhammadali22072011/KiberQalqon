@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -57,8 +57,13 @@ object NewsClient {
         data class NetworkError(val reason: String) : Result()
     }
 
-    /** Lentani yuklaydi. onResult main thread'da chaqiriladi. */
-    fun fetch(onResult: (Result) -> Unit) {
+    /**
+     * Lentani yuklaydi. onResult main thread'da chaqiriladi.
+     * @param groupCode qurilma qo'shilgan guruh kodi (bo'sh emas bo'lsa `?g=` bilan yuboriladi) —
+     *   server global e'lonlar + SHU guruh e'lonlarini qaytaradi (guruhga yo'naltirilgan
+     *   ogohlantirishlar butun flotni spamlamasin). Yo'q bo'lsa — faqat global e'lonlar.
+     */
+    fun fetch(groupCode: String? = null, onResult: (Result) -> Unit) {
         val base = baseUrl()
         val secret = deviceSecret()
         if (base == null || secret == null) {
@@ -66,10 +71,14 @@ object NewsClient {
             return
         }
 
+        // Kod faqat guruh-alfavitidan (A-Z2-9) — URL'ga xavfsiz qo'shiladi.
+        val gc = groupCode?.trim()?.uppercase()?.filter { it in 'A'..'Z' || it in '2'..'9' }?.take(16).orEmpty()
+        val url = if (gc.isNotEmpty()) "$base/api/news?g=$gc" else "$base/api/news"
+
         scope.launch {
             val result = try {
                 val req = Request.Builder()
-                    .url("$base/api/news")
+                    .url(url)
                     .header("x-device-secret", secret)
                     .get()
                     .build()

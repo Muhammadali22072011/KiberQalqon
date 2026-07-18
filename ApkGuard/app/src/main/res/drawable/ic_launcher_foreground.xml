@@ -1,66 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Launcher icon foreground. Adaptive icon канвас 108×108dp, safe zone 72×72
-  (центральный диаметр 66dp). Поэтому всё рисуем в центре, отступив от краёв.
-
-  Дизайн = совпадает с kq_shield_mark.xml но скейл оптимизирован под
-  лаунчер-иконку (большой щит, читаемый APK-блок, чекмарк-бадж).
+  Launcher icon foreground — UzGuard LG mark (logo-uzguard.png).
+  Raster: @mipmap/ic_launcher_foreground. Background = white @color/ic_launcher_background.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Shield body — fills safe zone. -->
-    <path
-        android:pathData="M54 24 L88 34 V60 C88 80 74 92 54 96 C34 92 20 80 20 60 V34 Z"
-        android:fillColor="#C13A28" />
+    <group
+        android:scaleX="0.13"
+        android:scaleY="0.13"
+        android:translateX="20.72"
+        android:translateY="21.37">
 
-    <!-- Subtle highlight stroke -->
-    <path
-        android:pathData="M54 27 L85 36 V58 C85 76 72 87 54 91 C36 87 23 76 23 58 V36 Z"
-        android:strokeColor="#33FFFFFF"
-        android:strokeWidth="0.8"
-        android:fillColor="#00000000" />
+        <!-- Корона (чашелистик) -->
+        <path android:pathData="M256 112 C234 108 220 96 216 64 C224 76 236 78 240 64 C244 50 248 44 256 28 C264 44 268 50 272 64 C276 78 288 76 296 64 C292 96 278 108 256 112 Z"
+            android:fillColor="#D2204A" />
 
-    <!-- APK box inside the shield -->
-    <path
-        android:pathData="M40 51 L68 51 A 3.5 3.5 0 0 1 71.5 54.5 L71.5 78 A 3.5 3.5 0 0 1 68 81.5 L40 81.5 A 3.5 3.5 0 0 1 36.5 78 L36.5 54.5 A 3.5 3.5 0 0 1 40 51 Z"
-        android:fillColor="#FFFFFF" />
+        <!-- Щит -->
+        <path android:pathData="M256 92 C300 76 352 80 400 104 C422 115 432 134 430 164 C426 268 408 348 256 470 C104 348 86 268 82 164 C80 134 90 115 112 104 C160 80 212 76 256 92 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="200" android:startY="80"
+                    android:endX="300" android:endY="470"
+                    android:type="linear">
+                    <item android:offset="0" android:color="#E63A5B" />
+                    <item android:offset="0.5" android:color="#C2143D" />
+                    <item android:offset="1" android:color="#9B0F31" />
+                </gradient>
+            </aapt:attr>
+        </path>
 
-    <!-- "APK" letters -->
-    <path
-        android:pathData="M42 71 L45 58 L48 71 M43 66 L47 66"
-        android:strokeColor="#C13A28"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:fillColor="#00000000" />
-    <path
-        android:pathData="M51 71 L51 58 L57 58 A 3 3 0 0 1 57 64 L51 64"
-        android:strokeColor="#C13A28"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:fillColor="#00000000" />
-    <path
-        android:pathData="M61 71 L61 58 M61 65 L66 58 M61 65 L66 71"
-        android:strokeColor="#C13A28"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:fillColor="#00000000" />
+        <!-- Белое окно плода -->
+        <path
+            android:pathData="M256,272 m-130,0 a130,130 0 1,0 260,0 a130,130 0 1,0 -260,0"
+            android:fillColor="#FFFFFF" />
 
-    <!-- Checkmark badge top-right (verified) -->
-    <path
-        android:pathData="M72 47 m -7 0 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0"
-        android:fillColor="#FFFFFF" />
-    <path
-        android:pathData="M68.5 47 L71 49.5 L75.5 44.5"
-        android:strokeColor="#C13A28"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:fillColor="#00000000" />
+        <!-- Зёрна-капли: центр + кольцо -->
+        <group android:translateX="256" android:translateY="272" android:scaleX="1.5" android:scaleY="1.5">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#C2143D" />
+        </group>
+        <group android:translateX="256" android:translateY="202" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="305" android:translateY="223" android:rotation="45" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="326" android:translateY="272" android:rotation="90" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="305" android:translateY="321" android:rotation="135" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="256" android:translateY="342" android:rotation="180" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="207" android:translateY="321" android:rotation="225" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="186" android:translateY="272" android:rotation="270" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+        <group android:translateX="207" android:translateY="223" android:rotation="315" android:scaleX="1.3" android:scaleY="1.3">
+            <path android:pathData="M0 -16 C7 -8 12 0 12 6 C12 14 6 20 0 20 C-6 20 -12 14 -12 6 C-12 0 -7 -8 0 -16 Z" android:fillColor="#D2204A" />
+        </group>
+
+        <!-- Check-бейдж -->
+        <path
+            android:pathData="M390,404 m-56,0 a56,56 0 1,0 112,0 a56,56 0 1,0 -112,0"
+            android:fillColor="#FFFFFF" />
+        <path
+            android:pathData="M390,404 m-46,0 a46,46 0 1,0 92,0 a46,46 0 1,0 -92,0"
+            android:fillColor="#2DC971" />
+        <path
+            android:pathData="M368 404 L384 420 L414 388"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="13"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:fillColor="#00000000" />
+    </group>
 </vector>

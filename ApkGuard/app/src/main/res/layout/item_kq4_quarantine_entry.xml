@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v4 Karantin yozuvi: .li qator (av 48 danger + nom/meta + "O'chirildi" tag)
+  + ostida sm tugmalar qatori (Ghost "Tiklash" / Danger "O'chirish") + hairline.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- .li: padding 14/15, gap 13 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="15dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="6dp">
+
+        <!-- .av danger 48 r18 -->
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/kq4_av_danger">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/kq4_deleted"
+                android:src="@drawable/ic4_trash"
+                app:tint="@color/kq_danger" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:layout_marginEnd="13dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvQuarName"
+                style="@style/KQ4.RowTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+            <TextView
+                android:id="@+id/tvQuarMeta"
+                style="@style/KQ4.RowSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <!-- .tag soft: "O'chirildi" -->
+        <TextView
+            android:id="@+id/tvQuarTag"
+            style="@style/KQ4.Tag"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/kq4_tag_soft"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/kq4_deleted"
+            android:textColor="@color/kq_ink_2" />
+    </LinearLayout>
+
+    <!-- tugmalar qatori: sm Ghost "Tiklash" + sm Danger "O'chirish", gap 8 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="14dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnQuarRestore"
+            style="@style/KQ4.Button.Ghost"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:minHeight="44dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/kq4_quar_restore"
+            android:textSize="14.5sp"
+            app:cornerRadius="22dp"
+            app:icon="@drawable/ic4_refresh"
+            app:iconSize="19dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnQuarDelete"
+            style="@style/KQ4.Button.Danger"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="44dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/kq4_quar_delete"
+            android:textSize="14.5sp"
+            app:cornerRadius="22dp"
+            app:icon="@drawable/ic4_trash"
+            app:iconSize="19dp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/quarDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/kq_hairline" />
+</LinearLayout>

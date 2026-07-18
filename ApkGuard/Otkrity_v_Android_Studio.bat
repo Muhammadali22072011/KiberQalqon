@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-echo Opening KiberQalqon project in Android Studio...
+echo Opening UzGuard project in Android Studio...
 
 REM Short path (8.3) avoids Cyrillic — Android Studio then accepts the path
 set "DIR=%~dp0"

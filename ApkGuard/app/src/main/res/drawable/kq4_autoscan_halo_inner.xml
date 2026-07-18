@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Xavf doirasi ichki nim-ободок — box-shadow 0 0 0 10px rgba(224,67,47,.18). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#2EE0432F" />
+</shape>

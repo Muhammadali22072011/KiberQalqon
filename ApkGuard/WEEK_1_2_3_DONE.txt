@@ -123,7 +123,7 @@ if (Config.isFirstRun(this)) {
 ### 6. Карантин:
 
 Создать QuarantineActivity.kt
-Папка /KiberQalqon/Quarantine
+Папка /UzGuard/Quarantine
 Переместить вместо удаления
 
 
@@ -131,7 +131,7 @@ if (Config.isFirstRun(this)) {
 📱 ТЕКУЩИЙ APK:
 ═══════════════════════════════════════════════════════════════
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 (Версия 6.1 - работает, но без WorkManager)
 

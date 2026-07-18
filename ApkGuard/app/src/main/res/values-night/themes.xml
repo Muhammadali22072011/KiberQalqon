@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.KiberQalqon" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/background_dark</item>
-        <item name="colorAccent">@color/primary_glow</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
-        <item name="colorControlActivated">@color/primary_glow</item>
-        <item name="colorControlHighlight">@color/chip_background</item>
+    <!-- Dark base theme — Anor brand on mockup ink surfaces (brand/mockup.html:
+         bg #141319, cards #26262E, line #33333D, anor #E11D48). -->
+    <style name="Theme.UzGuard" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/kq_anor</item>
+        <item name="colorPrimaryDark">@color/kq_bg_sunken</item>
+        <item name="colorAccent">@color/kq_anor</item>
+        <item name="colorControlNormal">@color/kq_ink_3</item>
+        <item name="colorControlActivated">@color/kq_anor</item>
+        <item name="colorControlHighlight">@color/kq_anor_soft</item>
 
-        <item name="android:statusBarColor">@color/background_dark</item>
-        <item name="android:navigationBarColor">@color/background_dark</item>
+        <item name="android:statusBarColor">@color/kq_bg</item>
+        <item name="android:navigationBarColor">@color/kq_bg</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:colorBackground">@color/background</item>
+        <item name="android:windowBackground">@color/kq_bg</item>
+        <item name="android:colorBackground">@color/kq_bg</item>
 
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="android:textColorPrimary">@color/kq_ink</item>
+        <item name="android:textColorSecondary">@color/kq_ink_2</item>
+        <item name="android:textColorHint">@color/kq_ink_3</item>
+
+        <!-- Same screen transitions as the light base theme. -->
+        <item name="android:windowAnimationStyle">@style/KqWindowAnimations</item>
 
         <!-- MUST mirror the light base theme: `@color/kq_primary` is a state list
              backed by `?attr/kqPrimary`. A same-named style in values-night REPLACES
              the default (no merge), so without these any screen that doesn't apply an
              accent overlay (e.g. LanguageSelectActivity) crashes inflating @color/kq_primary
              in dark mode. Dark accent values come from values-night/colors.xml. -->
-        <item name="kqPrimary">@color/kq_feruz</item>
-        <item name="kqPrimary2">@color/kq_feruz_2</item>
-        <item name="kqPrimarySoft">@color/kq_feruz_soft</item>
+        <item name="kqPrimary">@color/kq_anor</item>
+        <item name="kqPrimary2">@color/kq_anor_2</item>
+        <item name="kqPrimarySoft">@color/kq_anor_soft</item>
     </style>
 </resources>

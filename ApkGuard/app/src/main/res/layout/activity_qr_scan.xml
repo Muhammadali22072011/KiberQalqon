@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «QR-kod tekshiruvi» — v4 «Milliy Kiber Himoya» dizayni.
+  Asosiy qatlam: CameraX PreviewView (butun ekran). Ustida: orqaga tugma + eyebrow +
+  sarlavha, markazda skan ramkasi (kvadrat overlay), pastda yo'riqnoma satri.
+  Uchta holat overlay'i: cameraGroup (jonli skan), permGroup (kamera ruxsati),
+  noCameraGroup (apparat yo'q), resultGroup (QR matni — havola emas).
+
+  QrScanActivity.kt IDlari: previewView, scanFrame, btnBack, tvInstruction,
+  cameraGroup, permGroup, btnPermGrant, tvPermBody, noCameraGroup,
+  resultGroup, tvDecodedText, btnResultClose.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:fitsSystemWindows="true">
+
+    <!-- ═══ Kamera preview (asosiy qatlam) ═══ -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- ═══ Jonli skan chromi (preview ustida) ═══ -->
+    <FrameLayout
+        android:id="@+id/cameraGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Markaziy skan ramkasi — shaffof oyna + anor burchak qavslar (kamerani yopmaydi).
+             Avval kq4_card_selected (to'liq fon) edi → kamera ko'rinmasdi. -->
+        <com.uzguard.QrScanFrameView
+            android:id="@+id/scanFrame"
+            android:layout_width="248dp"
+            android:layout_height="248dp"
+            android:layout_gravity="center" />
+
+        <!-- Yo'riqnoma satri (pastda) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="40dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/kq4_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="15dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic4_scan"
+                    app:tint="@color/kq_primary" />
+
+                <TextView
+                    android:id="@+id/tvInstruction"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/onest_medium"
+                    android:lineSpacingMultiplier="1.4"
+                    android:text="@string/kq4_qr_instruction"
+                    android:textColor="@color/kq_ink_2"
+                    android:textSize="13.5sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══ Sarlavha qatori (har doim ustda) ═══ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/kq4_icon_btn"
+            android:contentDescription="@string/kq4_qr_close"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic4_back"
+            app:tint="@color/kq_ink" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/KQ4.Eyebrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/kq4_qr_eyebrow" />
+
+            <TextView
+                style="@style/KQ4.HTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/kq4_qr_title"
+                android:textSize="22sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ═══ Holat: kamera ruxsati kerak ═══ -->
+    <LinearLayout
+        android:id="@+id/permGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/kq_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:background="@drawable/kq4_av_primary">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_scan"
+                app:tint="@color/kq_primary" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="@font/onest_bold"
+            android:gravity="center"
+            android:text="@string/kq4_qr_perm_title"
+            android:textColor="@color/kq_ink"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvPermBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/onest_regular"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.5"
+            android:text="@string/kq4_qr_perm_body"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="14.5sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPermGrant"
+            style="@style/KQ4.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:minHeight="58dp"
+            android:text="@string/kq4_qr_perm_grant"
+            android:textSize="17sp" />
+    </LinearLayout>
+
+    <!-- ═══ Holat: kamera apparati yo'q ═══ -->
+    <LinearLayout
+        android:id="@+id/noCameraGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/kq_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:background="@drawable/kq4_av_warn">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic4_alert"
+                app:tint="@color/kq_warn" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="@font/onest_medium"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.5"
+            android:text="@string/kq4_qr_no_camera"
+            android:textColor="@color/kq_ink_2"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- ═══ Holat: QR matni (havola emas) ═══ -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/resultGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/kq_bg"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingTop="96dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="30dp">
+
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/kq4_av_neutral">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic4_scan"
+                    app:tint="@color/kq_ink_2" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/onest_bold"
+                android:text="@string/kq4_qr_not_url_title"
+                android:textColor="@color/kq_ink"
+                android:textSize="19sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/onest_regular"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.5"
+                android:text="@string/kq4_qr_not_url"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="14sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/KQ4.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/tvDecodedText"
+                    style="@style/KQ4.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0"
+                    android:lineSpacingMultiplier="1.45"
+                    android:padding="16dp"
+                    android:textColor="@color/kq_ink"
+                    android:textIsSelectable="true"
+                    android:textSize="13.5sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnResultClose"
+                style="@style/KQ4.Button.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:minHeight="58dp"
+                android:text="@string/kq4_qr_close"
+                android:textSize="17sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>

@@ -5,7 +5,7 @@ Common drawables/styles for the redesign. Paste these into the corresponding fil
 ## values/colors.xml additions (LIGHT)
 
 ```xml
-<!-- KiberQalqon · Milliy LIGHT -->
+<!-- UzGuard · Milliy LIGHT -->
 <color name="kq_bg">#FBF8F3</color>
 <color name="kq_bg_elev">#FFFFFF</color>
 <color name="kq_bg_sunken">#F2EFE8</color>

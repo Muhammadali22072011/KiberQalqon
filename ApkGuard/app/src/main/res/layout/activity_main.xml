@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Skaner (MainActivity) — kreativ redesign 2026-05-27.
+  v4 «Milliy Kiber Himoya» — Skaner ekrani (screens1.jsx → Apps).
 
-  Hero "Command Card" + 4-stat strip + Avto-himoya pill + primary scan CTA + refresh
-  + section header + list/empty card. 8-point star pattern overlay on hero card.
+  Tuzilma (dizayn tartibida): screen-pad (14/18/30) →
+    header between (eyebrow SKANER + h-title | icon-btn scan) →
+    live-karta (Avto-himoya yoniq/o'chiq) → 3 filtr chip →
+    loading → e'lonlar lentasi → tvCount → ro'yxat kartasi (.li qatorlar) →
+    KQ4.Button.Ghost "Hammasini qayta tekshirish" → pastki navigatsiya.
 
-  Saqlangan ID lar (MainActivity.kt binding talab qiladi):
-    cardPermission, btnGrant, contentMain,
-    switchBackground, btnScan, btnRefresh,
-    loadingLayout, tvLoading, tvCount, recycler,
+  Saqlangan ID lar (MainActivity.kt binding kontrakti):
+    cardPermission, btnGrant, contentMain, switchBackground (yashirin — live-karta boshqaradi),
+    btnScan (endi yuqoridagi icon-btn), btnRefresh (endi pastdagi ghost tugma),
+    loadingLayout, tvLoading, tvCount, recycler, layoutEmpty, newsSection, newsTicker,
     btnLang, btnDashboard, btnSettings (hidden compat).
+  Yangi ID lar: cardLive, avLiveBox, avLiveIcon, tvLiveTitle, tvLiveSub,
+    tagLive, tagLiveDot, tagLiveText, chipAll/Bad/Ok (+Label/+Count).
 -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,20 +30,22 @@
         android:layout_marginBottom="68dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="20dp"
         android:scrollbars="none">
 
+        <!-- .screen-pad: 14 / 18 / 30 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="20dp">
+            android:paddingHorizontal="18dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="30dp">
 
-            <!-- ─── Header ─── -->
+            <!-- ─── Header: eyebrow + h-title | icon-btn (to'liq skan) ─── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -49,78 +56,39 @@
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/KQ4.Eyebrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.12"
-                        android:text="@string/scanner_eyebrow"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:text="@string/kq4_skaner_eyebrow" />
 
                     <TextView
+                        style="@style/KQ4.HTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/apk_list_title"
-                        android:textColor="@color/kq_ink"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="8dp"
+                        android:text="@string/kq4_skaner_title" />
                 </LinearLayout>
 
-                <!-- Live status chip -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/kq_stat_badge_safe"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp">
-
-                    <View
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
-                        android:background="@drawable/kq_safe_dot" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.12"
-                        android:text="@string/scan_live_chip"
-                        android:textAllCaps="true"
-                        android:textColor="@color/kq_safe_ink"
-                        android:textSize="10sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- Upload icon -->
                 <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/kq_icon_btn"
-                    android:contentDescription="Upload"
-                    android:padding="10dp"
+                    android:id="@+id/btnScan"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/kq4_icon_btn"
+                    android:contentDescription="@string/kq4_skaner_scan_cd"
+                    android:padding="12dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_upload_cyber"
-                    app:tint="@color/kq_ink" />
+                    android:src="@drawable/ic4_scan"
+                    app:tint="@color/kq_ink_2" />
             </LinearLayout>
 
-            <!-- ─── Permission card (initial state) ─── -->
+            <!-- ─── Ruxsat kartasi (boshlang'ich holat) ─── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPermission"
+                style="@style/KQ4.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                app:cardBackgroundColor="@color/kq_bg_elev"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/kq_hairline"
-                app:strokeWidth="1dp">
+                android:layout_marginBottom="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -135,54 +103,49 @@
                         android:orientation="horizontal">
 
                         <FrameLayout
-                            android:layout_width="44dp"
-                            android:layout_height="44dp"
-                            android:background="@drawable/kq_icon_tile_primary">
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/kq4_av_primary">
 
                             <ImageView
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
                                 android:layout_gravity="center"
                                 android:contentDescription="@null"
-                                android:src="@drawable/ic_cyber_lock"
-                                app:tint="@color/kq_primary" />
+                                android:src="@drawable/ic4_folder"
+                                app:tint="?attr/kqPrimary" />
                         </FrameLayout>
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
+                            android:layout_marginStart="13dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/onest_bold"
+                            android:letterSpacing="-0.01"
                             android:text="@string/permission_required"
                             android:textColor="@color/kq_ink"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <TextView
+                        style="@style/KQ4.RowSub"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:lineSpacingMultiplier="1.4"
-                        android:text="@string/permission_reason"
-                        android:textColor="@color/kq_ink_2"
-                        android:textSize="13sp" />
+                        android:text="@string/permission_reason" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnGrant"
+                        style="@style/KQ4.Button.Primary"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
-                        android:text="@string/grant"
-                        android:textAllCaps="false"
-                        android:textColor="@color/kq_on_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="@color/kq_primary"
-                        app:cornerRadius="999dp" />
+                        android:text="@string/grant" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ─── Main content (after permission granted) ─── -->
+            <!-- ─── Asosiy kontent (ruxsat berilgach) ─── -->
             <FrameLayout
                 android:id="@+id/contentMain"
                 android:layout_width="match_parent"
@@ -194,263 +157,15 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- ╔══════ HERO COMMAND CARD ══════╗ -->
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
-                        android:background="@drawable/kq_hero_card">
-
-                        <!-- 8-point star pattern overlay (subtle) -->
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:alpha="0.35"
-                            android:contentDescription="@null"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/kq_star_tile" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="18dp">
-
-                            <!-- Top row: status text + radar viz -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="monospace"
-                                        android:letterSpacing="0.12"
-                                        android:text="@string/scan_hero_eyebrow"
-                                        android:textAllCaps="true"
-                                        android:textColor="@color/kq_primary"
-                                        android:textSize="11sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="6dp"
-                                        android:letterSpacing="-0.018"
-                                        android:text="@string/scan_hero_status_clean"
-                                        android:textColor="@color/kq_ink"
-                                        android:textSize="24sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="4dp"
-                                        android:text="@string/scan_hero_subtitle"
-                                        android:textColor="@color/kq_ink_2"
-                                        android:textSize="13sp" />
-                                </LinearLayout>
-
-                                <!-- Radar viz: 3 concentric rings + KQ shield -->
-                                <FrameLayout
-                                    android:layout_width="120dp"
-                                    android:layout_height="120dp"
-                                    android:layout_marginStart="8dp">
-
-                                    <View
-                                        android:layout_width="120dp"
-                                        android:layout_height="120dp"
-                                        android:layout_gravity="center"
-                                        android:alpha="0.35"
-                                        android:background="@drawable/kq_scan_ring_outer" />
-
-                                    <View
-                                        android:layout_width="92dp"
-                                        android:layout_height="92dp"
-                                        android:layout_gravity="center"
-                                        android:alpha="0.55"
-                                        android:background="@drawable/kq_scan_ring_mid" />
-
-                                    <View
-                                        android:layout_width="64dp"
-                                        android:layout_height="64dp"
-                                        android:layout_gravity="center"
-                                        android:background="@drawable/kq_scan_disc_inner" />
-
-                                    <ImageView
-                                        android:layout_width="36dp"
-                                        android:layout_height="36dp"
-                                        android:layout_gravity="center"
-                                        android:contentDescription="@null"
-                                        android:src="@drawable/kq_shield_mark" />
-                                </FrameLayout>
-                            </LinearLayout>
-
-                            <!-- Hairline divider inside hero -->
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_marginTop="16dp"
-                                android:background="@color/kq_hairline" />
-
-                            <!-- 4-stat inline strip inside hero -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="14dp"
-                                android:orientation="horizontal">
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:id="@+id/tvHeroAll"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0"
-                                        android:textColor="@color/kq_ink"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:fontFamily="monospace"
-                                        android:letterSpacing="0.08"
-                                        android:text="@string/scan_stat_all"
-                                        android:textAllCaps="true"
-                                        android:textColor="@color/kq_ink_3"
-                                        android:textSize="10sp" />
-                                </LinearLayout>
-
-                                <View
-                                    android:layout_width="1dp"
-                                    android:layout_height="32dp"
-                                    android:layout_gravity="center_vertical"
-                                    android:background="@color/kq_hairline" />
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:id="@+id/tvHeroDanger"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0"
-                                        android:textColor="@color/kq_danger"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:fontFamily="monospace"
-                                        android:letterSpacing="0.08"
-                                        android:text="@string/scan_stat_danger"
-                                        android:textAllCaps="true"
-                                        android:textColor="@color/kq_ink_3"
-                                        android:textSize="10sp" />
-                                </LinearLayout>
-
-                                <View
-                                    android:layout_width="1dp"
-                                    android:layout_height="32dp"
-                                    android:layout_gravity="center_vertical"
-                                    android:background="@color/kq_hairline" />
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:id="@+id/tvHeroWarn"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0"
-                                        android:textColor="@color/kq_warn"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:fontFamily="monospace"
-                                        android:letterSpacing="0.08"
-                                        android:text="@string/scan_stat_warn"
-                                        android:textAllCaps="true"
-                                        android:textColor="@color/kq_ink_3"
-                                        android:textSize="10sp" />
-                                </LinearLayout>
-
-                                <View
-                                    android:layout_width="1dp"
-                                    android:layout_height="32dp"
-                                    android:layout_gravity="center_vertical"
-                                    android:background="@color/kq_hairline" />
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:id="@+id/tvHeroSafe"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0"
-                                        android:textColor="@color/kq_safe"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:fontFamily="monospace"
-                                        android:letterSpacing="0.08"
-                                        android:text="@string/scan_stat_safe"
-                                        android:textAllCaps="true"
-                                        android:textColor="@color/kq_ink_3"
-                                        android:textSize="10sp" />
-                                </LinearLayout>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </FrameLayout>
-
-                    <!-- ─── Avto-himoya toggle pill ─── -->
+                    <!-- ─── Live-karta: Avto-himoya holati (yoniq/o'chiq — kod boshqaradi) ─── -->
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardLive"
+                        style="@style/KQ4.Card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardBackgroundColor="@color/kq_bg_elev"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/kq_hairline"
-                        app:strokeWidth="1dp">
+                        android:layout_marginBottom="14dp"
+                        android:clickable="true"
+                        android:focusable="true">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -460,17 +175,19 @@
                             android:padding="14dp">
 
                             <FrameLayout
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:background="@drawable/kq_icon_tile_primary">
+                                android:id="@+id/avLiveBox"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:background="@drawable/kq4_av_safe">
 
                                 <ImageView
+                                    android:id="@+id/avLiveIcon"
                                     android:layout_width="22dp"
                                     android:layout_height="22dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@null"
-                                    android:src="@drawable/ic_shield"
-                                    app:tint="@color/kq_primary" />
+                                    android:src="@drawable/ic4_check_circle"
+                                    app:tint="@color/kq_safe" />
                             </FrameLayout>
 
                             <LinearLayout
@@ -481,84 +198,200 @@
                                 android:orientation="vertical">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/background_guard"
-                                    android:textColor="@color/kq_ink"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
+                                    android:id="@+id/tvLiveTitle"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:lineSpacingMultiplier="1.4"
-                                    android:text="@string/background_guard_hint"
-                                    android:textColor="@color/kq_ink_2"
-                                    android:textSize="11.5sp" />
+                                    android:fontFamily="@font/onest_bold"
+                                    android:letterSpacing="-0.01"
+                                    android:text="@string/kq4_skaner_live_on_title"
+                                    android:textColor="@color/kq_ink"
+                                    android:textSize="14.5sp" />
+
+                                <TextView
+                                    android:id="@+id/tvLiveSub"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/onest_regular"
+                                    android:text="@string/kq4_skaner_live_on_sub"
+                                    android:textColor="@color/kq_ink_3"
+                                    android:textSize="12.5sp" />
                             </LinearLayout>
 
+                            <!-- .tag safe «Jonli» / warn «O'chiq» -->
+                            <LinearLayout
+                                android:id="@+id/tagLive"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:layout_marginStart="10dp"
+                                android:background="@drawable/kq4_tag_safe"
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="12dp">
+
+                                <ImageView
+                                    android:id="@+id/tagLiveDot"
+                                    android:layout_width="7dp"
+                                    android:layout_height="7dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/kq4_dot"
+                                    app:tint="@color/kq_safe_ink" />
+
+                                <TextView
+                                    android:id="@+id/tagLiveText"
+                                    style="@style/KQ4.Tag"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="7dp"
+                                    android:text="@string/kq4_live"
+                                    android:textColor="@color/kq_safe_ink" />
+                            </LinearLayout>
+
+                            <!-- Yashirin tumbler — binding kontrakti uchun saqlangan; holatni
+                                 live-karta bosishi va Config sinxron boshqaradi. -->
                             <com.google.android.material.switchmaterial.SwitchMaterial
                                 android:id="@+id/switchBackground"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:checked="true" />
+                                android:checked="true"
+                                android:visibility="gone" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- ─── Primary CTA + circular refresh ─── -->
-                    <LinearLayout
+                    <!-- ─── Filtr chiplari: Hammasi / Xavfli / Xavfsiz (+ hisoblagich) ───
+                         HorizontalScrollView: uch chip + hisoblagichlar tor (360dp) ekranga
+                         yoki RU tiliga sig'magan holatda o'ngdagi chip kesilib qolmasin. -->
+                    <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="14dp"
+                        android:clipToPadding="false"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnScan"
-                            android:layout_width="0dp"
-                            android:layout_height="56dp"
-                            android:layout_weight="1"
-                            android:letterSpacing="0.01"
-                            android:text="@string/scan_now_cta"
-                            android:textAllCaps="false"
-                            android:textColor="@color/kq_on_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            app:backgroundTint="@color/kq_primary"
-                            app:cornerRadius="999dp"
-                            app:icon="@drawable/ic_radar_scan"
-                            app:iconGravity="textStart"
-                            app:iconPadding="8dp"
-                            app:iconSize="20dp"
-                            app:iconTint="@color/kq_on_primary" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnRefresh"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginStart="10dp"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:minWidth="0dp"
-                            android:minHeight="0dp"
-                            android:padding="0dp"
-                            app:cornerRadius="999dp"
-                            app:icon="@drawable/ic_search"
-                            app:iconGravity="textStart"
-                            app:iconPadding="0dp"
-                            app:iconSize="22dp"
-                            app:iconTint="@color/kq_ink"
-                            app:strokeColor="@color/kq_hairline_strong"
-                            app:strokeWidth="1dp" />
-                    </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/chipAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:background="@drawable/kq4_skaner_chip_on"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="16dp">
 
-                    <!-- ─── Loading indicator ─── -->
+                            <TextView
+                                android:id="@+id/chipAllLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/onest_semibold"
+                                android:letterSpacing="-0.01"
+                                android:text="@string/kq4_all"
+                                android:textColor="@color/kq_on_primary"
+                                android:textSize="14.5sp" />
+
+                            <TextView
+                                android:id="@+id/chipAllCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/kq4_skaner_badge_on"
+                                android:fontFamily="@font/onest_bold"
+                                android:gravity="center"
+                                android:minWidth="24dp"
+                                android:paddingHorizontal="7dp"
+                                android:text="0"
+                                android:textColor="@color/kq_on_primary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/chipBad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/kq4_skaner_chip_off"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="16dp">
+
+                            <TextView
+                                android:id="@+id/chipBadLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/onest_semibold"
+                                android:letterSpacing="-0.01"
+                                android:text="@string/kq4_danger"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="14.5sp" />
+
+                            <TextView
+                                android:id="@+id/chipBadCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/kq4_tag_soft"
+                                android:fontFamily="@font/onest_bold"
+                                android:gravity="center"
+                                android:minWidth="24dp"
+                                android:paddingHorizontal="7dp"
+                                android:text="0"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/chipOk"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/kq4_skaner_chip_off"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="16dp">
+
+                            <TextView
+                                android:id="@+id/chipOkLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/onest_semibold"
+                                android:letterSpacing="-0.01"
+                                android:text="@string/kq4_safe"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="14.5sp" />
+
+                            <TextView
+                                android:id="@+id/chipOkCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/kq4_tag_soft"
+                                android:fontFamily="@font/onest_bold"
+                                android:gravity="center"
+                                android:minWidth="24dp"
+                                android:paddingHorizontal="7dp"
+                                android:text="0"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <!-- ─── Qidiruv indikatori ─── -->
                     <LinearLayout
                         android:id="@+id/loadingLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
+                        android:layout_marginBottom="14dp"
                         android:gravity="center"
                         android:orientation="horizontal"
                         android:visibility="gone">
@@ -566,60 +399,33 @@
                         <ProgressBar
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:indeterminateTint="@color/kq_primary" />
+                            android:indeterminateTint="?attr/kqPrimary" />
 
                         <TextView
                             android:id="@+id/tvLoading"
+                            style="@style/KQ4.RowSub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
                             android:text="@string/scanner_searching"
-                            android:textColor="@color/kq_ink_2"
-                            android:textSize="13sp" />
+                            android:textColor="@color/kq_ink_2" />
                     </LinearLayout>
 
-                    <!-- ─── Yangiliklar (e'lonlar) — cloud'dan; bo'sh/sozlanmagan bo'lsa yashirin ─── -->
+                    <!-- ─── E'lonlar lentasi (cloud; bo'sh bo'lsa yashirin) ─── -->
                     <LinearLayout
                         android:id="@+id/newsSection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
                         android:orientation="vertical"
                         android:visibility="gone">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            style="@style/KQ4.SecTitle"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
+                            android:text="@string/news_section_title" />
 
-                            <View
-                                android:layout_width="6dp"
-                                android:layout_height="6dp"
-                                android:layout_marginEnd="10dp"
-                                android:background="@drawable/kq_section_dot" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:letterSpacing="0.12"
-                                android:text="@string/news_section_title"
-                                android:textAllCaps="true"
-                                android:textColor="@color/kq_primary"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
-
-                            <View
-                                android:layout_width="0dp"
-                                android:layout_height="1dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_weight="1"
-                                android:background="@color/kq_hairline" />
-                        </LinearLayout>
-
-                        <!-- Beruvchi lenta: e'lonlar gorizontal va uzluksiz suriladi.
-                             Kartochka bosilsa — to'liq e'lon dialogda ochiladi. -->
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/newsTicker"
                             android:layout_width="match_parent"
@@ -630,57 +436,29 @@
                             android:overScrollMode="never" />
                     </LinearLayout>
 
-                    <!-- ─── Section header: tvCount ko'rsatadi "Topilgan APK: N" / "Tekshirilmoqda..." ─── -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- ─── Holat satri: "Topilgan APK: N" / "Tekshirilmoqda..." ─── -->
+                    <TextView
+                        android:id="@+id/tvCount"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="@font/onest_semibold"
+                        android:text="@string/scanning"
+                        android:textColor="@color/kq_ink_3"
+                        android:textSize="13sp" />
 
-                        <View
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginEnd="10dp"
-                            android:background="@drawable/kq_section_dot" />
-
-                        <TextView
-                            android:id="@+id/tvCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="monospace"
-                            android:letterSpacing="0.12"
-                            android:text="@string/scanning"
-                            android:textAllCaps="true"
-                            android:textColor="@color/kq_primary"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:background="@color/kq_hairline" />
-                    </LinearLayout>
-
-                    <!-- ─── List card with empty state ─── -->
+                    <!-- ─── Ro'yxat kartasi (.li qatorlar) + bo'sh holat ─── -->
                     <com.google.android.material.card.MaterialCardView
+                        style="@style/KQ4.Card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:minHeight="220dp"
-                        app:cardBackgroundColor="@color/kq_bg_elev"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/kq_hairline"
-                        app:strokeWidth="1dp">
+                        android:minHeight="220dp">
 
                         <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <!-- Empty state — toggled from MainActivity via AdapterDataObserver -->
+                            <!-- Bo'sh holat — MainActivity AdapterDataObserver orqali boshqaradi -->
                             <LinearLayout
                                 android:id="@+id/layoutEmpty"
                                 android:layout_width="match_parent"
@@ -696,72 +474,63 @@
                                     <View
                                         android:layout_width="96dp"
                                         android:layout_height="96dp"
-                                        android:layout_gravity="center"
-                                        android:alpha="0.3"
-                                        android:background="@drawable/kq_scan_ring_outer" />
+                                        android:background="@drawable/kq4_circle_safe_soft" />
 
-                                    <View
-                                        android:layout_width="72dp"
-                                        android:layout_height="72dp"
+                                    <ImageView
+                                        android:layout_width="44dp"
+                                        android:layout_height="44dp"
                                         android:layout_gravity="center"
-                                        android:alpha="0.5"
-                                        android:background="@drawable/kq_scan_ring_mid" />
-
-                                    <FrameLayout
-                                        android:layout_width="52dp"
-                                        android:layout_height="52dp"
-                                        android:layout_gravity="center"
-                                        android:background="@drawable/kq_icon_tile_safe">
-
-                                        <ImageView
-                                            android:layout_width="28dp"
-                                            android:layout_height="28dp"
-                                            android:layout_gravity="center"
-                                            android:contentDescription="@null"
-                                            android:src="@drawable/ic_shield_check"
-                                            app:tint="@color/kq_safe" />
-                                    </FrameLayout>
+                                        android:contentDescription="@null"
+                                        android:src="@drawable/ic4_shield_check"
+                                        app:tint="@color/kq_safe" />
                                 </FrameLayout>
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="16dp"
+                                    android:fontFamily="@font/onest_bold"
+                                    android:letterSpacing="-0.01"
                                     android:text="@string/scan_empty_title"
                                     android:textColor="@color/kq_ink"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold" />
+                                    android:textSize="17sp" />
 
                                 <TextView
+                                    style="@style/KQ4.RowSub"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
                                     android:gravity="center"
-                                    android:lineSpacingMultiplier="1.4"
-                                    android:text="@string/scan_empty_desc"
-                                    android:textColor="@color/kq_ink_2"
-                                    android:textSize="13sp" />
+                                    android:text="@string/scan_empty_desc" />
                             </LinearLayout>
 
-                            <!-- Recycler (sits on top; hides empty state when populated) -->
+                            <!-- Ro'yxat (to'lganda bo'sh holatni yopadi) -->
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/recycler"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:background="@color/kq_bg_elev"
-                                android:clipToPadding="false"
                                 android:layoutAnimation="@anim/kq_layout_stagger"
                                 android:nestedScrollingEnabled="false"
-                                android:overScrollMode="never"
-                                android:paddingVertical="4dp" />
+                                android:overScrollMode="never" />
                         </FrameLayout>
                     </com.google.android.material.card.MaterialCardView>
+
+                    <!-- ─── Ghost tugma: hammasini qayta tekshirish ─── -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRefresh"
+                        style="@style/KQ4.Button.Ghost"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/kq4_skaner_rescan"
+                        app:icon="@drawable/ic4_refresh"
+                        app:iconSize="19dp" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom navigation -->
+    <!-- Pastki navigatsiya -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -770,7 +539,7 @@
         <include layout="@layout/view_kq_bottom_nav" />
     </FrameLayout>
 
-    <!-- Compat — eski binding ID lar, hidden -->
+    <!-- Compat — eski binding ID lar, yashirin -->
     <ImageButton
         android:id="@+id/btnLang"
         android:layout_width="0dp"

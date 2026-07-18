@@ -34,7 +34,7 @@
 
 2. АВТОМАТИЧЕСКОЕ СКАНИРОВАНИЕ:
    ✅ Скачиваешь APK через браузер
-   ✅ ⚡ СРАЗУ выскакивает окно KiberQalqon
+   ✅ ⚡ СРАЗУ выскакивает окно UzGuard
    ✅ Видишь "Tekshirilmoqda..." с анимацией
    ✅ Через 2 секунды результат:
       - 🔴 XAVFLI (красный) - опасно
@@ -81,7 +81,7 @@ for (file in files) {
 
 📱 НОВЫЙ APK ГОТОВ:
 
-KiberQalqon\app\build\outputs\apk\debug\app-debug.apk
+UzGuard\app\build\outputs\apk\debug\app-debug.apk
 
 ═══════════════════════════════════════════════════════════════
 

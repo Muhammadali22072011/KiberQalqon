@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.app.Activity
 import android.app.PendingIntent
@@ -47,20 +47,36 @@ object FileDeleter {
      */
     fun delete(activity: Activity, filePath: String): Result {
         val file = File(filePath)
-        if (!file.exists()) return Result.Deleted
 
-        // ЗАЩИТА ОТ СУИЦИДА: никогда не удаляем сам KiberQalqon.
+        // ЗАЩИТА ОТ СУИЦИДА: никогда не удаляем сам UzGuard.
         if (SelfGuard.isOwnApk(activity, filePath)) {
             Log.w(TAG, "Refusing to delete self APK: $filePath")
-            return Result.Failed("Bu KiberQalqon ning o'zi — himoyachini o'chirish taqiqlangan.")
+            return Result.Failed("Bu UzGuardning o'zi — himoyachini o'chirish taqiqlangan.")
         }
 
         // Файл в /Android/data/<pkg>/ — особая зона, в неё нельзя пробиться никаким разрешением.
         // Единственный пользовательский способ — удалить через само приложение-владельца.
+        //
+        // ВАЖНО (#delete-false-success): эта проверка ДОЛЖНА быть ВЫШЕ `!file.exists()`.
+        // На Android 11+ мы не можем даже stat'нуть чужую песочницу, поэтому
+        // file.exists()==false здесь НЕ значит «файл удалён» — вредонос всё ещё лежит
+        // в хранилище приложения-владельца (Telegram и т.п.), просто невидим нам.
+        // Раньше ранний `return Deleted` врал «o'chirildi» на выжившем вирусе.
         sandboxOwner(file)?.let { owner ->
             Log.w(TAG, "File belongs to sandboxed dir of $owner: $filePath")
+            // Настоящий обход песочницы /Android/data: если пользователь настроил
+            // Shizuku (uid=shell в группе ext_data_rw) — удаляем файл под ним.
+            // Это ЕДИНСТВЕННЫЙ способ реально стереть файл владельца без root.
+            // Не настроен → возвращаем SandboxedByOwner (UI предложит включить Shizuku).
+            if (ShizukuDeleter.deleteViaShizuku(filePath)) {
+                Log.d(TAG, "Deleted sandboxed file via Shizuku: $filePath")
+                return Result.Deleted
+            }
             return Result.SandboxedByOwner(owner)
         }
+
+        // Путь, который мы реально видим, и его уже нет → действительно удалён.
+        if (!file.exists()) return Result.Deleted
 
         // 1) Если есть MANAGE_EXTERNAL_STORAGE / WRITE_EXTERNAL_STORAGE — пробуем сразу прямое удаление.
         if (hasFullStorage()) {

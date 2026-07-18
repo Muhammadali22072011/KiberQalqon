@@ -47,17 +47,17 @@ export const VERDICT_UZ: Record<string, string> = {
   danger: 'Xavfli', suspicious: 'Shubhali', safe: 'Xavfsiz', error: 'Xatolik',
 };
 export const VERDICT_BG: Record<string, string> = {
-  danger: 'rgba(255,67,97,.16)', suspicious: 'rgba(255,176,32,.16)',
-  safe: 'rgba(37,224,176,.16)', error: 'rgba(154,167,194,.16)',
+  danger: '#FBE0DB', suspicious: '#FBECD2',
+  safe: '#E1F4E7', error: '#EFE9E0',
 };
 export const VERDICT_FG: Record<string, string> = {
-  danger: '#ff6679', suspicious: '#ffc24d', safe: '#3ee9bd', error: '#9aa7c2',
+  danger: '#911C10', suspicious: '#84500C', safe: '#0C6135', error: '#685C52',
 };
 export const VERDICT_DOT: Record<string, string> = {
-  danger: '#ff3b5c', suspicious: '#ffb020', safe: '#25e0b0', error: '#9aa7c2',
+  danger: '#E0432F', suspicious: '#DF8A18', safe: '#1A9E54', error: '#9A8D82',
 };
 export const SEV_COLOR: Record<string, string> = {
-  critical: '#ff3b5c', high: '#ff6a3d', medium: '#ffb020', low: '#25e0b0',
+  critical: '#911C10', high: '#E0432F', medium: '#DF8A18', low: '#1A9E54',
 };
 export const CAT_UZ: Record<string, string> = {
   sms_stealer: "SMS o'g'risi", spyware: 'Josus dastur', dropper: 'Yuklovchi (dropper)',
@@ -71,5 +71,5 @@ export const scoreVerdict = (s: number): Verdict =>
 // Xavf bali → rang (yashildan qizilgacha).
 export const riskColor = (s: number): string => {
   const v = Math.max(0, Math.min(100, s || 0));
-  return `hsl(${(150 * (1 - v / 100)).toFixed(0)},82%,55%)`;
+  return `hsl(${(150 * (1 - v / 100)).toFixed(0)},70%,40%)`;
 };

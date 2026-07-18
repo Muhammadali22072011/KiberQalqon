@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  KiberQalqon — tarmoq xavfsizligi sozlamasi (anti-RE).
+  UzGuard — tarmoq xavfsizligi sozlamasi (anti-RE).
 
   • Cleartext (HTTP) BUTUNLAY taqiqlangan — telemetriya va qurilma kaliti faqat HTTPS'da
     ketadi (tarmoqda ochiq sniff qilinmasin).
-  • kiberqalqon-cloud.vercel.app uchun sertifikat-PINNING: reverser o'zining proxy-CA'si
+  • uzguard-cloud.vercel.app uchun sertifikat-PINNING: reverser o'zining proxy-CA'si
     (Burp/mitmproxy) bilan TLS'ni MITM qilib qurilma kalitini/endpointlarni JONLI ushlay
     OLMAYDI — bu "movdarukni qanday ishlashini bilib olish" yo'lini yopadi.
 
@@ -24,7 +24,7 @@
         </trust-anchors>
     </base-config>
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">kiberqalqon-cloud.vercel.app</domain>
+        <domain includeSubdomains="true">uzguard-cloud.vercel.app</domain>
         <pin-set expiration="2027-06-01">
             <!-- Google Trust Services WR1 — *.vercel.app ni imzolovchi intermediate -->
             <pin digest="SHA-256">yDu9og255NN5GEf+Bwa9rTrqFQ0EydZ0r1FCh9TdAW4=</pin>

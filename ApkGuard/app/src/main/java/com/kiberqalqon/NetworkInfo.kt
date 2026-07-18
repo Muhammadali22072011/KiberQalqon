@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -74,7 +74,7 @@ object NetworkInfo {
         return try {
             val req = Request.Builder()
                 .url("https://api.ipify.org")
-                .header("User-Agent", "KiberQalqon/admin")
+                .header("User-Agent", "UzGuard/admin")
                 .get()
                 .build()
             client.newCall(req).execute().use { resp ->

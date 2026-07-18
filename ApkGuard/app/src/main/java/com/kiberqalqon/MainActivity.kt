@@ -4,13 +4,14 @@
  *  ###  #  # #    ##      #### #  # #  #
  *  #    #  # #    # #       #  #  # #  #
  *  #    #### #### #  #      #  #### ####
- *  Bu kod Muhammadaliniki. O'g'irlama. — KiberQalqon
+ *  Bu kod Muhammadaliniki. O'g'irlama. — UzGuard
  */
-package com.kiberqalqon
+package com.uzguard
 
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,6 +20,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -26,9 +28,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
-import com.kiberqalqon.databinding.ActivityMainBinding
-import com.kiberqalqon.databinding.DialogNewsBinding
+import com.uzguard.databinding.ActivityMainBinding
+import com.uzguard.databinding.DialogNewsBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -40,8 +44,22 @@ class MainActivity : AppCompatActivity() {
     // Ruxsat berilgach skan/kuzatuvchini bir martagina ishga tushiramiz —
     // har onResume'da (masalan, sozlamalardan qaytganda) takror skan bo'lmasligi uchun.
     private var scanStarted = false
+    // O'rnatilgan ilovalar skani bir vaqtda BITTA ishlashi uchun guard (tez-tez bosishda takror ishga tushmasin).
+    @Volatile private var installedScanRunning = false
+    // v4: joriy filtr (Hammasi/Xavfli/Xavfsiz) — chip ko'rinishini renderChips() shu orqali chizadi.
+    private var currentFilter = ApkAdapter.Filter.ALL
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var multiPathObserver: MultiPathFileObserver? = null
+
+    // PERF: "Hammasini skanlash" bir vaqtning o'zida HAR BIR APK uchun coroutine ochardi
+    // (apks.forEach { launch(Dispatchers.IO) }) — Dispatchers.IO 64 thread'gacha ko'taradi,
+    // Telegram/Downloads'da 50-200 APK bo'lsa o'nlab og'ir skan (SHA-256/ZIP/DEX) bir vaqtda
+    // ishlab BARCHA yadroni band qilardi → telefon qizardi. Endi bir vaqtda ko'pi bilan N ta
+    // skan (yadrolarning yarmi, 2..4 oralig'ida) — fayllar o'sha-o'sha, movJ o'sha-o'sha,
+    // faqat parallellik cheklangan. Aniqlash kuchi O'ZGARMAYDI.
+    private val scanGate = Semaphore(
+        (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, 4)
+    )
 
     // Beruvchi lenta (news ticker) holati.
     private var tickerAdapter: NewsTickerAdapter? = null
@@ -50,8 +68,10 @@ class MainActivity : AppCompatActivity() {
     private var tickerRunnable: Runnable? = null
     private var tickerPaused = false
     private var tickerAccum = 0f
-    // Kadrlararo siljish (~0.7dp/16ms ≈ 44dp/s) — sokin, o'qish mumkin bo'lgan tezlik.
-    private val tickerStepPx by lazy { (resources.displayMetrics.density * 0.7f).coerceAtLeast(1f) }
+    // PERF: lenta har 16ms da (≈60fps) RecyclerView.scrollBy chaqirib UI-thread'ni doimiy
+    // band qilardi. Endi har 32ms (≈30fps) — sokin marquee uchun ko'zga bilinmaydi, lekin
+    // UI ish ikki barobar kamayadi. Tezlik o'sha-o'sha: qadam 2 barobar (1.4dp/32ms ≈ 44dp/s).
+    private val tickerStepPx by lazy { (resources.displayMetrics.density * 1.4f).coerceAtLeast(1f) }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -67,7 +87,9 @@ class MainActivity : AppCompatActivity() {
 
             setupAdapter()
             setupButtons()
+            setupFilters()
             refreshPermissionState()
+            updateLiveCard()
 
             // Единая нижняя нав — активна вкладка Skaner.
             KqBottomNav.attach(this, KqBottomNav.Tab.SCAN)
@@ -83,56 +105,7 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun setupAdapter() {
-        adapter = ApkAdapter(emptyList()) { item ->
-            scope.launch {
-                try {
-                    binding.tvCount.text = getString(R.string.scanning)
-                    binding.btnScan.isEnabled = false
-                    
-                    // UX-08: 30s (avval 5s edi — bujetli telefonlarda katta APK ulgurmasdi va
-                    // foydalanuvchi faylni umuman tekshira olmasdi; popup yo'lida esa timeout yo'q).
-                    val result = withTimeout(30000) {
-                        withContext(Dispatchers.IO) {
-                            try {
-                                ApkScanner.scan(this@MainActivity, item.file.absolutePath)
-                            } catch (e: Exception) {
-                                android.util.Log.e("MainActivity", "Scan error", e)
-                                null
-                            }
-                        }
-                    }
-                    
-                    binding.tvCount.text = getString(R.string.apk_count, adapter.itemCount)
-                    
-                    if (result != null) {
-                        startActivity(ScanResultActivity.intent(this@MainActivity, item.file.absolutePath, result))
-                    } else {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Faylni tekshirib bo'lmadi",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                } catch (e: TimeoutCancellationException) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Tekshirish juda ko'p vaqt oldi",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.tvCount.text = getString(R.string.apk_count, adapter.itemCount)
-                } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "Critical error", e)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Xatolik: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.tvCount.text = getString(R.string.apk_count, adapter.itemCount)
-                } finally {
-                    binding.btnScan.isEnabled = true
-                }
-            }
-        }
+        adapter = ApkAdapter(emptyList()) { item -> scanItem(item) }
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
 
@@ -146,7 +119,67 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshEmptyState() {
-        binding.layoutEmpty.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+        // totalCount (filtrsiz): filtr 0 qator ko'rsatsa ham "Tizim toza" deb aldamaymiz.
+        binding.layoutEmpty.visibility = if (adapter.totalCount == 0) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Qator bosilganda YAGONA skan yo'li. UX-08: 30s timeout (avval 5s edi — bujetli
+     * telefonlarda katta APK ulgurmasdi). Ilgari startAutoProtection() adapterni o'z
+     * 5s-callback'i bilan QAYTA yaratardi va real foydalanishda har doim o'sha qisqa yo'l
+     * ishlardi, xatolar esa jim yutilardi (tvCount «Tekshirilmoqda...» da osilib qolardi).
+     * Endi adapter qayta yaratilmaydi — ikkala holat ham shu funksiyadan o'tadi.
+     */
+    private fun scanItem(item: ApkItem) {
+        scope.launch {
+            try {
+                binding.tvCount.text = getString(R.string.scanning)
+                binding.btnScan.isEnabled = false
+
+                val result = withTimeout(30000) {
+                    withContext(Dispatchers.IO) {
+                        try {
+                            ApkScanner.scan(this@MainActivity, item.file.absolutePath)
+                        } catch (e: Exception) {
+                            android.util.Log.e("MainActivity", "Scan error", e)
+                            null
+                        }
+                    }
+                }
+
+                binding.tvCount.text = getString(R.string.apk_count, adapter.totalCount)
+
+                if (result != null) {
+                    // v4: real verdiktni qatorda av/tag sifatida ko'rsatamiz + filtr hisoblari.
+                    adapter.setVerdict(item.file.absolutePath, result.verdict)
+                    updateFilterCounts()
+                    startActivity(ScanResultActivity.intent(this@MainActivity, item.file.absolutePath, result))
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.kq4_skaner_err_scan_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: TimeoutCancellationException) {
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.kq4_skaner_err_scan_timeout),
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.tvCount.text = getString(R.string.apk_count, adapter.totalCount)
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "Critical error", e)
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.kq4_skaner_err_generic, e.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.tvCount.text = getString(R.string.apk_count, adapter.totalCount)
+            } finally {
+                binding.btnScan.isEnabled = true
+            }
+        }
     }
 
     // ─── Yangiliklar / e'lonlar lentasi (cloud'dan) ──────────────────────────
@@ -157,7 +190,7 @@ class MainActivity : AppCompatActivity() {
             binding.newsSection.visibility = View.GONE
             return
         }
-        NewsClient.fetch { result ->
+        NewsClient.fetch(CloudTelemetry.savedGroupCode(this)) { result ->
             if (isFinishing || isDestroyed) return@fetch
             when (result) {
                 is NewsClient.Result.Success -> renderNews(result.items)
@@ -222,11 +255,11 @@ class MainActivity : AppCompatActivity() {
                         tickerAccum -= dx
                     }
                 }
-                tickerHandler.postDelayed(this, 16)
+                tickerHandler.postDelayed(this, TICKER_FRAME_MS)
             }
         }
         tickerRunnable = r
-        tickerHandler.postDelayed(r, 16)
+        tickerHandler.postDelayed(r, TICKER_FRAME_MS)
     }
 
     private fun stopTicker() {
@@ -261,9 +294,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val (lvlText, lvlColor) = when (item.level) {
-            "critical" -> "Muhim" to R.color.kq_danger
-            "warning" -> "Ogohlantirish" to R.color.kq_warn
-            else -> "E'lon" to R.color.kq_primary
+            "critical" -> getString(R.string.kq4_skaner_news_level_critical) to R.color.kq_danger
+            "warning" -> getString(R.string.kq4_skaner_news_level_warning) to R.color.kq_warn
+            else -> getString(R.string.kq4_skaner_news_level_info) to R.color.kq_primary
         }
         db.newsDlgLevel.text = lvlText
         db.newsDlgLevel.setTextColor(ContextCompat.getColor(this, lvlColor))
@@ -307,6 +340,9 @@ class MainActivity : AppCompatActivity() {
         // butunlay yo'qotardi. Qo'lda tekshiruv ruxsat bo'lsa doimo ishlaydi.
         val scanHandler = View.OnClickListener {
             if (hasPermission) {
+                // manual_scan telemetriyasi: avval faqat o'lik findAndShowApks() ichida edi,
+                // shuning uchun hodisa hech qachon ketmasdi. Endi real skan yo'lida.
+                try { TelemetryReporter.reportManualScan(this, "MainActivity → Skaner tugma") } catch (_: Throwable) {}
                 startAutoProtection()
             } else {
                 Toast.makeText(this, getString(R.string.toast_grant_storage_first), Toast.LENGTH_SHORT).show()
@@ -329,6 +365,8 @@ class MainActivity : AppCompatActivity() {
                         .cancel(ProtectionService.NOTIFICATION_ID)
                 } catch (_: Throwable) {}
             }
+            // v4: live-karta (Avto-himoya yoniq/o'chiq) holatini sinxron yangilaymiz.
+            updateLiveCard()
         }
 
         binding.btnSettings.setOnClickListener {
@@ -355,6 +393,93 @@ class MainActivity : AppCompatActivity() {
         binding.btnLang.setOnLongClickListener {
             showThemeDialog()
             true
+        }
+    }
+
+    // ─── v4 Skaner UI: filtr chiplari + live-karta ───────────────────────────
+
+    /** Chip kliklarini va live-kartani ulaydi (dizayn screens1.jsx → Apps). */
+    private fun setupFilters() {
+        binding.chipAll.setOnClickListener { applyFilter(ApkAdapter.Filter.ALL) }
+        binding.chipBad.setOnClickListener { applyFilter(ApkAdapter.Filter.BAD) }
+        binding.chipOk.setOnClickListener { applyFilter(ApkAdapter.Filter.OK) }
+        renderChips()
+        updateFilterCounts()
+
+        // Live-karta: o'chiq bo'lsa — bosish himoyani yoqadi (switch listener xizmatni
+        // ishga tushiradi); yoniq bo'lsa — himoya holati ekraniga olib boradi.
+        binding.cardLive.setOnClickListener {
+            if (Config.isBackgroundEnabled(this)) {
+                startActivity(Intent(this, ProtectionStatusActivity::class.java))
+            } else {
+                binding.switchBackground.isChecked = true
+                updateLiveCard()
+            }
+        }
+    }
+
+    private fun applyFilter(f: ApkAdapter.Filter) {
+        currentFilter = f
+        adapter.setFilter(f)
+        renderChips()
+    }
+
+    private fun renderChips() {
+        bindChip(binding.chipAll, binding.chipAllLabel, binding.chipAllCount,
+            currentFilter == ApkAdapter.Filter.ALL)
+        bindChip(binding.chipBad, binding.chipBadLabel, binding.chipBadCount,
+            currentFilter == ApkAdapter.Filter.BAD)
+        bindChip(binding.chipOk, binding.chipOkLabel, binding.chipOkCount,
+            currentFilter == ApkAdapter.Filter.OK)
+    }
+
+    /** design .chip / .chip.on: pilyulya fon + matn rangi + beydj foni. */
+    private fun bindChip(chip: View, label: TextView, count: TextView, on: Boolean) {
+        chip.setBackgroundResource(
+            if (on) R.drawable.kq4_skaner_chip_on else R.drawable.kq4_skaner_chip_off
+        )
+        val c = ContextCompat.getColor(this, if (on) R.color.kq_on_primary else R.color.kq_ink_2)
+        label.setTextColor(c)
+        count.setTextColor(c)
+        count.setBackgroundResource(
+            if (on) R.drawable.kq4_skaner_badge_on else R.drawable.kq4_tag_soft
+        )
+    }
+
+    private fun updateFilterCounts() {
+        val c = adapter.counts()
+        binding.chipAllCount.text = c.all.toString()
+        binding.chipBadCount.text = c.bad.toString()
+        binding.chipOkCount.text = c.ok.toString()
+    }
+
+    /** Live-karta: Avto-himoya yoniq (safe/Jonli) yoki o'chiq (warn/O'chiq). */
+    private fun updateLiveCard() {
+        val on = Config.isBackgroundEnabled(this)
+        if (on) {
+            binding.avLiveBox.setBackgroundResource(R.drawable.kq4_av_safe)
+            binding.avLiveIcon.setImageResource(R.drawable.ic4_check_circle)
+            binding.avLiveIcon.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(this, R.color.kq_safe))
+            binding.tvLiveTitle.text = getString(R.string.kq4_skaner_live_on_title)
+            binding.tvLiveSub.text = getString(R.string.kq4_skaner_live_on_sub)
+            binding.tagLive.setBackgroundResource(R.drawable.kq4_tag_safe)
+            val ink = ContextCompat.getColor(this, R.color.kq_safe_ink)
+            binding.tagLiveDot.imageTintList = ColorStateList.valueOf(ink)
+            binding.tagLiveText.setTextColor(ink)
+            binding.tagLiveText.text = getString(R.string.kq4_live)
+        } else {
+            binding.avLiveBox.setBackgroundResource(R.drawable.kq4_av_warn)
+            binding.avLiveIcon.setImageResource(R.drawable.ic4_alert)
+            binding.avLiveIcon.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(this, R.color.kq_warn))
+            binding.tvLiveTitle.text = getString(R.string.kq4_skaner_live_off_title)
+            binding.tvLiveSub.text = getString(R.string.kq4_skaner_live_off_sub)
+            binding.tagLive.setBackgroundResource(R.drawable.kq4_tag_warn)
+            val ink = ContextCompat.getColor(this, R.color.kq_warn_ink)
+            binding.tagLiveDot.imageTintList = ColorStateList.valueOf(ink)
+            binding.tagLiveText.setTextColor(ink)
+            binding.tagLiveText.text = getString(R.string.kq4_skaner_live_off_tag)
         }
     }
     
@@ -409,7 +534,51 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     startFileObserver()
                 }
-                
+
+                // ENG AVVAL — telefonga O'RNATILGAN ilovalarni tekshiramiz (foydalanuvchi talabi:
+                // "birinchi navbatda o'rnatilganlarni skanla"). Fayl-skani (pastda) faqat APK fayllarni
+                // topadi; o'rnatilgan zararli ilova esa shu yerda topiladi va DARHOL o'chirishga chiqariladi.
+                // Rasmiy do'kon (Play Market) ilovalari o'tkaziladi. Fayl-skani bilan parallel ishlaydi,
+                // shuning uchun o'rnatilgan tahdid fayl qidiruvini kutmaydi.
+                if (!installedScanRunning) {
+                    installedScanRunning = true
+                    scope.launch(Dispatchers.IO) {
+                        try {
+                            val threats = ApkScanner.scanInstalledForThreats(applicationContext)
+                            val dangers = threats.filter { it.result.verdict == ScanResult.Verdict.DANGER }
+                            // YANGI (avval ko'rilmagan) tahdidlar — bildirishnoma + DARHOL o'chirish oynasi.
+                            // Ketgan tahdidlar to'plamdan chiqadi (qayta paydo bo'lsa yana ogohlantiriladi).
+                            val prefs = getSharedPreferences("uzguard_rescan", android.content.Context.MODE_PRIVATE)
+                            val notified = prefs.getStringSet("installed_threat_notified", emptySet()) ?: emptySet()
+                            val fresh = dangers.filter { it.pkg !in notified }
+                            prefs.edit().putStringSet("installed_threat_notified", dangers.map { it.pkg }.toSet()).apply()
+                            if (threats.isEmpty()) return@launch
+                            withContext(Dispatchers.Main) {
+                                for (t in fresh) {
+                                    try {
+                                        NotificationHelper.showInstalledDangerNotification(
+                                            applicationContext, t.pkg, t.label, t.result
+                                        )
+                                    } catch (_: Throwable) {}
+                                    // DARHOL o'chirish: tizim uninstall oynasini ochamiz. Android boshqa
+                                    // ilovani JIMGINA o'chirishga RUXSAT BERMAYDI — foydalanuvchi "O'chirish"ni
+                                    // bosishi shart; biz oynani darhol chiqaramiz, faqat bir tap qoladi.
+                                    launchUninstall(t.pkg)
+                                }
+                                val msg = if (dangers.isNotEmpty())
+                                    "⚠️ ${dangers.size} ta o'rnatilgan virus — o'chirishga chiqarildi"
+                                else
+                                    "⚠️ ${threats.size} ta o'rnatilgan ilova shubhali"
+                                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
+                            }
+                        } catch (e: Throwable) {
+                            android.util.Log.e("MainActivity", "installed-apps scan error", e)
+                        } finally {
+                            installedScanRunning = false
+                        }
+                    }
+                }
+
                 // Асинхронно сканируем все существующие APK с таймаутом
                 android.util.Log.d("MainActivity", "🔍 Начинаю поиск APK...")
                 
@@ -425,29 +594,13 @@ class MainActivity : AppCompatActivity() {
                 android.util.Log.d("MainActivity", "✅ Найдено APK: ${apks.size}")
                 
                 withContext(Dispatchers.Main) {
-                    // Обновляем список
-                    adapter = ApkAdapter(apks) { item ->
-                        scope.launch {
-                            try {
-                                binding.tvCount.text = getString(R.string.scanning)
-                                
-                                val result = withTimeout(5000) {
-                                    withContext(Dispatchers.IO) {
-                                        ApkScanner.scan(this@MainActivity, item.file.absolutePath)
-                                    }
-                                }
-                                
-                                binding.tvCount.text = getString(R.string.apk_count, adapter.itemCount)
-                                
-                                if (result != null) {
-                                    startActivity(ScanResultActivity.intent(this@MainActivity, item.file.absolutePath, result))
-                                }
-                            } catch (e: Exception) {
-                                android.util.Log.e("MainActivity", "Scan error", e)
-                            }
-                        }
-                    }
-                    binding.recycler.adapter = adapter
+                    // Ro'yxatni yangilaymiz. Adapterni QAYTA YARATMAYMIZ: avval bu yerda
+                    // o'zining 5s-timeout'li callback'i bilan yangi ApkAdapter qurilardi va
+                    // setupAdapter'dagi 30s yo'l (UX-08) hech qachon ishlamasdi. updateList
+                    // bilan bo'sh-holat observer'i, joriy filtr va yagona scanItem() saqlanadi.
+                    adapter.updateList(apks)
+                    updateFilterCounts()
+                    if (apks.isNotEmpty()) binding.recycler.scheduleLayoutAnimation()
                     binding.tvCount.text = getString(R.string.apk_count, apks.size)
                     
                     // Скрываем индикатор загрузки
@@ -462,15 +615,21 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 
-                // Проверяем каждый APK асинхронно
+                // Проверяем каждый APK асинхронно — НО scanGate bilan parallellik cheklangan
+                // (yuqoridagi izohga qarang): bir vaqtda ko'pi bilan N ta skan, qolganlari navbatda.
                 apks.forEach { apkItem ->
                     scope.launch(Dispatchers.IO) {
                         try {
-                            val result = ApkScanner.scan(applicationContext, apkItem.path)
-                            
-                            // Если опасный - показываем уведомление и удаляем
-                            if (result.verdict == ScanResult.Verdict.DANGER) {
-                                withContext(Dispatchers.Main) {
+                            val result = scanGate.withPermit {
+                                ApkScanner.scan(applicationContext, apkItem.path)
+                            }
+
+                            withContext(Dispatchers.Main) {
+                                // v4: real verdikt qatorga (av/tag) va chip hisoblariga tushadi.
+                                adapter.setVerdict(apkItem.path, result.verdict)
+                                updateFilterCounts()
+                                // Если опасный - показываем уведомление и удаляем
+                                if (result.verdict == ScanResult.Verdict.DANGER) {
                                     showDangerNotification(apkItem.path, result)
                                 }
                             }
@@ -502,6 +661,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Zararli O'RNATILGAN ilovani o'chirish — tizim uninstall oynasini DARHOL ochadi.
+     * DIQQAT: Android bir ilovaga boshqasini JIMGINA (fonda) o'chirishga ruxsat bermaydi —
+     * foydalanuvchi tizim dialogida "O'chirish"ni bosishi shart. Biz shu dialogni bir tapga
+     * yaqinlashtiramiz. Skan foreground'da ishlagani uchun Activity ochish ruxsat etilgan.
+     */
+    private fun launchUninstall(pkg: String) {
+        try {
+            startActivity(
+                Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        } catch (e: Throwable) {
+            android.util.Log.w("MainActivity", "uninstall launch failed for $pkg", e)
+        }
+    }
+
     /**
      * Список-skan'da topilgan xavfli fayl haqida xabar berish.
      *
@@ -542,6 +718,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             scanStarted = false
         }
+        // v4: live-karta holati (Sozlamalardan qaytganda ham to'g'ri ko'rinsin).
+        updateLiveCard()
         loadNews()
     }
 
@@ -684,73 +862,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun findAndShowApks() {
-        if (!hasPermission) return
-
-        try { TelemetryReporter.reportManualScan(this, "MainActivity → Skanlash tugma") } catch (_: Throwable) {}
-
-        scope.launch {
-            try {
-                // Показываем индикатор загрузки
-                withContext(Dispatchers.Main) {
-                    binding.tvCount.text = getString(R.string.scanning)
-                    binding.btnScan.isEnabled = false
-                }
-                
-                val list = withTimeout(3000) { // Таймаут 3 секунды
-                    withContext(Dispatchers.IO) {
-                        try {
-                            ApkScanner.findApkFiles(this@MainActivity)
-                        } catch (e: Exception) {
-                            android.util.Log.e("MainActivity", "Error finding APKs", e)
-                            emptyList()
-                        }
-                    }
-                }
-                
-                withContext(Dispatchers.Main) {
-                    adapter.updateList(list)
-                    // Ro'yxat kelganda satrlar ketma-ket (stagger) suriladi.
-                    if (list.isNotEmpty()) binding.recycler.scheduleLayoutAnimation()
-                    binding.tvCount.text = getString(R.string.apk_count, list.size)
-
-                    if (list.isEmpty()) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Downloads papkasida APK fayllar topilmadi",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            } catch (e: TimeoutCancellationException) {
-                withContext(Dispatchers.Main) {
-                    binding.tvCount.text = getString(R.string.apk_count, 0)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Qidiruv juda ko'p vaqt oldi",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    adapter.updateList(emptyList())
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "Critical error", e)
-                withContext(Dispatchers.Main) {
-                    binding.tvCount.text = getString(R.string.apk_count, 0)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Xatolik: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    adapter.updateList(emptyList())
-                }
-            } finally {
-                withContext(Dispatchers.Main) {
-                    binding.btnScan.isEnabled = true
-                }
-            }
-        }
-    }
-    
     /**
      * Показать диалог при первом запуске
      */
@@ -771,5 +882,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             android.util.Log.e("MainActivity", "Ошибка показа диалога", e)
         }
+    }
+
+    companion object {
+        // Yangiliklar lentasi kadr oralig'i (ms). 32ms ≈ 30fps — sokin marquee uchun
+        // yetarli, eski 16ms (60fps) ga nisbatan UI-thread ishini ikki barobar kamaytiradi.
+        private const val TICKER_FRAME_MS = 32L
     }
 }

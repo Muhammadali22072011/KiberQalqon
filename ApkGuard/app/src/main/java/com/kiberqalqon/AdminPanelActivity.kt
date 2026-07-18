@@ -1,4 +1,4 @@
-package com.kiberqalqon
+package com.uzguard
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -97,7 +97,7 @@ class AdminPanelActivity : AppCompatActivity() {
         w.webViewClient = object : WebViewClient() {
             // Faqat o'z panelimiz ichida qolamiz; tashqi havola — tashqi brauzerda.
             // Xost (host) bo'yicha solishtiramiz, satr prefiksi bo'yicha EMAS — aks holda
-            // "panel.kiberqalqon.app.evil.com" kabi soxta xost ham startsWith'ni qanoatlantirib,
+            // "panel.uzguard.app.evil.com" kabi soxta xost ham startsWith'ni qanoatlantirib,
             // ishonchli panel ichida ochilib ketardi.
             private fun isInternal(uri: Uri): Boolean {
                 if (uri.scheme != "https") return false
