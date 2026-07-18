@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PLAY flavor manifest overlay (manifest-merger bilan `main` ustiga qo'shiladi).
+  Google Play siyosatiga mos qilish uchun `direct` (sideload) manifestidan quyidagilarni OLIB TASHLAYDI:
+   • InstallShieldService (AccessibilityService, installer oynasini auto-cancel) — Play Accessibility
+     siyosati bunga o'ta qattiq; deklaratsiyaning O'ZI (manifestdagi xizmat) rad sababi bo'ladi.
+   • PhishingNotificationService (NotificationListenerService) — notification-access cheklovi.
+   • READ_MEDIA_IMAGES/VIDEO/AUDIO — APK skaneriga rasm/video/audio KONTENTI kerak emas
+     (MANAGE_EXTERNAL_STORAGE fayl o'qishni API 30+ da qamraydi); ularni olib tashlash Photo/Video
+     deklaratsiyasidan qutqaradi va All-files-access asosini kuchaytiradi.
+  Runtime funksiyalar ham BuildConfig bayroqlari bilan o'chiq (INSTALL_SHIELD/NOTIF_LISTENER/
+  SELF_UPDATE/HARD_KILL=false, play flavor) — bu overlay esa deklaratsiyani manifestdan yo'q qiladi,
+  chunki reviewer aynan manifestni tekshiradi.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
+
+    <application>
+        <service android:name=".InstallShieldService" tools:node="remove" />
+        <service android:name=".PhishingNotificationService" tools:node="remove" />
+    </application>
+</manifest>

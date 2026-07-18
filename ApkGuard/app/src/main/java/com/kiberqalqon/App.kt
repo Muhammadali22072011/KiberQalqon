@@ -96,7 +96,10 @@ class App : android.app.Application() {
         // чтобы взломщик не смог по ним понять как обойти защиту.
         try {
             val result = SecurityGuard.runAllChecks(this)
-            if (!result.passed) {
+            // HARD_KILL faqat `direct` (sideload) variantda. `play` variantda O'CHIQ: Play revyusi
+            // emulyatorda ishlaydi va Play App Signing APK'ni Google kaliti bilan qayta imzolaydi —
+            // aks holda ilova reviewer emulyatorida va har bir Play-o'rnatishda o'zini o'ldirardi.
+            if (BuildConfig.HARD_KILL && !result.passed) {
                 Log.e("UzGuard", "Security check failed: ${result.reason}. Exiting.")
                 // SD-02: jim o'ldirishdan oldin foydalanuvchiga sababni узбекча tushuntiramiz.
                 try { NotificationHelper.showSecurityBlockNotification(this, result.reason) } catch (_: Throwable) {}

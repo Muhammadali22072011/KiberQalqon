@@ -127,7 +127,7 @@ object Config {
     }
 
     fun isPhishingBlockerEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_PHISHING, true)
+        BuildConfig.NOTIF_LISTENER && prefs(context).getBoolean(KEY_PHISHING, true)
 
     fun setPhishingBlockerEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_PHISHING, enabled) }
@@ -229,7 +229,7 @@ object Config {
     // Jonli o'rnatish qalqoni (Accessibility xizmati orqali avtomatik "Bekor").
     // Default YOQILGAN, lekin xizmat foydalanuvchi tizimda yoqmaguncha ishlamaydi.
     fun isInstallShieldEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_INSTALL_SHIELD, true)
+        BuildConfig.INSTALL_SHIELD && prefs(context).getBoolean(KEY_INSTALL_SHIELD, true)
 
     fun setInstallShieldEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_INSTALL_SHIELD, enabled) }

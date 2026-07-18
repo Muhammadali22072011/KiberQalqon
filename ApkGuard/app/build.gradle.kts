@@ -183,6 +183,32 @@ android {
         }
     }
 
+    // Tarqatish kanali (dist). `direct` = to'g'ridan-to'g'ri/sideload — barcha funksiyalar YOQIQ
+    // (self-update, install-shield accessibility, notif-listener, anti-tamper self-kill). `play` =
+    // Google Play uchun — Play siyosatiga zid komponentlar O'CHIQ: self-update yo'q, accessibility va
+    // notif-listener xizmatlari manifestdan olib tashlangan (src/play/AndroidManifest.xml), emulator/
+    // imzo self-kill o'chiq. `direct` STANDART — mavjud CI va self-update pipeline shu variantda ishlaydi
+    // (assembleDirectDebug / assembleDirectReleasefast / bundleDirectReleasefast). Play artefakti:
+    // bundlePlayReleasefast (yoki R8'li bundlePlayRelease).
+    flavorDimensions += "dist"
+    productFlavors {
+        create("direct") {
+            dimension = "dist"
+            isDefault = true
+            buildConfigField("boolean", "INSTALL_SHIELD", "true")
+            buildConfigField("boolean", "SELF_UPDATE", "true")
+            buildConfigField("boolean", "NOTIF_LISTENER", "true")
+            buildConfigField("boolean", "HARD_KILL", "true")
+        }
+        create("play") {
+            dimension = "dist"
+            buildConfigField("boolean", "INSTALL_SHIELD", "false")
+            buildConfigField("boolean", "SELF_UPDATE", "false")
+            buildConfigField("boolean", "NOTIF_LISTENER", "false")
+            buildConfigField("boolean", "HARD_KILL", "false")
+        }
+    }
+
     // Дополнительно: запрет дебаг-флага во ВСЕХ buildTypes
     packaging {
         resources {

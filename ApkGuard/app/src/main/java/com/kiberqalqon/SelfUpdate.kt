@@ -61,6 +61,9 @@ object SelfUpdate {
      * App.onCreate fonida RemoteConfig.refresh'dan KEYIN chaqiriladi. Hech qachon throw qilmaydi.
      */
     fun checkAndNotify(ctx: Context) {
+        // Play variantda self-update BUTUNLAY o'chiq — yangilanishlar faqat Google Play orqali
+        // (Device & Network Abuse: Play'dan tarqatilgan ilova o'z APK'sini yuklab o'rnata olmaydi).
+        if (!BuildConfig.SELF_UPDATE) return
         try {
             val info = RemoteConfig.updateInfo(ctx) ?: return
             if (info.versionCode <= BuildConfig.VERSION_CODE) return
@@ -107,6 +110,7 @@ object SelfUpdate {
      * (string resursi).
      */
     fun downloadVerifyInstall(ctx: Context, info: Info): Int? {
+        if (!BuildConfig.SELF_UPDATE) return null   // Play variantda o'z-APK o'rnatish yo'q
         val app = ctx.applicationContext
         val dir = File(app.cacheDir, "shared")   // FileProvider cache-path "shared/" bilan mos
         val out = File(dir, "kq-update-${info.versionCode}.apk")
