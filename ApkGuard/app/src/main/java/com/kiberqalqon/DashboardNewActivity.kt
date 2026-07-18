@@ -374,6 +374,18 @@ class DashboardNewActivity : AppCompatActivity() {
                     } catch (_: Throwable) { null }
                     if (knownBad != null) verdict = "DANGER"
 
+                    // Rasmiy do'kondan (Play Market / Galaxy / AppGallery / Mi / RuStore...) o'rnatilgan
+                    // ilova — HAR DOIM XAVFSIZ deb ko'rsatamiz va UMUMAN SKANLAMAYMIZ. Play Protect uni
+                    // allaqachon tekshirgan, /data/app'dagi base.apk'ni boshqa ilova almashtira olmaydi,
+                    // va har bir o'rnatilgan ilovani qayta skanlash telefonni bekorga qizdiradi. verdict==null
+                    // sharti YO'Q — eski false-positive to'lqinidan qolgan noto'g'ri "DANGER" keshini ham
+                    // shu yerda tozalaymiz. Ma'lum zararli paket (knownBad) bu qoidadan YUQORI turadi —
+                    // u yagona istisno bo'lib, baribir DANGER bo'lib qoladi.
+                    if (knownBad == null &&
+                        ApkScanner.isFromTrustedStore(applicationContext, p.packageName)) {
+                        verdict = "SAFE"
+                    }
+
                     val source = detectInstallSource(pm, p.packageName)
                     AppRowData(label, p.packageName, icon, verdict, source, sourceDir)
                 }.sortedBy { it.label.lowercase() }
