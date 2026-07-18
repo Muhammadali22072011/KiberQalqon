@@ -1,0 +1,59 @@
+I have enough grounding from the manifest and Uzbek strings. Here is the store listing.
+
+---
+
+**TITLE** (20/30)
+
+UzGuard — APK Skaner
+
+---
+
+**SHORT DESCRIPTION** (65/80)
+
+Zararli APK'larni oflayn aniqlang. Telegram troyanlaridan himoya.
+
+---
+
+**FULL DESCRIPTION** (~2870/4000)
+
+UzGuard — O'zbekiston foydalanuvchilari uchun yaratilgan telefon xavfsizligi yordamchisi. U APK fayllarni siz o'rnatishdan OLDIN tekshiradi va zararli dasturlarni aniqlashga yordam beradi.
+
+Bugungi kunda firibgarlar zararli ilovalarni ko'pincha Telegram, brauzer yoki havolalar orqali "video", "taklifnoma" yoki "yangilanish" niqobida tarqatishadi. UzGuard aynan shunday hujumlardan himoyalanishga qaratilgan.
+
+QANDAY ISHLAYDI
+• Oflayn, telefonning o'zida tekshirish. APK tahlili qurilmada bajariladi — faylni tekshirish uchun uni hech qayerga yuklash shart emas va doimiy internet talab qilinmaydi.
+• Telegram, "Yuklab olishlar" va boshqa papkalardagi yangi APK fayllarni avtomatik kuzatadi.
+• Xavfli fayl topilsa, aniq va sodda ogohlantirish beradi — o'rnatishni to'xtatib turishga yordam beradi.
+
+ASOSIY IMKONIYATLAR
+• APK skaneri — fayl ichidagi shubhali ruxsatlar, xatti-harakat belgilari va yashirin qismlarni tahlil qiladi.
+• Telegram bank troyanlariga e'tibor — Ajina.Banker, RoundRift kabi Markaziy Osiyoga qaratilgan zararli oilalar belgilarini aniqlashga mo'ljallangan.
+• O'rnatilgan ilovalar tekshiruvi — telefondagi ilovalar orasidan shubhalilarini topishga yordam beradi.
+• Havola va QR tekshiruvi — Telegram yoki SMS'dan kelgan havolani ochishdan oldin baholaydi.
+• Soxta bank ilovalari auditi — haqiqiy bank brendiga taqlid qiluvchi ilovalarni ajratib beradi.
+• Ruxsatlar rentgeni — qaysi ilova SMS, qo'ng'iroq yoki joylashuvga kirishini sodda tilda ko'rsatadi.
+• Karantin — shubhali fayllarni ajratib qo'yish va keyin o'chirish yoki tiklash.
+• C2 domen filtri (ixtiyoriy, standart holatda o'chiq) — ma'lum zararli boshqaruv domenlariga ulanishni cheklashga urinadi.
+
+SODDA TIL
+Natijalar shifrlangan texnik atamalarda emas, tushunarli o'zbek tilida beriladi. Nima xavfli va nima qilish kerakligini oddiy so'zlar bilan aytamiz.
+
+MAXFIYLIK BIRINCHI O'RINDA
+• Google akkaunti yoki ro'yxatdan o'tish talab qilinmaydi — ilovadan foydalanish uchun hisob yaratish shart emas.
+• Asosiy tekshiruv qurilmangizda, oflayn bajariladi.
+• Ixtiyoriy va anonim telemetriya — "Jamoatchilik xavfsizligi" opsiyasi faqat siz yoqsangiz ishlaydi. Uni yoqsangiz ham shaxsingizni oshkor qiluvchi ma'lumot emas, faqat texnik belgilar (masalan, fayl xesh va paket nomi) yuboriladi.
+• Joylashuv (GPS) faqat ixtiyoriy tahdid xaritasi uchun va faqat ruxsat bersangiz o'qiladi. Rad etsangiz ham ilova to'liq ishlayveradi.
+• Shaxsiy fayllaringiz, kontakt yoki xabarlaringiz sotilmaydi.
+
+TILLAR
+• O'zbekcha (asosiy)
+• Русский
+
+HALOL MA'LUMOT
+UzGuard xavfsizlikni oshirishga yordam beruvchi vosita bo'lib, hech bir dastur 100% himoyani kafolatlay olmaydi. UzGuard sizni ehtiyotkorlikning o'rnini bosmaydi: noma'lum manbalardan ilova o'rnatmang va shubhali havolalarni ochmang. Ilova ichida "Himoya chegaralari" bo'limida nimalarni qila olmasligimizni ham ochiq yozib qo'yganmiz.
+
+Telefoningizni zararli APK'lardan himoyalashni bugundan boshlang.
+
+---
+
+Grounding notes: All claims verified against `ApkGuard/app/src/main/AndroidManifest.xml` and `ApkGuard/app/src/main/res/values-uz/strings.xml`. Kept it honest — no "100% / full antivirus" guarantees, no comparative/competitor claims; "Antivirus" avoided in the title (used "Skaner"). Offline on-device scanning, no-Google-account, opt-in anonymous telemetry, optional GPS, and Ajina.Banker/RoundRift Telegram-trojan focus are all sourced from the app's own onboarding/about strings. Version number deliberately omitted (strings still say 7.6/7.8 — stale vs the 8.7 build — so leaving it out avoids a wrong number in the listing).
