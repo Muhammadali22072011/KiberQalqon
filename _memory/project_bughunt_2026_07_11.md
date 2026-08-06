@@ -1,0 +1,22 @@
+---
+name: project_bughunt_2026_07_11
+description: "100-agent full-codebase bug audit of UzGuard (2026-07-11) — 51 confirmed findings, report file, nothing fixed yet"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 967de86a-8732-4de1-80ef-0d5d21ef5f08
+---
+
+2026-07-11: ran a 100-agent Workflow bug hunt over ALL shipping code (133 Kotlin ~32.6k lines + ~30 cloud TS + telegram_bot/bot.py + server/app.py; forensics analysis/*.py excluded). 74 finder groups → adversarial refute-first verifiers, all Opus 4.8. 156 agents, 9.75M tokens, 30 min.
+
+Result: **51 CONFIRMED (9 HIGH + 42 MEDIUM), 22 PLAUSIBLE, 79 LOW, 7 REJECTED.** No CRITICAL survived verification (all downgraded). Full report written to repo root: `AUDIT_BUGHUNT_2026-07-11.md` (617+ lines, all findings with file:line + failure scenario + fix + verifier reasoning, plus FIXES APPLIED section).
+
+**ALL 51 CONFIRMED NOW FIXED** (2026-07-11, same day): 2nd Workflow (apply-confirmed-fixes) ran 1 general-purpose agent per file (40 disjoint files) → independent reviewer per diff → **40/40 GOOD, 0 broken, 0 needs-work.** 105 edits, ~988 insertions/268 deletions. 2 secondary sub-fixes intentionally skipped (BankAppAudit dictionary-word guard — would weaken icon-impersonation path; webhook.ts ok:false fallback — core escaping already fixes it). Cross-file hand-verified: getUpdates→UpdatesResult (only caller TelegramCommandPoller, TelemetrySettings uses own raw HTTP), DexPatternAnalyzer Pattern.needle2 optional, SecurityGuard Context threaded through private isRooted/checkRootApps/isXposedPresent (all in-file), ImprovedApkFileObserver flow→per-path ConcurrentHashMap<String,Job>, LinkScanner sub>=2-relative-to-registrable aligns with all LinkScannerTest cases. Scripts: scratchpad/applyfixes.js (resume wf_d0c0e627-987), fixes/_manifest.json, fixes/*.txt per-file instructions.
+
+**STATE: COMMITTED e2b45f5 + PUSHED to feat/anti-re-hardening. CI GREEN** (both checks success @ e2b45f5: "Android — unit tests + debug build" = success → Kotlin compiles, debug APK builds, ALL unit tests pass incl. LinkScannerTest/AppReputationTest/ApkScannerTest that the fixes touch; "Cloud — TypeScript check" = success). Committed only the 41 fix source files + AUDIT_BUGHUNT_2026-07-11.md — the large pre-existing rebrand/pitch/demo/docs churn in the working tree was deliberately NOT staged. NOT device-tested. Local build IMPOSSIBLE (RAM) → CI was the compile+test gate. TelegramBot.kt also modified (getUpdates return type) though not in the 40-file manifest — expected, done by the TelegramCommandPoller fix agent. Note: apk_analyzer.py/unpack_apk.py/rebuild_launcher_icons.py were already modified pre-session (not from this work).
+
+9 HIGH: DexPatternAnalyzer.kt:77 (`;->` needles never match raw DEX bytes → SMS/OTP/exec detectors DEAD, banker undercounts ~130pts — the single most urgent fix), FilenameHeuristic.kt:314 (typosquat flags common words payment/clicker/signed → instant hard-DANGER FP-flood bypassing trust-shield), SecurityGuard.kt:512 (test-keys fingerprint → emulator self-kill boot-loop on grey-market/custom-ROM devices), SelfGuard.kt:73 + InstallShieldService.kt:100 + NativeLibAnalyzer.kt:74 (forgeable-substring self/trust whitelists → scan-skip bypass), LinkScanner.kt:247 (path/query not percent-decoded → %-encoded APK/phishing bypass), ImprovedApkFileObserver.kt:32 (debounce(700) drops all-but-last APK in a burst), CommandRouter.kt:112 (Telegram delete bypasses FileDeleter + lies for /Android/data sandbox — re-introduces delete-false-success).
+
+Systemic themes (exec summary in report): (A) trust by forgeable substrings not crypto, (B) dead/bypassable core detectors, (C) exception-swallow = fail-open false-SAFE (ManifestAnalyzer.kt:226, upload.ts:250, login.ts:65), (D) hard-DANGER short-circuits bypassing trust-shield = FP flood (same class as [[project_false_positive_flood_2026_07_09]]), (E) non-atomic SharedPrefs read-modify-write races (ScanHistory/ThreatActions/Quarantine/NotificationHelper fixed-ID 777), (F) delete/update false-success, (G) self-kill availability-DoS, (H) cloud fail-open auth (ratelimit.ts:49 Supabase-error opens brute-force, [id].ts:198 legacy shared-secret default-on), (I) heat/battery (CloudTelemetry.kt:405 GPS-fix per upload).
+
+GAP: 1 group `find:device-net` (DeviceLocation.kt, NetworkInfo.kt) failed on Opus cyber-safety filter — those 2 files NOT reviewed; re-run manually or reworded. Script: scratchpad/bughunt.js (resumeFromRunId wf_68631c1b-24c). Parser: scratchpad/gen_report.py.
