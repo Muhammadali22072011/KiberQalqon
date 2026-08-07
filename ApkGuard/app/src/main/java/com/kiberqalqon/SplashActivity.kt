@@ -279,10 +279,14 @@ class SplashActivity : AppCompatActivity() {
             // Himoya holati ekrani — barcha ruxsat/sozlama yoqilganini bir joyda ko'rsatadi.
             // Bir marta "Davom etish" bosilgach qayta majburlanmaydi (Config.isProtectionAcked).
             !Config.isProtectionAcked(this) -> ProtectionStatusActivity::class.java
-            // MAJBURIY ruxsatlardan birortasi keyinchalik o'chirilgan bo'lsa — Dashboard'ga
+            // MAJBURIY TIZIM ruxsatlaridan birortasi keyinchalik o'chirilgan bo'lsa — Dashboard'ga
             // o'tkazmaymiz, qaytadan "Himoya holati" shlagbaumiga yo'naltiramiz. Ruxsatsiz
             // ilova ishlamaydi (fon kuzatuvi / o'chirish / ogohlantirish oynasi ishlamaydi).
-            !ProtectionStatusActivity.allCriticalPermissionsGranted(this) ->
+            //
+            // DIQQAT: bu yerda ataylab `criticalSystemPermissionsGranted` — `allCritical…` EMAS.
+            // Ikkinchisiga `Config.isBackgroundEnabled` tumbleri ham kiradi, va uni o'chirgan
+            // foydalanuvchi ilovaga umuman kira olmay qolardi (izohga qarang).
+            !ProtectionStatusActivity.criticalSystemPermissionsGranted(this) ->
                 ProtectionStatusActivity::class.java
             else -> DashboardNewActivity::class.java
         }

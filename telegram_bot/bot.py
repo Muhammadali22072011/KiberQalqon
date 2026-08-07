@@ -49,7 +49,7 @@ except ImportError:
     raise SystemExit(1)
 
 BASE = Path(__file__).resolve().parent
-# Корень проекта APK-анализа — там лежит apk_analyzer.py.
+# Корень проекта APK-анализа — apk_analyzer.py лежит в его tools/.
 PROJECT_ROOT = BASE.parent
 SAMPLES_DIR = BASE / "samples"
 SAMPLES_DIR.mkdir(exist_ok=True)
@@ -216,7 +216,7 @@ def _run_analyzer(apk_path: Path) -> dict:
     # tahlilда diskni ikkilantirardi). Analizator faylni to'g'ridan-to'g'ri save_path'dan oladi,
     # workdir esa faqat extraction (apk_extracted) uchun.
 
-    analyzer = PROJECT_ROOT / "apk_analyzer.py"
+    analyzer = PROJECT_ROOT / "tools" / "apk_analyzer.py"
     if not analyzer.is_file():
         shutil.rmtree(workdir, ignore_errors=True)
         return {"risk": "error", "reasons": ["apk_analyzer.py topilmadi"], "perms": []}

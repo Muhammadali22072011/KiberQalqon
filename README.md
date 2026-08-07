@@ -94,6 +94,9 @@ cd ApkGuard
 # natija: app\build\outputs\apk\debug\kiberqalqon-<epoch-millis>-debug.apk
 ```
 
+Yoki ildizdagi `build-apk.bat` / `build-apk.ps1` — yig'adi va APK'ni vaqt tamg'asi bilan
+`builds/` papkasiga nusxalaydi.
+
 - `minSdk 24`, `target/compile 34`, ViewBinding + BuildConfig yoqilgan.
 - APK fayl nomida `System.currentTimeMillis()` ataylab turadi (Windows Defender yangi yig'ilgan APK'ni bir muddat bloklaydi — har yig'ish unikal nom oladi).
 - **Release imzo** gitignore qilingan `keystore.properties`'dan o'qiladi; bo'lmasa build imzosiz bo'ladi (o'z-o'zini himoya faqat release'da ishlaydi va debug'da o'tkazib yuboriladi).
@@ -122,12 +125,29 @@ cd ApkGuard
 KiberQalqon/
 ├── ApkGuard/              # antivirus ilova (paket com.kiberqalqon)
 │   ├── app/src/main/...   # ~89 Kotlin fayl: skaner, analizatorlar, workerlar, UI
+│   ├── brand/             # logotip, mockup, Play Store ikonasi
 │   ├── cloud/             # Vercel + Supabase backend (TS) + React SPA panel
 │   └── gradlew(.bat)      # shu yerdan yig'iladi
 ├── analysis/              # zararli dastur tahlili: deshifrlash skriptlari, IOC'lar, hisobotlar
 ├── telegram_bot/          # yordamchi Python namuna-qabul boti
-└── *.md / *.txt           # virus tahlil hisobotlari (RU / UZ / EN)
+├── threat_intel/          # hash / sertifikat bazalari
+├── pitch/                 # taqdimot sahifalari (HTML / PDF)
+├── scripts/               # yordamchi build skriptlari
+├── tools/                 # tahlil asboblari: apk_analyzer.py, unpack_apk.py, apktool, jadx, jdk
+├── docs/
+│   ├── audit/             # xavfsizlik auditlari
+│   ├── build/             # yig'ish va asbob o'rnatish yo'riqnomalari
+│   └── virus/             # virus tahlil hisobotlari (RU / UZ)
+├── builds/                # yig'ilgan debug APK'lar          ← git'ga tushmaydi
+├── malware/               # KARANTIN                          ← git'ga tushmaydi
+│   ├── samples/           # jonli zararli APK namunalari
+│   ├── unpacked/          # ochilgan / dekodlangan chiqishlar
+│   └── competitor/        # raqobatchi ilova tahlili
+└── reports/               # skan va ochish hisobotlari
 ```
+
+> **Karantin qoidasi:** `malware/` va `builds/` butunlay `.gitignore`'da — jonli zararli
+> dastur GitHub qoidalarini buzadi. Namunalarni faqat `malware/samples/` ichida saqlang.
 
 ---
 

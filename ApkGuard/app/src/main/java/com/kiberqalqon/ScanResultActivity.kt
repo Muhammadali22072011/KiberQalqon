@@ -52,7 +52,11 @@ class ScanResultActivity : AppCompatActivity() {
         installedPackage = intent.getStringExtra(EXTRA_PACKAGE)
         val verdict = intent.getSerializableExtra(EXTRA_VERDICT) as? ScanResult.Verdict
         val res = ScanResult(
-            verdict = verdict ?: ScanResult.Verdict.SAFE,
+            // HECH QACHON yolg'on XAVFSIZ: extra yo'q yoki turi mos kelmasa — SHUBHALI.
+            // Ilgari bu yerda SAFE turardi, ya'ni EXTRA_VERDICT'siz ochilgan ekran
+            // tekshirilmagan fayl uchun yashil "xavfsiz" bannerini ko'rsatardi. Bu loyihaning
+            // asosiy qoidasiga zid (ApkScanner ham o'qib bo'lmagan faylni SUSPICIOUS deb beradi).
+            verdict = verdict ?: ScanResult.Verdict.SUSPICIOUS,
             reason = intent.getStringExtra(EXTRA_REASON) ?: "",
             details = intent.getStringArrayListExtra(EXTRA_DETAILS) ?: emptyList(),
             dangerousPermissions = intent.getStringArrayListExtra(EXTRA_PERMS) ?: emptyList(),

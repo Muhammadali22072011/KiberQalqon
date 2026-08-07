@@ -32,6 +32,17 @@ import java.io.File
 // Plain Activity (not AppCompat): manifest theme is platform Theme.Translucent.NoTitleBar — AppCompatActivity requires a Theme.AppCompat descendant and would crash in createSubDecor.
 class ShareReceiverActivity : Activity() {
 
+    companion object {
+        /**
+         * ASL faylning manbasi (content:// yoki file://). Biz skan uchun cacheDir'ga
+         * NUSXA olamiz, lekin "O'chirish" bosilganda foydalanuvchi ASL faylni —
+         * Telegram/Yuklab olishlar papkasidagi virusni — o'chirishni kutadi, ichki
+         * nusxani emas. AutoScanActivity shu URI orqali asl faylni topib o'chiradi
+         * (qarang: deleteSharedOriginal).
+         */
+        const val EXTRA_ORIGIN_URI = "apk_origin_uri"
+    }
+
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun attachBaseContext(newBase: Context) {
@@ -75,6 +86,7 @@ class ShareReceiverActivity : Activity() {
                 putExtra("apk_path", copied.absolutePath)
                 putExtra("apk_name", copied.name)
                 putExtra("apk_source", "share")
+                putExtra(EXTRA_ORIGIN_URI, uri.toString())
             }
             startActivity(launch)
             finish()

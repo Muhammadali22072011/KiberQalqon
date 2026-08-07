@@ -82,15 +82,27 @@ object KqBottomNav {
             view.setOnClickListener(null)
             view.isClickable = false
         } else {
-            view.setOnClickListener {
-                activity.startActivity(
-                    Intent(activity, targetCls).apply {
-                        // Не дублируем Activity в стеке если юзер ходит home/stats/home/stats.
-                        addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    }
-                )
-                activity.overridePendingTransition(0, 0)
-            }
+            view.setOnClickListener { go(activity, targetCls) }
         }
+    }
+
+    /**
+     * Главный экран → другой главный экран, БЕЗ дублирования в back-stack.
+     *
+     * Вынесено из [wireClick], потому что не только нижняя нав. водит между этими
+     * экранами: у Dashboard есть ещё hero-кнопка "Tekshirish" и карточка списка APK.
+     * Раньше они звали голый `startActivity()` — и каждый тап клал В СТЕК новый
+     * экземпляр MainActivity поверх того, который нижняя нав. только что вынесла
+     * вперёд. Пользователь получал несколько копий Skaner'а (Back приходилось жать
+     * 5-6 раз) и рассинхрон: часть переходов переиспользует экран, часть — создаёт
+     * новый. Теперь ВСЕ переходы между главными экранами идут через один путь.
+     */
+    fun go(activity: Activity, targetCls: Class<*>) {
+        activity.startActivity(
+            Intent(activity, targetCls).apply {
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+        )
+        activity.overridePendingTransition(0, 0)
     }
 }

@@ -39,6 +39,19 @@ class ProtectionStatusActivity : AppCompatActivity() {
     // Joylashuv ruxsati shu sessiyada bir marta so'ralganmi (loop bo'lmasligi uchun).
     private var locationAsked = false
 
+    /**
+     * Ekran SHLAGBAUM sifatida ochildimi (ishga tushirish marshrutidan), yoki oddiy
+     * MA'LUMOT varag'i sifatida Sozlamalardan?
+     *
+     * Sozlamalardan ochilganda foydalanuvchi qaytishni kutadi, lekin ilgari ikkala yo'l
+     * ham bir xil edi: "Orqaga" bosilsa — yo YANGI Dashboard ochilib Sozlamalar stack
+     * ichida ko'milib qolardi, yo `moveTaskToBack(true)` BUTUN ilovani fonga tushirardi.
+     * Ya'ni Sozlamalarga qaytishning iloji yo'q edi.
+     */
+    private val standalone: Boolean by lazy {
+        intent?.getBooleanExtra(EXTRA_STANDALONE, false) == true
+    }
+
     // Joylashuv runtime-so'rovi. Natija kelgach qatorlarni qayta chizamiz (✓/✗ yangilanadi).
     private val locationLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -55,6 +68,11 @@ class ProtectionStatusActivity : AppCompatActivity() {
             buildUi()
             onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
+                    // Sozlamalardan ochilgan ma'lumot varag'i — shunchaki qaytamiz.
+                    if (standalone) {
+                        finish()
+                        return
+                    }
                     // Barcha majburiy ruxsat berilgan bo'lsa — orqaga = davom etish.
                     // Aks holda ichkariga O'TKAZMAYMIZ: ilovani fonga tushiramiz
                     // (chiqib ketmaydi, lekin ruxsatsiz Dashboard'ga ham kira olmaydi).
@@ -117,7 +135,10 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
             ).apply { topMargin = dp(20) }
             setOnClickListener {
-                if (allCriticalPermissionsGranted(this@ProtectionStatusActivity)) {
+                if (standalone) {
+                    // Sozlamalardan kelgan — tugma "yopish" vazifasini bajaradi.
+                    finish()
+                } else if (allCriticalPermissionsGranted(this@ProtectionStatusActivity)) {
                     proceed(ack = true)
                 } else {
                     // Ruxsatsiz davom ettirmaymiz — qaysi biri yetishmayotganini
@@ -408,11 +429,41 @@ class ProtectionStatusActivity : AppCompatActivity() {
          *  - Bildirishnoma           → tahdid BILDIRISHNOMASI chiqishi
          *  - Fon himoyasi yoqilgan   → doimiy kuzatuv (Config bayrog'i)
          */
-        fun allCriticalPermissionsGranted(ctx: Context): Boolean {
+        /**
+         * FAQAT tizim ruxsatlari — foydalanuvchi sozlamalarisiz.
+         *
+         * Splash marshruti aynan shundan foydalanadi. Ilgari u
+         * [allCriticalPermissionsGranted] ni tekshirardi, unga esa
+         * `Config.isBackgroundEnabled` ham kirardi — bu RUXSAT emas, Skaner ekranidagi
+         * oddiy tumbler. Foydalanuvchi batareyani tejash uchun fon himoyasini ataylab
+         * o'chirsa (MainActivity buni ochiq taklif qiladi), keyingi HAR ishga tushirishda
+         * Splash uni shu shlagbaum ekraniga qaytarardi: "Davom etish" xira, orqaga bosish
+         * ilovani fonga tushirardi — ya'ni Dashboard'ga ham, Skaner'ga ham kira olmasdi.
+         */
+        /**
+         * `true` → ekran Sozlamalardan MA'LUMOT varag'i sifatida ochildi: "Orqaga" va
+         * "Davom etish" ikkalasi ham shunchaki `finish()` qiladi va foydalanuvchi
+         * Sozlamalarga qaytadi. Bayroqsiz — eski shlagbaum xatti-harakati.
+         */
+        const val EXTRA_STANDALONE = "standalone"
+
+        /** Sozlamalardan ochish uchun. */
+        fun openFromSettings(ctx: Context) {
+            ctx.startActivity(
+                Intent(ctx, ProtectionStatusActivity::class.java)
+                    .putExtra(EXTRA_STANDALONE, true)
+            )
+        }
+
+        fun criticalSystemPermissionsGranted(ctx: Context): Boolean {
             return VersionCompat.hasFileScanAccess(ctx) &&
                 VersionCompat.hasOverlayPermission(ctx) &&
-                VersionCompat.hasNotificationPermission(ctx) &&
-                Config.isBackgroundEnabled(ctx)
+                VersionCompat.hasNotificationPermission(ctx)
+        }
+
+        /** Tizim ruxsatlari + fon himoyasi yoqilgani — birinchi marta "Davom etish" uchun shart. */
+        fun allCriticalPermissionsGranted(ctx: Context): Boolean {
+            return criticalSystemPermissionsGranted(ctx) && Config.isBackgroundEnabled(ctx)
         }
 
         private fun isBatteryIgnored(ctx: Context): Boolean {

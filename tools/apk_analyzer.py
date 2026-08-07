@@ -13,10 +13,12 @@ import os
 import sys
 from pathlib import Path
 
-# Папка с APK и куда распаковать
+# Скрипт лежит в tools/; образцы и распаковка — в malware/ в корне проекта.
 BASE = Path(__file__).resolve().parent
-APK_DIR = BASE
-OUT_DIR = BASE / "apk_extracted"
+ROOT = BASE.parent
+APK_DIR = ROOT / "malware" / "samples"
+UNPACK_ROOT = ROOT / "malware" / "unpacked"
+OUT_DIR = UNPACK_ROOT / "apk_extracted"
 
 # Не считаем кандидатами на анализ — это наш собственный антивирус и его сборки.
 SELF_PREFIXES = ("kiberqalqon", "apkguard")
@@ -376,7 +378,7 @@ def main():
     global OUT_DIR
     args = sys.argv[1:]
     apk_arg = args[0] if len(args) >= 1 else None
-    out_base = Path(args[1]).resolve() if len(args) >= 2 else BASE
+    out_base = Path(args[1]).resolve() if len(args) >= 2 else UNPACK_ROOT
     # Выходную папку делаем per-invocation, чтобы параллельные запуски бота не затирали
     # друг другу apk_extracted / result_analiza.txt.
     OUT_DIR = out_base / "apk_extracted"

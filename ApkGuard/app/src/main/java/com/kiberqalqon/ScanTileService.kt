@@ -31,7 +31,7 @@ class ScanTileService : TileService() {
         // unlockAndRun, чтобы корректно стартовать Activity с заблокированного экрана.
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("trigger_scan", true)
+            putExtra(MainActivity.EXTRA_TRIGGER_SCAN, true)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startActivityAndCollapse(

@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.kiberqalqon.databinding.ActivitySettingsNewBinding
 import java.text.SimpleDateFormat
@@ -78,18 +77,8 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.set_row_phishing_sub),
             icon = R.drawable.ic_bell_cyber,
         )
-        bindRow(
-            binding.rowBackground.root,
-            title = getString(R.string.set_row_background_title),
-            sub = getString(R.string.set_row_background_sub),
-            icon = R.drawable.ic_shield,
-        )
-        bindRow(
-            binding.rowUpload.root,
-            title = getString(R.string.set_row_upload_title),
-            sub = getString(R.string.set_row_upload_sub),
-            icon = R.drawable.ic_upload_cyber,
-        )
+        // OLIB TASHLANDI: rowBackground ("Fon xizmati") va rowUpload ("Bulutga yuklash")
+        // + SERVER bo'limi (rowServerUrl). Sabab layout izohida.
     }
 
     private fun bindRow(root: View, title: String, sub: String, icon: Int) {
@@ -116,12 +105,6 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowAutoScan.root).isChecked = Config.isBackgroundEnabled(this)
         toggleOf(binding.rowAutoDelete.root).isChecked = Config.getAutoDeleteMode(this) == "delete"
         toggleOf(binding.rowPhishing.root).isChecked = Config.isPhishingBlockerEnabled(this)
-        toggleOf(binding.rowBackground.root).isChecked = Config.isAutoUpdateEnabled(this)
-        toggleOf(binding.rowUpload.root).isChecked = Config.isUploadEnabled(this)
-
-        // Server URL display
-        val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
-        binding.etServerUrl.text = url
 
         // Theme segmented switch
         applyThemeSegmentUi(isDark = ThemeHelper.isDarkTheme(this))
@@ -183,23 +166,6 @@ class SettingsActivity : AppCompatActivity() {
             Config.setPhishingBlockerEnabled(this, on)
             toastSaved()
         }
-        toggleOf(binding.rowBackground.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setAutoUpdateEnabled(this, on)
-            toastSaved()
-        }
-        toggleOf(binding.rowUpload.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setUploadEnabled(this, on)
-            toastSaved()
-        }
-
-        // Server URL → edit dialog. Привязываем клик ко ВСЕМУ ряду (rowServerUrl),
-        // не только к маленькому TextView c URL — раньше тап на иконку или пустую
-        // область строки не работал.
-        binding.rowServerUrl.setOnClickListener { showServerUrlDialog() }
-        binding.etServerUrl.setOnClickListener { showServerUrlDialog() }
-
         // Theme segmented switch.
         binding.segThemeLight.setOnClickListener {
             if (!ready) return@setOnClickListener
@@ -242,7 +208,10 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, TelemetrySettingsActivity::class.java))
         }
         binding.rowProtectionStatus.root.setOnClickListener {
-            startActivity(Intent(this, ProtectionStatusActivity::class.java))
+            // Sozlamalardan — MA'LUMOT rejimida: "Orqaga" shu yerga qaytaradi.
+            // Oddiy startActivity'da bu ekran shlagbaum sifatida ochilib, orqaga bosilganda
+            // yo yangi Dashboard ochardi, yo butun ilovani fonga tushirardi.
+            ProtectionStatusActivity.openFromSettings(this)
         }
     }
 
@@ -289,26 +258,6 @@ class SettingsActivity : AppCompatActivity() {
                 return
             }
         }
-    }
-
-    private fun showServerUrlDialog() {
-        val input = AppCompatEditText(this).apply {
-            setText(Config.getServerUrl(this@SettingsActivity))
-            setSelection(text?.length ?: 0)
-        }
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.settings_server_url_label))
-            .setView(input)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val v = input.text?.toString()?.trim().orEmpty()
-                if (v.isNotBlank()) {
-                    Config.setServerUrl(this, v)
-                    binding.etServerUrl.text = v
-                    toastSaved()
-                }
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
     }
 
     private fun showAboutDialog() {

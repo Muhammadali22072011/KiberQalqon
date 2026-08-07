@@ -78,11 +78,23 @@ fun shieldEnc(plain: String): String {
     }
 }
 
+// `-Pkq.skipNative=true` → nativ qism butunlay o'tkazib yuboriladi (pastdagi izohga qarang).
+val kqSkipNative = (project.findProperty("kq.skipNative") as String?)?.toBoolean() == true
+
 android {
     namespace = "com.kiberqalqon"
     compileSdk = 34
     // Native himoya kutubxonasi (libkqguard.so) NDK versiyasi. D: da, C:\Android\ndk\... junction.
-    ndkVersion = "26.1.10909125"
+    //
+    // `ndkVersion`ni O'RNATISHNING O'ZI AGP'ni NDK'ni yechishga majbur qiladi — CMake
+    // chaqirilmasa ham. Shu sababli u ilgari `kq.skipNative` gate'idan TASHQARIDA turgani
+    // uchun bayroq o'z vazifasini bajarmasdi: NDK yo'q yoki chala o'rnatilgan mashinada
+    // build KONFIGURATSIYA bosqichidayoq yiqilardi —
+    //   [CXX1101] NDK at ...\ndk\26.1.10909125 did not have a source.properties file
+    // — `-Pkq.skipNative=true` berilgan bo'lsa ham. Endi u ham bir xil shart ostida.
+    if (!kqSkipNative) {
+        ndkVersion = "26.1.10909125"
+    }
     // Уникальное имя выходного APK по времени сборки — чтобы не конфликтовать
     // с залоченным предыдущим файлом (Windows AV держит свежий APK ~15-30 мин).
     setProperty("archivesBaseName", "kiberqalqon-${System.currentTimeMillis()}")
@@ -204,7 +216,7 @@ android {
     // NDK yo'q hamkor/CI sborkalari qurilishni shu yerda yiqitmasligi uchun gate qo'shildi:
     //   -Pkq.skipNative=true  → CMake umuman chaqirilmaydi (ilova .so'siz ham ishlaydi — Kotlin fallback).
     // Default (egasi sborkasi) — native YOQILGAN, .so o'z joyida qoladi.
-    if ((project.findProperty("kq.skipNative") as String?)?.toBoolean() != true) {
+    if (!kqSkipNative) {
         externalNativeBuild {
             cmake {
                 path = file("src/main/cpp/CMakeLists.txt")

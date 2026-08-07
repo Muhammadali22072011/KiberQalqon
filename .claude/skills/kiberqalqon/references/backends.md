@@ -169,7 +169,7 @@ of SHA-256(path), 7-day TTL via `ThreatActions.kt`). Whitelist enforced in `Tele
 ## 5. Python polling bot (Gen-2, dormant)
 
 `telegram_bot/bot.py` — handlers `/start`, `/help` and a `Document.ALL` handler `on_apk` that
-accepts a forwarded `.apk` (≤20 MB), runs `apk_analyzer.py`, and replies with an Uzbek verdict.
+accepts a forwarded `.apk` (≤20 MB), runs `tools/apk_analyzer.py`, and replies with an Uzbek verdict.
 Independent intake tool; **not** part of the app runtime or the cloud.
 
 ---

@@ -23,16 +23,24 @@ export default function Login() {
   });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
-
-  // Allaqachon kirgan bo'lsa /login bo'sh forma ko'rsatmaydi — panelga yuboradi.
-  if (authed) return <Navigate to={from} replace />;
-
   // egasi
   const [secret, setSecret] = useState('');
   const [otp, setOtp] = useState('');
   // admin
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+
+  // Allaqachon kirgan bo'lsa /login bo'sh forma ko'rsatmaydi — panelga yuboradi.
+  //
+  // DIQQAT: bu erta `return` BARCHA hook chaqiruvlaridan KEYIN turishi shart. Ilgari u
+  // `busy` bilan `secret` orasida edi, ya'ni React'ning Rules of Hooks buzilardi: birinchi
+  // render'da (AuthProvider sessiyani tiklovchi useEffect hali ishlamagan, authed=false)
+  // 11 ta hook chaqirilardi, effect ishlab authed=true bo'lgach esa faqat 7 tasi —
+  // React "Rendered fewer hooks than expected" (#310) tashlardi. ErrorBoundary yo'qligi
+  // uchun butun daraxt uzilib, foydalanuvchi OQ EKRAN ko'rardi: /login ga jonli sessiya
+  // bilan kirsa (xatcho'p, qo'lda URL, brauzerda "orqaga") sahifa qayta yuklansa ham
+  // xato takrorlanaverardi — sessionStorage tozalanmaguncha panelga kira olmasdi.
+  if (authed) return <Navigate to={from} replace />;
 
   const switchMode = (m: Mode) => { setMode(m); setErr(''); };
 

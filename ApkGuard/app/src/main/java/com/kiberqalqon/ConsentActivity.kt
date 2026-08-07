@@ -30,7 +30,6 @@ class ConsentActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_REVIEW_MODE = "review_mode"
-        private const val REQ_LOCATION = 104
 
         /** Open in review mode (from Settings) — no checkboxes, no exit-on-decline. */
         fun openForReview(ctx: Context) {
@@ -115,16 +114,10 @@ class ConsentActivity : AppCompatActivity() {
         proceedAfterConsent()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // Joylashuv berilsa GPS yuboriladi; rad etilsa server IP'dan taxminlaydi —
-        // ikki holda ham flow to'xtamaydi.
-        if (requestCode == REQ_LOCATION) proceedAfterConsent()
-    }
+    // OLIB TASHLANDI: onRequestPermissionsResult + REQ_LOCATION (104). Bu ekran
+    // ActivityCompat.requestPermissions ni HECH QACHON chaqirmaydi — joylashuv so'rovi
+    // ProtectionStatusActivity ro'yxatiga ko'chirilgan, ya'ni 104 kodi bilan natija
+    // hech qachon kelmasdi va butun tarmoq o'lik edi.
 
     // Post-consent route — mirrors SplashActivity.goToMainActivity():
     // Onboarding (first run) → InitialScanActivity (если ещё не было первичного скана)
@@ -148,7 +141,13 @@ class ConsentActivity : AppCompatActivity() {
             Config.isFirstRun(this) -> OnboardingActivity::class.java
             !Config.isInitialScanDone(this) -> InitialScanActivity::class.java
             !Config.isProtectionAcked(this) -> ProtectionStatusActivity::class.java
-            !ProtectionStatusActivity.allCriticalPermissionsGranted(this) ->
+            // SplashActivity.goToMainActivity() bilan BIR XIL tekshiruv: `criticalSystemPermissions…`,
+            // `allCritical…` EMAS. Ikkinchisiga `Config.isBackgroundEnabled` tumbleri ham kiradi —
+            // fon himoyasini ataylab o'chirgan foydalanuvchi (bu qo'llab-quvvatlanadigan tanlov)
+            // ToS versiyasi yangilangach roziligini qayta bergandan keyin Dashboard o'rniga
+            // shlagbaumga tushib qolardi, holbuki oddiy ishga tushirishda Splash uni o'tkazib
+            // yuborardi — bitta holat uchun ikki xil marshrut.
+            !ProtectionStatusActivity.criticalSystemPermissionsGranted(this) ->
                 ProtectionStatusActivity::class.java
             else -> DashboardNewActivity::class.java
         }

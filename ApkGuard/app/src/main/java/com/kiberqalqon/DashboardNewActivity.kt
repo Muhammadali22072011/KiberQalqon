@@ -46,8 +46,11 @@ class DashboardNewActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
+        // Skaner ekraniga o'tish — pastki navigatsiya bilan BIR XIL yo'l orqali
+        // (KqBottomNav.go), aks holda har bosishda back-stack'da MainActivity'ning
+        // yangi nusxasi to'planardi.
         binding.btnQuickScan.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            KqBottomNav.go(this, MainActivity::class.java)
         }
 
         // UX-01: "Karantin" plitkasi — karantin ekranini ochadi (tiklash/butunlay o'chirish).
@@ -60,7 +63,7 @@ class DashboardNewActivity : AppCompatActivity() {
         }
 
         binding.cardApkList.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            KqBottomNav.go(this, MainActivity::class.java)
         }
 
         // UZ / RU toggle — раньше пилюля не имела click handler, теперь

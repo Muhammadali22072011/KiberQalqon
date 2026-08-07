@@ -62,7 +62,6 @@ type RegisterBody = {
   app_ver?: string;
   lat?: number | string;
   lng?: number | string;
-  loc_accuracy_m?: number | string;
 };
 
 async function handleRegister(req: VercelRequest, res: VercelResponse) {

@@ -770,28 +770,9 @@
         <include layout="@layout/view_kq_bottom_nav" />
     </FrameLayout>
 
-    <!-- Compat — eski binding ID lar, hidden -->
-    <ImageButton
-        android:id="@+id/btnLang"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_language"
-        android:visibility="gone" />
-
-    <ImageButton
-        android:id="@+id/btnDashboard"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_threat_radar"
-        android:visibility="gone" />
-
-    <ImageButton
-        android:id="@+id/btnSettings"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_settings"
-        android:visibility="gone" />
+    <!-- OLIB TASHLANDI: btnLang / btnDashboard / btnSettings compat-zaglushkalari.
+         Uchalasi ham 0dp + visibility="gone" edi, ya'ni foydalanuvchi ularni HECH QACHON
+         bosa olmasdi — lekin MainActivity ularga jonli click/long-click listener'lar
+         bog'lardi. Bu yo'llarni endi pastki navigatsiya (KqBottomNav) bajaradi, tema esa
+         Sozlamalardagi Light/Dark segmentidan tanlanadi. -->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

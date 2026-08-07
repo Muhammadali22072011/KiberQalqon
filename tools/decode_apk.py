@@ -21,16 +21,28 @@ except Exception:
     pass
 
 BASE = Path(__file__).resolve().parent
-DECODED = BASE / "apk_decoded"
+ROOT = BASE.parent
+APK_DIR = ROOT / "malware" / "samples"
+DECODED = ROOT / "malware" / "unpacked" / "apk_decoded"
 JDK_DIR = BASE / "jdk"
 
 # Не считаем кандидатами наши собственные сборки.
-SELF_PREFIXES = ("kiberqalqon", "kiberqalqon")
+SELF_PREFIXES = ("kiberqalqon", "apkguard")
+
+
+def _jdk_usable(jdk_dir: Path) -> bool:
+    """java.exe одного мало: полураспакованный JDK без jvm.dll падает с
+    "missing `server' JVM". Требуем и саму VM-библиотеку."""
+    if not (jdk_dir / "bin" / "java.exe").is_file():
+        return False
+    return any(
+        (jdk_dir / sub / "server" / "jvm.dll").is_file() for sub in ("bin", "lib")
+    )
 
 
 def ensure_jdk():
     """Если папки jdk нет, распаковать JDK из zip (adoptium-jdk21.zip или jdk21.zip)."""
-    if (JDK_DIR / "bin" / "java.exe").is_file():
+    if _jdk_usable(JDK_DIR):
         return
     for name in ("adoptium-jdk21.zip", "jdk21.zip", "openjdk-21.zip"):
         zpath = BASE / name
@@ -66,7 +78,7 @@ def ensure_jdk():
 
 def find_system_java_home():
     """Ищем установленный JDK в стандартных папках Windows."""
-    if (JDK_DIR / "bin" / "java.exe").is_file():
+    if _jdk_usable(JDK_DIR):
         return str(JDK_DIR)
     roots = [
         Path(os.environ.get("ProgramFiles", "C:\\Program Files")),
@@ -145,9 +157,9 @@ def _run_apktool(apktool_exe, apk_path: Path, env) -> tuple[bool, str]:
 
 
 def main():
-    apks = sorted(p for p in BASE.glob("*.apk") if not p.name.lower().startswith(SELF_PREFIXES))
+    apks = sorted(p for p in APK_DIR.glob("*.apk") if not p.name.lower().startswith(SELF_PREFIXES))
     if not apks:
-        print("В папке нет подозрительных .apk")
+        print("Нет подозрительных .apk в", APK_DIR)
         return 0
     ensure_jdk()
     java_home = find_system_java_home()

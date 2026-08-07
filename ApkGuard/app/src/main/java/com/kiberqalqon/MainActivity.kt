@@ -72,6 +72,8 @@ class MainActivity : AppCompatActivity() {
             // Единая нижняя нав — активна вкладка Skaner.
             KqBottomNav.attach(this, KqBottomNav.Tab.SCAN)
 
+            handleLaunchIntent(intent)
+
             // Показываем диалог при первом запуске
             if (Config.isFirstRun(this)) {
                 showFirstRunDialog()
@@ -82,6 +84,53 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    companion object {
+        /**
+         * "Ekranni och VA darhol skanla" bayrog'i. Quick Settings plitkasi yuboradi
+         * (ScanTileService). Ilgari plitkada shu kalit oddiy satr-literal sifatida
+         * yozilardi va MainActivity tomonida umuman o'qilmasdi — endi bitta konstanta.
+         */
+        const val EXTRA_TRIGGER_SCAN = "trigger_scan"
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // Ekran allaqachon ochiq bo'lsa onCreate CHAQIRILMAYDI — yangi intent'ni shu yerda
+        // qabul qilamiz, aks holda plitka/vidjet ikkinchi bosishda umuman ishlamasdi.
+        intent?.let { setIntent(it) }
+        handleLaunchIntent(intent)
+    }
+
+    /**
+     * Tashqi "darhol skanla" kirish nuqtalari:
+     *  - Quick Settings plitkasi  → `trigger_scan` (ScanTileService.kt:34)
+     *  - Asosiy ekran vidjetining "Skan" tugmasi → `from_widget` (KqWidgetProvider.kt:76)
+     *
+     * Ikkala kalit ham YOZILARDI, lekin MainActivity ularni HECH QACHON O'QIMASDI — natijada
+     * plitka ham, vidjet tugmasi ham shunchaki ekranni ochib qo'yardi va o'zi va'da qilgan
+     * skanni boshlamasdi (ScanTileService izohi: "запускает MainActivity и сразу триггерит
+     * сканирование"). Bundan tashqari `scanStarted` bayrog'i tufayli onResume ham skanni
+     * qayta ishga tushirmasdi, ya'ni tugma butunlay o'lik edi.
+     */
+    private fun handleLaunchIntent(launchIntent: Intent?) {
+        val i = launchIntent ?: return
+        val wantsScan = i.getBooleanExtra(EXTRA_TRIGGER_SCAN, false) ||
+            i.getBooleanExtra(KqWidgetProvider.EXTRA_FROM_WIDGET, false)
+        if (!wantsScan) return
+        // Bir martalik buyruq: burilish / qayta yaratilishda takror skan bo'lmasin.
+        i.removeExtra(EXTRA_TRIGGER_SCAN)
+        i.removeExtra(KqWidgetProvider.EXTRA_FROM_WIDGET)
+
+        // `hasPermission` onResume'da yangilanadi, u esa onNewIntent'dan KEYIN keladi —
+        // shu sababli holatni bevosita so'raymiz.
+        if (VersionCompat.hasFileScanAccess(this)) {
+            scanStarted = true
+            startAutoProtection()
+        } else {
+            Toast.makeText(this, getString(R.string.toast_grant_storage_first), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun setupAdapter() {
         adapter = ApkAdapter(emptyList()) { item ->
             scope.launch {
@@ -331,66 +380,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-        
-        // Кнопка Dashboard
-        binding.btnDashboard?.setOnClickListener {
-            startActivity(Intent(this, DashboardNewActivity::class.java))
-        }
-        
-        binding.btnLang.setOnClickListener {
-            try {
-                val current = Config.getLanguage(this)
-                val next = if (current == "ru") "uz" else "ru"
-                Config.setLanguage(this, next)
-                recreate()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        
-        // Долгое нажатие на кнопку языка - выбор темы
-        binding.btnLang.setOnLongClickListener {
-            showThemeDialog()
-            true
-        }
+        // OLIB TASHLANDI: btnSettings / btnDashboard / btnLang listener'lari. Uchala view ham
+        // layout'da 0dp + visibility="gone" compat-zaglushka edi — foydalanuvchi bosa olmasdi.
+        // Sozlamalar va Dashboard'ga o'tish pastki navigatsiya (KqBottomNav) orqali, til esa
+        // Sozlamalardagi UZ/RU radio orqali almashadi.
+        // Tema tanlash ham shu ko'rinmas btnLang'ga uzoq bosish orqali edi (showThemeDialog) —
+        // ya'ni umuman ochib bo'lmasdi. Tema Sozlamalardagi Light/Dark segmentidan tanlanadi.
     }
     
-    /**
-     * Диалог выбора темы
-     */
-    private fun showThemeDialog() {
-        val themes = arrayOf(
-            getString(R.string.theme_system),
-            getString(R.string.theme_light),
-            getString(R.string.theme_dark)
-        )
-        val current = when (Config.getDarkThemeMode(this)) {
-            "system" -> 0
-            "light" -> 1
-            "dark" -> 2
-            else -> 0
-        }
-
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle(getString(R.string.theme_dialog_title))
-            .setSingleChoiceItems(themes, current) { dialog, which ->
-                val mode = when (which) {
-                    0 -> "system"
-                    1 -> "light"
-                    2 -> "dark"
-                    else -> "system"
-                }
-                Config.setDarkThemeMode(this, mode)
-                ThemeHelper.applyTheme(this)
-                dialog.dismiss()
-                recreate()
-            }
-            .setNegativeButton(getString(R.string.btn_cancel_generic), null)
-            .show()
-    }
+    // OLIB TASHLANDI: showThemeDialog() — uni faqat ko'rinmas btnLang'ga uzoq bosish
+    // chaqirardi, ya'ni erishib bo'lmaydigan dialog edi.
     
     /**
      * Запуск автоматической защиты
@@ -425,29 +424,16 @@ class MainActivity : AppCompatActivity() {
                 android.util.Log.d("MainActivity", "✅ Найдено APK: ${apks.size}")
                 
                 withContext(Dispatchers.Main) {
-                    // Обновляем список
-                    adapter = ApkAdapter(apks) { item ->
-                        scope.launch {
-                            try {
-                                binding.tvCount.text = getString(R.string.scanning)
-                                
-                                val result = withTimeout(5000) {
-                                    withContext(Dispatchers.IO) {
-                                        ApkScanner.scan(this@MainActivity, item.file.absolutePath)
-                                    }
-                                }
-                                
-                                binding.tvCount.text = getString(R.string.apk_count, adapter.itemCount)
-                                
-                                if (result != null) {
-                                    startActivity(ScanResultActivity.intent(this@MainActivity, item.file.absolutePath, result))
-                                }
-                            } catch (e: Exception) {
-                                android.util.Log.e("MainActivity", "Scan error", e)
-                            }
-                        }
-                    }
-                    binding.recycler.adapter = adapter
+                    // UX-08 REGRESSIYA TUZATILDI: bu yerda ilgari IKKINCHI `ApkAdapter`
+                    // yaratilardi — o'z click-handler'i bilan, lekin u `setupAdapter()`dagi
+                    // handler'ning ESKI nusxasi edi: timeout 30s emas 5s, `finally`da
+                    // `btnScan.isEnabled = true` yo'q, xato uchun Toast yo'q va empty-state
+                    // `AdapterDataObserver` ro'yxatdan o'tmagan. Natijada "Hozir tekshirish"
+                    // bosilgach ro'yxatdagi faylga bosish katta APK'da 5s'da uzilardi,
+                    // `TimeoutCancellationException` jim yutilardi va `tvCount` abadiy
+                    // "Skanlanmoqda..." bo'lib qolardi — foydalanuvchi uchun "skaner ishlamayapti".
+                    // Endi mavjud adapter'ning FAQAT ma'lumotini yangilaymiz.
+                    adapter.updateList(apks)
                     binding.tvCount.text = getString(R.string.apk_count, apks.size)
                     
                     // Скрываем индикатор загрузки
@@ -609,7 +595,11 @@ class MainActivity : AppCompatActivity() {
         hasPermission = VersionCompat.hasFileScanAccess(this)
         binding.cardPermission.visibility = if (hasPermission) View.GONE else View.VISIBLE
         binding.contentMain.visibility = if (hasPermission) View.VISIBLE else View.GONE
-        if (hasPermission) {
+        // Hisoblagichni FAQAT ro'yxat haqiqatan bo'sh bo'lganda nolga tushiramiz.
+        // Ilgari u shartsiz 0 ga qo'yilardi: pastki navigatsiya orqali qaytganda
+        // (FLAG_ACTIVITY_REORDER_TO_FRONT — onCreate CHAQIRILMAYDI, faqat onResume)
+        // adapter'da APK'lar turgan holda ekran "0 ta APK" deb yolg'on ko'rsatardi.
+        if (hasPermission && (!::adapter.isInitialized || adapter.itemCount == 0)) {
             binding.tvCount.text = getString(R.string.apk_count, 0)
         }
     }

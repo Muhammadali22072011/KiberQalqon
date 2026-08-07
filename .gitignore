@@ -14,6 +14,11 @@ release.keystore*
 #  MALWARE SAMPLES & APKs — keep OFF GitHub
 #  (live malware violates GitHub ToS and can get the account
 #   banned; built APKs are regenerable)
+#
+#  Butun /malware/ karantin katalogi: namunalar, dekompilyatsiya
+#  qilingan begona ilova kodlari va raqobatchi ilova kodi.
+#  Kengaytma bo'yicha emas, butun katalog bilan e'tiborga olinmaydi —
+#  bitta `git add -A` hech narsani jim qo'shib qo'ymasin.
 # ============================================================
 *.apk
 *.dex
@@ -22,32 +27,16 @@ release.keystore*
 *.zip
 *.7z
 *.7z.*
-/samples/
-/вирусы/
-/новые вирусы/
-/VIRUS_ANALYSIS/
-/VIRUS_DECOMPILED/
-/apk_decoded/
-/apk_extracted/
-/apk_unpacked/
-/design_extracted/
-/sources/
-/resources/
-/competitor_cyberhimoya/
+/malware/
+/builds/
 **/unpacked/
-# Karantin-papkalar: malware namunalari va dekompilyatsiya qilingan begona ilova kodlari.
-# Butun katalog bilan e'tiborga olinmaydi (faqat kengaytma bo'yicha emas) — bitta `git add -A`
-# raqobatchining dekompilyatsiya qilingan kodi (mualliflik huquqi + RE izi) yoki .xapk/переименованный
-# sample'ni jim qo'shib qo'ymasin.
-/_samples/
-/_competitor/
 
 # ============================================================
 #  BUNDLED TOOLING — large & regenerable
 # ============================================================
-/jdk/
-/jadx_tool/
-apktool_*.jar
+/tools/jdk/
+/tools/jadx_tool/
+/tools/apktool_*.jar
 
 # ============================================================
 #  BUILD OUTPUTS
@@ -74,14 +63,14 @@ Thumbs.db
 
 # ============================================================
 #  LOGS & LARGE GENERATED REPORTS
+#  (reports/unpacked_files_*.txt — qo'lda saqlanadi, git'da qoladi)
 # ============================================================
 *.log
-build_log.txt
-scan_report_*.txt
-result_analiza.txt
+/reports/scan_report_*.txt
+/reports/result_analiza.txt
 
 # ============================================================
-#  ROOT SCREENSHOTS (ишчи скриншотлар — репога керак эмас)
+#  ROOT SCREENSHOTS (ishchi skrinshotlar — repoga kerak emas)
 # ============================================================
 /kq_screen*.png
 /s3.png

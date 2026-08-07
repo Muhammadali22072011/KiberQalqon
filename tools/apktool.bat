@@ -5,15 +5,20 @@ pushd "%~dp0"
 
 set "JAVA_EXE="
 
-rem 1) Локальный jdk/ — приоритет (распаковывается decode_apk.py)
-if exist "%~dp0jdk\bin\java.exe" set "JAVA_EXE=%~dp0jdk\bin\java.exe"
+rem 1) Local tools\jdk\ has priority (unpacked by decode_apk.py).
+rem    java.exe alone is not enough - a half-extracted JDK has no jvm.dll and
+rem    dies with "missing `server' JVM". Require the VM library too.
+if exist "%~dp0jdk\bin\java.exe" (
+  if exist "%~dp0jdk\bin\server\jvm.dll" set "JAVA_EXE=%~dp0jdk\bin\java.exe"
+  if exist "%~dp0jdk\lib\server\jvm.dll" set "JAVA_EXE=%~dp0jdk\bin\java.exe"
+)
 
-rem 2) JAVA_HOME, если ещё не нашли
+rem 2) JAVA_HOME, if not found yet
 if not defined JAVA_EXE (
   if defined JAVA_HOME if exist "%JAVA_HOME%\bin\java.exe" set "JAVA_EXE=%JAVA_HOME%\bin\java.exe"
 )
 
-rem 3) Java в PATH — отдельный if, иначе && и логика if смешиваются и ломаются
+rem 3) java in PATH - separate if, otherwise && and if-logic mix and break
 if not defined JAVA_EXE (
   where java >nul 2>&1
   if not errorlevel 1 set "JAVA_EXE=java"

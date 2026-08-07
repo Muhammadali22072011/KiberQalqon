@@ -5,5 +5,5 @@ cd /d "%~dp0"
 echo Raspakovka APK dlya reversa...
 python unpack_apk.py
 echo.
-echo Gotovo. Papka: apk_unpacked
+echo Gotovo. Papka: malware\unpacked\apk_unpacked
 pause

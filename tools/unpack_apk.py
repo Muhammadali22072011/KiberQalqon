@@ -13,7 +13,10 @@ except Exception:
     pass
 
 BASE = Path(__file__).resolve().parent
-OUT = BASE / "apk_unpacked"
+ROOT = BASE.parent
+APK_DIR = ROOT / "malware" / "samples"
+OUT = ROOT / "malware" / "unpacked" / "apk_unpacked"
+REPORTS = ROOT / "reports"
 
 # Не считаем кандидатами наши собственные сборки.
 SELF_PREFIXES = ("kiberqalqon", "kiberqalqon")
@@ -144,7 +147,8 @@ def unpack(apk: Path) -> None:
         return
 
     files = [str(f.relative_to(target_dir)) for f in target_dir.rglob("*") if f.is_file()]
-    (BASE / f"unpacked_files_{apk.stem}.txt").write_text(
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    (REPORTS / f"unpacked_files_{apk.stem}.txt").write_text(
         "\n".join(sorted(files)), encoding="utf-8"
     )
     print(f"  Распаковано: {apk.name} -> {target_dir}  (файлов: {len(files)})")
@@ -153,11 +157,11 @@ def unpack(apk: Path) -> None:
 
 
 def main():
-    apks = [p for p in BASE.glob("*.apk") if not p.name.lower().startswith(SELF_PREFIXES)]
+    apks = [p for p in APK_DIR.glob("*.apk") if not p.name.lower().startswith(SELF_PREFIXES)]
     if not apks:
-        print("Подозрительные APK не найдены")
+        print("Подозрительные APK не найдены в", APK_DIR)
         return
-    OUT.mkdir(exist_ok=True)
+    OUT.mkdir(parents=True, exist_ok=True)
     for apk in apks:
         unpack(apk)
     print()

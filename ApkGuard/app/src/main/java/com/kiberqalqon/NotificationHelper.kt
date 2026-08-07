@@ -185,7 +185,7 @@ object NotificationHelper {
             putExtra("apk_name", fileName)
             if (!originalPath.isNullOrBlank()) putExtra("apk_path", originalPath)
             putExtra("already_handled", true)
-            putExtra("verdict", "DANGER")
+            // OLIB TASHLANDI: putExtra("verdict", "DANGER") — o'qilmaydigan kalit (GuardWorker'da ham).
             putExtra("reason", reason)
         }
         val pi = PendingIntent.getActivity(

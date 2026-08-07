@@ -299,22 +299,11 @@
                 android:value="Real-time APK and installed app malware protection — antivirus security monitoring" />
         </service>
 
-        <!-- TAJRIBAVIY (opt-in, default OFF): DNS-sinkhole VPN — ma'lum C2 domenlarini bloklaydi.
-             HOZIRCHA O'CHIRILGAN (deactivated): hech qayerda ulanmagan (settings toggle + VpnService.prepare
-             oqimi hali yo'q), shuning uchun manifestdan ham olib qo'yildi — yoqib bo'lmaydigan service
-             keraksiz hujum yuzasi (attack surface) bo'lib qolmasligi uchun. Manbаа (VpnFilterService.kt)
-             saqlanadi va fail-open qilib mustahkamlandi; opt-in UI tayyor bo'lgach, quyidagi blokni
-             qayta yoqing.
-        <service
-            android:name=".VpnFilterService"
-            android:exported="false"
-            android:permission="android.permission.BIND_VPN_SERVICE">
-            <intent-filter>
-                <action android:name="android.net.VpnService" />
-            </intent-filter>
-        </service>
-        -->
-        <!-- /VpnFilterService (o'chirilgan) -->
+        <!-- OLIB TASHLANDI: DNS-sinkhole VPN (VpnFilterService). Service manifestda allaqachon
+             izohga olingan edi, lekin 321 qatorlik sinf va uning start()/stop() companion'i
+             manbada qolib ketgandi — hech kim chaqirmaydigan, yoqib ham bo'lmaydigan o'lik kod.
+             Endi butunlay olib tashlandi. Qayta kerak bo'lsa git tarixidan tiklanadi:
+             `git show HEAD:ApkGuard/app/src/main/java/com/kiberqalqon/VpnFilterService.kt` -->
 
         <service
             android:name=".PhishingNotificationService"

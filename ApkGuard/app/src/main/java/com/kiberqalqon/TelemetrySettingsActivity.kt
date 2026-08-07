@@ -175,16 +175,37 @@ class TelemetrySettingsActivity : AppCompatActivity() {
                 p.edit().remove("tg_owner_user_id").remove("tg_update_offset").apply()
             }
         }
-        TelemetryReporter.configure(this, token, chatId, cbEnabled.isChecked)
-        TelegramBot.setListenEnabled(this, cbListen.isChecked)
+        // Token yoki chat_id bo'sh bo'lsa telemetriyani YOQIB BO'LMAYDI. Ilgari save()
+        // ularni tekshirmasdan `configure(..., cbEnabled.isChecked)` chaqirardi va shartsiz
+        // "Saqlandi" chiqarardi: foydalanuvchi ikkala katakchani belgilab, maydonlarni bo'sh
+        // qoldirsa ham "muvaffaqiyat" ko'rardi, TelegramCommandPoller esa fon rejimida bo'sh
+        // token bilan Telegram API'ga urinib, jim yiqilib turaverardi — hech qanday xato
+        // ko'rinmasdi va telemetriya ishlayotgandek tuyulardi.
+        val credsOk = token.isNotBlank() && chatId.isNotBlank()
+        val enable = cbEnabled.isChecked && credsOk
+
+        TelemetryReporter.configure(this, token, chatId, enable)
+        TelegramBot.setListenEnabled(this, cbListen.isChecked && credsOk)
         TelegramBot.setSendApkEnabled(this, cbSendApk.isChecked)
         // Запускаем/останавливаем poller в зависимости от чекбокса.
-        if (cbListen.isChecked && cbEnabled.isChecked) {
+        if (cbListen.isChecked && enable) {
             TelegramCommandPoller.start(this)
         } else {
             TelegramCommandPoller.stop(this)
         }
-        Toast.makeText(this, "Saqlandi", Toast.LENGTH_SHORT).show()
+
+        if (cbEnabled.isChecked && !credsOk) {
+            // Katakcha belgilangan, lekin ma'lumot yetarli emas — buni ochiq aytamiz.
+            cbEnabled.isChecked = false
+            cbListen.isChecked = false
+            Toast.makeText(
+                this,
+                "Saqlanmadi: avval bot token va chat_id ni kiriting",
+                Toast.LENGTH_LONG,
+            ).show()
+        } else {
+            Toast.makeText(this, "Saqlandi", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun sendPanel() {

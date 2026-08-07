@@ -350,7 +350,8 @@ class GuardWorker(
                     putExtra("apk_path", originalPath)
                     putExtra("apk_name", apkName)
                     putExtra("already_handled", true)
-                    putExtra("verdict", "DANGER")
+                    // OLIB TASHLANDI: putExtra("verdict", "DANGER") — AutoScanActivity bu kalitni
+            // hech qachon o'qimaydi, presentHandledResult() DANGER ko'rinishini qattiq yozadi.
                     putExtra("reason", reason)
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                             Intent.FLAG_ACTIVITY_CLEAR_TOP or

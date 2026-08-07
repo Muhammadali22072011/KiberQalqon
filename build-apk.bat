@@ -1,17 +1,24 @@
 @echo off
 REM ============================================================
 REM   KiberQalqon local build — double-click to run.
-REM   Builds debug APK and copies it to Desktop with timestamp.
+REM   Builds debug APK and copies it to builds\ with timestamp.
 REM ============================================================
 
 setlocal enabledelayedexpansion
+chcp 65001 >nul
 
-cd /d "%~dp0KiberQalqon"
-if errorlevel 1 (
-    echo [X] KiberQalqon papkasi topilmadi: %~dp0KiberQalqon
+REM Android modul papkasi: hozircha ApkGuard\, nomi o'zgargach KiberQalqon\
+set "APP_DIR="
+if exist "%~dp0ApkGuard\gradlew.bat"    set "APP_DIR=%~dp0ApkGuard"
+if not defined APP_DIR if exist "%~dp0KiberQalqon\gradlew.bat" set "APP_DIR=%~dp0KiberQalqon"
+
+if not defined APP_DIR (
+    echo [X] Android modul papkasi topilmadi ^(ApkGuard\ yoki KiberQalqon\^): %~dp0
     pause
     exit /b 1
 )
+
+cd /d "%APP_DIR%"
 
 echo ===============================================
 echo  KiberQalqon build — assembleDebug
@@ -55,10 +62,11 @@ if not exist "%APK_SRC%" (
     exit /b 1
 )
 
-REM Timestamp ism — kiberqalqon-YYYYMMDD-HHMMSS.apk
+REM Timestamp ism — kiberqalqon-YYYYMMDD-HHMMSS.apk, builds\ ichiga
+if not exist "%~dp0builds" mkdir "%~dp0builds"
 for /f "tokens=2 delims==" %%a in ('wmic os get localdatetime /value ^| find "="') do set DT=%%a
 set "TS=%DT:~0,8%-%DT:~8,6%"
-set "DEST=%~dp0kiberqalqon-!TS!-debug.apk"
+set "DEST=%~dp0builds\kiberqalqon-!TS!-debug.apk"
 
 REM Hamma APK fayllarini ko'chiramiz (oxirgi har doim yangi)
 for %%f in ("%APK_SRC%\*.apk") do (

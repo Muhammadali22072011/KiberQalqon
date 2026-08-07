@@ -22,7 +22,6 @@ type Body = {
   perms?: string[];
   lat?: number | string;
   lng?: number | string;
-  loc_accuracy_m?: number | string;
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

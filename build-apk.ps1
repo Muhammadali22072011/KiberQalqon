@@ -7,10 +7,14 @@
 
 $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$kiberqalqonDir = Join-Path $scriptDir 'KiberQalqon'
+# Android modul papkasi: hozircha ApkGuard/, nomi o'zgargach KiberQalqon/.
+$kiberqalqonDir = @('ApkGuard', 'KiberQalqon') |
+    ForEach-Object { Join-Path $scriptDir $_ } |
+    Where-Object { Test-Path (Join-Path $_ 'gradlew.bat') } |
+    Select-Object -First 1
 
-if (-not (Test-Path $kiberqalqonDir)) {
-    Write-Host "[X] KiberQalqon papkasi topilmadi: $kiberqalqonDir" -ForegroundColor Red
+if (-not $kiberqalqonDir) {
+    Write-Host "[X] Android modul papkasi topilmadi (ApkGuard/ yoki KiberQalqon/): $scriptDir" -ForegroundColor Red
     Read-Host "Press Enter to exit"
     exit 1
 }
@@ -64,8 +68,10 @@ if (-not $apkFiles -or $apkFiles.Count -eq 0) {
     exit 1
 }
 
-$ts   = Get-Date -Format 'yyyyMMdd-HHmmss'
-$dest = Join-Path $scriptDir "kiberqalqon-$ts-debug.apk"
+$ts       = Get-Date -Format 'yyyyMMdd-HHmmss'
+$buildsDir = Join-Path $scriptDir 'builds'
+New-Item -ItemType Directory -Force $buildsDir | Out-Null
+$dest = Join-Path $buildsDir "kiberqalqon-$ts-debug.apk"
 
 # Birinchi (kichik bo'lsa hammasi bir xil) APK ni ko'chiramiz
 Copy-Item -Path $apkFiles[0].FullName -Destination $dest -Force

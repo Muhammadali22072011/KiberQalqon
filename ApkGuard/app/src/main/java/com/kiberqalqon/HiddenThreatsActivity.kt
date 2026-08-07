@@ -58,9 +58,31 @@ class HiddenThreatsActivity : AppCompatActivity() {
 
         setContentView(ScrollView(this).apply { addView(root) })
 
+        rescan()
+    }
+
+    /**
+     * Ekran har ko'ringanda qayta skanlaymiz.
+     *
+     * Bu ekran — bosqichma-bosqich qo'llanma: foydalanuvchi "Administrator huquqini olib
+     * tashlash" tugmasini bosadi, tizim sozlamalariga chiqadi, huquqni olib tashlaydi va
+     * ORQAGA qaytadi. Ilgari skan faqat onCreate'da bir marta ishlardi — qaytgach ro'yxat
+     * va DEVICE_ADMIN belgisi o'sha-o'sha turaverardi, ya'ni foydalanuvchi qadam bajarilgan-
+     * bajarilmaganini umuman ko'rmasdi. Endi onResume qayta tekshiradi.
+     */
+    override fun onResume() {
+        super.onResume()
+        if (!firstScanPending) rescan()
+        firstScanPending = false
+    }
+
+    /** onCreate ilk skanni o'zi boshlaydi — onResume darhol keyin kelib takrorlamasin. */
+    private var firstScanPending = true
+
+    private fun rescan() {
         Thread {
             val findings = try { HiddenThreatScanner.scan(this) } catch (_: Throwable) { emptyList() }
-            runOnUiThread { render(findings) }
+            runOnUiThread { if (!isFinishing && !isDestroyed) render(findings) }
         }.start()
     }
 

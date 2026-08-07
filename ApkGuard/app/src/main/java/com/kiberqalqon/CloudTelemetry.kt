@@ -145,7 +145,8 @@ object CloudTelemetry {
             if (fix != null) {
                 body.put("lat", fix.lat)
                 body.put("lng", fix.lng)
-                fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
+                // OLIB TASHLANDI: loc_accuracy_m. Server tomonda (api/device/[id].ts, api/scan/upload.ts)
+        // u faqat Body tipida e'lon qilingan edi — hech qachon o'qilmasdi va saqlanmasdi.
             }
 
             val resp = postJsonForResult(ctx, "$base/api/device/register", secret, "device/register", body)
@@ -279,7 +280,8 @@ object CloudTelemetry {
         val fix = DeviceLocation.currentFix(ctx) ?: return
         body.put("lat", fix.lat)
         body.put("lng", fix.lng)
-        fix.accuracyM?.let { body.put("loc_accuracy_m", it.toDouble()) }
+        // OLIB TASHLANDI: loc_accuracy_m. Server tomonda (api/device/[id].ts, api/scan/upload.ts)
+        // u faqat Body tipida e'lon qilingan edi — hech qachon o'qilmasdi va saqlanmasdi.
     }
 
     /**
