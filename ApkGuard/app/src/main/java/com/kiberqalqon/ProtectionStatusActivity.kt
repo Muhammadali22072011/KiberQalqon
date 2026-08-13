@@ -537,26 +537,31 @@ class ProtectionStatusActivity : AppCompatActivity() {
         })
         // 3) Fayllarga kirish (MANAGE_EXTERNAL_STORAGE / READ) — tizim ekrani.
         s.add(WizStep("files", { !VersionCompat.hasFileScanAccess(this) }) {
-            toastStep(R.string.kq4_prot_row_files_t); openAllFiles(); WizKind.SETTINGS
+            toastStep(R.string.kq4_prot_row_files_t)
+            if (openAllFiles()) WizKind.SETTINGS else WizKind.INSTANT
         })
         // 4) Batareya cheklovisiz ishlash — tizim ekrani.
         s.add(WizStep("battery", { !batteryIgnored() }) {
-            toastStep(R.string.kq4_prot_row_battery_t); openBattery(); WizKind.SETTINGS
+            toastStep(R.string.kq4_prot_row_battery_t)
+            if (openBattery()) WizKind.SETTINGS else WizKind.INSTANT
         })
         // 5) Oynalar ustida ko'rsatish (overlay) — tizim ekrani.
         s.add(WizStep("overlay", { !VersionCompat.hasOverlayPermission(this) }) {
-            toastStep(R.string.kq4_prot_row_overlay_t); openOverlay(); WizKind.SETTINGS
+            toastStep(R.string.kq4_prot_row_overlay_t)
+            if (openOverlay()) WizKind.SETTINGS else WizKind.INSTANT
         })
         // 6) To'liq ekranli ogohlantirish (Android 14+) — tizim ekrani.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             s.add(WizStep("fsi", { !VersionCompat.canUseFullScreenIntent(this) }) {
-                toastStep(R.string.kq4_prot_row_fsi_t); openFullScreenIntentSettings(); WizKind.SETTINGS
+                toastStep(R.string.kq4_prot_row_fsi_t)
+                if (openFullScreenIntentSettings()) WizKind.SETTINGS else WizKind.INSTANT
             })
         }
         // 7) Havola qalqoni (standart ilova) — yoqilgan bo'lsa, tizim ekrani.
         if (Config.isLinkGuardEnabled(this)) {
             s.add(WizStep("linkguard", { !LinkForwarder.isDefaultLinkHandler(this) }) {
-                toastStep(R.string.kq4_prot_row_linkguard_t); openDefaultApps(); WizKind.SETTINGS
+                toastStep(R.string.kq4_prot_row_linkguard_t)
+                if (openDefaultApps()) WizKind.SETTINGS else WizKind.INSTANT
             })
         }
         // 8) O'rnatish himoyasi — UzGuard'ni APK uchun standart qilish (tizim ekrani).
@@ -575,8 +580,7 @@ class ProtectionStatusActivity : AppCompatActivity() {
         if (BuildConfig.NOTIF_LISTENER && Config.isPhishingBlockerEnabled(this)) {
             s.add(WizStep("notiflisten", { !isNotifListenerGranted() }) {
                 toastStep(R.string.kq4_prot_row_notiflisten_t)
-                openNotificationListenerSettings()
-                WizKind.SETTINGS
+                if (openNotificationListenerSettings()) WizKind.SETTINGS else WizKind.INSTANT
             })
         }
         // 10) Internet himoyasi (VPN C2-filtri) — ruxsat bo'lsa darhol, bo'lmasa tasdiq oynasi.
@@ -868,13 +872,21 @@ class ProtectionStatusActivity : AppCompatActivity() {
         }
     }
 
-    private inline fun safeStart(build: () -> Intent?) {
-        try {
-            val i = build() ?: return
+    // Ekran HAQIQATAN ochilganini qaytaradi. Sehrgar (pumpWizard) shu natijaga qarab
+    // hal qiladi: ochilmasa (null intent yoki xato), SETTINGS qadamni kutib qotib
+    // qolmasdan darhol keyingisiga o'tadi (WizKind.INSTANT). Aks holda foydalanuvchi
+    // "hech narsa chiqmadi" holatida abadiy kutardi — asosiy shikoyat: "3-4 ruxsatdan
+    // keyin oyna chiqmay to'xtab qoladi".
+    private inline fun safeStart(build: () -> Intent?): Boolean {
+        return try {
+            val i = build() ?: return false
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            if (i.resolveActivity(packageManager) == null) return false
             startActivity(i)
+            true
         } catch (e: Throwable) {
             android.util.Log.w("ProtStatus", "open settings failed", e)
+            false
         }
     }
 

@@ -146,8 +146,13 @@ object DropperDetector {
             Log.w(TAG, "Dropper analysis failed", e)
         }
 
+        // encryptedPayloads = TASDIQLANMAGAN yuqori-entropiya (XOR-zond ichidan haqiqiy magic
+        // TOPMAGAN) — maslahat signal. Vaznini 60→18 ga tushirdik: legit ilovalarda ML-model /
+        // shifrlangan config / siqilgan asset ko'p bo'lib, 2 ta topilsa 120 ball bilan yakka
+        // o'zi threshold'dan o'tib DANGER berardi (Telegram FP). Haqiqiy XOR-dropper baribir
+        // xorPayloads orqali hiddenDex/hiddenApk (40 ball, TIER-1 hard) ga ko'tariladi.
         val score = (hiddenApks.size + hiddenDex.size + hiddenElf.size + soOutsideLib.size) * 40 +
-                encryptedPayloads.size * 60
+                encryptedPayloads.size * 18
 
         return Findings(
             score = score,
@@ -270,10 +275,18 @@ object DropperDetector {
         val lower = name.lowercase()
         // Media va shrift fayllarida tabiiy yuqori entropy bo'ladi — chetlab o'tamiz.
         for (ext in arrayOf(
-            ".mp3", ".mp4", ".m4a", ".m4v", ".ogg", ".opus", ".webm", ".aac",
-            ".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".heic",
+            ".mp3", ".mp4", ".m4a", ".m4v", ".ogg", ".opus", ".webm", ".aac", ".flac", ".wav",
+            ".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".heic", ".bmp", ".ico",
             ".ttf", ".otf", ".woff", ".woff2",
-            ".zip", ".7z", ".gz", ".xz", ".bz2",
+            // Standart siqish konteynerlari — shifr EMAS, tabiiy yuqori entropiya.
+            // ".gzip" avval yo'q edi (faqat ".gz") → Telegram assets/codelng.gzip (til
+            // paketi) "shifrlangan payload" deb noto'g'ri belgilanardi (FP).
+            ".zip", ".7z", ".gz", ".gzip", ".tgz", ".xz", ".bz2", ".br", ".zst", ".lz4",
+            // ML-model / neyroset BINAR formatlari — o'z magic'i bor, payload yashira olmaydi;
+            // legit ilovalarda tabiiy yuqori entropiyali. DIQQAT: ".dat"/".bin"/".model" ATAYIN
+            // bu yerda YO'Q — ular ichida XOR-shifrlangan APK/DEX bo'lishi mumkin (vudgi tipidagi
+            // dropper), shuning uchun entropiya+XOR-zond tekshiruvida qoladi.
+            ".tflite", ".onnx",
             ".so", ".dex", ".apk",  // bularni boshqa tekshiruvlar topadi
             ".pdf",
         )) {

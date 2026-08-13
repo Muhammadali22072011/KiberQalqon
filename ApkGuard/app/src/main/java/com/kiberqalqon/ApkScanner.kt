@@ -932,10 +932,17 @@ object ApkScanner {
                     AppReputation.Reputation.UNKNOWN
                 }
                 // O'rnatilgan ilovaning O'Z faylini skanlayapmiz — u o'ziga nisbatan "soxta imzo"
-                // bo'la olmaydi. SIGNATURE_MISMATCH bu yerda cert o'qishdagi nomuvofiqlik
-                // (getPackageArchiveInfo fayldan vs getPackageInfo PM'dan — split/rotatsiya/null),
-                // soxtalik emas. Haqiqiy o'rnatilgan ilova → VERIFIED (false-DANGER tuzatildi).
-                if (selfInstalled && reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {
+                // bo'la olmaydi. SIGNATURE_MISMATCH va UNVERIFIED bu yerda cert o'qishdagi
+                // nomuvofiqlik (getPackageArchiveInfo fayldan vs getPackageInfo PM'dan —
+                // split/rotatsiya/null; katta APK'da arxiv-imzo o'qilmay UNVERIFIED chiqadi),
+                // soxtalik emas. Haqiqiy o'rnatilgan ishonchli-brend ilova → VERIFIED.
+                // FALSE-DANGER FIX (2026-08-13): avval faqat MISMATCH ko'tarilardi; 82MB Telegram
+                // arxiv-imzosi o'qilmay UNVERIFIED bo'lib qolar va reputatsiya qalqoni ishlamas,
+                // legit ilova permission-combo/score bilan DANGER bo'lardi.
+                if (selfInstalled && (
+                        reputation == AppReputation.Reputation.SIGNATURE_MISMATCH ||
+                        reputation == AppReputation.Reputation.UNVERIFIED)
+                ) {
                     reputation = AppReputation.Reputation.VERIFIED
                 }
                 if (reputation == AppReputation.Reputation.SIGNATURE_MISMATCH) {

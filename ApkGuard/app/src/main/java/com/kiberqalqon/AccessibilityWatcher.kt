@@ -42,6 +42,17 @@ class AccessibilityWatcher(
         try {
             val current = readEnabledServices(ctx)
             val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+            // BIRINCHI ISHGA TUSHISH: baseline hali yozilmagan bo'lsa (KEY_PREV umuman yo'q),
+            // hozirgi ro'yxatni JIM saqlaymiz va ALERT BERMAYMIZ. Aks holda ilovaga birinchi
+            // kirishda avvaldan yoqilgan har bir accessibility-xizmat (TalkBack, parol-menejer,
+            // avtomatlashtirish ilovalari) uchun "banker tahdidi" alerti chiqib, foydalanuvchini
+            // cho'chitardi. Endi faqat KEYINCHALIK qo'shilgan YANGI xizmat ogohlantiradi.
+            if (!prefs.contains(KEY_PREV)) {
+                prefs.edit().putString(KEY_PREV, current.joinToString("|")).apply()
+                return Result.success()
+            }
+
             val prevRaw = prefs.getString(KEY_PREV, "") ?: ""
             val prev = if (prevRaw.isBlank()) emptySet() else prevRaw.split('|').toSet()
             val newServices = current - prev

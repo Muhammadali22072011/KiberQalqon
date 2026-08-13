@@ -35,6 +35,15 @@ class NotificationAccessWatcher(
         try {
             val current = readEnabledListeners(ctx)
             val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+            // BIRINCHI ISHGA TUSHISH: baseline yo'q bo'lsa — jim saqlaymiz, alert bermaymiz
+            // (avvaldan bildirishnoma-ruxsati bor ilovalar uchun cho'chitmaymiz). Faqat
+            // keyinchalik qo'shilgan YANGI listener ogohlantiradi. [AccessibilityWatcher] kabi.
+            if (!prefs.contains(KEY_PREV)) {
+                prefs.edit().putString(KEY_PREV, current.joinToString("|")).apply()
+                return Result.success()
+            }
+
             val prevRaw = prefs.getString(KEY_PREV, "") ?: ""
             val prev = if (prevRaw.isBlank()) emptySet() else prevRaw.split('|').toSet()
             val newOnes = current - prev
