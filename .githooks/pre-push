@@ -30,8 +30,10 @@ fi
 if [ "$KQ_SKIP_ANDROID" = "1" ]; then
   echo "[pre-push] ⏭ android compile o'tkazildi (KQ_SKIP_ANDROID=1) — CI tekshiradi"
 elif [ -x "$ROOT/ApkGuard/gradlew" ]; then
-  echo "[pre-push] android :app:compileDebugKotlin (yengil — dex/R8/NDK yo'q)…"
-  if ! ( cd "$ROOT/ApkGuard" && ./gradlew --no-daemon -q :app:compileDebugKotlin ); then
+  # play flavor kirgach 'compileDebugKotlin' nomi ikkilangan (Direct/Play) —
+  # asosiy dev-flavor Direct'ni tekshiramiz; Play variantini CI qamrab oladi.
+  echo "[pre-push] android :app:compileDirectDebugKotlin (yengil — dex/R8/NDK yo'q)…"
+  if ! ( cd "$ROOT/ApkGuard" && ./gradlew --no-daemon -q :app:compileDirectDebugKotlin ); then
     echo "[pre-push] ❌ Kotlin kompilyatsiya xatosi — push TO'XTATILDI."
     echo "           (Agar RAM yetmay yiqilgan bo'lsa: export KQ_SKIP_ANDROID=1 — CI baribir tekshiradi.)"
     exit 1
