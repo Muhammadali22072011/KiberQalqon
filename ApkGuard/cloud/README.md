@@ -146,7 +146,7 @@ hech qachon.
 ```powershell
 $env:TELEGRAM_REG_BOT_TOKEN="456:AAH..."
 $env:TELEGRAM_REG_WEBHOOK_SECRET="boshqa-random-32-hex"
-$env:VERCEL_URL="https://uzguard-cloud.vercel.app"
+$env:VERCEL_URL="https://kiberqalqon-cloud.vercel.app"
 node scripts/set-webhook-reg.mjs
 ```
 

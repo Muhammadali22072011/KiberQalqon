@@ -45,7 +45,7 @@ vercel --prod
 После миграции 15 журнал смотрится так (только владелец):
 
 ```
-GET https://uzguard-cloud.vercel.app/api/stats?audit=1
+GET https://kiberqalqon-cloud.vercel.app/api/stats?audit=1
 заголовок: x-admin-secret: <токен владельца или ADMIN_SECRET>
 ```
 
@@ -99,7 +99,7 @@ GET https://uzguard-cloud.vercel.app/api/stats?audit=1
    - `TELEGRAM_REG_BOT_USERNAME` — `uzguardapp_bot` (без `@`)
    - `TELEGRAM_REG_WEBHOOK_SECRET` — новый random 32 hex (**не тот же**, что
      `TELEGRAM_WEBHOOK_SECRET`)
-   - `PUBLIC_BASE_URL` — `https://uzguard-cloud.vercel.app` (для кнопки «вернуться
+   - `PUBLIC_BASE_URL` — `https://kiberqalqon-cloud.vercel.app` (для кнопки «вернуться
      в UzGuard»)
 3. **Миграция**: Supabase → SQL Editor → выполнить
    `ApkGuard/cloud/supabase/18_tg_registration.sql`.
@@ -108,7 +108,7 @@ GET https://uzguard-cloud.vercel.app/api/stats?audit=1
    ```
    $env:TELEGRAM_REG_BOT_TOKEN="456:AAH..."
    $env:TELEGRAM_REG_WEBHOOK_SECRET="новый-random-32-hex"
-   $env:VERCEL_URL="https://uzguard-cloud.vercel.app"
+   $env:VERCEL_URL="https://kiberqalqon-cloud.vercel.app"
    node ApkGuard/cloud/scripts/set-webhook-reg.mjs
    ```
    Проверка: написать боту `/help` — должен ответить.
