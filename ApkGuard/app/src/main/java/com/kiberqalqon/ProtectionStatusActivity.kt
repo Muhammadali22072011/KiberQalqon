@@ -156,13 +156,15 @@ class ProtectionStatusActivity : AppCompatActivity() {
         // Foydalanuvchi tizim sozlamalaridan qaytsa — holatni qayta o'qiymiz.
         try { renderRows() } catch (e: Throwable) { android.util.Log.e("ProtStatus", "render", e) }
         // Sehrgar tizim EKRANINI kutayotgan bo'lsa (SETTINGS) — qaytib kelindi, keyingisini ochamiz.
-        // LAUNCHER (runtime/VPN dialog) bo'lsa — uni callback yopadi, bu yerda tegmaymiz.
-        // MUHIM: faqat HAQIQATAN tashqi ekrandan qaytilganda (wentBackground) pump qilamiz.
-        // LAUNCHER callback'i shu resume tsiklida SETTINGS qadamini sinxron ochib qo'ysa,
-        // oraliqda onStop bo'lmaydi → wentBackground=false → bu yerda ikki marta o'tkazmaymiz.
-        val returned = wentBackground
+        // TUZATISH (2026-08-13, "3-4 ruxsatdan keyin to'xtaydi"): avval pump FAQAT wentBackground
+        // (onStop) yoqilganda bo'lardi. Lekin ko'p Samsung/OEM sozlama ekrani yoki ruxsat dialogi
+        // onStop CHAQIRMAYDI (faqat onPause) → wentBackground false qolib, SETTINGS qadami HECH
+        // QACHON pump bo'lmasdi va sehrgar qotib qolardi. Endi ekranga har qaytilganda kutilayotgan
+        // SETTINGS qadami bo'lsa — davom etamiz. Re-entrantlikdan wizardOutstanding himoya qiladi
+        // (null qilib olib, keyin pumpWizard yangisini qo'yadi). LAUNCHER qadamini bu yerda
+        // tegmaymiz — uni callback yopadi.
         wentBackground = false
-        if (returned && wizardActive && wizardOutstanding == WizKind.SETTINGS) {
+        if (wizardActive && wizardOutstanding == WizKind.SETTINGS) {
             wizardOutstanding = null
             try { pumpWizard() } catch (e: Throwable) { android.util.Log.w("ProtStatus", "wizard resume", e) }
         }
