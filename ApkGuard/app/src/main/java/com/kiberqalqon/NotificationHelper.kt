@@ -385,11 +385,12 @@ object NotificationHelper {
         val context = LocaleHelper.apply(context)
         createChannels(context)
         val oem = OemAutostartGuide.detect()
-        // Tap → ProtectionStatusActivity: u yerda "Avtomatik ishga tushirish (OEM)" qatori
-        // bor — foydalanuvchi autostart'ni qayta yoqadi. (Ilgari Splash marafoni orqali
-        // ochilardi; marafon olib tashlangach, ro'yxat ekraniga to'g'ridan-to'g'ri o'tamiz.)
+        // Tap → ProtectionStatusActivity + EXTRA_OPEN_AUTOSTART: darhol OEM autostart
+        // yo'riqnomasi ochiladi. (Avval "Avtomatik ishga tushirish" QATORI va'da qilinardi,
+        // lekin u 2026-06-16 da olib tashlangan — foydalanuvchi ro'yxatda uni topa olmasdi.)
         val intent = Intent(context, ProtectionStatusActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(ProtectionStatusActivity.EXTRA_OPEN_AUTOSTART, true)
         }
         val pi = PendingIntent.getActivity(
             context, 7002, intent,

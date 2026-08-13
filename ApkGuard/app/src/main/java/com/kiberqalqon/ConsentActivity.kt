@@ -1,6 +1,5 @@
 package com.uzguard
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,7 +10,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.google.android.material.card.MaterialCardView
 
 /**
@@ -30,7 +28,6 @@ class ConsentActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_REVIEW_MODE = "review_mode"
-        private const val REQ_LOCATION = 104
 
         /** Open in review mode (from Settings) — no checkboxes, no exit-on-decline. */
         fun openForReview(ctx: Context) {
@@ -125,17 +122,6 @@ class ConsentActivity : AppCompatActivity() {
         proceedAfterConsent()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // Joylashuv berilsa GPS yuboriladi; rad etilsa server IP'dan taxminlaydi —
-        // ikki holda ham flow to'xtamaydi.
-        if (requestCode == REQ_LOCATION) proceedAfterConsent()
-    }
-
     // Post-consent route — mirrors SplashActivity.goToMainActivity():
     // Onboarding (first run) → InitialScanActivity (если ещё не было первичного скана)
     // → ProtectionStatusActivity (gate: !isProtectionAcked ИЛИ отозвано критичное
@@ -148,21 +134,9 @@ class ConsentActivity : AppCompatActivity() {
         // bajaradi va 12 soatlik throttle bilan takror yubormaydi.
         CloudTelemetry.registerDevice(this)
 
-        // SplashActivity.goToMainActivity() bilan BIR XIL marshrut zinapoyasini takrorlaymiz
-        // (rozilik allaqachon berilgan — shu sababli birinchi shart o'tkazib yuboriladi):
-        // birinchi ishga tushish → Onboarding; ilk skan qilinmagan → InitialScan; "Himoya
-        // holati" tasdiqlanmagan YOKI majburiy ruxsatlardan biri o'chirilgan → ProtectionStatus
-        // shlagbaumi; aks holda Dashboard. Bu yerda ProtectionStatus gate'ini o'tkazib yuborish
-        // foydalanuvchiga ruxsat o'chirilgan holatda ham Dashboard'ga kirish imkonini berardi.
-        val target = when {
-            Config.isFirstRun(this) -> OnboardingActivity::class.java
-            !Config.isInitialScanDone(this) -> InitialScanActivity::class.java
-            !Config.isProtectionAcked(this) -> ProtectionStatusActivity::class.java
-            !ProtectionStatusActivity.allCriticalPermissionsGranted(this) ->
-                ProtectionStatusActivity::class.java
-            else -> DashboardNewActivity::class.java
-        }
-        startActivity(Intent(this, target))
+        // Marshrut zinapoyasi — StartRouter'da (Splash bilan BIR XIL manba). Rozilik
+        // endigina berildi, shuning uchun `next` birinchi shartdan o'tib ketadi.
+        startActivity(Intent(this, StartRouter.after(this, ConsentActivity::class.java)))
         finish()
     }
 

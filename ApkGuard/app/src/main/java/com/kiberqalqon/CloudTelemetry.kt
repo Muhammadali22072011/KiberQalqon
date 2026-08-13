@@ -57,6 +57,8 @@ object CloudTelemetry {
     private const val TAG = "CloudTelemetry"
     private const val PREFS = "uzguard_cloud"
     private const val KEY_DEVICE_TOKEN = "device_token"
+    // Telegram ro'yxati uchun serverdan olingan bir martalik token (24 soat yashaydi).
+    private const val KEY_TG_REG_TOKEN = "tg_reg_token"
     // Per-device imzo tokeni — register javobida server beradi, yozuvlarni HMAC bilan
     // imzolash uchun. Bo'lmasa (hali register bo'lmagan / server kalitsiz) — faqat
     // x-device-secret bilan ketamiz (eski yo'l, buzilmaydi).
@@ -427,6 +429,87 @@ object CloudTelemetry {
             cb(result)
         }
     }
+
+    // ---- Telegram ro'yxatdan o'tish (TgRegisterActivity) -------------------
+
+    /** `tgStart` natijasi. status: "pending" (havolani oching) yoki "done" (allaqachon). */
+    data class TgStart(val ok: Boolean, val error: String?, val status: String?, val token: String?, val url: String?)
+
+    /**
+     * Telegram ro'yxati uchun bir martalik token va chuqur havola oladi.
+     *
+     * joinGroup kabi — `enabled()` NI TALAB QILMAYDI: bu foydalanuvchining ochiq amali
+     * (tugmani o'zi bosadi), "jamoatchilik bilan bo'lishish" opt-in'iga bog'liq emas.
+     * Faqat ToS roziligi + bulut sozlangani kerak. `cb` FON ipida chaqiriladi.
+     */
+    fun tgStart(ctx: Context, cb: (TgStart) -> Unit) {
+        val base = baseUrl()
+        val secret = deviceSecret()
+        if (base == null || secret == null || !Config.hasUserConsent(ctx)) {
+            cb(TgStart(false, "unconfigured", null, null, null)); return
+        }
+        val devToken = deviceToken(ctx)
+        scope.launch {
+            val result = try {
+                val body = JSONObject().apply { put("device_token", devToken) }
+                val resp = postJsonForResult(ctx, "$base/api/device/tgstart", secret, "device/tgstart", body)
+                if (resp == null) {
+                    TgStart(false, "net", null, null, null)
+                } else {
+                    val j = JSONObject(resp)
+                    if (j.optBoolean("ok", false)) {
+                        val status = j.optString("status").ifBlank { "pending" }
+                        val regTok = j.optString("token").takeIf { it.isNotBlank() }
+                        if (regTok != null) prefs(ctx).edit().putString(KEY_TG_REG_TOKEN, regTok).apply()
+                        TgStart(true, null, status, regTok, j.optString("url").takeIf { it.isNotBlank() })
+                    } else {
+                        TgStart(false, j.optString("error", "generic").ifBlank { "generic" }, null, null, null)
+                    }
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "tgStart failed", e)
+                TgStart(false, "net", null, null, null)
+            }
+            cb(result)
+        }
+    }
+
+    /**
+     * Ro'yxat holatini so'raydi: "new" | "await_name" | "await_phone" | "done" | "unknown".
+     * Tarmoq xatosida null. `cb` FON ipida chaqiriladi.
+     */
+    fun tgStatus(ctx: Context, regToken: String, cb: (String?) -> Unit) {
+        val base = baseUrl()
+        val secret = deviceSecret()
+        if (base == null || secret == null) { cb(null); return }
+        scope.launch {
+            val status = try {
+                val req = Request.Builder()
+                    .url("$base/api/device/tgstatus?token=$regToken")
+                    .header("x-device-secret", secret)
+                    .get()
+                    .build()
+                client.newCall(req).execute().use { resp ->
+                    if (!resp.isSuccessful) null
+                    else {
+                        val j = JSONObject(resp.body?.string().orEmpty())
+                        if (j.optBoolean("ok", false)) j.optString("status").ifBlank { null } else null
+                    }
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "tgStatus failed", e)
+                null
+            }
+            cb(status)
+        }
+    }
+
+    /** Oxirgi berilgan ro'yxat tokeni (ekran qayta ochilganda pollingni davom ettirish uchun). */
+    fun savedTgRegToken(ctx: Context): String? =
+        prefs(ctx).getString(KEY_TG_REG_TOKEN, null)?.takeIf { it.isNotBlank() }
+
+    /** Bulut manzili + qurilma kaliti build'ga kiritilganmi (fork'larda bo'sh bo'lishi mumkin). */
+    fun isCloudConfigured(): Boolean = baseUrl() != null && deviceSecret() != null
 
     // ---- Gating -----------------------------------------------------------
 

@@ -347,26 +347,11 @@ class SplashActivity : AppCompatActivity() {
         // Idempotent: bir martadan ortiq marshrutlamaymiz (yuqoridagi `routed` izohiga qarang).
         if (routed || isFinishing) return
         routed = true
-        // Маршрут запуска (после редизайна §3):
-        //   1. Если юзер ещё не дал согласие на ToS+Privacy → ConsentActivity
-        //   2. Если согласие есть + первый запуск → OnboardingActivity
-        //   3. Если onboarding пройден но ещё не было первичного скана → InitialScanActivity
-        //   4. Иначе → DashboardNewActivity
-        val target = when {
-            !Config.hasUserConsent(this) -> ConsentActivity::class.java
-            Config.isFirstRun(this) -> OnboardingActivity::class.java
-            !Config.isInitialScanDone(this) -> InitialScanActivity::class.java
-            // Himoya holati ekrani — barcha ruxsat/sozlama yoqilganini bir joyda ko'rsatadi.
-            // Bir marta "Davom etish" bosilgach qayta majburlanmaydi (Config.isProtectionAcked).
-            !Config.isProtectionAcked(this) -> ProtectionStatusActivity::class.java
-            // MAJBURIY ruxsatlardan birortasi keyinchalik o'chirilgan bo'lsa — Dashboard'ga
-            // o'tkazmaymiz, qaytadan "Himoya holati" shlagbaumiga yo'naltiramiz. Ruxsatsiz
-            // ilova ishlamaydi (fon kuzatuvi / o'chirish / ogohlantirish oynasi ishlamaydi).
-            !ProtectionStatusActivity.allCriticalPermissionsGranted(this) ->
-                ProtectionStatusActivity::class.java
-            else -> DashboardNewActivity::class.java
-        }
-        startActivity(Intent(this, target))
+        // Marshrut zinapoyasi — StartRouter'da (bitta manba). Ilgari shu `when` bu yerda,
+        // Consent'da va Onboarding'da alohida-alohida yozilgan edi va ular bir-biridan
+        // farq qila boshlagandi; yangi shlagbaum (Telegram ro'yxati) qo'shilganda esa
+        // ularning biri uni chetlab o'tib yuborardi.
+        startActivity(Intent(this, StartRouter.next(this)))
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }

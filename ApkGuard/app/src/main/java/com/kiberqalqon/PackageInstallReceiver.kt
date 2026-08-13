@@ -73,6 +73,14 @@ class PackageInstallReceiver : BroadcastReceiver() {
                 // REMOVED prikhodit s EXTRA_REPLACING=true vo vremya update — skipaem.
                 if (isReplacing) return
                 Log.d(TAG, "Package uninstalled: $pkg (own=$isOwn)")
+                // Ilova o'chirildi — uning rescan-verdiktini tozalaymiz. Aks holda
+                // SecurityScore "verdict_<pkg>"=DANGER kalitini abadiy sanab, foydalanuvchi
+                // zararli ilovani o'chirgandan KEYIN ham -20 jarima ushlab turardi
+                // ("100 gacha yetkaz" hech qachon bajarilmasdi).
+                try {
+                    ctx.getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
+                        .edit().remove("verdict_$pkg").apply()
+                } catch (_: Throwable) {}
                 try {
                     TelemetryReporter.reportPackageUninstalled(ctx, pkg)
                 } catch (e: Throwable) {

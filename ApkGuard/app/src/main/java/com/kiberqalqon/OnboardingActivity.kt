@@ -84,15 +84,14 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun finishOnboarding() {
         Config.setFirstRunComplete(this)
-        // Posle Onboarding zapuskaem pervichnyy poiskj opasnykh APK na ustroystve —
-        // chtoby user srazu uvidel chto UzGuard real'no rabotayet i chto na ego
-        // telefone est' opasnogo. Posle InitialScan flag stavitsya, bol'she ne pokazyvayetsya.
-        val target = if (!Config.isInitialScanDone(this)) {
-            InitialScanActivity::class.java
-        } else {
-            DashboardNewActivity::class.java
-        }
-        startActivity(Intent(this, target))
+        // Marshrut — StartRouter'da (bitta manba). Odatda bu «Ro'yxatdan o'tish»
+        // shlagbaumi, undan keyin ilk skan: user srazu uvidit chto UzGuard real'no
+        // rabotayet i chto na ego telefone est' opasnogo.
+        //
+        // Ilgari bu yerda faqat `isInitialScanDone` tekshirilardi va Onboarding
+        // to'g'ridan-to'g'ri InitialScan'ga sakrardi — yangi shlagbaum shu yo'l bilan
+        // butunlay chetlab o'tilardi.
+        startActivity(Intent(this, StartRouter.after(this, OnboardingActivity::class.java)))
         finish()
     }
 

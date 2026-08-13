@@ -230,7 +230,6 @@ class InstallShieldService : AccessibilityService() {
             "com.vivo.packageinstaller",
             "com.oppo.packageinstaller",
             "com.coloros.packageinstaller",
-            "p.android.packageinstaller",
         )
         // O'z ilovamizning ANIQ yorliqlari (normallashtirilgan: past registr, bo'sh joysiz).
         // Substring emas — aniq tenglik uchun. Joriy: "UZGUARD"; tarixiy brendlar ham.

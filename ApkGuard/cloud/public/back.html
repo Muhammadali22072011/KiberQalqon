@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>UzGuard'ga qaytish</title>
+<!--
+  Telegram botidagi «UzGuard'ga qaytish» tugmasi shu sahifani ochadi. Sahifa
+  uzguard://open chuqur havolasini beradi — ilova o'sha havolani ushlaydi
+  (RegisterActivity, BROWSABLE intent-filter) va bosh ekranga o'tadi.
+
+  Nega inline <script> yo'q: vercel.json CSP'si script-src 'self' — inline JS
+  bloklanadi. Shuning uchun avtomatik redirect emas, oddiy havola: brauzer
+  maxsus sxemani FOYDALANUVCHI BOSGANDA ochadi (bu Android'da eng ishonchli yo'l —
+  gesture'siz redirectni Chrome jimgina tashlab yuboradi).
+
+  Ilova baribir fon pollingida holatni ko'radi, shuning uchun bu sahifa
+  ochilmasa ham ro'yxatdan o'tish YO'QOLMAYDI — foydalanuvchi shunchaki
+  ilovaga qo'lda qaytadi.
+-->
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #FBF7F4; color: #1A1214;
+  }
+  .card {
+    width: 100%; max-width: 380px; text-align: center;
+    background: #fff; border: 1px solid #EADFD8; border-radius: 20px;
+    padding: 32px 24px;
+  }
+  .mark {
+    width: 64px; height: 64px; margin: 0 auto 18px;
+    border-radius: 50%; background: #C2143D;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+  }
+  h1 { margin: 0 0 8px; font-size: 20px; }
+  p { margin: 0 0 22px; font-size: 14.5px; line-height: 1.5; opacity: .72; }
+  a.btn {
+    display: block; padding: 15px 20px; border-radius: 14px;
+    background: #C2143D; color: #fff; font-weight: 600; font-size: 15.5px;
+    text-decoration: none;
+  }
+  .hint { margin: 16px 0 0; font-size: 12.5px; opacity: .55; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #140E10; color: #F5EDEA; }
+    .card { background: #1D1518; border-color: #33262A; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="mark">🛡</div>
+    <h1>Ro'yxatdan o'tdingiz</h1>
+    <p>Qurilmangiz UzGuard'ga ulandi. Ilovaga qayting — himoya ishga tushadi.</p>
+    <a class="btn" href="uzguard://open">UzGuard'ni ochish</a>
+    <p class="hint">Tugma ishlamasa — telefoningizda UzGuard ilovasini qo'lda oching.</p>
+  </div>
+</body>
+</html>

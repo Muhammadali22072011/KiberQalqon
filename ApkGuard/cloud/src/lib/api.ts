@@ -212,3 +212,29 @@ export interface KnownGood {
 export interface RuleStat {
   rule_id: string; fires: number; devices: number; dismissed: number; last_fire?: string | null;
 }
+
+// ── Telegram ro'yxati analitikasi (stats?tgreg=1) ───────────────────────────
+// Ilovadagi «Ro'yxatdan o'tish» shlagbaumi: foydalanuvchi Telegram boti orqali
+// ismi + tasdiqlangan raqamini beradi. `masked` — telefon raqamlari niqoblangan
+// (cheklangan admin ko'radi); to'liq raqamni faqat EGASI oladi.
+export interface TgRegUser {
+  chat_id: number | null; tg_username?: string | null; full_name?: string | null;
+  phone?: string | null; done_at?: string | null; blocked?: boolean; has_device?: boolean;
+}
+export interface TgRegPending {
+  chat_id: number | null; tg_username?: string | null; full_name?: string | null;
+  step: string; linked_at?: string | null;
+}
+export interface TgRegDay { day: string; started: number; done: number; }
+export interface TgRegStats {
+  totals: {
+    started: number; linked: number; named: number; done: number;
+    blocked: number; stuck: number; unique_people: number;
+  };
+  today: { started: number; done: number };
+  median_complete_sec: number | null;
+  series: TgRegDay[];
+  recent: TgRegUser[];
+  pending: TgRegPending[];
+  masked: boolean;
+}

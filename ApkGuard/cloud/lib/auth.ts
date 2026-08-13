@@ -53,6 +53,16 @@ export function checkTelegramSecret(req: VercelRequest): boolean {
   return typeof got === 'string' && timingSafeEqual(got, expected);
 }
 
+// Ro'yxatdan o'tish boti — ALOHIDA sirdan foydalanadi. Ikkalasi bitta webhook
+// faylida (Hobby 12-funksiya limiti) yashaydi, shuning uchun sirlarni ham ajratamiz:
+// ochiq botning sirri sizib chiqsa, egasi paneliga kirish yo'li ochilmaydi.
+export function checkTelegramRegSecret(req: VercelRequest): boolean {
+  const expected = process.env.TELEGRAM_REG_WEBHOOK_SECRET;
+  if (!expected) return false;
+  const got = req.headers['x-telegram-bot-api-secret-token'];
+  return typeof got === 'string' && timingSafeEqual(got, expected);
+}
+
 // #45: avval bu yerda charCodeAt bilan o'z-o'zidan yozilgan solishtirish bor edi —
 // u UTF-16 kod birliklari bo'yicha ishlardi (baytma bayt emas) va login.ts/session.ts
 // ishlatadigan crypto.timingSafeEqual'dan farq qilardi. Endi hamma joyda bir xil,

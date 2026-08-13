@@ -127,7 +127,6 @@ class ReportProblemActivity : AppCompatActivity() {
         sb.appendLine("[Sozlamalar]")
         sb.appendLine("  bg=${Config.isBackgroundEnabled(this)}")
         sb.appendLine("  phishing=${Config.isPhishingBlockerEnabled(this)}")
-        sb.appendLine("  upload=${Config.isUploadEnabled(this)}")
         sb.appendLine("  lang=${Config.getLanguage(this)}")
         sb.appendLine()
         sb.appendLine("[Oxirgi xato]")

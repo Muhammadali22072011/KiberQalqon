@@ -50,6 +50,8 @@
     <string name="kq4_prot_row_oempopup_t">Всплывающее окно в фоне</string>
     <string name="kq4_prot_row_oempopup_s">Разрешение показывать окно из фона — обязательно для Xiaomi/MIUI, иначе окно не появится.</string>
     <string name="kq4_prot_row_notif_s">Нужно для предупреждений об угрозах</string>
+    <string name="kq4_prot_row_notiflisten_t">Доступ к уведомлениям (анти-фишинг)</string>
+    <string name="kq4_prot_row_notiflisten_s">Включите UzGuard в открывшемся списке — для поиска опасных ссылок в сообщениях</string>
     <string name="kq4_prot_row_loc_t">Геолокация</string>
     <string name="kq4_prot_row_loc_s">Для карты угроз вашего региона. Необязательно — приложение полностью работает и без неё.</string>
     <string name="kq4_prot_row_autostart_t">Автозапуск (%1$s)</string>

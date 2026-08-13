@@ -138,8 +138,9 @@ object DexPatternAnalyzer {
         Pattern("com.topjohnwu.magisk", 30, "Anti-Magisk (root check)"),
         Pattern("/data/local/tmp/", 12, "Suspicious tmp path probe"),
         Pattern("Landroid/net/VpnService;", 0, "VpnService"),   // легитимные VPN/firewall — не штраф
-        // ZIP-evasion (GP-flag=0x01 trick — Ajina.Banker'ning antivirus bypass'i):
-        Pattern("setMethod(ZipEntry.DEFLATED)", 10, "ZipEntry custom method (ZIP-evasion)"),
+        // "setMethod(ZipEntry.DEFLATED)" needle O'CHIRILDI (2026-08-13): bu manba-kod
+        // ifodasi DEX string-pool'da hech qachon yaxlit satr bo'lib uchramaydi
+        // (setMethod — alohida metod-nom yozuvi, DEFLATED — compile-time int) — o'lik imzo edi.
 
         // === Foreground process snooping (overlay timing) — есть у launcher'ов, task-killer'ов ===
         Pattern("getRunningAppProcesses", 5, "getRunningAppProcesses (qaysi ilova ochiq?)"),

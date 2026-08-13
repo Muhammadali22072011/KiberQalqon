@@ -28,7 +28,7 @@ private const val TAG = "GuardWorker"
  *     eng yangi 10 ta APK.
  *
  * Barcha rejimlar bitta [handleResult] orqali bir xil qayta ishlanadi:
- * DANGER → karantin/popup (+ upload), SUSPICIOUS → popup, SAFE → (yangi yuklangan
+ * DANGER → karantin/popup, SUSPICIOUS → popup, SAFE → (yangi yuklangan
  * bo'lsa) bildirishnoma.
  */
 class GuardWorker(
@@ -91,16 +91,12 @@ class GuardWorker(
                 return Result.success()
             }
 
-            val serverUrl = Config.getServerUrl(applicationContext)
-            val uploadEnabled = Config.isUploadEnabled(applicationContext) && serverUrl.isNotBlank()
-
             val explicitPaths = inputData.getStringArray(KEY_APK_PATHS)
             val fullSweep = inputData.getBoolean(KEY_FULL_SWEEP, false)
 
             when {
                 // 1) ProtectionService aniqlagan aniq YANGI APK yo'l(lar)i — real vaqtda hammasini.
                 !explicitPaths.isNullOrEmpty() -> {
-                    var uploaded = 0
                     var scanned = 0
                     for (p in explicitPaths) {
                         if (isStopped) break  // Worker to'xtatilsa og'ir skanni davom ettirmaymiz (batareya/qizish)
@@ -113,10 +109,10 @@ class GuardWorker(
                             Log.w(TAG, "Scan error for ${f.name}", e); continue
                         }
                         scanned++
-                        uploaded += handleResult(item, result, uploadEnabled, serverUrl, allowSafeNotification = false)
+                        handleResult(item, result, allowSafeNotification = false)
                     }
-                    Log.d(TAG, "Explicit scan: $scanned APKs, uploaded=$uploaded")
-                    Result.success(workDataOf("scanned" to scanned, "uploaded" to uploaded))
+                    Log.d(TAG, "Explicit scan: $scanned APKs")
+                    Result.success(workDataOf("scanned" to scanned))
                 }
 
                 // 2) Periodik to'liq tekshiruv (avvalgi PeriodicCheckWorker o'rnida) — butun telefon,
@@ -133,7 +129,6 @@ class GuardWorker(
                     val checked = HashSet<String>().apply {
                         addAll(prefs.getStringSet("checked_paths", emptySet()) ?: emptySet())
                     }
-                    var uploaded = 0
                     var scanned = 0
                     for (apk in apks) {
                         if (isStopped) break  // Worker to'xtatilsa (batareya past bo'lib qolsa) qolgan APK'larni skanlamaymiz
@@ -151,8 +146,8 @@ class GuardWorker(
                         scanned++
                         val recentlyDownloaded =
                             (System.currentTimeMillis() - apk.file.lastModified()) < 30 * 60 * 1000L
-                        uploaded += handleResult(
-                            apk, result, uploadEnabled, serverUrl,
+                        handleResult(
+                            apk, result,
                             allowSafeNotification = recentlyDownloaded,
                             suspiciousAsPopup = recentlyDownloaded
                         )
@@ -172,8 +167,8 @@ class GuardWorker(
                     // qayta SHA-256/ZIP/DEX bilan skanlanib telefon qizib turardi (anti-qizish fiksini
                     // bekor qiladi). Shtamp faqat baza HAQIQATAN o'zgarsa yangilanadi — uни CloudBlacklist
                     // (real merge bo'lsa) va APK versiyasi (versionCode shtampда) hal qiladi.
-                    Log.d(TAG, "Full sweep: ${apks.size} APKs, new=$scanned, uploaded=$uploaded")
-                    Result.success(workDataOf("scanned" to scanned, "uploaded" to uploaded))
+                    Log.d(TAG, "Full sweep: ${apks.size} APKs, new=$scanned")
+                    Result.success(workDataOf("scanned" to scanned))
                 }
 
                 // 3) Bir martalik tezkor skan (ekran ochilishi / Telegram "skan") — mtime bo'yicha top 10.
@@ -193,7 +188,6 @@ class GuardWorker(
                         addAll(prefs.getStringSet("unlock_warned", emptySet()) ?: emptySet())
                     }
                     val now = System.currentTimeMillis()
-                    var uploaded = 0
                     for (item in list.take(10)) {
                         if (isStopped) break  // Worker to'xtatilsa qolgan skanlarni to'xtatamiz
                         if (!item.file.exists()) continue
@@ -205,8 +199,8 @@ class GuardWorker(
                         val key = "${item.file.absolutePath}|${item.file.lastModified()}|${item.file.length()}"
                         val alreadyWarned = !warned.add(key)
                         val recentlyDownloaded = (now - item.file.lastModified()) < 30 * 60 * 1000L
-                        uploaded += handleResult(
-                            item, result, uploadEnabled, serverUrl,
+                        handleResult(
+                            item, result,
                             allowSafeNotification = false,
                             // Eski (yangi yuklanmagan) SUSPICIOUS → jim bildirishnoma, popup emas.
                             suspiciousAsPopup = recentlyDownloaded,
@@ -222,8 +216,8 @@ class GuardWorker(
                     }
                     val capped = if (stillExistsWarned.size > 2000) stillExistsWarned.take(2000).toHashSet() else stillExistsWarned.toHashSet()
                     prefs.edit().putStringSet("unlock_warned", capped).apply()
-                    Log.d(TAG, "Quick scan: ${list.size} found, uploaded=$uploaded")
-                    Result.success(workDataOf("scanned" to list.size, "uploaded" to uploaded))
+                    Log.d(TAG, "Quick scan: ${list.size} found")
+                    Result.success(workDataOf("scanned" to list.size))
                 }
             }
         } catch (ce: kotlinx.coroutines.CancellationException) {
@@ -237,7 +231,7 @@ class GuardWorker(
     }
 
     /**
-     * Bitta skan natijasini qayta ishlash. Qaytaradi: serverga yuklangan fayllar soni (0/1).
+     * Bitta skan natijasini qayta ishlash.
      *
      * DANGER + "delete" rejimi → ekran qulflangan bo'lsa ham fonida darhol karantinga
      * ko'chiramiz (AutoScanActivity'ning 2.5s auto-delete'i faqat ekran ochiq bo'lsa
@@ -258,8 +252,6 @@ class GuardWorker(
     private fun handleResult(
         item: ApkItem,
         result: ScanResult,
-        uploadEnabled: Boolean,
-        serverUrl: String,
         allowSafeNotification: Boolean,
         // SUSPICIOUS uchun OYNA ko'rsatilsinmi? Real-time/tezkor skanda — ha (yangi aniqlangan).
         // To'liq periodik sweep'da esa faqat YANGI yuklab olingan fayl uchun — aks holda antivirus
@@ -270,24 +262,13 @@ class GuardWorker(
         // skan SHU fayl uchun allaqachon ogohlantirgan bo'lsa — har unlock'da qayta popup/tovush
         // chiqmasin (xavfsizlik buzilmaydi: fayl o'sha-o'sha holatda).
         suppressAlerts: Boolean = false
-    ): Int {
-        var uploaded = 0
+    ) {
         val autoDelete = result.verdict == ScanResult.Verdict.DANGER &&
             Config.getAutoDeleteMode(applicationContext) == "delete"
         val shouldAlert = result.verdict == ScanResult.Verdict.DANGER ||
             result.verdict == ScanResult.Verdict.SUSPICIOUS
 
         if (autoDelete) {
-            // Avval upload (agar yoqilgan) — fayl karantinga ketgach asl yo'l yo'qoladi.
-            if (uploadEnabled) {
-                try {
-                    val ok = ServerUpload.uploadApk(serverUrl, item.file, item.name)
-                    if (ok) uploaded++
-                } catch (e: Exception) {
-                    Log.w(TAG, "Upload error", e)
-                }
-            }
-
             val q = Quarantine.quarantine(
                 applicationContext,
                 item.file,
@@ -340,15 +321,6 @@ class GuardWorker(
                     Log.w(TAG, "suspicious notification failed", e)
                 }
             }
-
-            if (uploadEnabled && result.verdict == ScanResult.Verdict.DANGER) {
-                try {
-                    val ok = ServerUpload.uploadApk(serverUrl, item.file, item.name)
-                    if (ok) uploaded++
-                } catch (e: Exception) {
-                    Log.w(TAG, "Upload error", e)
-                }
-            }
         } else if (allowSafeNotification) {
             // SAFE + yangi yuklab olingan → "tekshirildi, xavfsiz" bildirishnomasi.
             try {
@@ -359,7 +331,6 @@ class GuardWorker(
                 Log.w(TAG, "found-apk notification failed", e)
             }
         }
-        return uploaded
     }
 
     /**

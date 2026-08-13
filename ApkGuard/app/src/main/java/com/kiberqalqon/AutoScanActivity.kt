@@ -69,9 +69,6 @@ class AutoScanActivity : AppCompatActivity() {
     // после finish() и крашат app на binding.* (Activity destroyed but view accessed).
     private val handler = Handler(Looper.getMainLooper())
 
-    /** True после того как scan завершился и результат показан — для разрешения back. */
-    private var resultShown = false
-
     /** Skan jarayoni halqasini boshqaradigan animator (0..90%, natijada 100%). */
     private var progressAnimator: ValueAnimator? = null
 
@@ -206,7 +203,6 @@ class AutoScanActivity : AppCompatActivity() {
         scope.coroutineContext.cancelChildren()
         progressAnimator?.cancel()
 
-        resultShown = false
         lastResult = null
         apkPath = incomingPath
         apkName = intent.getStringExtra("apk_name") ?: getString(R.string.autoscan_unknown_file)
@@ -436,7 +432,6 @@ class AutoScanActivity : AppCompatActivity() {
                 VoiceVerdict.init(this)
                 VoiceVerdict.speak(this, v)
             } catch (_: Throwable) {}
-            resultShown = true
         } catch (e: Throwable) {
             android.util.Log.e("AutoScanActivity", "presentResult crashed", e)
             // Не убиваем Activity — показываем минимальное сообщение через Toast.
@@ -903,7 +898,6 @@ class AutoScanActivity : AppCompatActivity() {
             VoiceVerdict.init(this)
             VoiceVerdict.speak(this, ScanResult.Verdict.DANGER)
         } catch (_: Throwable) {}
-        resultShown = true
     }
 
     private fun showSafeResult() {
@@ -1313,7 +1307,12 @@ class AutoScanActivity : AppCompatActivity() {
         if (apkIsCopy) return true
         val p = apkPath ?: return false
         return try {
-            p.startsWith(cacheDir.absolutePath) || p.contains("/cache/")
+            // FAQAT o'z kesh papkamizdagi fayl scratch-nusxa. Umumiy "/cache/" tekshiruvi
+            // XATO edi (ScanResultActivity'da allaqachon tuzatilgan sabab bilan): Telegram
+            // keshidagi REAL o'chirilgan fayl uchun "nusxa o'chirildi, asl qoldi" degan
+            // yolg'on ogohlantirish chiqarardi.
+            p.startsWith(cacheDir.absolutePath) ||
+                (externalCacheDir?.absolutePath?.let { p.startsWith(it) } == true)
         } catch (_: Throwable) {
             false
         }

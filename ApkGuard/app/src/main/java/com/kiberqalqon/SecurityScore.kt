@@ -121,8 +121,14 @@ object SecurityScore {
 
         val dangerCount = try {
             // Kunlik re-scan (InstalledAppsRescanWorker) yozgan oxirgi verdiktlar.
+            // MUHIM: faqat HOZIR o'rnatilgan paketlarni sanaymiz — o'chirilgan ilovaning
+            // eski DANGER kaliti (PackageInstallReceiver tozalashi o'tkazib yuborilgan
+            // bo'lsa ham) ballni abadiy pasaytirmasligi kerak.
             val prefs = ctx.getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
-            prefs.all.count { (k, v) -> k.startsWith("verdict_") && v == "DANGER" }
+            val pm = ctx.packageManager
+            prefs.all.count { (k, v) ->
+                k.startsWith("verdict_") && v == "DANGER" && isInstalled(pm, k.removePrefix("verdict_"))
+            }
         } catch (_: Throwable) { 0 }
 
         val remoteCount = try {
@@ -141,5 +147,12 @@ object SecurityScore {
             vpnFilter = Config.isVpnFilterEnabled(ctx),
             usbDebugging = adbOn,
         )
+    }
+
+    private fun isInstalled(pm: android.content.pm.PackageManager, pkg: String): Boolean {
+        return try {
+            pm.getApplicationInfo(pkg, 0)
+            true
+        } catch (_: Throwable) { false }
     }
 }

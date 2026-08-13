@@ -28,6 +28,9 @@ class PinLockActivity : AppCompatActivity() {
 
     private var verifyMode = true      // false = "set"
     private var firstEntry: String? = null   // "set" rejimida 1-kiritish
+    // "set" rejimida PIN allaqachon o'rnatilgan bo'lsa — AVVAL eski PIN so'raladi.
+    // Aks holda qulflanmagan telefonni ushlagan har kim PIN'ni jimgina almashtira olardi.
+    private var needOldPin = false
     private val entered = StringBuilder()
 
     private lateinit var titleView: TextView
@@ -49,6 +52,7 @@ class PinLockActivity : AppCompatActivity() {
         if (verifyMode && !PinStore.isSet(this)) {
             setResult(RESULT_OK); finish(); return
         }
+        needOldPin = !verifyMode && PinStore.isSet(this)
 
         setContentView(buildUi())
         updateUi()
@@ -143,11 +147,35 @@ class PinLockActivity : AppCompatActivity() {
         entered.setLength(0)
         updateDots()
 
+        // Backoff: PIN tekshiriladigan bosqichlarda (verify / eski PIN) qulf faolmi.
+        if (verifyMode || needOldPin) {
+            val lockMs = PinStore.lockedRemainingMs(this)
+            if (lockMs > 0) {
+                toast("Juda ko'p urinish. ${(lockMs / 1000) + 1} soniyadan keyin qayta urining.")
+                return
+            }
+        }
+
         if (verifyMode) {
             if (PinStore.verify(this, pin)) {
+                PinStore.resetFails(this)
                 setResult(RESULT_OK); finish()
             } else {
+                PinStore.recordFail(this)
                 toast("PIN noto'g'ri. Qaytadan urinib ko'ring.")
+            }
+            return
+        }
+
+        // "set" rejimida avval ESKI PIN tasdig'i (agar o'rnatilgan bo'lsa).
+        if (needOldPin) {
+            if (PinStore.verify(this, pin)) {
+                PinStore.resetFails(this)
+                needOldPin = false
+                updateUi()
+            } else {
+                PinStore.recordFail(this)
+                toast("Joriy PIN noto'g'ri.")
             }
             return
         }
@@ -172,6 +200,9 @@ class PinLockActivity : AppCompatActivity() {
         if (verifyMode) {
             titleView.text = "Qulfni oching"
             subtitleView.text = "UzGuard PIN kodini kiriting"
+        } else if (needOldPin) {
+            titleView.text = "Joriy PIN'ni kiriting"
+            subtitleView.text = "PIN'ni o'zgartirish uchun avval eskisini tasdiqlang"
         } else if (firstEntry == null) {
             titleView.text = "Yangi PIN o'rnating"
             subtitleView.text = "4 xonali PIN o'ylab toping"

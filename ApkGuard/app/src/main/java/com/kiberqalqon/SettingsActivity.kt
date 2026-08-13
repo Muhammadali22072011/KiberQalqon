@@ -10,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.SwitchCompat
 import com.uzguard.databinding.ActivityAboutBinding
 import com.uzguard.databinding.ActivitySettingsNewBinding
@@ -50,8 +49,12 @@ class SettingsActivity : AppCompatActivity() {
             VpnFilterService.start(this)
             toastSaved()
         } else {
-            // Ruxsat berilmadi — toggle'ni qaytaramiz, Config'ga yozilmaydi.
+            // Ruxsat berilmadi — toggle'ni LISTENER'NI ISHGA TUSHIRMASDAN qaytaramiz.
+            // Aks holda o'chirish-listener'i PIN so'rardi (hech qachon yoqilmagan filtr
+            // uchun!) va PIN bekor qilinsa toggle yolg'on ON holatda qolib ketardi.
+            ready = false
             toggleOf(binding.rowVpnFilter.root).isChecked = false
+            ready = true
             Toast.makeText(this, getString(R.string.kq4_vpn_perm_denied), Toast.LENGTH_SHORT).show()
         }
     }
@@ -78,6 +81,14 @@ class SettingsActivity : AppCompatActivity() {
         wireListeners()
         bindConsentSection()
         applyOwnerRowsVisibility()
+
+        // Play flavor: notification-listener yo'q (BuildConfig.NOTIF_LISTENER=false,
+        // xizmat manifest'dan olib tashlangan) — anti-fishing qatori "zombi" bo'lib
+        // qolmasin (doim OFF ko'rinib, yoqilgach jim qaytib tushardi): butunlay yashiramiz.
+        if (!BuildConfig.NOTIF_LISTENER) {
+            binding.rowPhishing.root.visibility = View.GONE
+            binding.divPhishing.visibility = View.GONE
+        }
 
         KqBottomNav.attach(this, KqBottomNav.Tab.SETTINGS)
 
@@ -117,32 +128,6 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_phishing_sub),
             icon = R.drawable.ic4_message,
         )
-        bindRow(
-            binding.rowBackground.root,
-            title = getString(R.string.kq4_set_row_background_title),
-            sub = getString(R.string.kq4_set_row_background_sub),
-            icon = R.drawable.ic4_refresh,
-        )
-        bindRow(
-            binding.rowUpload.root,
-            title = getString(R.string.set_row_upload_title),
-            sub = getString(R.string.set_row_upload_sub),
-            icon = R.drawable.ic4_download,
-        )
-        // QO'SHIMCHA — haftalik hisobot bildirishnomasi.
-        bindRow(
-            binding.rowWeeklyReport.root,
-            title = getString(R.string.kq4_set_row_weekly),
-            sub = getString(R.string.kq4_set_row_weekly_sub),
-            icon = R.drawable.ic4_chart,
-        )
-        // QO'SHIMCHA — Yangilik bildirishnomalari (panel e'lonlari → push).
-        bindRow(
-            binding.rowNewsNotif.root,
-            title = getString(R.string.kq4_set_row_newsnotif),
-            sub = getString(R.string.kq4_set_row_newsnotif_sub),
-            icon = R.drawable.ic4_bell,
-        )
         // QO'SHIMCHA — DNS C2-filtri (tajribaviy, opt-in).
         bindRow(
             binding.rowVpnFilter.root,
@@ -157,20 +142,6 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_linkguard_sub),
             icon = R.drawable.ic4_link,
         )
-        // QO'SHIMCHA — Wi-Fi straj (ochiq tarmoq ogohlantirishi).
-        bindRow(
-            binding.rowWifiGuard.root,
-            title = getString(R.string.kq4_set_row_wifiguard),
-            sub = getString(R.string.kq4_set_row_wifiguard_sub),
-            icon = R.drawable.ic4_wifi,
-        )
-        // QO'SHIMCHA — Masofaviy boshqaruv ogohlantirgichi (AnyDesk/TeamViewer).
-        bindRow(
-            binding.rowRemoteAccess.root,
-            title = getString(R.string.kq4_set_row_remote),
-            sub = getString(R.string.kq4_set_row_remote_sub),
-            icon = R.drawable.ic4_alert,
-        )
         // QO'SHIMCHA — Uyg'otuvchi signal (baland sirena tunda topilgan tahdidda).
         bindRow(
             binding.rowLoudAlarm.root,
@@ -178,13 +149,10 @@ class SettingsActivity : AppCompatActivity() {
             sub = getString(R.string.kq4_set_row_alarm_sub),
             icon = R.drawable.ic4_bell,
         )
-        // QO'SHIMCHA — Ilova yangilanishi bildirishnomasi (sideload "tekshirildi ✅").
-        bindRow(
-            binding.rowAppUpdate.root,
-            title = getString(R.string.kq4_set_row_appupdate),
-            sub = getString(R.string.kq4_set_row_appupdate_sub),
-            icon = R.drawable.ic4_shield_check,
-        )
+        // "Toza dastur" (2026-08-13): auto-yangilanish / haftalik hisobot / yangilik push /
+        // Wi-Fi straj / masofaviy boshqaruv / "ilova yangilandi" tumblerlari OLIB TASHLANDI —
+        // bu funksiyalar endi doim yoqiq (Config'da hardcode true). Server upload (Gen-1)
+        // butunlay o'chirildi.
         // QO'SHIMCHA — Ishonchli ro'yxat (UserWhitelist boshqaruvi).
         bindChevronWithSub(
             binding.rowTrustList.root,
@@ -241,9 +209,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun labelChevronRows() {
-        // HAQIDA
+        // HAQIDA ("Yordam" qatori olib tashlandi — "Muammo haqida xabar" bilan bitta oynani ochardi).
         bindChevron(binding.rowAbout.root, getString(R.string.about_title), R.drawable.ic4_heart)
-        bindChevron(binding.rowHelp.root, getString(R.string.set_help_center), R.drawable.ic4_help)
         bindChevron(binding.rowReportProblem.root, getString(R.string.kq4_set_row_report), R.drawable.ic4_alert)
         // QO'SHIMCHA — flagman ekranlar + maxfiylik + boshqaruv paneli.
         bindChevron(binding.rowHiddenThreats.root, getString(R.string.kq4_set_row_hidden), R.drawable.ic4_eye)
@@ -285,12 +252,8 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.kq4_set_row_scamcheck_sub),
             R.drawable.ic4_alert,
         )
-        bindChevronWithSub(
-            binding.rowCheckup.root,
-            getString(R.string.kq4_set_row_checkup),
-            getString(R.string.kq4_set_row_checkup_sub),
-            R.drawable.ic4_shield_check,
-        )
+        // "30 soniyalik tekshiruv" (CheckupWizard) olib tashlandi — Xavfsizlik balli
+        // ekrani bilan to'liq dublikat edi.
         bindChevronWithSub(
             binding.rowFamilyGuard.root,
             getString(R.string.kq4_set_row_family),
@@ -335,20 +298,9 @@ class SettingsActivity : AppCompatActivity() {
         toggleOf(binding.rowAutoScan.root).isChecked = Config.isBackgroundEnabled(this)
         toggleOf(binding.rowAutoDelete.root).isChecked = Config.getAutoDeleteMode(this) == "delete"
         toggleOf(binding.rowPhishing.root).isChecked = Config.isPhishingBlockerEnabled(this)
-        toggleOf(binding.rowBackground.root).isChecked = Config.isAutoUpdateEnabled(this)
-        toggleOf(binding.rowUpload.root).isChecked = Config.isUploadEnabled(this)
-        toggleOf(binding.rowWeeklyReport.root).isChecked = Config.isWeeklyReportEnabled(this)
-        toggleOf(binding.rowNewsNotif.root).isChecked = Config.isNewsNotificationEnabled(this)
         toggleOf(binding.rowVpnFilter.root).isChecked = Config.isVpnFilterEnabled(this)
         toggleOf(binding.rowLinkGuard.root).isChecked = Config.isLinkGuardEnabled(this)
-        toggleOf(binding.rowWifiGuard.root).isChecked = Config.isWifiGuardEnabled(this)
-        toggleOf(binding.rowRemoteAccess.root).isChecked = Config.isRemoteAccessAlertEnabled(this)
         toggleOf(binding.rowLoudAlarm.root).isChecked = Config.isLoudAlarmEnabled(this)
-        toggleOf(binding.rowAppUpdate.root).isChecked = Config.isAppUpdateNotifyEnabled(this)
-
-        // Server URL display
-        val url = Config.getServerUrl(this).ifBlank { getString(R.string.settings_server_url_example) }
-        binding.etServerUrl.text = url
 
         // Theme segmented switch
         applyThemeSegmentUi(isDark = ThemeHelper.isDarkTheme(this))
@@ -395,20 +347,63 @@ class SettingsActivity : AppCompatActivity() {
         toastSaved()
     }
 
-    /** PIN natijasi — himoyani o'chirish so'rovi tasdiqlanganда qo'llaymiz; aks holda tumblerni qaytaramiz. */
+    // PIN-gate: himoya sozlamasini O'CHIRISH oldidan PIN so'raladi (o'rnatilgan bo'lsa).
+    // Avval faqat fon-himoya tumbleri gate'lanardi — firibgar "VPN'ni o'chiring, avto-
+    // o'chirishni o'chiring" deb qolgan tumblerlarni bemalol o'chirtira olardi.
+    private var pendingPinAction: (() -> Unit)? = null
+    private var pendingPinRevert: (() -> Unit)? = null
+
+    private fun requirePinThen(revert: () -> Unit, action: () -> Unit) {
+        if (!PinStore.isSet(this)) { action(); return }
+        pendingPinAction = action
+        pendingPinRevert = revert
+        startActivityForResult(
+            Intent(this, PinLockActivity::class.java)
+                .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_VERIFY),
+            RC_PIN_PROTECT,
+        )
+    }
+
+    /** PIN natijasi: tasdiqlansa kutayotgan amal bajariladi, aks holda tumbler qaytariladi. */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_PIN_PROTECT) {
-            if (resultCode == RESULT_OK) {
-                applyBackgroundEnabled(false)
-            } else {
-                // Bekor qilindi / noto'g'ri PIN — himoya YOQILGAN qoladi, tumblerni qaytaramiz
-                // (ready=false bilan listenerni qayta ishga tushirmasdan).
-                ready = false
-                toggleOf(binding.rowAutoScan.root).isChecked = true
-                ready = true
+        when (requestCode) {
+            RC_PIN_PROTECT -> {
+                if (resultCode == RESULT_OK) {
+                    pendingPinAction?.invoke()
+                } else {
+                    // Bekor qilindi / noto'g'ri PIN — sozlama YOQILGAN qoladi, tumblerni
+                    // qaytaramiz (ready=false bilan listenerni qayta ishga tushirmasdan).
+                    ready = false
+                    pendingPinRevert?.invoke()
+                    ready = true
+                }
+                pendingPinAction = null
+                pendingPinRevert = null
+            }
+            RC_PIN_DISABLE -> {
+                if (resultCode == RESULT_OK) {
+                    PinStore.clear(this)
+                    Toast.makeText(this, getString(R.string.kq4_pin_disabled), Toast.LENGTH_SHORT).show()
+                    refreshPinRowSub()
+                }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // PIN o'rnatish/o'zgartirish ekranidan qaytganda subtitr yangilansin.
+        if (ready) refreshPinRowSub()
+    }
+
+    private fun refreshPinRowSub() {
+        bindChevronWithSub(
+            binding.rowPinLock.root,
+            getString(R.string.kq4_set_row_pin),
+            getString(if (PinStore.isSet(this)) R.string.kq4_set_row_pin_on else R.string.kq4_set_row_pin_sub),
+            R.drawable.ic4_lock,
+        )
     }
 
     /**
@@ -444,54 +439,47 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun wireListeners() {
-        // Each HIMOYA toggle → immediate Config save.
+        // Each HIMOYA toggle → immediate Config save. Har bir himoya tumblerini
+        // O'CHIRISH PIN ostida (firibgar skripti "antivirusni o'chiring"ni buzish uchun).
         toggleOf(binding.rowAutoScan.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
-            // Himoya qulfi: himoyani O'CHIRISHdan oldin PIN so'raymiz (agar o'rnatilgan bo'lsa).
-            // Firibgar qo'ng'irog'i skripti aynan "antivirusni o'chiring" bilan boshlanadi — PIN
-            // shu 5 soniyalik qadamni oila a'zosiga qo'ng'iroqqa aylantirib, skriptni buzadi.
-            // Tasdiqlanmaguncha qo'llanmaydi (natija onActivityResult'da) — tumblerni qaytaramiz.
-            if (!on && PinStore.isSet(this)) {
-                startActivityForResult(
-                    Intent(this, PinLockActivity::class.java)
-                        .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_VERIFY),
-                    RC_PIN_PROTECT,
-                )
-                return@setOnCheckedChangeListener
+            if (!on) {
+                requirePinThen(revert = { toggleOf(binding.rowAutoScan.root).isChecked = true }) {
+                    applyBackgroundEnabled(false)
+                }
+            } else {
+                applyBackgroundEnabled(true)
             }
-            applyBackgroundEnabled(on)
         }
         toggleOf(binding.rowAutoDelete.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
-            Config.setAutoDeleteMode(this, if (on) "delete" else "warn")
-            toastSaved()
+            if (!on) {
+                requirePinThen(revert = { toggleOf(binding.rowAutoDelete.root).isChecked = true }) {
+                    Config.setAutoDeleteMode(this, "warn")
+                    toastSaved()
+                }
+            } else {
+                Config.setAutoDeleteMode(this, "delete")
+                toastSaved()
+            }
         }
         toggleOf(binding.rowPhishing.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
-            Config.setPhishingBlockerEnabled(this, on)
-            toastSaved()
-        }
-        toggleOf(binding.rowBackground.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setAutoUpdateEnabled(this, on)
-            toastSaved()
-        }
-        toggleOf(binding.rowUpload.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setUploadEnabled(this, on)
-            toastSaved()
-        }
-        toggleOf(binding.rowWeeklyReport.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setWeeklyReportEnabled(this, on)
-            toastSaved()
-        }
-        toggleOf(binding.rowNewsNotif.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setNewsNotificationEnabled(this, on)
-            // Ekran o'chiq / Doze yetkazish uyg'otish zanjirini yoqamiz/bekor qilamiz.
-            NewsNotifier.scheduleNext(this)
-            toastSaved()
+            if (!on) {
+                requirePinThen(revert = { toggleOf(binding.rowPhishing.root).isChecked = true }) {
+                    Config.setPhishingBlockerEnabled(this, false)
+                    toastSaved()
+                }
+            } else {
+                Config.setPhishingBlockerEnabled(this, true)
+                toastSaved()
+                // KEY GAP fix: listener uchun bildirishnoma-kirish ruxsati hech qayerda
+                // so'ralmasdi — toggle yoqiq bo'lsa ham xizmat hech qachon bind bo'lmasdi.
+                // Endi yoqishda ruxsat yo'q bo'lsa tizim ekraniga yo'naltiramiz.
+                if (BuildConfig.NOTIF_LISTENER && !isNotifListenerGranted()) {
+                    showPhishingAccessDialog()
+                }
+            }
         }
         toggleOf(binding.rowVpnFilter.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
@@ -506,46 +494,41 @@ class SettingsActivity : AppCompatActivity() {
                     vpnPermissionLauncher.launch(prepare)
                 }
             } else {
-                Config.setVpnFilterEnabled(this, false)
-                VpnFilterService.stop(this)
-                toastSaved()
+                requirePinThen(revert = { toggleOf(binding.rowVpnFilter.root).isChecked = true }) {
+                    Config.setVpnFilterEnabled(this, false)
+                    VpnFilterService.stop(this)
+                    toastSaved()
+                }
             }
         }
         toggleOf(binding.rowLinkGuard.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
-            Config.setLinkGuardEnabled(this, on)
-            toastSaved()
-            // Yoqilganda — foydalanuvchiga bizni standart havola ochuvchi qilishni eslatamiz
-            // (interceptor faqat shunda ishlaydi).
-            if (on) showLinkGuardSetupDialog()
-        }
-        toggleOf(binding.rowWifiGuard.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setWifiGuardEnabled(this, on)
-            toastSaved()
-        }
-        toggleOf(binding.rowRemoteAccess.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setRemoteAccessAlertEnabled(this, on)
-            toastSaved()
+            if (!on) {
+                requirePinThen(revert = { toggleOf(binding.rowLinkGuard.root).isChecked = true }) {
+                    Config.setLinkGuardEnabled(this, false)
+                    toastSaved()
+                }
+            } else {
+                Config.setLinkGuardEnabled(this, true)
+                toastSaved()
+                // Yoqilganda — foydalanuvchiga bizni standart havola ochuvchi qilishni eslatamiz
+                // (interceptor faqat shunda ishlaydi).
+                showLinkGuardSetupDialog()
+            }
         }
         toggleOf(binding.rowLoudAlarm.root).setOnCheckedChangeListener { _, on ->
             if (!ready) return@setOnCheckedChangeListener
-            Config.setLoudAlarmEnabled(this, on)
-            if (!on) { try { AlarmSiren.stop() } catch (_: Throwable) {} }
-            toastSaved()
+            if (!on) {
+                requirePinThen(revert = { toggleOf(binding.rowLoudAlarm.root).isChecked = true }) {
+                    Config.setLoudAlarmEnabled(this, false)
+                    try { AlarmSiren.stop() } catch (_: Throwable) {}
+                    toastSaved()
+                }
+            } else {
+                Config.setLoudAlarmEnabled(this, true)
+                toastSaved()
+            }
         }
-        toggleOf(binding.rowAppUpdate.root).setOnCheckedChangeListener { _, on ->
-            if (!ready) return@setOnCheckedChangeListener
-            Config.setAppUpdateNotifyEnabled(this, on)
-            toastSaved()
-        }
-
-        // Server URL → edit dialog. Привязываем клик ко ВСЕМУ ряду (rowServerUrl),
-        // не только к маленькому TextView c URL — раньше тап на иконку или пустую
-        // область строки не работал.
-        binding.rowServerUrl.setOnClickListener { showServerUrlDialog() }
-        binding.etServerUrl.setOnClickListener { showServerUrlDialog() }
 
         // Theme segmented switch (sun/moon piktogramma tugmalar).
         binding.segThemeLight.setOnClickListener {
@@ -575,7 +558,6 @@ class SettingsActivity : AppCompatActivity() {
 
         // HAQIDA rows.
         binding.rowAbout.root.setOnClickListener { showAboutOverlay() }
-        binding.rowHelp.root.setOnClickListener { openReportProblem() }
         binding.rowReportProblem.root.setOnClickListener { openReportProblem() }
 
         // QO'SHIMCHA rows — flagman ekranlar (UX-03: Sozlamalardan ochiladi).
@@ -604,16 +586,34 @@ class SettingsActivity : AppCompatActivity() {
         binding.rowScamCheck.root.setOnClickListener {
             startActivity(Intent(this, ScamMessageActivity::class.java))
         }
-        binding.rowCheckup.root.setOnClickListener {
-            startActivity(Intent(this, CheckupWizardActivity::class.java))
-        }
         binding.rowFamilyGuard.root.setOnClickListener {
             startActivity(Intent(this, FamilyGuardActivity::class.java))
         }
-        // Himoya qulfi: PIN o'rnatish/o'zgartirish (PinLockActivity "set" rejimi).
+        // Himoya qulfi: o'rnatilmagan bo'lsa — yangi PIN; o'rnatilgan bo'lsa —
+        // o'zgartirish (eski PIN so'raladi, PinLockActivity ichida) yoki O'CHIRISH
+        // (avval PIN tasdig'i). Avval PIN'ni o'chirish umuman MUMKIN EMAS edi
+        // (PinStore.clear hech qayerdan chaqirilmasdi).
         binding.rowPinLock.root.setOnClickListener {
-            startActivity(Intent(this, PinLockActivity::class.java)
-                .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_SET))
+            if (!PinStore.isSet(this)) {
+                startActivity(Intent(this, PinLockActivity::class.java)
+                    .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_SET))
+                return@setOnClickListener
+            }
+            AlertDialog.Builder(this)
+                .setTitle(R.string.kq4_set_row_pin)
+                .setItems(arrayOf(getString(R.string.kq4_pin_change), getString(R.string.kq4_pin_disable))) { _, which ->
+                    when (which) {
+                        0 -> startActivity(Intent(this, PinLockActivity::class.java)
+                            .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_SET))
+                        1 -> startActivityForResult(
+                            Intent(this, PinLockActivity::class.java)
+                                .putExtra(PinLockActivity.EXTRA_MODE, PinLockActivity.MODE_VERIFY),
+                            RC_PIN_DISABLE,
+                        )
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
         binding.rowLimits.root.setOnClickListener {
             startActivity(Intent(this, LimitsActivity::class.java))
@@ -637,8 +637,6 @@ class SettingsActivity : AppCompatActivity() {
      */
     private fun applyOwnerRowsVisibility() {
         val v = if (Config.isOwnerUiEnabled(this)) View.VISIBLE else View.GONE
-        binding.rowServerUrl.visibility = v
-        binding.divServerUrl.visibility = v
         binding.rowTelegram.root.visibility = v
         binding.divTelegram.visibility = v
         binding.rowAdminPanel.root.visibility = v
@@ -762,23 +760,23 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun showServerUrlDialog() {
-        val input = AppCompatEditText(this).apply {
-            setText(Config.getServerUrl(this@SettingsActivity))
-            setSelection(text?.length ?: 0)
-        }
+    /** Anti-fishing listener'iga bildirishnoma-kirish berilganmi. */
+    private fun isNotifListenerGranted(): Boolean = try {
+        androidx.core.app.NotificationManagerCompat.getEnabledListenerPackages(this)
+            .contains(packageName)
+    } catch (_: Throwable) { false }
+
+    /** Anti-fishing uchun tizim "Bildirishnoma kirishi" ekranini taklif qiladi. */
+    private fun showPhishingAccessDialog() {
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.settings_server_url_label))
-            .setView(input)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val v = input.text?.toString()?.trim().orEmpty()
-                if (v.isNotBlank()) {
-                    Config.setServerUrl(this, v)
-                    binding.etServerUrl.text = v
-                    toastSaved()
-                }
+            .setTitle(R.string.kq4_phishing_access_title)
+            .setMessage(R.string.kq4_phishing_access_msg)
+            .setPositiveButton(R.string.kq4_phishing_access_open) { _, _ ->
+                try {
+                    startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                } catch (_: Throwable) {}
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setNegativeButton(R.string.kq4_btn_later, null)
             .show()
     }
 
@@ -857,7 +855,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     companion object {
-        // Himoyani o'chirish oldidan PIN tekshiruvi natijasi.
+        // Himoya sozlamasini o'chirish oldidan PIN tekshiruvi natijasi.
         private const val RC_PIN_PROTECT = 0x9101
+        // PIN'ni butunlay o'chirish oldidan tasdiq.
+        private const val RC_PIN_DISABLE = 0x9102
     }
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Регистрация» — шлагбаум перед главным экраном (TgRegisterActivity), через Telegram-бота.
+-->
+<resources>
+    <string name="kq4_tgreg_eyebrow">РЕГИСТРАЦИЯ</string>
+    <string name="kq4_tgreg_title">Добро пожаловать в UzGuard</string>
+    <string name="kq4_tgreg_sub">Перед включением защиты пройдите разовую регистрацию — это займёт 30 секунд.</string>
+
+    <string name="kq4_tgreg_steps_title">Как это будет</string>
+    <string name="kq4_tgreg_steps">1. Нажимаете кнопку — откроется Telegram.\n2. Бот спросит ваше имя.\n3. Нажимаете «Отправить номер».\n4. Возвращаетесь в приложение — защита включается.</string>
+
+    <string name="kq4_tgreg_privacy_title">Ваши данные</string>
+    <string name="kq4_tgreg_privacy">Сохраняются имя и номер телефона. Они используются только для оповещений о вирусах и новостей приложения. Третьим лицам не передаются и для рекламы не используются.</string>
+
+    <string name="kq4_tgreg_btn">Зарегистрироваться через Telegram</string>
+    <string name="kq4_tgreg_open_again">Открыть Telegram снова</string>
+    <string name="kq4_tgreg_refresh">Проверить</string>
+
+    <string name="kq4_tgreg_waiting_hint">Напишите в Telegram своё имя и отправьте номер. После этого вернитесь сюда — приложение продолжит само.</string>
+
+    <!-- Статус -->
+    <string name="kq4_tgreg_preparing">Подготовка…</string>
+    <string name="kq4_tgreg_waiting">Ждём ваш ответ в Telegram…</string>
+    <string name="kq4_tgreg_checking">Проверяем…</string>
+    <string name="kq4_tgreg_step_name">Напишите в боте своё имя…</string>
+    <string name="kq4_tgreg_step_phone">Нажмите в боте «Отправить номер»…</string>
+    <string name="kq4_tgreg_ok">✓ Регистрация завершена</string>
+
+    <!-- Ошибки -->
+    <string name="kq4_tgreg_err_net">Нет интернета — попробуйте снова</string>
+    <string name="kq4_tgreg_err_no_telegram">Telegram не найден. Сначала установите приложение Telegram.</string>
+    <string name="kq4_tgreg_err_unconfigured">Сервис временно недоступен</string>
+    <string name="kq4_tgreg_err_generic">Не удалось зарегистрироваться — попробуйте снова</string>
+</resources>

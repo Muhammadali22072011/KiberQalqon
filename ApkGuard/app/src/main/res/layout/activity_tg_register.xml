@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Ro'yxatdan o'tish» shlagbaumi (TgRegisterActivity). Bosh ekrandan oldingi oxirgi qadam:
+  foydalanuvchi Telegram boti orqali ismi + tasdiqlangan raqamini yuboradi.
+  ID'lar: btnRegister, btnRefresh, tvWaiting, tvStatus.
+  Orqaga tugmasi YO'Q — bu shlagbaum (TgRegisterActivity.onBackPressed → fon).
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/kq_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="30dp">
+
+        <!-- ═══ Sarlavha ═══ -->
+        <TextView
+            style="@style/KQ4.Eyebrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kq4_tgreg_eyebrow" />
+
+        <TextView
+            style="@style/KQ4.HTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/kq4_tgreg_title"
+            android:textSize="24sp" />
+
+        <TextView
+            style="@style/KQ4.HSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/kq4_tgreg_sub" />
+
+        <!-- ═══ Nima bo'ladi (3 qadam) ═══ -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/KQ4.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/KQ4.SecTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kq4_tgreg_steps_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/onest_regular"
+                    android:lineSpacingMultiplier="1.45"
+                    android:text="@string/kq4_tgreg_steps"
+                    android:textColor="@color/kq_ink_2"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══ Maxfiylik ═══ -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/KQ4.Card.Flat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/KQ4.SecTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kq4_tgreg_privacy_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/onest_regular"
+                    android:lineSpacingMultiplier="1.4"
+                    android:text="@string/kq4_tgreg_privacy"
+                    android:textColor="@color/kq_ink_3"
+                    android:textSize="12.5sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ═══ Asosiy tugma ═══ -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            style="@style/KQ4.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:minHeight="56dp"
+            android:text="@string/kq4_tgreg_btn"
+            android:textSize="16sp" />
+
+        <!-- Telegram ochilgandan keyin ko'rinadi -->
+        <TextView
+            android:id="@+id/tvWaiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/onest_regular"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.4"
+            android:text="@string/kq4_tgreg_waiting_hint"
+            android:textColor="@color/kq_ink_3"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRefresh"
+            style="@style/KQ4.Button.Ghost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:minHeight="50dp"
+            android:text="@string/kq4_tgreg_refresh"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/onest_medium"
+            android:gravity="center"
+            android:text=""
+            android:textColor="@color/kq_ink_2"
+            android:textSize="13.5sp"
+            android:visibility="gone" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { db } from '../../lib/supabase.js';
 import { sendMessage, isAdmin } from '../../lib/telegram.js';
-import { checkTelegramSecret } from '../../lib/auth.js';
+import { checkTelegramSecret, checkTelegramRegSecret } from '../../lib/auth.js';
+import { handleRegUpdate, type TgRegUpdate } from '../../lib/tgreg.js';
 import { formatStats, verdictLabel, escape } from '../../lib/format.js';
 
 type TgUpdate = {
@@ -16,6 +17,22 @@ type TgUpdate = {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();
+
+  // Ikkita bot bitta funksiyada (Hobby 12-funksiya limiti — yangi fayl qo'sha olmaymiz).
+  // Ajratuvchi — webhook URL'idagi ?bot=reg. Sirlar ham ALOHIDA (auth.ts izohiga qarang),
+  // shuning uchun ochiq botning webhook'i egasi buyruqlariga umuman tega olmaydi.
+  if (req.query.bot === 'reg') {
+    if (!checkTelegramRegSecret(req)) return res.status(401).end();
+    try {
+      await handleRegUpdate(req.body as TgRegUpdate);
+    } catch (e) {
+      // Telegram 200'dan boshqa javobni "yetkazilmadi" deb biladi va update'ni
+      // soatlab qayta yuboraveradi → xatoni yutamiz, faqat loglaymiz.
+      console.error(`[webhook:reg] ${(e as Error).message}`);
+    }
+    return res.status(200).json({ ok: true });
+  }
+
   if (!checkTelegramSecret(req)) return res.status(401).end();
 
   const u = req.body as TgUpdate;

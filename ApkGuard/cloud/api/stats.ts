@@ -170,6 +170,125 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  // ?tgreg=1 → TELEGRAM RO'YXATI analitikasi (foydalanuvchilar, voronka, trend).
+  // Alohida funksiya EMAS (Vercel Hobby 12-funksiya limiti) — stats?series=1 uslubidagi branch.
+  // Migratsiyasiz agregatsiya: xom qatorlar o'qilib JS'da hisoblanadi (jadval kichik —
+  // bitta qator = bitta ro'yxatdan o'tish urinishi).
+  //
+  // MAXFIYLIK: telefon raqami — shaxsiy ma'lumot. To'liq raqamni FAQAT EGASI ko'radi;
+  // cheklangan admin niqoblangan ko'rinishni oladi (+99890***1234). Guruh a'zolari
+  // ro'yxatidan farqli o'laroq bu yerda butun foydalanuvchi bazasi turibdi — niqob arzon,
+  // sizib chiqish narxi esa katta.
+  if (req.query.tgreg === '1') {
+    const owner = checkAdminSecret(req);
+    const { data: rows, error: tErr } = await sb
+      .from('tg_registrations')
+      .select('chat_id, tg_username, full_name, phone, step, blocked, created_at, linked_at, done_at, device_token')
+      .order('id', { ascending: false })
+      .limit(20000);
+    if (tErr) { console.error(`[stats] tgreg db error: ${tErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+    type Row = {
+      chat_id: number | null; tg_username: string | null; full_name: string | null;
+      phone: string | null; step: string; blocked: boolean;
+      created_at: string; linked_at: string | null; done_at: string | null;
+      device_token: string | null;
+    };
+    const all = (rows ?? []) as Row[];
+
+    // Voronka — qadamlar KUMULYATIV: /start bosgan hamma "started"da, ismini yozgan
+    // hamma "named"da va h.k. Aks holda "await_phone"dagi 3 kishi tugatganlardan
+    // ko'proqdek ko'rinardi (ular allaqachon o'sha qadamdan o'tgan).
+    const started = all.length;
+    const linked = all.filter((r) => r.step !== 'new').length;                       // Telegram'ni ochdi
+    const named = all.filter((r) => r.step === 'await_phone' || r.step === 'done').length;
+    const done = all.filter((r) => r.step === 'done').length;
+    const blocked = all.filter((r) => r.blocked).length;
+
+    // "Osilib qolgan" — Telegram'ni ochgan, lekin 1 soatdan beri tugatmagan.
+    const hourAgo = Date.now() - 3600 * 1000;
+    const stuck = all.filter(
+      (r) => (r.step === 'await_name' || r.step === 'await_phone') &&
+        new Date(r.linked_at ?? r.created_at).getTime() < hourAgo,
+    ).length;
+
+    // Noyob odamlar (bitta odam bir necha qurilmada ro'yxatdan o'tishi mumkin).
+    const uniqueChats = new Set(all.filter((r) => r.step === 'done' && r.chat_id != null).map((r) => r.chat_id)).size;
+
+    // 14 kunlik trend: boshlanganlar va tugatganlar.
+    const DAYS = 14;
+    const from = new Date();
+    from.setUTCHours(0, 0, 0, 0);
+    from.setUTCDate(from.getUTCDate() - (DAYS - 1));
+    const buckets = new Map<string, { day: string; started: number; done: number }>();
+    for (let i = 0; i < DAYS; i++) {
+      const key = new Date(from.getTime() + i * 86400000).toISOString().slice(0, 10);
+      buckets.set(key, { day: key, started: 0, done: 0 });
+    }
+    for (const r of all) {
+      const b1 = buckets.get(r.created_at.slice(0, 10));
+      if (b1) b1.started++;
+      if (r.done_at) {
+        const b2 = buckets.get(r.done_at.slice(0, 10));
+        if (b2) b2.done++;
+      }
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const todayRow = buckets.get(today) ?? { day: today, started: 0, done: 0 };
+
+    // O'rtacha tugatish vaqti (linked → done), sekundlarda — median.
+    const durations = all
+      .filter((r) => r.done_at && r.linked_at)
+      .map((r) => (new Date(r.done_at!).getTime() - new Date(r.linked_at!).getTime()) / 1000)
+      .filter((s) => s >= 0 && s < 24 * 3600)
+      .sort((a, b) => a - b);
+    const medianSec = durations.length ? Math.round(durations[Math.floor(durations.length / 2)]) : null;
+
+    const mask = (p: string | null): string | null => {
+      if (!p) return null;
+      if (owner) return p;
+      return p.length > 8 ? `${p.slice(0, 6)}***${p.slice(-2)}` : '***';
+    };
+
+    const recent = all
+      .filter((r) => r.step === 'done')
+      .slice(0, 300)
+      .map((r) => ({
+        chat_id: r.chat_id,
+        tg_username: r.tg_username,
+        full_name: r.full_name,
+        phone: mask(r.phone),
+        done_at: r.done_at,
+        blocked: r.blocked,
+        // Qurilma tokeni panelga OCHILMAYDI (u yozuv kaliti) — faqat bog'langanligi.
+        has_device: Boolean(r.device_token),
+      }));
+
+    const pending = all
+      .filter((r) => r.step === 'await_name' || r.step === 'await_phone')
+      .slice(0, 100)
+      .map((r) => ({
+        chat_id: r.chat_id,
+        tg_username: r.tg_username,
+        full_name: r.full_name,
+        step: r.step,
+        linked_at: r.linked_at,
+      }));
+
+    return res.status(200).json({
+      ok: true,
+      tgreg: {
+        totals: { started, linked, named, done, blocked, stuck, unique_people: uniqueChats },
+        today: { started: todayRow.started, done: todayRow.done },
+        median_complete_sec: medianSec,
+        series: [...buckets.values()],
+        recent,
+        pending,
+        masked: !owner,
+      },
+    });
+  }
+
   const { data, error } = await sb.from('v_stats_today').select('*').single();
   if (error) { console.error(`[stats] db error: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
   return res.status(200).json({ ok: true, stats: data });

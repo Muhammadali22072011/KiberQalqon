@@ -53,6 +53,8 @@
     <string name="kq4_prot_row_oempopup_t">Fonda popup oynasi</string>
     <string name="kq4_prot_row_oempopup_s">Fonda ishlaganda oyna chiqarish ruxsati — Xiaomi/MIUI uchun shart, aks holda oyna chiqmaydi.</string>
     <string name="kq4_prot_row_notif_s">Xavf haqida ogohlantirish yuborish uchun shart</string>
+    <string name="kq4_prot_row_notiflisten_t">Bildirishnoma kirishi (anti-fishing)</string>
+    <string name="kq4_prot_row_notiflisten_s">Xabarlardagi xavfli havolalarni aniqlash uchun ochilgan ro\'yxatda UzGuard\'ni yoqing</string>
     <string name="kq4_prot_row_loc_t">Joylashuv</string>
     <string name="kq4_prot_row_loc_s">Hududingizdagi tahdidlar xaritasi uchun. Ixtiyoriy — bermasangiz ham ilova to\'liq ishlaydi.</string>
     <string name="kq4_prot_row_autostart_t">Avtomatik ishga tushirish (%1$s)</string>

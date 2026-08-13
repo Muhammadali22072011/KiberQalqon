@@ -9,6 +9,7 @@ import Feed from './pages/Feed';
 import Threats from './pages/Threats';
 import Devices from './pages/Devices';
 import Groups from './pages/Groups';
+import Users from './pages/Users';
 import News from './pages/News';
 import Profile from './pages/Profile';
 import Audit from './pages/Audit';
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="threats" element={<Threats />} />
           <Route path="devices" element={<Devices />} />
           <Route path="groups" element={<Groups />} />
+          <Route path="users" element={<Users />} />
           <Route path="news" element={<News />} />
           <Route path="audit" element={<Audit />} />
           <Route path="profile" element={<Profile />} />

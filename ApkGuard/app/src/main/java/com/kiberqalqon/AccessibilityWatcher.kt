@@ -48,6 +48,10 @@ class AccessibilityWatcher(
 
             for (svc in newServices) {
                 val pkg = svc.substringBefore('/')
+                // O'zimizning InstallShieldService ham accessibility-xizmat — foydalanuvchi
+                // uni yoqqanida "banker" deb o'zimizga alert bermasligimiz kerak
+                // (NotificationAccessWatcher'dagi kabi own-package skip).
+                if (pkg == ctx.packageName) continue
                 if (pkg in WHITELIST_PACKAGES) continue
                 if (isSystemAccessibility(ctx, pkg)) continue
 

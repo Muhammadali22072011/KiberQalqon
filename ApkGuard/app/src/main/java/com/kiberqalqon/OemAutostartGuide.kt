@@ -404,28 +404,6 @@ object OemAutostartGuide {
         }
     }
 
-    /**
-     * Foydalanuvchi xohlasa, "boshqa eslatma korsatma" deydigan bayrog'i.
-     * Settings'da ham qaytarib yoqish mumkin.
-     */
-    private const val KEY_OEM_GUIDE_SHOWN = "oem_guide_shown_v1"
-    private const val KEY_OEM_GUIDE_DISMISSED = "oem_guide_dismissed"
-
-    fun wasShown(context: Context): Boolean =
-        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
-            .getBoolean(KEY_OEM_GUIDE_SHOWN, false)
-
-    fun markShown(context: Context) {
-        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
-            .edit().putBoolean(KEY_OEM_GUIDE_SHOWN, true).apply()
-    }
-
-    fun isDismissed(context: Context): Boolean =
-        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
-            .getBoolean(KEY_OEM_GUIDE_DISMISSED, false)
-
-    fun setDismissed(context: Context, dismissed: Boolean) {
-        context.getSharedPreferences("uzguard_prefs", Context.MODE_PRIVATE)
-            .edit().putBoolean(KEY_OEM_GUIDE_DISMISSED, dismissed).apply()
-    }
+    // wasShown/markShown/isDismissed/setDismissed olib tashlandi (2026-08-13):
+    // hech qayerdan chaqirilmaydigan o'lik kod edi.
 }

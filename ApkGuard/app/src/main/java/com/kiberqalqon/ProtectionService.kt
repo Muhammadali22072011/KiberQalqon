@@ -126,12 +126,28 @@ class ProtectionService : Service() {
             val req = android.net.NetworkRequest.Builder()
                 .addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI)
                 .build()
-            val cb = object : android.net.ConnectivityManager.NetworkCallback() {
-                override fun onCapabilitiesChanged(
-                    network: android.net.Network,
-                    caps: android.net.NetworkCapabilities
+            // API 31+ da FLAG_INCLUDE_LOCATION_INFO SHART: usiz transportInfo'dagi SSID
+            // har doim "<unknown ssid>" bo'lib keladi va ochiq-tarmoq ogohlantirishi
+            // HECH QACHON otmasdi (WifiGuard.cleanSsid null qaytarardi).
+            val cb = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                object : android.net.ConnectivityManager.NetworkCallback(
+                    android.net.ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO
                 ) {
-                    try { WifiGuard.onWifiCapabilities(applicationContext, caps) } catch (_: Throwable) {}
+                    override fun onCapabilitiesChanged(
+                        network: android.net.Network,
+                        caps: android.net.NetworkCapabilities
+                    ) {
+                        try { WifiGuard.onWifiCapabilities(applicationContext, caps) } catch (_: Throwable) {}
+                    }
+                }
+            } else {
+                object : android.net.ConnectivityManager.NetworkCallback() {
+                    override fun onCapabilitiesChanged(
+                        network: android.net.Network,
+                        caps: android.net.NetworkCapabilities
+                    ) {
+                        try { WifiGuard.onWifiCapabilities(applicationContext, caps) } catch (_: Throwable) {}
+                    }
                 }
             }
             cm.registerNetworkCallback(req, cb)

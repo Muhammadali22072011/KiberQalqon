@@ -878,11 +878,14 @@ object LinkScanner {
         if (pathAndQuery.isEmpty()) return false
         // Faqat yo'l qismi (query'dan oldin) — fayl nomi.
         val path = pathAndQuery.substringBefore('?').substringBefore('#')
-        // .apk bilan tugaydimi (har qanday joyda — query'da ham bo'lishi mumkin).
-        if (path.endsWith(".apk")) return true
-        // Ikki-kengaytma yoki query ichida .apk (download?file=x.apk).
-        if (Regex("\\.[a-z0-9]{1,5}\\.apk(\\b|$)").containsMatchIn(path)) return true
-        if (pathAndQuery.contains(".apk")) return true
+        // .apk / .apks (split-APK to'plami) bilan tugaydimi (fayl nomi sifatida).
+        if (path.endsWith(".apk") || path.endsWith(".apks")) return true
+        // Ikki-kengaytma (.mp4.apk / .mp4.apks) yo'l ichida.
+        if (Regex("\\.[a-z0-9]{1,5}\\.apks?(\\b|$)").containsMatchIn(path)) return true
+        // Query ichida .apk/.apks (download?file=x.apk) — SO'Z CHEGARASI bilan. Avvalgi
+        // oddiy contains(".apk") HAR QANDAY ".apk" bo'lagini (".apkfile", maqola
+        // slug'lari) HARD DANGER deb belgilardi — endi faqat haqiqiy fayl-kengaytma.
+        if (Regex("\\.apks?($|[^a-z0-9])").containsMatchIn(pathAndQuery)) return true
         return false
     }
 

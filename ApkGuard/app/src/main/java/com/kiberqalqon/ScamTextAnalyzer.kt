@@ -40,7 +40,10 @@ object ScamTextAnalyzer {
 
     /** Jarima / soliq / politsiya / sud nomidan qo'rqitish. */
     private val FINE = listOf(
-        "jarima", "soliq", "politsiya", "sud ", "ijro byurosi",
+        // "sud " (orqasida probel) o'lik kalit edi: hasWord probeldan KEYINGI belgini
+        // tekshiradi, "sud majlisi" hech qachon mos kelmasdi. Probelsiz "sud" so'z
+        // chegarasi bilan to'g'ri ishlaydi.
+        "jarima", "soliq", "politsiya", "sud", "ijro byurosi",
         // uz-cyrillic
         "жарима", "солиқ", "полиция", "суд",
         // ru

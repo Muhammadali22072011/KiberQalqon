@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { randomBytes } from 'node:crypto';
 import { db } from '../../lib/supabase.js';
+import { regDeepLink } from '../../lib/tgreg.js';
 import { canRead, checkAdminSecret, checkDeviceSecret } from '../../lib/auth.js';
 import { verifyDeviceWrite, issueDeviceToken } from '../../lib/devauth.js';
 import { readRaw } from '../../lib/rawbody.js';
@@ -32,6 +34,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (id === 'register') return handleRegister(req, res);
   if (id === 'join') return handleJoin(req, res);          // qurilma guruhga qo'shiladi (device auth)
   if (id === 'poll') return handlePoll(req, res);          // #3: qurilma o'z buyruqlarini oladi (device auth)
+  if (id === 'tgstart') return handleTgStart(req, res);    // Telegram ro'yxati: token + chuqur havola
+  if (id === 'tgstatus') return handleTgStatus(req, res);  // Telegram ro'yxati: holat pollingi
 
   // #3: paneldan buyruq qo'yish — POST /api/device/<uuid> {type,payload} (FAQAT EGASI).
   if (req.method === 'POST') return handleEnqueue(req, res, id);
@@ -254,6 +258,108 @@ async function handleJoin(req: VercelRequest, res: VercelResponse) {
   if (uErr) { console.error(`[join] device upsert: ${uErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
 
   return res.status(200).json({ ok: true, group: { name: group.name, color: group.color } });
+}
+
+// --- /api/device/tgstart — Telegram ro'yxati uchun bir martalik token + havola ---
+// Body: { device_token }. Javob: { ok, status, token?, url? }.
+//   status='done'    — bu qurilma allaqachon ro'yxatdan o'tgan (ilova darhol o'tadi)
+//   status='pending' — token berildi, ilova url'ni ochadi
+// Token 24 soat yashaydi. 30 daqiqadan yangi tugallanmagan urinish bo'lsa — QAYTA
+// ishlatiladi (foydalanuvchi tugmani ikki marta bossa ikkita "osilgan" qator qolmasin;
+// bot esa qaysi qatorni to'ldirishni bilmay qolardi).
+const TG_REUSE_MS = 30 * 60 * 1000;
+
+async function handleTgStart(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method' });
+  const rawBody = await readRaw(req);
+  if (!(await verifyDeviceWrite(req, rawBody, 'device/tgstart'))) {
+    return res.status(401).json({ ok: false, error: 'auth' });
+  }
+  let b: { device_token?: string };
+  try { b = JSON.parse(rawBody || '{}'); } catch { return res.status(400).json({ ok: false, error: 'bad json' }); }
+  const token = typeof b.device_token === 'string' ? b.device_token : '';
+  if (token.length < 16) return res.status(400).json({ ok: false, error: 'bad token' });
+  const hdrTok = req.headers['x-device-token'];
+  if (typeof hdrTok === 'string' && hdrTok.length > 0 && hdrTok !== token) {
+    return res.status(401).json({ ok: false, error: 'token/body mismatch' });
+  }
+
+  const sb = db();
+  res.setHeader('Cache-Control', 'no-store');
+
+  // Allaqachon tugagan bo'lsa — ilova shlagbaumni umuman ko'rsatmaydi.
+  const { data: done, error: dErr } = await sb
+    .from('tg_registrations')
+    .select('id')
+    .eq('device_token', token)
+    .eq('step', 'done')
+    .limit(1)
+    .maybeSingle();
+  if (dErr) { console.error(`[tgstart] done lookup: ${dErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+  if (done) return res.status(200).json({ ok: true, status: 'done' });
+
+  // Yaqinda boshlangan urinish bo'lsa — o'sha tokenni qaytaramiz.
+  const since = new Date(Date.now() - TG_REUSE_MS).toISOString();
+  const { data: recent, error: rErr } = await sb
+    .from('tg_registrations')
+    .select('token')
+    .eq('device_token', token)
+    .neq('step', 'done')
+    .gte('created_at', since)
+    .order('id', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (rErr) { console.error(`[tgstart] recent lookup: ${rErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+  let regToken = recent?.token as string | undefined;
+  if (!regToken) {
+    regToken = randomBytes(16).toString('hex');
+    const { error: iErr } = await sb
+      .from('tg_registrations')
+      .insert({ token: regToken, device_token: token, step: 'new' });
+    if (iErr) { console.error(`[tgstart] insert: ${iErr.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+
+    // Cron yo'q (Hobby) — tashlab ketilgan urinishlarni shu yerda tozalaymiz.
+    // Fail-soft: tozalash ishlamasa ham ro'yxatdan o'tish buzilmaydi.
+    const dayAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const { error: cErr } = await sb
+      .from('tg_registrations')
+      .delete()
+      .eq('step', 'new')
+      .lt('created_at', dayAgo);
+    if (cErr) console.error(`[tgstart] cleanup: ${cErr.message}`);
+  }
+
+  const url = regDeepLink(regToken);
+  if (!url) {
+    // TELEGRAM_REG_BOT_USERNAME sozlanmagan — ilova "bulut sozlanmagan" deb ko'rsatadi.
+    console.error('[tgstart] TELEGRAM_REG_BOT_USERNAME not set');
+    return res.status(200).json({ ok: false, error: 'unconfigured' });
+  }
+  return res.status(200).json({ ok: true, status: 'pending', token: regToken, url });
+}
+
+// --- /api/device/tgstatus?token=… — ilova ro'yxat holatini so'raydi (polling) ---
+// Auth: x-device-secret (o'qish yo'li, poll/config kabi). Tokenning o'zi ham sir —
+// uni faqat shu qurilma va Telegram ko'rgan. Javob: { ok, status, name? }.
+async function handleTgStatus(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method' });
+  if (!checkDeviceSecret(req)) return res.status(401).json({ ok: false, error: 'auth' });
+  const t = Array.isArray(req.query.token) ? req.query.token[0] : req.query.token;
+  if (typeof t !== 'string' || !/^[a-f0-9]{32}$/.test(t)) {
+    return res.status(400).json({ ok: false, error: 'bad token' });
+  }
+
+  const sb = db();
+  res.setHeader('Cache-Control', 'no-store');
+  const { data, error } = await sb
+    .from('tg_registrations')
+    .select('step, full_name')
+    .eq('token', t)
+    .maybeSingle();
+  if (error) { console.error(`[tgstatus] lookup: ${error.message}`); return res.status(500).json({ ok: false, error: 'db' }); }
+  if (!data) return res.status(200).json({ ok: true, status: 'unknown' });
+  return res.status(200).json({ ok: true, status: data.step, name: data.full_name ?? null });
 }
 
 // --- /api/device/register — qurilma o'zini ro'yxatdan o'tkazadi (x-device-secret) ---

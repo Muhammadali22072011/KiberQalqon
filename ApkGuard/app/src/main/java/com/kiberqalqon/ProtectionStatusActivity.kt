@@ -113,6 +113,15 @@ class ProtectionStatusActivity : AppCompatActivity() {
             b.btnProtContinue.setOnClickListener { onContinueClicked() }
             b.btnProtEnableAll.setOnClickListener { startWizard() }
 
+            // "Jarayon o'ldirildi" bildirishnomasidan kelindi — OEM autostart yo'riqnomasi
+            // + tegishli ekran. (Bildirishnoma avval shu ekranga olib kelib, olib tashlangan
+            // "Avtomatik ishga tushirish" qatorini va'da qilardi — foydalanuvchi tupikda qolardi.)
+            // removeExtra: rotatsiya/recreate'da dialog qayta-qayta chiqmasin.
+            if (intent?.getBooleanExtra(EXTRA_OPEN_AUTOSTART, false) == true) {
+                intent.removeExtra(EXTRA_OPEN_AUTOSTART)
+                if (savedInstanceState == null) showOemAutostartGuide()
+            }
+
             onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     // Ekran ilova ICHIDAN ochilgan (onboarding allaqachon o'tilgan,
@@ -289,6 +298,19 @@ class ProtectionStatusActivity : AppCompatActivity() {
                 VersionCompat.hasNotificationPermission(this), true,
             ) { requestNotifications() },
         )
+        // Anti-fishing listener'iga bildirishnoma-KIRISH (notification access). Bu ruxsat
+        // ILGARI HECH QAYERDA so'ralmasdi — funksiya barcha qurilmalarda jim o'lik edi.
+        // TAVSIYA (gate'ni bloklamaydi); faqat direct flavor'da (Play'da listener yo'q).
+        if (BuildConfig.NOTIF_LISTENER && Config.isPhishingBlockerEnabled(this)) {
+            out.add(
+                Row(
+                    R.drawable.ic4_message,
+                    getString(R.string.kq4_prot_row_notiflisten_t),
+                    getString(R.string.kq4_prot_row_notiflisten_s),
+                    isNotifListenerGranted(), false,
+                ) { openNotificationListenerSettings() },
+            )
+        }
         out.add(
             Row(
                 R.drawable.ic4_globe,
@@ -451,6 +473,16 @@ class ProtectionStatusActivity : AppCompatActivity() {
         } else null
     }
 
+    /** Anti-fishing listener'iga bildirishnoma-kirish berilganmi. */
+    private fun isNotifListenerGranted(): Boolean = try {
+        androidx.core.app.NotificationManagerCompat.getEnabledListenerPackages(this)
+            .contains(packageName)
+    } catch (_: Throwable) { false }
+
+    private fun openNotificationListenerSettings() = safeStart {
+        Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+    }
+
     /** VPN C2-filtri yoqilgan VA tizim ruxsati berilganmi (✓ holati). */
     private fun isVpnReady(): Boolean = try {
         Config.isVpnFilterEnabled(this) && VpnFilterService.prepareIntent(this) == null
@@ -537,6 +569,14 @@ class ProtectionStatusActivity : AppCompatActivity() {
         if (Config.isInstallShieldEnabled(this)) {
             s.add(WizStep("installshield", { !InstallProtectionGuide.isShieldServiceEnabled(this) }) {
                 toastStep(R.string.install_shield_t); InstallProtectionGuide.openAccessibilitySettings(this); WizKind.SETTINGS
+            })
+        }
+        // 9b) Anti-fishing bildirishnoma-kirishi — tizim ekrani (holati tekshiriladi).
+        if (BuildConfig.NOTIF_LISTENER && Config.isPhishingBlockerEnabled(this)) {
+            s.add(WizStep("notiflisten", { !isNotifListenerGranted() }) {
+                toastStep(R.string.kq4_prot_row_notiflisten_t)
+                openNotificationListenerSettings()
+                WizKind.SETTINGS
             })
         }
         // 10) Internet himoyasi (VPN C2-filtri) — ruxsat bo'lsa darhol, bo'lmasa tasdiq oynasi.
@@ -707,6 +747,31 @@ class ProtectionStatusActivity : AppCompatActivity() {
      * OemAutostartGuide tegishli "Other permissions" ekranini ochadi. Ochilmasa — qo'lda
      * yo'lni Toast bilan aytamiz.
      */
+    /**
+     * OEM autostart yo'riqnomasi + "Ochish" → OemAutostartGuide.openAutostartSettings.
+     * Kill-detected bildirishnomasidan chaqiriladi (EXTRA_OPEN_AUTOSTART).
+     */
+    private fun showOemAutostartGuide() {
+        try {
+            val oem = OemAutostartGuide.detect()
+            AlertDialog.Builder(this)
+                .setTitle(getString(R.string.notif_kill_title))
+                .setMessage(OemAutostartGuide.instructions(oem))
+                .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
+                    val opened = try {
+                        OemAutostartGuide.openAutostartSettings(this, oem)
+                    } catch (_: Throwable) { false }
+                    if (!opened) {
+                        Toast.makeText(this, R.string.kq4_prot_autostart_fail, Toast.LENGTH_LONG).show()
+                    }
+                }
+                .setNegativeButton(R.string.kq4_prot_autostart_close, null)
+                .show()
+        } catch (e: Throwable) {
+            android.util.Log.w("ProtStatus", "autostart guide failed", e)
+        }
+    }
+
     private fun showOemPopupGuide(oem: OemAutostartGuide.Oem) {
         try {
             AlertDialog.Builder(this)
@@ -836,6 +901,9 @@ class ProtectionStatusActivity : AppCompatActivity() {
     }
 
     companion object {
+        /** Kill-detected bildirishnomasi: darhol OEM autostart yo'riqnomasini ochish. */
+        const val EXTRA_OPEN_AUTOSTART = "open_autostart"
+
         /**
          * Barcha MAJBURIY (tizim orqali tekshirib bo'ladigan) ruxsatlar berilganmi.
          *

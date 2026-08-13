@@ -23,4 +23,17 @@
     <string name="kq4_set_row_vpn">Защита интернета (DNS-фильтр)</string>
     <string name="kq4_set_row_vpn_sub">Блокирует подключение вирусов к их серверам управления (экспериментально)</string>
     <string name="kq4_vpn_perm_denied">Разрешение VPN не выдано — фильтр не включён</string>
+
+    <!-- Диалог доступа к уведомлениям (анти-фишинг). -->
+    <string name="kq4_phishing_access_title">Нужен доступ к уведомлениям</string>
+    <string name="kq4_phishing_access_msg">Чтобы анти-фишинг видел опасные ссылки в сообщениях, нужно разрешение «Доступ к уведомлениям». Включите UzGuard в открывшемся списке.</string>
+    <string name="kq4_phishing_access_open">Разрешить</string>
+
+    <!-- Диалог управления PIN. -->
+    <string name="kq4_pin_change">Изменить PIN</string>
+    <string name="kq4_pin_disable">Отключить PIN</string>
+    <string name="kq4_pin_disabled">PIN отключён</string>
+
+    <!-- Общее имя для открытой Wi-Fi сети без читаемого SSID. -->
+    <string name="kq4_wifi_open_generic">открытая Wi-Fi сеть</string>
 </resources>

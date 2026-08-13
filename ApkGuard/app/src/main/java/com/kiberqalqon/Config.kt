@@ -5,9 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 private const val PREFS = "uzguard_prefs"
-private const val KEY_SERVER_URL = "srv_url"
 private const val KEY_BACKGROUND = "background_on"
-private const val KEY_UPLOAD = "upload_on"
 private const val KEY_PHISHING = "phishing_on"
 private const val KEY_LANG = "lang"
 private const val KEY_LANG_CHOSEN = "lang_chosen_v1"
@@ -15,10 +13,6 @@ private const val KEY_AUTO_DELETE = "auto_delete_mode"
 private const val KEY_SENSITIVITY = "sensitivity_level"
 private const val KEY_SOUND = "sound_enabled"
 private const val KEY_VIBRATION = "vibration_enabled"
-private const val KEY_AUTO_UPDATE = "auto_update_enabled"
-private const val KEY_WEEKLY_REPORT = "weekly_report_enabled"
-// Yangilik (e'lon) bildirishnomalari — panel yangi e'lon joylasa, qurilmada push.
-private const val KEY_NEWS_NOTIFY = "news_notify_enabled"
 private const val KEY_VPN_FILTER = "vpn_filter_enabled"
 // O'rnatish himoyasi (proxodnaya): UzGuard APK fayllar uchun standart ilova bo'lib,
 // har bir APK avval tekshiriladi. Faqat YO'RIQNOMA/PROMPT'ni boshqaradi (standart
@@ -36,20 +30,12 @@ private const val KEY_LINK_GUARD = "link_guard_enabled"
 // Xavfsiz havola yo'naltiriladigan standart brauzer paketi (o'zimiz EMAS). Bir marta
 // tanlanadi (yoki tizim default'idan aniqlanadi), keyin jim ishlaydi.
 private const val KEY_PREFERRED_BROWSER = "preferred_browser_pkg"
-// Wi-Fi straj: ochiq (parolsiz) jamoat tarmog'iga ulanilganda ogohlantirish. Default YOQILGAN.
-private const val KEY_WIFI_GUARD = "wifi_guard_enabled"
-// Masofaviy boshqaruv ogohlantirgichi: AnyDesk/TeamViewer kabi ilova topilsa ogohlantirish
-// (firibgarlik vektori). Default YOQILGAN.
-private const val KEY_REMOTE_ACCESS_ALERT = "remote_access_alert_enabled"
 // Uyg'otuvchi signal: xavfli tahdid tunda (ekran o'chiq/qulf) topilsa ALARM oqimida
 // maksimal balandlikda sirena + tebranish (jim rejimda ham). Default YOQILGAN.
 private const val KEY_LOUD_ALARM = "loud_alarm_enabled"
-// O'rnatilgan ilova yangilanganda bildirishnoma ("X yangilandi — tekshirildi ✅").
-// Faqat sideload (Play'dan tashqari) yangilanishlar uchun (Play yangilanishlari spam
-// bo'lmasin deb tekshirilmaydi). Default YOQILGAN.
-private const val KEY_APP_UPDATE_NOTIFY = "app_update_notify_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
+private const val KEY_TG_REGISTERED = "tg_registered_v1"
 private const val KEY_DARK_THEME = "dark_theme"
 private const val KEY_ACCENT = "accent_variant"
 private const val KEY_USER_CONSENT = "user_consent_v1"
@@ -73,18 +59,6 @@ const val CURRENT_CONSENT_VERSION = 5
 object Config {
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-
-    fun getServerUrl(context: Context): String {
-        val url = prefs(context).getString(KEY_SERVER_URL, null)
-        if (!url.isNullOrBlank()) return url.trim()
-        return try {
-            BuildConfig::class.java.getField("DEFAULT_SERVER_URL").get(null) as? String ?: ""
-        } catch (_: Exception) { "" }
-    }
-
-    fun setServerUrl(context: Context, url: String) {
-        prefs(context).edit { putString(KEY_SERVER_URL, url.trim()) }
-    }
 
     fun isBackgroundEnabled(context: Context): Boolean =
         prefs(context).getBoolean(KEY_BACKGROUND, true)
@@ -117,13 +91,6 @@ object Config {
 
     fun setOwnerUiEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit { putBoolean(KEY_OWNER_UI, enabled) }
-    }
-
-    fun isUploadEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_UPLOAD, true)
-
-    fun setUploadEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_UPLOAD, enabled) }
     }
 
     fun isPhishingBlockerEnabled(context: Context): Boolean =
@@ -182,31 +149,19 @@ object Config {
         prefs(context).edit { putBoolean(KEY_VIBRATION, enabled) }
     }
     
-    fun isAutoUpdateEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_AUTO_UPDATE, true)
+    // "Toza dastur" (2026-08-13): quyidagi funksiyalar tumblersiz DOIM YOQIQ —
+    // foydalanuvchi sozlamalarga kirmaydi, foydali narsalar o'z-o'zidan ishlashi kerak.
+    // Bildirishnomalarni o'chirish tizim kanallari orqali baribir mumkin.
 
-    fun setAutoUpdateEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_AUTO_UPDATE, enabled) }
-    }
+    // O'z-o'zini yangilash tekshiruvi — asosiy yangilanish kanali, doim yoqiq.
+    fun isAutoUpdateEnabled(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = true
 
-    // Haftalik hisobot bildirishnomasi (WeeklyReportWorker) — default YOQILGAN
-    // (getter default `true`; ensureFirstRunDefaults o'zgartirilmaydi).
-    fun isWeeklyReportEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_WEEKLY_REPORT, true)
+    // Haftalik hisobot bildirishnomasi (WeeklyReportWorker) — doim yoqiq.
+    fun isWeeklyReportEnabled(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = true
 
-    fun setWeeklyReportEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_WEEKLY_REPORT, enabled) }
-    }
-
-    // Yangilik bildirishnomalari (NewsNotifier) — panel yangi e'lon joylasa, qurilmaga
-    // bildirishnoma (rasm bilan) keladi. Default YOQILGAN. Kanal alohida ("Yangiliklar"),
-    // shu sabab foydalanuvchi tizimdan ham, shu toggle'dan ham o'chira oladi.
-    fun isNewsNotificationEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_NEWS_NOTIFY, true)
-
-    fun setNewsNotificationEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_NEWS_NOTIFY, enabled) }
-    }
+    // Yangilik bildirishnomalari (NewsNotifier) — doim yoqiq; alohida "Yangiliklar"
+    // kanali orqali tizimdan o'chirsa bo'ladi.
+    fun isNewsNotificationEnabled(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = true
 
     // DNS C2-filtri (VpnFilterService) — TAJRIBAVIY, default O'CHIQ (qat'iy opt-in:
     // foydalanuvchi toggle bosadi + tizim VPN ruxsat oynasini tasdiqlaydi).
@@ -244,21 +199,13 @@ object Config {
         prefs(context).edit { putBoolean(KEY_LINK_GUARD, enabled) }
     }
 
-    // Wi-Fi straj — ochiq/parolsiz tarmoq ogohlantirgichi. Default YOQILGAN.
-    fun isWifiGuardEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_WIFI_GUARD, true)
+    // Wi-Fi straj — ochiq/parolsiz tarmoq ogohlantirgichi. Tumblersiz DOIM YOQIQ
+    // ("toza dastur", 2026-08-13).
+    fun isWifiGuardEnabled(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = true
 
-    fun setWifiGuardEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_WIFI_GUARD, enabled) }
-    }
-
-    // Masofaviy boshqaruv (AnyDesk/TeamViewer) ogohlantirgichi. Default YOQILGAN.
-    fun isRemoteAccessAlertEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_REMOTE_ACCESS_ALERT, true)
-
-    fun setRemoteAccessAlertEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_REMOTE_ACCESS_ALERT, enabled) }
-    }
+    // Masofaviy boshqaruv (AnyDesk/TeamViewer) ogohlantirgichi — firibgarlikdan himoya,
+    // tumblersiz DOIM YOQIQ.
+    fun isRemoteAccessAlertEnabled(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = true
 
     // Uyg'otuvchi signal (baland sirena tunda topilgan tahdidda). Default YOQILGAN.
     fun isLoudAlarmEnabled(context: Context): Boolean =
@@ -268,13 +215,9 @@ object Config {
         prefs(context).edit { putBoolean(KEY_LOUD_ALARM, enabled) }
     }
 
-    // O'rnatilgan (sideload) ilova yangilanganda "tekshirildi" bildirishnomasi. Default YOQILGAN.
-    fun isAppUpdateNotifyEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_APP_UPDATE_NOTIFY, true)
-
-    fun setAppUpdateNotifyEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit { putBoolean(KEY_APP_UPDATE_NOTIFY, enabled) }
-    }
+    // O'rnatilgan (sideload) ilova yangilanganda "tekshirildi" bildirishnomasi —
+    // tumblersiz DOIM YOQIQ (kam uchraydigan, ishonch beruvchi xabar).
+    fun isAppUpdateNotifyEnabled(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = true
 
     /** Xavfsiz havola yo'naltiriladigan brauzer paketi (null = hali tanlanmagan). */
     fun getPreferredBrowser(context: Context): String? =
@@ -311,6 +254,19 @@ object Config {
 
     fun setInitialScanDone(context: Context) {
         prefs(context).edit { putBoolean(KEY_INITIAL_SCAN_DONE, true) }
+    }
+
+    /**
+     * Foydalanuvchi Telegram boti orqali ro'yxatdan o'tdimi (ism + tasdiqlangan raqam).
+     * Onboarding'dan KEYINGI shlagbaum: TgRegisterActivity shu bayroq qo'yilmaguncha
+     * bosh ekranga o'tkazmaydi. Bulut sozlanmagan build'larda (fork / CLOUD_BASE_URL
+     * bo'sh) ekran o'zi chetlab o'tadi — aks holda ilova umuman ochilmasdi.
+     */
+    fun isTgRegistered(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_TG_REGISTERED, false)
+
+    fun setTgRegistered(context: Context, done: Boolean) {
+        prefs(context).edit { putBoolean(KEY_TG_REGISTERED, done) }
     }
 
     /**
@@ -427,7 +383,6 @@ object Config {
             putBoolean(KEY_SOUND, true)
             putBoolean(KEY_VIBRATION, true)
             putBoolean(KEY_PHISHING, true)
-            putBoolean(KEY_AUTO_UPDATE, true)
             putString(KEY_SENSITIVITY, "medium")
             putString(KEY_AUTO_DELETE, "delete")
             putBoolean(KEY_INSTALL_PROTECTION, true)

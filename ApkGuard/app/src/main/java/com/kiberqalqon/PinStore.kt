@@ -20,6 +20,8 @@ object PinStore {
     private const val PREFS = "uzguard_pin"
     private const val KEY_HASH = "pin_hash"
     private const val KEY_SALT = "pin_salt"
+    private const val KEY_FAILS = "pin_fails"
+    private const val KEY_LOCK_UNTIL = "pin_lock_until"
 
     private fun prefs(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -51,7 +53,36 @@ object PinStore {
 
     /** PIN'ni butunlay o'chiradi (qulfni o'chirish). */
     fun clear(ctx: Context) {
-        prefs(ctx).edit().remove(KEY_HASH).remove(KEY_SALT).apply()
+        prefs(ctx).edit()
+            .remove(KEY_HASH).remove(KEY_SALT)
+            .remove(KEY_FAILS).remove(KEY_LOCK_UNTIL)
+            .apply()
+    }
+
+    // ── Noto'g'ri urinishlarga qarshi backoff ──
+    // 4 xonali PIN'da (10k kombinatsiya) cheksiz urinish = brute-force uchun ochiq eshik edi.
+    // 5 xatodan keyin 30s qulf, har keyingi xato bilan ikki baravar (max 8 daqiqa).
+
+    /** Qulf tugashigacha qolgan millisekundlar (0 = qulf yo'q). */
+    fun lockedRemainingMs(ctx: Context): Long =
+        (prefs(ctx).getLong(KEY_LOCK_UNTIL, 0L) - System.currentTimeMillis()).coerceAtLeast(0L)
+
+    /** Noto'g'ri PIN qayd etiladi; kerak bo'lsa qulf muddati uzaytiriladi. */
+    fun recordFail(ctx: Context) {
+        val p = prefs(ctx)
+        val fails = p.getInt(KEY_FAILS, 0) + 1
+        val e = p.edit().putInt(KEY_FAILS, fails)
+        if (fails >= 5) {
+            val steps = (fails - 5).coerceAtMost(4)
+            val lockMs = 30_000L shl steps  // 30s, 60s, 2min, 4min, 8min (cap)
+            e.putLong(KEY_LOCK_UNTIL, System.currentTimeMillis() + lockMs)
+        }
+        e.apply()
+    }
+
+    /** To'g'ri PIN — hisoblagich va qulf tozalanadi. */
+    fun resetFails(ctx: Context) {
+        prefs(ctx).edit().remove(KEY_FAILS).remove(KEY_LOCK_UNTIL).apply()
     }
 
     // ── Yordamchilar ──

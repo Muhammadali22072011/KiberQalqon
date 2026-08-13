@@ -154,6 +154,11 @@ object SelfUpdate {
             // o'ylardi. Buning o'rniga o'rnatishni FOYDALANUVCHI BOSADIGAN bildirishnoma orqali
             // beramiz: tap foreground kontekstdan keladi, BAL cheklovi tegmaydi. Ishonchli yo'l
             // bo'lmasa (bildirishnoma o'chirilgan) — haqiqiy xato qaytaramiz.
+            // Install-shield o'z yangilanishimizni bloklab qo'ymasin: hujjatlashtirilgan
+            // approve() endi HAQIQATAN chaqiriladi (avval faqat own-label whitelist'ga
+            // tayanardi — yorliq o'qilmasa, oxirgi DANGER'dan keyingi 5 daqiqada
+            // o'z yangilanishimiz ham bekor qilinishi mumkin edi).
+            try { InstallApproval.approve(app, app.packageName) } catch (_: Throwable) {}
             if (!offerInstall(app, intent)) {
                 Log.w(TAG, "o'rnatish oynasini ochib bo'lmadi (fon + bildirishnoma yo'q)")
                 return R.string.kq4_update_err_download

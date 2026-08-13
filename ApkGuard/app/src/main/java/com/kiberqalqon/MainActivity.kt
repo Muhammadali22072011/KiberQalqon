@@ -44,6 +44,10 @@ class MainActivity : AppCompatActivity() {
     // Ruxsat berilgach skan/kuzatuvchini bir martagina ishga tushiramiz —
     // har onResume'da (masalan, sozlamalardan qaytganda) takror skan bo'lmasligi uchun.
     private var scanStarted = false
+    // QS-tayl / SecurityScore "trigger_scan" extra bilan ochadi —
+    // ekran allaqachon ochiq bo'lsa ham skan MAJBURAN qayta ishga tushishi kerak
+    // (avval extra hech qayerda o'qilmasdi va foydalanuvchi "tupik"da qolardi).
+    private var pendingScanTrigger = false
     // O'rnatilgan ilovalar skani bir vaqtda BITTA ishlashi uchun guard (tez-tez bosishda takror ishga tushmasin).
     @Volatile private var installedScanRunning = false
     // v4: joriy filtr (Hammasi/Xavfli/Xavfsiz) — chip ko'rinishini renderChips() shu orqali chizadi.
@@ -80,6 +84,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ThemeHelper.applyAccent(this)
+
+        // QS-tayl va vidjet Onboarding→Consent oqimini chetlab o'tib to'g'ridan-to'g'ri
+        // shu ekranga kira olardi — rozilik berilmagan bo'lsa odatiy oqimga qaytaramiz
+        // (consent'siz skan/tarmoq ishlamasligi kerak).
+        if (!Config.hasUserConsent(this)) {
+            startActivity(Intent(this, SplashActivity::class.java))
+            finish()
+            return
+        }
+        consumeScanTrigger(intent)
 
         try {
             binding = ActivityMainBinding.inflate(layoutInflater)
@@ -700,6 +714,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        consumeScanTrigger(intent)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Ruxsat kutilayotganda rotatsiya/recreate bo'lsa, QS-tayl so'rovi yo'qolmasin
+        // (extra allaqachon intent'dan o'chirilgan).
+        outState.putBoolean(STATE_PENDING_SCAN, pendingScanTrigger)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState.getBoolean(STATE_PENDING_SCAN, false)) pendingScanTrigger = true
+    }
+
+    /** "trigger_scan" extra'ni bir marta o'qib flag'ga o'tkazadi (onResume ishlatadi). */
+    private fun consumeScanTrigger(i: Intent?) {
+        if (i?.getBooleanExtra(EXTRA_TRIGGER_SCAN, false) == true) {
+            i.removeExtra(EXTRA_TRIGGER_SCAN)
+            pendingScanTrigger = true
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         // BG-01: ilova ochilganda real-time himoyani idempotent qaytaramiz. Ruxsat berilgach shu yerda
@@ -711,7 +751,14 @@ class MainActivity : AppCompatActivity() {
         refreshPermissionState()
         if (hasPermission) {
             binding.switchBackground.isChecked = Config.isBackgroundEnabled(this)
-            if (!scanStarted) {
+            if (pendingScanTrigger) {
+                // QS-tayl / "Tuzatish" tugmasi: fon rejimidan qat'i nazar TO'LIQ skan
+                // (UX-08: qo'lda skan fon rejimiga bog'liq emas).
+                pendingScanTrigger = false
+                scanStarted = true
+                try { TelemetryReporter.reportManualScan(this, "trigger_scan intent (tile/wizard)") } catch (_: Throwable) {}
+                startAutoProtection()
+            } else if (!scanStarted) {
                 scanStarted = true
                 startScanningAfterGrant()
             }
@@ -888,5 +935,9 @@ class MainActivity : AppCompatActivity() {
         // Yangiliklar lentasi kadr oralig'i (ms). 32ms ≈ 30fps — sokin marquee uchun
         // yetarli, eski 16ms (60fps) ga nisbatan UI-thread ishini ikki barobar kamaytiradi.
         private const val TICKER_FRAME_MS = 32L
+
+        // QS-tayl / SecurityScore shu extra bilan skan so'raydi.
+        const val EXTRA_TRIGGER_SCAN = "trigger_scan"
+        private const val STATE_PENDING_SCAN = "pending_scan_trigger"
     }
 }

@@ -72,7 +72,11 @@ object WifiGuard {
                 val info = caps.transportInfo as? WifiInfo
                 if (info != null) {
                     val type = try { info.currentSecurityType } catch (_: Throwable) { SECURITY_TYPE_UNKNOWN }
-                    return if (isOpenSecurityType(type)) cleanSsid(info.ssid) else null
+                    if (!isOpenSecurityType(type)) return null
+                    // Tarmoq OCHIQ ekani aniq, lekin SSID joylashuv ruxsatisiz
+                    // "<unknown ssid>" bo'lishi mumkin — jim qolmaymiz, umumiy nom
+                    // bilan ogohlantiramiz (xavf haqiqiy, nomi shart emas).
+                    return cleanSsid(info.ssid) ?: GENERIC_OPEN
                 }
             }
 
@@ -120,13 +124,31 @@ object WifiGuard {
         if (!Config.isWifiGuardEnabled(ctx)) return
         val ssid = openSsidOrNull(ctx, caps) ?: return
         val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val key = "warned_$ssid"
-        if (prefs.getBoolean(key, false)) return
-        prefs.edit().putBoolean(key, true).apply()
+        if (ssid == GENERIC_OPEN) {
+            // Nomi o'qib bo'lmagan ochiq tarmoqlar: bitta abadiy bayroq o'rniga
+            // 24 soatlik dedup — har yangi kun/tarmoqda yana ogohlantiradi.
+            val last = prefs.getLong(KEY_GENERIC_TS, 0L)
+            val now = System.currentTimeMillis()
+            if (now - last < GENERIC_DEDUP_MS) return
+            prefs.edit().putLong(KEY_GENERIC_TS, now).apply()
+        } else {
+            val key = "warned_$ssid"
+            if (prefs.getBoolean(key, false)) return
+            prefs.edit().putBoolean(key, true).apply()
+        }
         try {
-            NotificationHelper.showOpenWifiNotification(ctx, ssid)
+            // Sentinel GENERIC_OPEN — ichki qiymat; ko'rsatishda joriy til resursi olinadi
+            // (aks holda RU bildirishnomasida o'zbekcha "ochiq Wi-Fi" aralashib qolardi).
+            val displaySsid = if (ssid == GENERIC_OPEN)
+                ctx.getString(R.string.kq4_wifi_open_generic) else ssid
+            NotificationHelper.showOpenWifiNotification(ctx, displaySsid)
         } catch (_: Throwable) {}
     }
+
+    /** SSID o'qilmaganda ogohlantirishda ko'rsatiladigan umumiy nom. */
+    const val GENERIC_OPEN = "ochiq Wi-Fi"
+    private const val KEY_GENERIC_TS = "warned_generic_ts"
+    private const val GENERIC_DEDUP_MS = 24L * 60 * 60 * 1000
 
     private const val PREFS = "uzguard_wifi"
 }

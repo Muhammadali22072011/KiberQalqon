@@ -189,13 +189,6 @@
             android:label="Xabar tekshiruvi"
             android:theme="@style/Theme.UzGuard" />
 
-        <!-- 30 soniyalik tekshiruv — mavjud himoya tekshiruvlarini bitta ustada birlashtiradi. -->
-        <activity
-            android:name=".CheckupWizardActivity"
-            android:exported="false"
-            android:label="Tez tekshiruv"
-            android:theme="@style/Theme.UzGuard" />
-
         <!-- Himoya qulfi — himoyani o'chirish/Sozlamalardan oldin PIN. -->
         <activity
             android:name=".PinLockActivity"
@@ -362,6 +355,30 @@
             android:exported="false"
             android:theme="@style/Theme.UzGuard"
             android:screenOrientation="portrait" />
+
+        <!-- «Ro'yxatdan o'tish» shlagbaumi — Onboarding'dan keyin, bosh ekrandan OLDIN.
+             Foydalanuvchi Telegram boti orqali ismi + tasdiqlangan raqamini yuboradi.
+
+             exported=true + uzguard://open — bot xabaridagi «UzGuard'ga qaytish» tugmasi
+             (cloud/public/back.html) shu havolani beradi. Ekran tashqaridan ochilishi
+             XAVFSIZ: u shlagbaumning O'ZI, har ochilganda holatni qayta tekshiradi va
+             ro'yxat tugamagan bo'lsa hech qayerga o'tkazmaydi.
+
+             singleTask — Telegram'dan qaytishda yangi nusxa yaratilmasin (aks holda
+             orqada "osilgan" ikkinchi shlagbaum qolardi). -->
+        <activity
+            android:name=".TgRegisterActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.UzGuard"
+            android:screenOrientation="portrait">
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="uzguard" android:host="open" />
+            </intent-filter>
+        </activity>
 
         <!-- Birinchi to'liq tekshiruv — odin raz srazu posle Onboarding,
              pokazyvayet vse opasnye APK na ustroystve s knopkami "O'chirish". -->

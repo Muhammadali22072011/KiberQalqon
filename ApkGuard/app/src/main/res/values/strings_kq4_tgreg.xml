@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  «Ro'yxatdan o'tish» shlagbaumi (TgRegisterActivity) — Telegram boti orqali.
+  Bosh ekrandan oldingi oxirgi qadam. values/ = O'ZBEKCHA (asosiy til).
+-->
+<resources>
+    <string name="kq4_tgreg_eyebrow">RO\'YXATDAN O\'TISH</string>
+    <string name="kq4_tgreg_title">UzGuard\'ga xush kelibsiz</string>
+    <string name="kq4_tgreg_sub">Himoyani yoqishdan oldin bir marta ro\'yxatdan o\'ting — bu 30 soniya oladi.</string>
+
+    <string name="kq4_tgreg_steps_title">Qanday bo\'ladi</string>
+    <string name="kq4_tgreg_steps">1. Tugmani bosasiz — Telegram ochiladi.\n2. Bot ismingizni so\'raydi.\n3. «Raqamni yuborish» tugmasini bosasiz.\n4. Ilovaga qaytasiz — himoya ishga tushadi.</string>
+
+    <string name="kq4_tgreg_privacy_title">Ma\'lumotlaringiz</string>
+    <string name="kq4_tgreg_privacy">Ismingiz va telefon raqamingiz saqlanadi. Ular faqat virus ogohlantirishlari va ilova yangiliklarini yuborish uchun ishlatiladi. Uchinchi shaxslarga berilmaydi va reklama uchun ishlatilmaydi.</string>
+
+    <string name="kq4_tgreg_btn">Telegram orqali ro\'yxatdan o\'tish</string>
+    <string name="kq4_tgreg_open_again">Telegramni qayta ochish</string>
+    <string name="kq4_tgreg_refresh">Tekshirish</string>
+
+    <string name="kq4_tgreg_waiting_hint">Telegram\'da ismingizni yozing va raqamingizni yuboring. Tugagach shu yerga qayting — ilova o\'zi davom etadi.</string>
+
+    <!-- Holat qatori -->
+    <string name="kq4_tgreg_preparing">Tayyorlanmoqda…</string>
+    <string name="kq4_tgreg_waiting">Telegram\'dagi javobingiz kutilmoqda…</string>
+    <string name="kq4_tgreg_checking">Tekshirilmoqda…</string>
+    <string name="kq4_tgreg_step_name">Botda ismingizni yozing…</string>
+    <string name="kq4_tgreg_step_phone">Botda «Raqamni yuborish» tugmasini bosing…</string>
+    <string name="kq4_tgreg_ok">✓ Ro\'yxatdan o\'tdingiz</string>
+
+    <!-- Xatolar -->
+    <string name="kq4_tgreg_err_net">Internet yo\'q — qayta urining</string>
+    <string name="kq4_tgreg_err_no_telegram">Telegram topilmadi. Avval Telegram ilovasini o\'rnating.</string>
+    <string name="kq4_tgreg_err_unconfigured">Xizmat vaqtincha mavjud emas</string>
+    <string name="kq4_tgreg_err_generic">Ro\'yxatdan o\'tib bo\'lmadi — qayta urining</string>
+</resources>

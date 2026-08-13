@@ -32,7 +32,16 @@
 # --- Сохраняем только entry-точки приложения (всё остальное обфусцируем) ---
 
 # Application класс — Android создаёт его рефлексивно по имени из манифеста.
--keep public class com.kiberqalqon.App { public <init>(); }
+# ВАЖНО: namespace приложения = com.uzguard (НЕ com.kiberqalqon — это applicationId).
+# Раньше здесь стоял com.kiberqalqon.App — правило было МЁРТВЫМ (нет такого класса),
+# реальный com.uzguard.App держался только авто-keep'ом AGP из манифеста. Чиним + добавляем
+# универсальное правило на любой Application-наследник (пояс + подтяжки под full-mode R8).
+-keep public class com.uzguard.App { public <init>(); }
+-keep public class * extends android.app.Application { <init>(); }
+
+# BuildConfig — оставляем целиком: поля читаются в т.ч. флагами флейворов, а full-mode R8
+# инлайнит static-final строки и может выкинуть поле → NoSuchFieldException.
+-keep class com.uzguard.BuildConfig { *; }
 
 # Activity/Service/Receiver/Provider — Android тоже инстанцирует их рефлексивно.
 -keep public class * extends android.app.Activity
@@ -49,7 +58,7 @@
 }
 
 # ViewBinding генерится с фиксированным именем, его трогать нельзя.
--keep class com.kiberqalqon.databinding.** { *; }
+-keep class com.uzguard.databinding.** { *; }
 
 # SecurityGuard сами обфусцируем — наоборот, чем меньше понятно, тем лучше.
 # Если бы оставили имена — Frida-скрипт мог бы по имени класса захукать.
@@ -113,7 +122,7 @@
 # JNI_OnLoad ichida RegisterNatives FindClass("com/kiberqalqon/NativeBridge") bo'yicha
 # bog'lanadi — shuning uchun klass NOMI R8'dan keyin ham saqlanishi SHART, aks holda
 # native binding yiqiladi (UnsatisfiedLinkError → loaded=false → himoya kuchsizlanadi).
--keep class com.kiberqalqon.NativeBridge { *; }
+-keep class com.uzguard.NativeBridge { *; }
 -keepclasseswithmembernames,includedescriptorclasses class * {
     native <methods>;
 }

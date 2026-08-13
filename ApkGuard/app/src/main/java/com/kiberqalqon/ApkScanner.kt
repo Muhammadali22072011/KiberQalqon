@@ -1226,14 +1226,16 @@ object ApkScanner {
             // /Anti-debug. 2+ ta birga bo'lsa ISHONCHSIZ ilovada score'dan qat'iy nazar DANGER
             // (TIER-2, decideVerdict). Eslatma: bank/o'yin/DRM ilovalari root/frida'ni QONUNIY
             // tekshiradi — shuning uchun VERIFIED/ishonchli ilovada bu DANGER bermaydi (reputatsiya qalqoni).
+            // "ZipEntry custom method (ZIP-evasion)" ro'yxatdan olib tashlandi — uning
+            // needle'i DEX'da hech qachon uchramaydigan o'lik imzo edi (DexPatternAnalyzer'da
+            // ham o'chirilgan); ZIP-evasion'ni ZipEncryptionDetector to'g'ridan-to'g'ri ushlaydi.
             val evasionLabels = setOf(
                 "Anti-debug check",
                 "TracerPid /proc anti-debug",
                 "Anti-Frida check (tahlilga qarshi)",
                 "Anti-Frida gadget probing",
                 "Anti-Magisk (root check)",
-                "Suspicious tmp path probe",
-                "ZipEntry custom method (ZIP-evasion)"
+                "Suspicious tmp path probe"
             )
             val evasionCount = dexFindings.patterns.count { it in evasionLabels }
 

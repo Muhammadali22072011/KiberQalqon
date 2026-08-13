@@ -15,4 +15,4 @@
     android:canRetrieveWindowContent="true"
     android:notificationTimeout="100"
     android:description="@string/install_shield_a11y_desc"
-    android:packageNames="com.samsung.android.packageinstaller,com.google.android.packageinstaller,com.android.packageinstaller,com.miui.packageinstaller,com.huawei.packageinstaller,com.vivo.packageinstaller,com.oppo.packageinstaller,com.coloros.packageinstaller,p.android.packageinstaller" />
+    android:packageNames="com.samsung.android.packageinstaller,com.google.android.packageinstaller,com.android.packageinstaller,com.miui.packageinstaller,com.huawei.packageinstaller,com.vivo.packageinstaller,com.oppo.packageinstaller,com.coloros.packageinstaller" />

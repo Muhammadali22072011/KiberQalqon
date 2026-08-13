@@ -49,6 +49,9 @@ class PhishingNotificationService : NotificationListenerService() {
                 val res = LinkScanner.analyze(url)
                 if (res.verdict != ScanResult.Verdict.DANGER) continue
                 val prefs = getSharedPreferences("uzguard_notif_links", MODE_PRIVATE)
+                // Dedup-pref cheksiz o'sib ketmasin: 500 yozuvdan keyin tozalaymiz
+                // (yomon holatda o'sha URL uchun bitta qo'shimcha ogohlantirish, xolos).
+                if (prefs.all.size > 500) prefs.edit().clear().apply()
                 val key = "warned_${url.hashCode()}"
                 if (prefs.getBoolean(key, false)) continue
                 prefs.edit().putBoolean(key, true).apply()
@@ -67,7 +70,10 @@ class PhishingNotificationService : NotificationListenerService() {
             notif.extras?.getCharSequence("android.text")?.toString()?.let { builder.append(it).append(" ") }
             notif.extras?.getCharSequence("android.bigText")?.toString()?.let { builder.append(it) }
         } catch (_: Exception) {}
+        // Apostrof variantlarini birlashtiramiz (’ ʻ ` → ') — kalit so'zlar (o'tkazma)
+        // matndagi istalgan apostrof bilan mos kelsin.
         return builder.toString().lowercase()
+            .replace('’', '\'').replace('ʻ', '\'').replace('`', '\'')
     }
 
     /**
@@ -84,10 +90,13 @@ class PhishingNotificationService : NotificationListenerService() {
         val hasLink = text.contains("http://") || text.contains("https://") ||
             text.contains("t.me/") || URL_PATTERN.matcher(text).find()
         if (!hasLink) return false
+        // "o'tkazma" avval kirillcha 'о' bilan yozilgan edi (о'tkazma) — hech qachon
+        // mos kelmasdi (o'lik kalit so'z). Endi lotincha 'o' + notificationText'dagi
+        // apostrof-normalizatsiya bilan barcha yozuv variantlari ushlanadi.
         val financialKeywords = listOf(
             "kod", "код", "parol", "пароль", "password", "payme", "uzcard", "humo",
             "bank", "банк", "karta", "карта", "tasdiq", "confirm", "подтвердит",
-            "click", "sms", "смс", "pin", "пин", "otp", "о'tkazma", "перевод", "transfer"
+            "click", "sms", "смс", "pin", "пин", "otp", "o'tkazma", "перевод", "transfer"
         )
         return financialKeywords.any { text.contains(it) }
     }

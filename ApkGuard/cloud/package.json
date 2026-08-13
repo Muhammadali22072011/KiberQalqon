@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "deploy": "vercel --prod",
     "set-webhook": "node scripts/set-webhook.mjs",
-    "ping": "node scripts/ping.mjs"
+    "ping": "node scripts/ping.mjs",
+    "set-webhook-reg": "node scripts/set-webhook-reg.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

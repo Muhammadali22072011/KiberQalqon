@@ -650,3 +650,22 @@ input::placeholder,textarea::placeholder{color:var(--ink-3)}
 .qr-tile svg{display:block;border-radius:6px}
 .qr-code{font:800 30px/1 var(--mono,monospace);letter-spacing:6px;margin:18px 0 4px;
   color:var(--g,#C2143D)}
+
+/* ── Foydalanuvchilar (Telegram ro'yxati) — voronka ── */
+/* Har qator: yorliq · to'ldirilgan chiziq · son+foiz. Chart-kutubxonasiz — panel
+   uslubidagi oddiy CSS bar (Overview'dagi .bar-* qatorlariga qarindosh). */
+.funnel{display:flex;flex-direction:column;gap:11px;padding:4px 0 2px}
+.fn-row{display:grid;grid-template-columns:120px 1fr 82px;align-items:center;gap:11px}
+.fn-lbl{font-size:12.5px;color:var(--ink-2)}
+.fn-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.fn-bar i{display:block;height:100%;border-radius:99px;transition:width .45s ease}
+.fn-val{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
+.fn-val b{font-family:var(--mono);font-size:14px}
+.fn-val small{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.fn-foot{display:flex;gap:22px;margin-top:14px;padding-top:13px;border-top:1px solid var(--hair)}
+.fn-foot span{display:flex;flex-direction:column;gap:3px}
+.fn-foot small{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.fn-foot b{font-family:var(--mono);font-size:16px}
+/* .legend rang kvadratchalari (xaritadagi .grad-bar o'rniga oddiy nuqta-yorliq) */
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:-4px}
+@media(max-width:640px){.fn-row{grid-template-columns:96px 1fr 70px;gap:8px}}

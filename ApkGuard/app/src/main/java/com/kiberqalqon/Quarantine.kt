@@ -31,8 +31,8 @@ import java.security.MessageDigest
  *  • Auto-purge: при каждом quarantine() удаляем записи старше 7 дней.
  *
  * Что делать с системно-установленным APK: карантин неприменим (apk в /data/app/
- * мы не можем переместить). Для таких случаев Quarantine.fromPackage() копирует
- * sourceDir в карантин ПЕРЕД тем, как мы предложим юзеру удалить пакет.
+ * мы не можем переместить) — для таких случаев путь один: системный uninstall-диалог
+ * (ScanResultActivity / MainActivity.launchUninstall).
  */
 object Quarantine {
 

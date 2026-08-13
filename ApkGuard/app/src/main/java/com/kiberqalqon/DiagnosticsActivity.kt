@@ -161,7 +161,6 @@ class DiagnosticsActivity : AppCompatActivity() {
 
         sb.appendLine("[Sozlamalar]")
         sb.appendLine("  Background:   ${Config.isBackgroundEnabled(this)}")
-        sb.appendLine("  Upload:       ${Config.isUploadEnabled(this)}")
         sb.appendLine("  Phishing:     ${Config.isPhishingBlockerEnabled(this)}")
         sb.appendLine("  Lang:         ${Config.getLanguage(this)}")
         sb.appendLine("  Theme:        ${Config.getDarkThemeMode(this)}")

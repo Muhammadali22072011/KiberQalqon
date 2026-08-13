@@ -1,7 +1,7 @@
 import type * as XLSXNS from 'xlsx';
 import {
   apiGet, type Stats, type DeviceRow, type ThreatFamily, type FeedItem, type MapPoint,
-  type GroupMember,
+  type GroupMember, type TgRegStats,
 } from './api';
 import { nearestCity } from './uzRegions';
 import { VERDICT_UZ, catUz } from './format';
@@ -27,13 +27,14 @@ export async function exportAllToExcel(): Promise<void> {
   let okCount = 0;
   const ok = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
     p.then((v) => { okCount++; return v; }).catch(() => fallback);
-  const [statsR, devicesR, threatsR, feedR, geoR, membersR] = await Promise.all([
+  const [statsR, devicesR, threatsR, feedR, geoR, membersR, tgregR] = await Promise.all([
     ok(apiGet<{ stats: Stats }>('/api/stats'), { stats: {} as Stats }),
     ok(apiGet<{ devices: DeviceRow[] }>('/api/devices'), { devices: [] as DeviceRow[] }),
     ok(apiGet<{ threats: ThreatFamily[] }>('/api/threats'), { threats: [] as ThreatFamily[] }),
     ok(apiGet<{ feed: FeedItem[] }>('/api/feed'), { feed: [] as FeedItem[] }),
     ok(apiGet<{ points: MapPoint[] }>('/api/geo'), { points: [] as MapPoint[] }),
     ok(apiGet<{ members: GroupMember[] }>('/api/devices?members=1'), { members: [] as GroupMember[] }),
+    ok(apiGet<{ tgreg: TgRegStats }>('/api/stats?tgreg=1'), { tgreg: null as TgRegStats | null }),
   ]);
   if (okCount === 0) throw new Error('export: barcha endpointlar xato');
 
@@ -106,10 +107,23 @@ export async function exportAllToExcel(): Promise<void> {
     "Oxirgi ko'rinish": m.last_seen ?? '',
   }));
 
+  // Telegram ro'yxatidan o'tgan ODAMLAR (rassilka bazasi). Telefon raqami cheklangan
+  // admin uchun serverda niqoblanadi — bu yerda ham niqoblangan holda tushadi.
+  const tg = tgregR.tgreg;
+  const userRows = (tg?.recent ?? []).map((u) => ({
+    Ism: u.full_name ?? '',
+    Telegram: u.tg_username ? `@${u.tg_username}` : '',
+    Telefon: u.phone ?? '',
+    "Ro'yxatdan o'tgan": u.done_at ?? '',
+    Qurilma: u.has_device ? 'bor' : '',
+    Bloklagan: u.blocked ? 'ha' : '',
+  }));
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, statsRows), 'Umumiy');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, deviceRows), 'Qurilmalar');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, memberRows), 'Guruhlar');
+  XLSX.utils.book_append_sheet(wb, sheet(XLSX, userRows), 'Foydalanuvchilar');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, threatRows), 'Tahdidlar');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, feedRows), 'Oqim');
   XLSX.utils.book_append_sheet(wb, sheet(XLSX, geoRows), 'Xarita');

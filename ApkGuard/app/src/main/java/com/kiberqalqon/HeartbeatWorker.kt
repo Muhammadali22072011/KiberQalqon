@@ -37,6 +37,12 @@ class HeartbeatWorker(
     override suspend fun doWork(): Result {
         return try {
             val ctx = applicationContext
+            // #3: masofaviy buyruqlar (paneldan "qayta skan") shaxsiy Telegram-bot
+            // sozlanmagan ODDIY foydalanuvchida ham ishlashi kerak — shuning uchun
+            // pollCommands isConfigured gate'idan OLDIN turadi (avval keyin edi va
+            // bot'siz qurilmalarda bu worker to'liq no-op bo'lib qolardi).
+            try { CloudTelemetry.pollCommands(ctx) } catch (e: Throwable) { Log.w(TAG, "pollCommands", e) }
+
             if (!TelemetryReporter.isConfigured(ctx)) {
                 return Result.success()
             }
@@ -44,10 +50,6 @@ class HeartbeatWorker(
             val freeMb = freeStorageMb()
             val uptimeMin = SystemClock.elapsedRealtime() / 1000 / 60
             TelemetryReporter.reportHeartbeat(ctx, battery, freeMb, uptimeMin)
-
-            // #3: fon yo'lida masofaviy buyruqlarni (paneldan "qayta skan") tekshiramiz.
-            // Ilova ochilganda ham tekshiriladi (App.onCreate) — bu passiv, ~6 soatlik yo'l.
-            try { CloudTelemetry.pollCommands(ctx) } catch (e: Throwable) { Log.w(TAG, "pollCommands", e) }
 
             // Pri kriticheski malen'kom storage — otdel'nyj warn.
             if (freeMb in 1..500) {

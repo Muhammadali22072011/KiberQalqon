@@ -37,9 +37,9 @@ import java.util.concurrent.TimeUnit
  *   - Reason (signature matched)
  *   - Device manufacturer + model
  *   - Android version
+ *   - Сам APK-файл угрозы (по Privacy Policy v2 / согласию v4 — reportThreat)
  *
  * Что НЕ отправляется ни при каких условиях:
- *   - APK файл сам
  *   - IMEI, серийник, MAC, IP, GPS
  *   - Имя/телефон пользователя
  *   - Список других установленных приложений

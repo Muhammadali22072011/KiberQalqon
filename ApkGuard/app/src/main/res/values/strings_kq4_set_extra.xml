@@ -102,4 +102,17 @@
     <string name="kq4_set_row_pin_on">PIN yoqilgan — o\'zgartirish uchun bosing</string>
     <string name="kq4_set_row_limits">Nimadan himoya qila olmaymiz</string>
     <string name="kq4_set_row_limits_sub">Halol cheklovlar — va ularga qarshi nima qilish kerak</string>
+
+    <!-- Anti-fishing bildirishnoma-kirish dialogi (Sozlamalar toggle'i yoqilganda). -->
+    <string name="kq4_phishing_access_title">Bildirishnoma kirishi kerak</string>
+    <string name="kq4_phishing_access_msg">Anti-fishing xabarlardagi xavfli havolalarni ko\'rishi uchun «Bildirishnomalarga kirish» ruxsati kerak. Ochilgan ro\'yxatda UzGuard\'ni yoqing.</string>
+    <string name="kq4_phishing_access_open">Ruxsat berish</string>
+
+    <!-- PIN boshqaruv dialogi. -->
+    <string name="kq4_pin_change">PIN\'ni o\'zgartirish</string>
+    <string name="kq4_pin_disable">PIN\'ni o\'chirish</string>
+    <string name="kq4_pin_disabled">PIN o\'chirildi</string>
+
+    <!-- Nomi o\'qilmagan ochiq Wi-Fi uchun umumiy nom (bildirishnomada SSID o\'rnida). -->
+    <string name="kq4_wifi_open_generic">ochiq Wi-Fi</string>
 </resources>

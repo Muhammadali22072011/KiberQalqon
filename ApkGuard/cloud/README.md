@@ -92,6 +92,10 @@ quyidagilarni qo'sh (`.env.example` dagi *barcha* qiymatlar):
 | `SESSION_SECRET` | (ixtiyoriy) panel sessiya tokenini imzolash; bo'sh = ADMIN_SECRET |
 | `DEVICE_TOKEN_SECRET` | **YANGI (anti-RE)** random 32 hex — per-device yozuv imzosi kaliti. Bo'sh = SESSION_SECRET/ADMIN_SECRET. APK'ga QO'YILMAYDI (server-only) |
 | `CONFIG_SIGNING_SECRET` | **YANGI** random 32 hex — imzolangan remote-config (verdikt chegaralari) HMAC kaliti. APK'dagi `config.signing.secret` bilan AYNAN BIR XIL bo'lsin |
+| `TELEGRAM_REG_BOT_TOKEN` | **YANGI** @BotFather — RO'YXAT boti (ochiq, ilovadagi tugma shuni ochadi). Egasi botidan ALOHIDA bot |
+| `TELEGRAM_REG_BOT_USERNAME` | **YANGI** o'sha botning @username'i (masalan `uzguard_bot`, `@` siz) — chuqur havola shundan quriladi |
+| `TELEGRAM_REG_WEBHOOK_SECRET` | **YANGI** random 32 hex — ro'yxat boti webhook siri (egasi botinikidan boshqa qiymat) |
+| `PUBLIC_BASE_URL` | (ixtiyoriy) `https://<domen>` — bot xabaridagi «UzGuard'ga qaytish» tugmasi `/back.html` sahifasiga shu manzil bilan quriladi. Bo'sh = tugma ko'rsatilmaydi |
 
 Endi deploy:
 
@@ -124,6 +128,34 @@ node scripts/set-webhook.mjs
 ```
 
 Natija: `✅ Webhook o'rnatildi`. Guruhga `/help` yoz — bot javob beradi.
+
+#### 4b) Ro'yxatdan o'tish boti (ilovadagi «Ro'yxatdan o'tish» tugmasi)
+
+Bu **ikkinchi, ochiq** bot — foydalanuvchilar shunga tushadi. Egasi paneli botidan
+ataylab ajratilgan: ochiq bot minglab notanish chatdan xabar oladi, panel boti esa
+hech qachon.
+
+1. @BotFather → `/newbot` → nom `UzGuard`, username masalan `uzguard_bot`.
+2. @BotFather → `/setprivacy` → **Disable** shart EMAS (bot faqat private chatda ishlaydi).
+3. Vercel env: `TELEGRAM_REG_BOT_TOKEN`, `TELEGRAM_REG_BOT_USERNAME`,
+   `TELEGRAM_REG_WEBHOOK_SECRET`, `PUBLIC_BASE_URL` (yuqoridagi jadval).
+4. Supabase → SQL Editor → `supabase/18_tg_registration.sql` ni **Run**.
+5. Webhook:
+
+```powershell
+$env:TELEGRAM_REG_BOT_TOKEN="456:AAH..."
+$env:TELEGRAM_REG_WEBHOOK_SECRET="boshqa-random-32-hex"
+$env:VERCEL_URL="https://uzguard-cloud.vercel.app"
+node scripts/set-webhook-reg.mjs
+```
+
+Tekshirish: botga `/help` yoz — «ro'yxatdan o'tish UzGuard ilovasidan boshlanadi»
+javobi kelishi kerak. To'liq oqim faqat ilovadagi tugmadan boshlanadi (tokensiz
+`/start` ataylab ishlamaydi — token qaysi QURILMA ekanini bildiradi).
+
+> ⚠️ **Play Console**: bu oqim ism + telefon raqamini yig'adi. Data safety formasi
+> va maxfiylik siyosati YANGILANMAGUNCHA relizga chiqarmang — telefon raqami
+> shaxsiy ma'lumot sanaladi.
 
 ### 5) Panelni ochish (markaziy monitoring)
 
