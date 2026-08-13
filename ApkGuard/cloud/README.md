@@ -93,7 +93,7 @@ quyidagilarni qo'sh (`.env.example` dagi *barcha* qiymatlar):
 | `DEVICE_TOKEN_SECRET` | **YANGI (anti-RE)** random 32 hex — per-device yozuv imzosi kaliti. Bo'sh = SESSION_SECRET/ADMIN_SECRET. APK'ga QO'YILMAYDI (server-only) |
 | `CONFIG_SIGNING_SECRET` | **YANGI** random 32 hex — imzolangan remote-config (verdikt chegaralari) HMAC kaliti. APK'dagi `config.signing.secret` bilan AYNAN BIR XIL bo'lsin |
 | `TELEGRAM_REG_BOT_TOKEN` | **YANGI** @BotFather — RO'YXAT boti (ochiq, ilovadagi tugma shuni ochadi). Egasi botidan ALOHIDA bot |
-| `TELEGRAM_REG_BOT_USERNAME` | **YANGI** o'sha botning @username'i (masalan `uzguard_bot`, `@` siz) — chuqur havola shundan quriladi |
+| `TELEGRAM_REG_BOT_USERNAME` | **YANGI** o'sha botning @username'i — hozirgi qiymat `uzguardapp_bot` (`@` siz). Chuqur havola shundan quriladi |
 | `TELEGRAM_REG_WEBHOOK_SECRET` | **YANGI** random 32 hex — ro'yxat boti webhook siri (egasi botinikidan boshqa qiymat) |
 | `PUBLIC_BASE_URL` | (ixtiyoriy) `https://<domen>` — bot xabaridagi «UzGuard'ga qaytish» tugmasi `/back.html` sahifasiga shu manzil bilan quriladi. Bo'sh = tugma ko'rsatilmaydi |
 
@@ -135,8 +135,9 @@ Bu **ikkinchi, ochiq** bot — foydalanuvchilar shunga tushadi. Egasi paneli bot
 ataylab ajratilgan: ochiq bot minglab notanish chatdan xabar oladi, panel boti esa
 hech qachon.
 
-1. @BotFather → `/newbot` → nom `UzGuard`, username masalan `uzguard_bot`.
-2. @BotFather → `/setprivacy` → **Disable** shart EMAS (bot faqat private chatda ishlaydi).
+1. @BotFather → `/newbot` → nom `UzGuard`. **Yaratilgan bot: @uzguardapp_bot** (id 8771917324).
+2. @BotFather → `/setjoingroups` → **Disable** (bot faqat private chatda ishlaydi; guruhga
+   qo'shilsa ham handler uni e'tiborsiz qoldiradi, lekin ortiqcha yuzani yopamiz).
 3. Vercel env: `TELEGRAM_REG_BOT_TOKEN`, `TELEGRAM_REG_BOT_USERNAME`,
    `TELEGRAM_REG_WEBHOOK_SECRET`, `PUBLIC_BASE_URL` (yuqoridagi jadval).
 4. Supabase → SQL Editor → `supabase/18_tg_registration.sql` ni **Run**.

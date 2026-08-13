@@ -45,7 +45,7 @@ vercel --prod
 После миграции 15 журнал смотрится так (только владелец):
 
 ```
-GET https://kiberqalqon-cloud.vercel.app/api/stats?audit=1
+GET https://uzguard-cloud.vercel.app/api/stats?audit=1
 заголовок: x-admin-secret: <токен владельца или ADMIN_SECRET>
 ```
 
@@ -80,3 +80,44 @@ GET https://kiberqalqon-cloud.vercel.app/api/stats?audit=1
 Безопасность: телефон ставит обновление ТОЛЬКО если совпали (а) HMAC-подпись
 конфига, (б) SHA-256 файла, (в) подпись APK = подпись установленного приложения.
 Чужой/подменённый APK молча удаляется.
+
+## 8. Регистрация через Telegram-бота (добавлено 2026-08-13)
+
+Перед главным экраном приложение теперь показывает шлагбаум «Ro'yxatdan o'tish»:
+кнопка открывает Telegram-бота, тот спрашивает имя и берёт **подтверждённый**
+номер через кнопку «Отправить номер». Пока шаг не пройден — на главный экран не
+пускает. Панель → раздел **Foydalanuvchilar** показывает всю аналитику
+(воронка, конверсия, тренд 14 дней, список, экспорт в Excel).
+
+Что нужно сделать владельцу:
+
+1. **Создать ОТДЕЛЬНОГО бота** у @BotFather (`/newbot`). Это второй бот — не тот,
+   что отвечает `/stats` в панели. ✅ **Сделано 2026-08-13: @uzguardapp_bot** (id 8771917324).
+   Не забыть `/setjoingroups → Disable`.
+2. **Vercel env** (Production), 4 переменные:
+   - `TELEGRAM_REG_BOT_TOKEN` — токен нового бота
+   - `TELEGRAM_REG_BOT_USERNAME` — `uzguardapp_bot` (без `@`)
+   - `TELEGRAM_REG_WEBHOOK_SECRET` — новый random 32 hex (**не тот же**, что
+     `TELEGRAM_WEBHOOK_SECRET`)
+   - `PUBLIC_BASE_URL` — `https://uzguard-cloud.vercel.app` (для кнопки «вернуться
+     в UzGuard»)
+3. **Миграция**: Supabase → SQL Editor → выполнить
+   `ApkGuard/cloud/supabase/18_tg_registration.sql`.
+4. **Redeploy**: `cd ApkGuard/cloud && vercel --prod`.
+5. **Привязать webhook**:
+   ```
+   $env:TELEGRAM_REG_BOT_TOKEN="456:AAH..."
+   $env:TELEGRAM_REG_WEBHOOK_SECRET="новый-random-32-hex"
+   $env:VERCEL_URL="https://uzguard-cloud.vercel.app"
+   node ApkGuard/cloud/scripts/set-webhook-reg.mjs
+   ```
+   Проверка: написать боту `/help` — должен ответить.
+
+⚠️ **До релиза в Play**: этот шаг собирает **имя и номер телефона** — это
+персональные данные. Нужно обновить политику конфиденциальности и форму
+**Data safety** в Play Console (раздел «Personal info → Phone number», цель —
+«App functionality / Communications»), иначе приложение снимут. Пока это не
+сделано — не выкатывать сборку с включённым шлагбаумом в Play.
+
+Если облако не настроено (`CLOUD_BASE_URL` пустой) — шлагбаум сам себя
+выключает, приложение открывается как раньше.
