@@ -35,7 +35,7 @@
     <string name="kq4_set_row_protection">Состояние защиты и разрешения</string>
     <string name="kq4_set_row_admin">Панель управления</string>
 
-    <string name="kq4_set_footer">UZGUARD v%1$s · BUILD %2$d\n© 2026 · Muhammadali · Навои</string>
+    <string name="kq4_set_footer">UZGUARD v%1$s · BUILD %2$d\n© 2026 · Muhammadali · Навои\nВ гос. реестре: свидетельство № DGU 68288</string>
 
     <!-- ── О проекте ── -->
     <string name="kq4_about_eyebrow">О проекте</string>
@@ -51,5 +51,6 @@
     <string name="kq4_about_f4_sub">Узбекский и русский</string>
     <string name="kq4_about_sec_author">Автор</string>
     <string name="kq4_about_author_sub">Навои · Узбекистан</string>
-    <string name="kq4_about_footer">© 2026 · UZGUARD · v%1$s</string>
+    <string name="kq4_about_registered">Официально зарегистрировано: Министерство юстиции Республики Узбекистан, Государственный реестр программных продуктов — свидетельство № DGU 68288 (15.08.2026). Автор и правообладатель: Изатиллаев Мухаммадали.</string>
+    <string name="kq4_about_footer">© 2026 · UZGUARD · v%1$s · Свидетельство № DGU 68288</string>
 </resources>

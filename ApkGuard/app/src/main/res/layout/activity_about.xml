@@ -436,6 +436,17 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ── Davlat reyestri (guvohnoma) ── -->
+            <TextView
+                android:id="@+id/tvAboutRegistered"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/kq4_about_registered"
+                android:textColor="@color/kq_ink_3"
+                android:textSize="11.5sp" />
+
             <!-- ── Futer ── -->
             <TextView
                 android:id="@+id/tvAboutFooter"
