@@ -52,6 +52,6 @@
     <string name="kq4_about_sec_author">Muallif</string>
     <string name="kq4_about_author_name" translatable="false">Muhammadali</string>
     <string name="kq4_about_author_sub">Navoiy · O\'zbekiston</string>
-    <string name="kq4_about_registered">Rasmiy ro\'yxatdan o\'tgan: O\'zbekiston Respublikasi Adliya vazirligi, Dasturiy mahsulotlar davlat reyestri — guvohnoma № DGU 68288 (15.08.2026). Muallif va huquq egasi: Izatillayev Muhammadali.</string>
+    <string name="kq4_about_registered">Rasmiy ro\'yxatdan o\'tgan: O\'zbekiston Respublikasi Adliya vazirligi, Dasturiy mahsulotlar davlat reyestri — guvohnoma № DGU 68288 (15.08.2026). Muallif va huquq egasi: Izatillayev Muhammadali.\nGuvohnomani tekshirish: https://im.adliya.uz/document/check/f553d910-8914-40df-b808-f66d5bcaf5bf</string>
     <string name="kq4_about_footer">© 2026 · UZGUARD · v%1$s · Guvohnoma № DGU 68288</string>
 </resources>
