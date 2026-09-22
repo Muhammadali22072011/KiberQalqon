@@ -48,13 +48,16 @@ object AnimationHelper {
             .setInterpolator(AccelerateDecelerateInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
+                    // ViewPropertyAnimator listener'ni O'ZI tozalamaydi — keyingi fadeIn()
+                    // shu listener'ni yana chaqirib, view'ni GONE qilib, cheksiz siklga tushardi.
+                    view.animate().setListener(null)
                     view.visibility = View.GONE
                     onEnd?.invoke()
                 }
             })
             .start()
     }
-    
+
     /**
      * Появление снизу вверх (slide up)
      */

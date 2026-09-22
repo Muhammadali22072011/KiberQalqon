@@ -481,7 +481,17 @@ class InitialScanActivity : AppCompatActivity() {
         binding.resultIcon.setImageResource(R.drawable.ic4_shield_alert)
         binding.resultIcon.imageTintList =
             ColorStateList.valueOf(getColor(R.color.kq_danger))
-        binding.tvHeaderTitle.text = getString(R.string.kq4_is_found_count, dangerous.size)
+        // Sarlavha: faqat fayllar / faqat o'rnatilgan dasturlar / aralash — "fayl" deb
+        // o'rnatilgan dasturni atamaymiz.
+        val appCount = dangerous.count { it.pkgName != null }
+        binding.tvHeaderTitle.text = getString(
+            when (appCount) {
+                0 -> R.string.kq4_is_found_count
+                dangerous.size -> R.string.kq4_is2_found_count_apps
+                else -> R.string.kq4_is2_found_count_mixed
+            },
+            dangerous.size,
+        )
         binding.tvHeaderSub.text = getString(R.string.is_recommend_delete)
         binding.btnDeleteAll.visibility = View.VISIBLE
         binding.emptyState.visibility = View.GONE

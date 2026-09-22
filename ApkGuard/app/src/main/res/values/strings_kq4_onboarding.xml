@@ -52,4 +52,7 @@
          deb yolg'on da'vo qilinmasin. -->
     <string name="kq4_is2_tts_safe_partial">Tekshiruv to\'xtatildi. %1$d ta fayl va dastur tekshirildi, xavf topilmadi.</string>
     <string name="kq4_is2_header_combined">%1$d ta fayl va dastur tekshirildi</string>
+    <!-- Natija sarlavhasi: topilganlar faqat o'rnatilgan dasturlar / aralash (fayl+dastur). -->
+    <string name="kq4_is2_found_count_apps">%1$d ta xavfli dastur topildi</string>
+    <string name="kq4_is2_found_count_mixed">%1$d ta xavfli fayl va dastur topildi</string>
 </resources>

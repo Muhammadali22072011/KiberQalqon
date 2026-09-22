@@ -37,4 +37,6 @@
     <!-- Проверка остановлена (Skip/тайм-аут) до завершения — не заявляем ложно, что ВСЁ безопасно. -->
     <string name="kq4_is2_tts_safe_partial">Проверка остановлена. Проверено %1$d файлов и программ, угроз не найдено.</string>
     <string name="kq4_is2_header_combined">Проверено файлов и программ: %1$d</string>
+    <string name="kq4_is2_found_count_apps">Найдено опасных программ: %1$d</string>
+    <string name="kq4_is2_found_count_mixed">Найдено опасных файлов и программ: %1$d</string>
 </resources>
