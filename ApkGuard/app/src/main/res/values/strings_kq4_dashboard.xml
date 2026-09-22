@@ -54,4 +54,21 @@
     <string name="kq4_dash_src_sideload">APK orqali</string>
     <string name="kq4_dash_src_system">Tizim</string>
     <string name="kq4_dash_src_unknown">Noma\'lum</string>
+
+    <!-- "Qurilma holati" kartasi (SPEC_autoscan.md p.6, p.5) -->
+    <string name="kq4_ds_card_eyebrow">QURILMA HOLATI</string>
+    <string name="kq4_ds_card_skeleton">Tekshirilmoqda kutilmoqda…</string>
+    <string name="kq4_ds_card_progress">Tekshirilmoqda: %1$s…</string>
+    <string name="kq4_ds_card_safe">Barcha o\'rnatilgan dasturlar xavfsiz</string>
+    <string name="kq4_ds_card_danger">%1$d ta xavfli dastur topildi</string>
+    <string name="kq4_ds_card_no_access">Tekshiruv uchun ruxsat kerak</string>
+    <string name="kq4_ds_card_reason_toggle">Nega xavfli?</string>
+    <string name="kq4_ds_reason_hash">Fayl imzosi baza bilan mos keldi: %1$s</string>
+    <string name="kq4_ds_reason_cert">Shubhali sertifikat: %1$s</string>
+    <string name="kq4_ds_reason_pkg">Ma\'lum zararli dastur: %1$s</string>
+    <string name="kq4_ds_reason_mismatch">Dastur imzosi mos kelmadi</string>
+    <string name="kq4_ds_reason_zip_evasion">Antivirusni chetlab o\'tishga urinish (ZIP fayllar shifrlangan)</string>
+    <string name="kq4_ds_reason_impersonation">\"%1$s\" nomidan foydalanib o\'zini asl dastur qilib ko\'rsatmoqda</string>
+    <string name="kq4_ds_reason_homoglyph">\"%1$s\" so\'zida harflar almashtirilgan (soxta nom)</string>
+    <string name="kq4_ds_card_toast_safe">Hammasi joyida</string>
 </resources>

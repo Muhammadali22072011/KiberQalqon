@@ -39,4 +39,17 @@
     <!-- Skan natijasi ovozli e'loni (TTS) -->
     <string name="kq4_is_tts_danger">Ogohlantirish! %1$d ta xavfli fayl aniqlandi.</string>
     <string name="kq4_is_tts_susp">Diqqat! %1$d ta shubhali fayl topildi.</string>
+
+    <!-- ============ InitialScan Faza A2: o'rnatilgan dasturlar (SPEC_autoscan.md p.6) ============ -->
+    <string name="kq4_is2_phase_label_files">FAYLLAR TEKSHIRILMOQDA</string>
+    <string name="kq4_is2_phase_label_apps">O\'RNATILGAN DASTURLAR TEKSHIRILMOQDA</string>
+    <string name="kq4_is2_current_app">%1$s tekshirilmoqda…</string>
+    <string name="kq4_is2_danger_row_sub">O\'rnatilgan dastur · %1$s</string>
+    <string name="kq4_is2_tts_danger">Ogohlantirish! Qurilmangizda %1$d ta xavfli dastur aniqlandi.</string>
+    <string name="kq4_is2_tts_susp">Diqqat! Qurilmangizda %1$d ta shubhali dastur topildi.</string>
+    <string name="kq4_is2_tts_safe_combined">Barcha fayllar va o\'rnatilgan dasturlar xavfsiz.</string>
+    <!-- Skan Skip/vaqt byudjeti tufayli to'liq tugallanmagan holat uchun — "BARCHASI xavfsiz"
+         deb yolg'on da'vo qilinmasin. -->
+    <string name="kq4_is2_tts_safe_partial">Tekshiruv to\'xtatildi. %1$d ta fayl va dastur tekshirildi, xavf topilmadi.</string>
+    <string name="kq4_is2_header_combined">%1$d ta fayl va dastur tekshirildi</string>
 </resources>

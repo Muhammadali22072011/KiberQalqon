@@ -18,6 +18,7 @@
     android:background="@color/kq_bg">
 
     <ScrollView
+        android:id="@+id/dashboardScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
@@ -509,6 +510,110 @@
                         android:textSize="20sp" />
                 </LinearLayout>
 
+                <!-- ▌ "Qurilma holati" — o'rnatilgan dasturlar holati kartochkasi
+                     (SPEC_autoscan.md §5, T6). Chapda KqRingView (64dp) + ustida ikonka,
+                     o'ngda eyebrow/sarlavha/vaqt/"Nega xavfli?" — barchasi
+                     DashboardNewActivity'da boshqariladi (due-tekshiruv onCreate'da,
+                     yengil kesh-refresh onResume'da). -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardDeviceStatus"
+                    style="@style/KQ4.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="64dp"
+                            android:layout_height="64dp">
+
+                            <com.uzguard.KqRingView
+                                android:id="@+id/ringDeviceStatus"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+
+                            <ImageView
+                                android:id="@+id/ivDeviceStatusIcon"
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic4_shield_check"
+                                app:tint="@color/kq_safe" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvDeviceStatusEyebrow"
+                                style="@style/KQ4.Eyebrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/kq4_ds_card_eyebrow" />
+
+                            <TextView
+                                android:id="@+id/tvDeviceStatusTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/onest_bold"
+                                android:letterSpacing="-0.015"
+                                android:text="@string/kq4_ds_card_skeleton"
+                                android:textColor="@color/kq_ink"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tvDeviceStatusSub"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/onest_regular"
+                                android:textColor="@color/kq_ink_3"
+                                android:textSize="12.5sp" />
+
+                            <TextView
+                                android:id="@+id/tvDeviceStatusReason"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/onest_regular"
+                                android:lineSpacingMultiplier="1.35"
+                                android:textColor="@color/kq_ink_2"
+                                android:textSize="12sp"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/tvDeviceStatusReasonToggle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:fontFamily="@font/onest_semibold"
+                                android:padding="2dp"
+                                android:text="@string/kq4_ds_card_reason_toggle"
+                                android:textColor="@color/kq_primary"
+                                android:textSize="12.5sp"
+                                android:visibility="gone" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- ▌ "Bugun bloklangan" + Hammasi -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -541,6 +646,7 @@
 
                 <!-- bloklangan ro'yxati (3 tagacha real ScanHistory yozuvi) -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardThreatPanel"
                     style="@style/KQ4.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">

@@ -25,4 +25,16 @@
     <!-- Голосовое объявление результата сканирования (TTS) -->
     <string name="kq4_is_tts_danger">Внимание! Обнаружено опасных файлов: %1$d.</string>
     <string name="kq4_is_tts_susp">Внимание! Найдено подозрительных файлов: %1$d.</string>
+
+    <!-- ============ InitialScan Фаза A2: установленные программы (SPEC_autoscan.md п.6) ============ -->
+    <string name="kq4_is2_phase_label_files">ПРОВЕРКА ФАЙЛОВ</string>
+    <string name="kq4_is2_phase_label_apps">ПРОВЕРКА УСТАНОВЛЕННЫХ ПРОГРАММ</string>
+    <string name="kq4_is2_current_app">Проверяется: %1$s…</string>
+    <string name="kq4_is2_danger_row_sub">Установленное приложение · %1$s</string>
+    <string name="kq4_is2_tts_danger">Внимание! На устройстве обнаружено опасных программ: %1$d.</string>
+    <string name="kq4_is2_tts_susp">Внимание! Найдено подозрительных программ: %1$d.</string>
+    <string name="kq4_is2_tts_safe_combined">Все файлы и установленные программы безопасны.</string>
+    <!-- Проверка остановлена (Skip/тайм-аут) до завершения — не заявляем ложно, что ВСЁ безопасно. -->
+    <string name="kq4_is2_tts_safe_partial">Проверка остановлена. Проверено %1$d файлов и программ, угроз не найдено.</string>
+    <string name="kq4_is2_header_combined">Проверено файлов и программ: %1$d</string>
 </resources>

@@ -21,13 +21,40 @@ import androidx.viewpager2.widget.ViewPager2
 import com.uzguard.databinding.ActivityDashboardNewBinding
 import com.uzguard.databinding.IncKq4NewsCardBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
 
 class DashboardNewActivity : AppCompatActivity() {
+
+    companion object {
+        /** "Qurilma holati" docскани uchun stale-chegara — kunlik InstalledAppsRescanWorker
+         *  sikli bilan sinxron, alohida batareya sarfi manbai qo'shilmasin (SPEC_autoscan.md §5.3). */
+        private const val STALE_MS = 24 * 60 * 60 * 1000L
+
+        /** Docскан rotatsiyasi kursori — workerning "rescan_rotate_cursor"idan ATAYLAB alohida,
+         *  ikkalasi bir-biriga "oyoq ostida" bo'lmasin (SPEC_autoscan.md §2.2). */
+        private const val KEY_DASH_CURSOR = "installed_scan_dash_cursor"
+
+        /** Umumiy gate: populateInstalledApps() ichki catch-up sikli va "Qurilma holati"
+         *  docскани bir vaqtda ishlamasin (SPEC_autoscan.md §2.3, termal xavf).
+         *  @Volatile Boolean check-then-act EMAS (T findings #22) — ikkita mustaqil korutina
+         *  (setupDeviceStatusCard→startDeviceStatusDoscan va populateInstalledApps) o'zaro
+         *  bog'liqsiz `withContext(Dispatchers.IO)` suspend nuqtalari orasida "!inFlight"ni
+         *  bir vaqtda true deb o'qib, ikkalasi ham parallel ApkScanner skanini boshlashi mumkin
+         *  edi. Mutex.tryLock() — atom "band bo'lsa o'tkazib yuborish" semantikasi beradi. */
+        private val installedScanMutex = Mutex()
+    }
 
     private lateinit var binding: ActivityDashboardNewBinding
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     // O'rnatilgan ilovalar ro'yxatini to'ldiruvchi oxirgi korutina — qayta-resume'da bekor qilinadi.
     private var installedAppsJob: Job? = null
+    // "Qurilma holati" kartochkasi docскани — Activity qayta yaratilganda bekor qilinadi (onDestroy).
+    private var cardDoscanJob: Job? = null
+    // null = holat hali aniqlanmagan (skeleton); true/false — oxirgi ko'rsatilgan danger/safe holati
+    // (danger→safe rang o'tishini aniqlash uchun, 7.2-band).
+    private var lastDeviceStatusIsDanger: Boolean? = null
+    // Kartochka birinchi marta shu Activity hayoti davomida chizilganda BIR MARTA fadeIn (7.2 §1).
+    private var deviceStatusFirstBuildDone = false
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
@@ -46,6 +73,7 @@ class DashboardNewActivity : AppCompatActivity() {
 
         setupUI()
         loadNews()
+        setupDeviceStatusCard()
         // loadStatistics() bu yerda chaqirilmaydi — onResume() har doim onCreate'dan keyin
         // keladi va statistikani o'zi yuklaydi (ikki marta yuklashning hojati yo'q).
     }
@@ -238,6 +266,15 @@ class DashboardNewActivity : AppCompatActivity() {
         // установить/удалить приложение, и dashboard должен это отразить.
         populateThreatRows()
         populateInstalledApps()
+        // "Qurilma holati" kartochkasi — faqat kesh (verdict_$pkg) o'qiladi, yangi scan() yo'q
+        // (SPEC_autoscan.md §5.2). Shu tufayli ScanResultActivity'da virus o'chirilib qaytilganda
+        // kartochka darhol danger→safe rangga o'tadi.
+        refreshDeviceStatusCardFromCache()
+        // Due-tekshiruvni onResume'da HAM qaytaramiz (T findings #12): onCreate'dagi birinchi
+        // urinish paytida gate (installedScanMutex) band bo'lgani uchun docскан BOSHLANMAGAN
+        // bo'lishi mumkin edi — onResume boshqa hech qachon uni qayta so'ramasdi, kartochka esa
+        // keyingi Activity qayta yaratilgunga qadar skeleton/eskirgan holatda qotib qolardi.
+        checkDeviceStatusDueAndMaybeDoscan()
         updateProtectionStatusBar()
         updateGuardDots()
         refreshGroupCard()
@@ -312,6 +349,364 @@ class DashboardNewActivity : AppCompatActivity() {
         )
     }
 
+    // ═══════════════════════ "Qurilma holati" kartochkasi (SPEC_autoscan.md §5) ═══════════════
+
+    /**
+     * Bir martalik (onCreate) sozlash: ring qalinligi, tap-listenerlar, va — agar fayl-skan
+     * ruxsati bo'lsa — arzon due-tekshiruv (faqat PackageManager + prefs, hech qanday scan()
+     * chaqiruvi yo'q). Due bo'lsa va boshqa installed-skan ketmayotgan bo'lsa — docскан
+     * boshlanadi (§5.4). onResume() esa faqat keshdan yengil rasm chizadi (§5.2).
+     */
+    private fun setupDeviceStatusCard() {
+        binding.ringDeviceStatus.strokeWidthDp = 8f
+        binding.cardDeviceStatus.setOnClickListener { onDeviceStatusCardClick() }
+        binding.tvDeviceStatusReasonToggle.setOnClickListener { toggleDeviceStatusReason() }
+
+        if (!VersionCompat.hasFileScanAccess(this)) {
+            showDeviceStatusNoAccess()
+            return
+        }
+
+        checkDeviceStatusDueAndMaybeDoscan()
+    }
+
+    /**
+     * Due-tekshiruv (arzon: faqat PackageManager + prefs, hech qanday scan() chaqiruvi yo'q) —
+     * onCreate()dan (setupDeviceStatusCard) VA onResume()dan (T findings #12) chaqiriladi.
+     * Ikkinchisi bo'lmasa, agar birinchi urinishda gate (installedScanMutex) band bo'lgani
+     * uchun docскан BOSHLANMAGAN bo'lsa, bu holat Activity qayta yaratilgunga qadar hech
+     * qachon qayta tekshirilmasdi.
+     */
+    private fun checkDeviceStatusDueAndMaybeDoscan() {
+        if (!VersionCompat.hasFileScanAccess(this)) return
+        scope.launch {
+            val (due, currentCount, currentMaxFirstInstall) = withContext(Dispatchers.IO) {
+                val userPackages = userPackagesForStatusCheck(packageManager)
+                val count = userPackages.size
+                val maxFirstInstall = userPackages.maxOfOrNull { it.firstInstallTime } ?: 0L
+                val lastTs = Config.installedScanLastTs(this@DashboardNewActivity)
+                val isDue = lastTs == 0L ||
+                    (System.currentTimeMillis() - lastTs) >= STALE_MS ||
+                    count != Config.knownInstalledCount(this@DashboardNewActivity) ||
+                    maxFirstInstall > Config.knownMaxFirstInstallTs(this@DashboardNewActivity)
+                Triple(isDue, count, maxFirstInstall)
+            }
+            refreshDeviceStatusCardFromCache()
+            if (due && !installedScanMutex.isLocked) {
+                startDeviceStatusDoscan(currentCount, currentMaxFirstInstall)
+            }
+        }
+    }
+
+    /**
+     * populateInstalledApps() bilan BIR XIL filtr (system'siz, o'zimizdan tashqari) — due-tekshiruv
+     * shu ro'yxatning soni va eng yangi o'rnatish vaqti bo'yicha ishlaydi (SPEC_autoscan.md §5.3).
+     */
+    private fun userPackagesForStatusCheck(
+        pm: android.content.pm.PackageManager
+    ): List<android.content.pm.PackageInfo> {
+        val packages = try { pm.getInstalledPackages(0) } catch (_: Throwable) { return emptyList() }
+        return packages.filter { p ->
+            val app = p.applicationInfo ?: return@filter false
+            val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+            val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+            val isSelf = p.packageName == packageName || p.packageName == "${packageName}.debug"
+            (!isSystem || updatedSystem) && !isSelf
+        }
+    }
+
+    /** Bitta user-paketning eng og'ir keshlangan natijasi (agregatsiya uchun). */
+    private data class DeviceStatusAggregate(val dangerOrSuspCount: Int, val worst: ScanResult?)
+
+    /**
+     * `uzguard_rescan`dagi `verdict_$pkg`larni user-paketlar bo'yicha agregatsiya qiladi —
+     * hech qanday yangi scan() chaqirilmaydi (faqat SharedPreferences + kerak bo'lsa
+     * ScanCache.get — ikkalasi ham arzon, O(1)). DANGER verdikti SUSPICIOUS'dan ustun turadi:
+     * "Nega xavfli?" doim eng og'ir topilgan natijani ko'rsatishi kerak.
+     */
+    private fun aggregateDeviceStatus(): DeviceStatusAggregate {
+        val userPackages = userPackagesForStatusCheck(packageManager)
+        val rescanPrefs = getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
+        var count = 0
+        var worst: ScanResult? = null
+        for (p in userPackages) {
+            val sourceDir = p.applicationInfo?.sourceDir
+            var verdictStr = rescanPrefs.getString("verdict_${p.packageName}", null)
+            // rescanPrefs hali bo'sh bo'lishi mumkin — masalan InitialScanActivity'ning
+            // birinchi-ishga-tushirish skani natijani faqat ScanCache'ga yozadi, uzguard_rescan'ga
+            // EMAS (T findings #18). populateInstalledApps() bilan bir xil ScanCache fallback:
+            // aks holda kartochka onboarding'dan darhol keyin YOLG'ON "hammasi xavfsiz" ko'rsatishi
+            // mumkin, garchi Faza A2 aynan shu ilovada DANGER topgan bo'lsa ham.
+            if (verdictStr == null && sourceDir != null) {
+                verdictStr = try {
+                    ScanCache.get(applicationContext, sourceDir)?.verdict?.name
+                } catch (_: Throwable) { null }
+            }
+            var verdict = when (verdictStr) {
+                "DANGER" -> ScanResult.Verdict.DANGER
+                "SUSPICIOUS" -> ScanResult.Verdict.SUSPICIOUS
+                else -> null
+            }
+            // populateInstalledApps() bilan BIR XIL ikki qoida (T findings #10): keshdagi
+            // eskirgan vердikt emas, aynan shu qoidalar asosiy manba — aks holda shu ekrandagi
+            // ikkita UI elementi (appList vs "Qurilma holati" kartochkasi) bir-biriga zid
+            // ma'lumot ko'rsatishi mumkin (masalan, Play Market ilovasi uchun eski DANGER keshi).
+            val knownBad = try {
+                MaliciousPackages.maliciousFamily(p.packageName)
+            } catch (_: Throwable) { null }
+            verdict = when {
+                knownBad != null -> ScanResult.Verdict.DANGER
+                ApkScanner.isFromTrustedStore(applicationContext, p.packageName) -> null
+                else -> verdict
+            }
+            verdict ?: continue
+            count++
+            if (worst == null || (worst.verdict != ScanResult.Verdict.DANGER && verdict == ScanResult.Verdict.DANGER)) {
+                worst = (sourceDir?.let { ScanCache.get(applicationContext, it) }) ?: ScanResult(
+                    verdict = verdict,
+                    reason = "",
+                    details = emptyList(),
+                    dangerousPermissions = emptyList(),
+                    malwareSignatures = emptyList(),
+                )
+            }
+        }
+        return DeviceStatusAggregate(count, worst)
+    }
+
+    /** onResume() va docскан tugagandan keyin chaqiriladigan yengil (kesh-only) rejim. */
+    private fun refreshDeviceStatusCardFromCache() {
+        if (!VersionCompat.hasFileScanAccess(this)) {
+            showDeviceStatusNoAccess()
+            return
+        }
+        scope.launch {
+            val aggregate = withContext(Dispatchers.IO) { aggregateDeviceStatus() }
+            applyDeviceStatusCardState(aggregate.dangerOrSuspCount, aggregate.worst)
+        }
+    }
+
+    /** Ruxsat yo'q holati — tap ProtectionStatusActivity'ga olib boradi, skan boshlanmaydi. */
+    private fun showDeviceStatusNoAccess() {
+        if (!deviceStatusFirstBuildDone) {
+            deviceStatusFirstBuildDone = true
+            AnimationHelper.fadeIn(binding.cardDeviceStatus, duration = 320)
+        }
+        binding.ringDeviceStatus.ringColor = getColor(R.color.kq_warn)
+        binding.ringDeviceStatus.setValue(0f, animate = false)
+        binding.ivDeviceStatusIcon.setImageResource(R.drawable.ic4_shield_alert)
+        binding.ivDeviceStatusIcon.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_warn))
+        binding.tvDeviceStatusTitle.text = getString(R.string.kq4_ds_card_no_access)
+        binding.tvDeviceStatusSub.text = ""
+        binding.tvDeviceStatusReason.visibility = View.GONE
+        binding.tvDeviceStatusReasonToggle.visibility = View.GONE
+        lastDeviceStatusIsDanger = null
+    }
+
+    /**
+     * Kartochka holatini (rang/ikonka/matn/halqa) yangilaydi. `count==0` va hech qachon
+     * skan bo'lmagan bo'lsa — "xavfsiz" deb DA'VO QILMAYMIZ (hech qachon yolg'on SAFE), skeleton
+     * ko'rsatamiz. Skeleton→holat va danger→safe o'tishlari — bir martalik animatsiyalar (§7.2).
+     */
+    private fun applyDeviceStatusCardState(count: Int, worst: ScanResult?) {
+        if (!deviceStatusFirstBuildDone) {
+            deviceStatusFirstBuildDone = true
+            AnimationHelper.fadeIn(binding.cardDeviceStatus, duration = 320)
+        }
+
+        val neverScanned = Config.installedScanLastTs(this) == 0L
+        val isDanger = count > 0
+
+        if (neverScanned && !isDanger) {
+            binding.ringDeviceStatus.ringColor = getColor(R.color.kq_ink_3)
+            binding.ringDeviceStatus.setValue(0f, animate = false)
+            binding.ivDeviceStatusIcon.setImageResource(R.drawable.ic4_shield_check)
+            binding.ivDeviceStatusIcon.imageTintList = ColorStateList.valueOf(getColor(R.color.kq_ink_3))
+            binding.tvDeviceStatusTitle.text = getString(R.string.kq4_ds_card_skeleton)
+            binding.tvDeviceStatusSub.text = ""
+            binding.tvDeviceStatusReasonToggle.visibility = View.GONE
+            binding.tvDeviceStatusReason.visibility = View.GONE
+            return
+        }
+
+        val prevDanger = lastDeviceStatusIsDanger
+        lastDeviceStatusIsDanger = isDanger
+
+        val targetColor = getColor(if (isDanger) R.color.kq_danger else R.color.kq_safe)
+        binding.ivDeviceStatusIcon.setImageResource(
+            if (isDanger) R.drawable.ic4_shield_alert else R.drawable.ic4_shield_check
+        )
+        binding.ivDeviceStatusIcon.imageTintList = ColorStateList.valueOf(targetColor)
+
+        when {
+            prevDanger == true && !isDanger -> {
+                // Danger→Safe: foydalanuvchi virusni o'chirib qaytdi — rang silliq o'tadi.
+                AnimationHelper.animateColorTransition(getColor(R.color.kq_danger), targetColor, duration = 600) {
+                    binding.ringDeviceStatus.ringColor = it
+                    binding.ringDeviceStatus.invalidate()
+                }
+                binding.ringDeviceStatus.setValue(100f, animate = false)
+            }
+            prevDanger != isDanger -> {
+                // Birinchi marta aniqlandi yoki safe→danger — bitta bounce+shake (continuous EMAS).
+                binding.ringDeviceStatus.ringColor = targetColor
+                binding.ringDeviceStatus.setValue(100f, animate = false)
+                if (isDanger) {
+                    AnimationHelper.bounce(binding.ivDeviceStatusIcon, duration = 320)
+                    AnimationHelper.shake(binding.ivDeviceStatusIcon, duration = 280)
+                }
+            }
+            else -> binding.ringDeviceStatus.ringColor = targetColor
+        }
+
+        binding.tvDeviceStatusTitle.text = if (isDanger)
+            getString(R.string.kq4_ds_card_danger, count)
+        else
+            getString(R.string.kq4_ds_card_safe)
+
+        // DIQQAT (kod bilan spekaning kelishmovchiligi): kq4_ds_card_last_check shablonida
+        // "oldin"/"назад" so'zi ALLAQACHON qattiq yozilgan (strings_kq4_dashboard.xml:64,
+        // values-ru xuddi shu faylda ":51" — "назад" bilan), lekin shu faylda ALLAQACHON bor
+        // humanAgo() funksiyasi ham o'zining natijasiga "oldin"/"назад"ni ICHIGA qo'shib
+        // qaytaradi (kq4_dash_ago_min/hour/day). Ikkalasini birga ishlatsak — "2 soat oldin
+        // oldin" chiqadi. strings_kq4_dashboard.xml — T6 uchun ruxsat etilgan fayl EMAS,
+        // shuning uchun shu faylni tuzatolmayman; buning o'rniga humanAgo()ni xuddi shu faylda
+        // yuqorida (populateThreatRows) ishlatilgan kq4_dash_last_scan ("So'nggi tekshiruv: %1$s",
+        // suffikssiz shablon) bilan qo'shib ishlataman — natija to'g'ri chiqadi, faqat
+        // kq4_ds_card_last_check resursi ishlatilmay qoladi (deviations_from_spec'ga yozilgan).
+        val lastTs = Config.installedScanLastTs(this)
+        binding.tvDeviceStatusSub.text = getString(R.string.kq4_dash_last_scan, humanAgo(lastTs))
+
+        if (isDanger && worst != null) {
+            binding.tvDeviceStatusReasonToggle.visibility = View.VISIBLE
+            binding.tvDeviceStatusReason.text = humanReadableReason(worst)
+        } else {
+            binding.tvDeviceStatusReasonToggle.visibility = View.GONE
+            binding.tvDeviceStatusReason.visibility = View.GONE
+        }
+    }
+
+    /** "Nega xavfli?" — malwareSignatures prefiksiga qarab odam o'qiy oladigan sabab (§5.5). */
+    private fun humanReadableReason(result: ScanResult): String {
+        val sig = result.malwareSignatures.firstOrNull()
+        return when {
+            sig?.startsWith("hash:") == true ->
+                getString(R.string.kq4_ds_reason_hash, sig.substringAfter("hash:"))
+            sig?.startsWith("cert:") == true ->
+                getString(R.string.kq4_ds_reason_cert, sig.substringAfter("cert:"))
+            sig?.startsWith("pkg:") == true ->
+                getString(R.string.kq4_ds_reason_pkg, sig.substringAfter("pkg:"))
+            sig?.startsWith("signature-mismatch:") == true ->
+                getString(R.string.kq4_ds_reason_mismatch)
+            // T findings #23: bu uchtasi ilgari `else` orqali ApkScanner'ning o'zbekcha+ingliz
+            // texnik jargon aralash xom `result.reason`iga tushib qolardi, ruscha tarjimasiz.
+            sig == "zip-encryption-evasion" ->
+                getString(R.string.kq4_ds_reason_zip_evasion)
+            sig?.startsWith("impersonation:") == true ->
+                getString(R.string.kq4_ds_reason_impersonation, sig.substringAfter("impersonation:").substringBefore(":"))
+            sig?.startsWith("homoglyph:") == true ->
+                getString(R.string.kq4_ds_reason_homoglyph, sig.substringAfter("homoglyph:"))
+            else -> result.reason
+        }
+    }
+
+    private fun toggleDeviceStatusReason() {
+        val reason = binding.tvDeviceStatusReason
+        if (reason.visibility == View.VISIBLE) {
+            reason.visibility = View.GONE
+        } else {
+            AnimationHelper.fadeIn(reason, duration = 200)
+        }
+    }
+
+    /**
+     * Kartochkaga tap: ruxsat yo'q bo'lsa — ProtectionStatusActivity; DANGER holatida —
+     * mavjud threat-panelga scroll (alohida "tahdidlar" ekrani yo'q, eng oddiy variant,
+     * SPEC_autoscan.md §5 item 8); aks holda — tinchlantiruvchi toast.
+     */
+    private fun onDeviceStatusCardClick() {
+        if (!VersionCompat.hasFileScanAccess(this)) {
+            startActivity(Intent(this, ProtectionStatusActivity::class.java))
+            return
+        }
+        // lastDeviceStatusIsDanger == null — kartochka hali skeleton holatida (tekshiruv hali
+        // tugamagan). Bunda "Hammasi joyida" deb YOLG'ON tinchlantirmaymiz (T findings #21) —
+        // kartochka o'zi bir vaqtning o'zida "Tekshirilmoqda kutilmoqda…" ko'rsatib turibdi.
+        when (lastDeviceStatusIsDanger) {
+            true -> scrollToThreatPanel()
+            false -> Toast.makeText(this, getString(R.string.kq4_ds_card_toast_safe), Toast.LENGTH_SHORT).show()
+            null -> Unit
+        }
+    }
+
+    /**
+     * `cardThreatPanel` ScrollView ichida bir necha LinearLayout ichida joylashgan —
+     * `View.top` faqat bevosita ota-view'ga nisbatan bo'lgani uchun to'g'ridan-to'g'ri
+     * ishlatib bo'lmaydi (chuqurlikdagi barcha marginlar/paddinglar hisobga olinmay qoladi).
+     * Shuning uchun ikkala view'ning oynadagi mutlaq joylashuvi farqi orqali scroll qilamiz.
+     */
+    private fun scrollToThreatPanel() {
+        val scrollView = binding.dashboardScroll
+        val target = binding.cardThreatPanel
+        scrollView.post {
+            val scrollLoc = IntArray(2)
+            val targetLoc = IntArray(2)
+            scrollView.getLocationInWindow(scrollLoc)
+            target.getLocationInWindow(targetLoc)
+            val delta = targetLoc[1] - scrollLoc[1] + scrollView.scrollY
+            scrollView.smoothScrollTo(0, delta)
+        }
+    }
+
+    /**
+     * Docскан (§5.4): ротация kursori + umumiy gate orqali. `onProgress` IO threadda
+     * chaqiriladi — UI'ni `runOnUiThread` bilan Main'ga o'tkazamiz, halqa esa
+     * `AnimationHelper.throttledRingUpdate` bilan buferlanadi (220мс, §7.3).
+     */
+    private fun startDeviceStatusDoscan(installedCountAtDue: Int, maxFirstInstallAtDue: Long) {
+        // tryLock() — atom "band bo'lsa o'tkazib yuborish" (T findings #22). Bu funksiya
+        // faqat gate BO'SH ekani allaqachon aniqlangandan keyin chaqiriladi, shuning uchun
+        // muvaffaqiyatsizlik amalda kutilmaydi — lekin tekshiruv-va-belgilash orasidagi
+        // poyga oynasini yopish uchun baribir shart (oldingi @Volatile Boolean buni ta'minlamasdi).
+        if (!installedScanMutex.tryLock()) return
+        val rescanPrefs = getSharedPreferences("uzguard_rescan", Context.MODE_PRIVATE)
+        // Eski `cardDoscanJob?.cancel()` shu yerda O'LIK KOD edi (T findings #15): gate
+        // tufayli bu nuqtaga faqat oldingi job yo'q/tugagan bo'lsagina yetib kelinadi.
+        cardDoscanJob = scope.launch(Dispatchers.IO) {
+            val cursor = rescanPrefs.getInt(KEY_DASH_CURSOR, 0)
+            var lastIdx = cursor
+            var totalSeen = 0   // 0 = onProgress hech chaqirilmadi → kursor o'zgarmaydi
+            val threats = ApkScanner.scanInstalledForThreats(
+                context = applicationContext,
+                limit = 40,
+                startIndex = cursor,
+                loadIcons = true,
+                timeBudgetMs = null,
+                isCancelled = { !isActive },
+                onProgress = { idx, total, _, label, _, _ ->
+                    lastIdx = idx
+                    totalSeen = total
+                    val pct = if (total > 0) (idx + 1) * 100f / total else 100f
+                    runOnUiThread {
+                        AnimationHelper.throttledRingUpdate(binding.ringDeviceStatus, pct)
+                        binding.tvDeviceStatusTitle.text = getString(R.string.kq4_ds_card_progress, label)
+                    }
+                }
+            )
+            threats.forEach { t ->
+                rescanPrefs.edit().putString("verdict_${t.pkg}", t.result.verdict.name).apply()
+            }
+            // Birorta paket ko'rilmagan bo'lsa (0 ta ilova yoki darhol bekor qilindi) — kursor
+            // joyida qoladi, aks holda (lastIdx+1)%1 uni noldan boshlab yuborardi.
+            if (totalSeen > 0) {
+                rescanPrefs.edit().putInt(KEY_DASH_CURSOR, (lastIdx + 1) % totalSeen).apply()
+            }
+            Config.markInstalledScanDone(applicationContext, installedCountAtDue, maxFirstInstallAtDue)
+            refreshDeviceStatusCardFromCache()
+        }
+        cardDoscanJob?.invokeOnCompletion { installedScanMutex.unlock() }
+    }
+
     /**
      * `appList` ichiga barcha user-app'larni (system'sis) ro'yxat sifatida joylaydi.
      * Har bir satr: real ikonka + ilova nomi + paket · manba + verdict-tag.
@@ -323,6 +718,12 @@ class DashboardNewActivity : AppCompatActivity() {
      * shuning uchun ro'yxat va metadata IO threadda yig'iladi, UI'ga main thread'da kiritamiz.
      */
     private fun populateInstalledApps() {
+        // DIQQAT (T findings #11): bu yerda ILGARI butun funksiyani (ro'yxatni qayta qurishni
+        // ham) to'sadigan gate bor edi — agar "Qurilma holati" docскани ketayotgan bo'lsa,
+        // appList HECH QACHON yangilanmasdi (faqat qayta-skan qilinmasdi). Endi gate faqat
+        // pastdagi ICHKI catch-up siklini to'sadi (haqiqiy ApkScanner.scan() chaqiruvlari,
+        // termal xavf, SPEC_autoscan.md §2.3) — ro'yxatning o'zi HAR DOIM PackageManager'dan
+        // qayta quriladi, shu bilan o'rnatilgan/o'chirilgan ilova darhol ko'rinadi.
         val container = binding.appList
         container.removeAllViews()
 
@@ -420,27 +821,38 @@ class DashboardNewActivity : AppCompatActivity() {
             var attempted = 0
             var foundThreatOnOpen = false   // ilova ochilishida o'rnatilgan (sideload) virus topildimi
             val nowMs = System.currentTimeMillis()
-            for (data in rows) {
-                if (attempted >= 40) break           // bitta ochilishda ko'pi bilan 40 urinish — qizib ketmasin
-                if (data.verdict != null) continue   // allaqachon verdikti bor — o'tkazamiz
-                val sourceDir = data.sourceDir ?: continue
-                if (nowMs < rescanPrefs.getLong("slow_until_${data.pkgName}", 0L)) continue
-                attempted++
-                val scanned = withContext(Dispatchers.IO) {
-                    try { withTimeoutOrNull(8000) { ApkScanner.scan(applicationContext, sourceDir) } }
-                    catch (_: Throwable) { null }
+            // Ushbu ichki catch-up sikl haqiqiy ApkScanner.scan() chaqiradi — "Qurilma holati"
+            // docскани bilan bir vaqtda ishlamasligi uchun umumiy gate shu yerda ham o'rnatiladi.
+            // tryLock() — agar boshqa installed-skan (masalan startDeviceStatusDoscan) ALLAQACHON
+            // ketayotgan bo'lsa, bu sikl BUTUNLAY o'tkazib yuboriladi (SPEC_autoscan.md §2.3,
+            // T findings #11/#22) — lekin yuqorida qurilgan ro'yxat baribir ekranga chiqadi.
+            if (installedScanMutex.tryLock()) {
+                try {
+                    for (data in rows) {
+                        if (attempted >= 40) break           // bitta ochilishda ko'pi bilan 40 urinish — qizib ketmasin
+                        if (data.verdict != null) continue   // allaqachon verdikti bor — o'tkazamiz
+                        val sourceDir = data.sourceDir ?: continue
+                        if (nowMs < rescanPrefs.getLong("slow_until_${data.pkgName}", 0L)) continue
+                        attempted++
+                        val scanned = withContext(Dispatchers.IO) {
+                            try { withTimeoutOrNull(8000) { ApkScanner.scan(applicationContext, sourceDir) } }
+                            catch (_: Throwable) { null }
+                        }
+                        if (scanned == null) {
+                            rescanPrefs.edit()
+                                .putLong("slow_until_${data.pkgName}", nowMs + 24L * 60 * 60 * 1000)
+                                .apply()
+                            continue
+                        }
+                        rescanPrefs.edit().putString("verdict_${data.pkgName}", scanned.verdict.name).apply()
+                        // Tegni jonli yangilaymiz — foydalanuvchi tekshiruv ketayotganini ko'radi.
+                        rowByPkg[data.pkgName]?.let { applyAppTag(it, scanned.verdict.name) }
+                        if (scanned.verdict != ScanResult.Verdict.SAFE) foundThreatOnOpen = true
+                        yield()
+                    }
+                } finally {
+                    installedScanMutex.unlock()
                 }
-                if (scanned == null) {
-                    rescanPrefs.edit()
-                        .putLong("slow_until_${data.pkgName}", nowMs + 24L * 60 * 60 * 1000)
-                        .apply()
-                    continue
-                }
-                rescanPrefs.edit().putString("verdict_${data.pkgName}", scanned.verdict.name).apply()
-                // Tegni jonli yangilaymiz — foydalanuvchi tekshiruv ketayotganini ko'radi.
-                rowByPkg[data.pkgName]?.let { applyAppTag(it, scanned.verdict.name) }
-                if (scanned.verdict != ScanResult.Verdict.SAFE) foundThreatOnOpen = true
-                yield()
             }
             // Ilova ochilganda inline skan o'rnatilgan (sideload) ilovada VIRUS topgan bo'lsa —
             // "So'nggi tahdidlar" panelini DARHOL yangilaymiz. Aks holda topilgan virus faqat
@@ -836,6 +1248,7 @@ class DashboardNewActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        cardDoscanJob?.cancel()
         scope.cancel()
     }
 

@@ -41,4 +41,21 @@
     <string name="kq4_dash_src_sideload">Через APK</string>
     <string name="kq4_dash_src_system">Система</string>
     <string name="kq4_dash_src_unknown">Неизвестно</string>
+
+    <!-- Карточка «Состояние устройства» (SPEC_autoscan.md п.6, п.5) -->
+    <string name="kq4_ds_card_eyebrow">СОСТОЯНИЕ УСТРОЙСТВА</string>
+    <string name="kq4_ds_card_skeleton">Ожидает проверки…</string>
+    <string name="kq4_ds_card_progress">Проверяется: %1$s…</string>
+    <string name="kq4_ds_card_safe">Все установленные программы безопасны</string>
+    <string name="kq4_ds_card_danger">Найдено опасных программ: %1$d</string>
+    <string name="kq4_ds_card_no_access">Для проверки нужен доступ</string>
+    <string name="kq4_ds_card_reason_toggle">Почему опасно?</string>
+    <string name="kq4_ds_reason_hash">Сигнатура файла совпала с базой: %1$s</string>
+    <string name="kq4_ds_reason_cert">Подозрительный сертификат: %1$s</string>
+    <string name="kq4_ds_reason_pkg">Известная вредоносная программа: %1$s</string>
+    <string name="kq4_ds_reason_mismatch">Подпись программы не совпадает</string>
+    <string name="kq4_ds_reason_zip_evasion">Попытка обойти антивирус (шифрование ZIP-файлов)</string>
+    <string name="kq4_ds_reason_impersonation">Выдаёт себя за «%1$s»</string>
+    <string name="kq4_ds_reason_homoglyph">В слове «%1$s» подменены буквы (поддельное название)</string>
+    <string name="kq4_ds_card_toast_safe">Всё в порядке</string>
 </resources>

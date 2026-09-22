@@ -2,7 +2,9 @@ package com.uzguard
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -12,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -65,6 +68,10 @@ class InitialScanActivity : AppCompatActivity() {
         val verdict: ScanResult.Verdict,
         val reason: String,
         var rowView: View? = null,
+        // Faza A2 (o'rnatilgan dasturlar) uchun — fayllar uchun null bo'lib qoladi.
+        val pkgName: String? = null,
+        val fullResult: ScanResult? = null,
+        val icon: Drawable? = null,
     )
 
     /** MediaStore.createDeleteRequest consent flow — same pattern as AutoScanActivity. */
@@ -86,6 +93,30 @@ class InitialScanActivity : AppCompatActivity() {
     /** Consent talab qiladigan o'chirishlar navbati — ketma-ket bajariladi. */
     private val consentDeleteQueue = ArrayDeque<DangerEntry>()
 
+    // Faza A2 (o'rnatilgan dasturlar) holati — Skip tugmasi va orqaga tugmasi shu paytda
+    // darhol Dashboard'ga chiqarmaydi, balki skanni muloyimlik bilan to'xtatadi (isCancelled).
+    @Volatile private var inPhaseA2 = false
+    @Volatile private var skipRequested = false
+
+    /** Jami HAQIQATDA tekshirilgan (fayl + dastur) son — bo'sh-holat sarlavhasida va TTS'da
+     *  ko'rsatiladi. Skan boshida darhol yakuniy summaga tenglashtirilmaydi — Faza A/A2
+     *  davomida real vaqtda oshib boradi (T findings #7/#8/#19): aks holda hisoblagich
+     *  Faza A2 boshida pastga "sakraydi" va Skip/timeout paytida haqiqatdan ko'proq
+     *  tekshirilgan deb yolg'on da'vo qilinadi. */
+    private var combinedTotalChecked = 0
+
+    /** true — Faza A2 Skip yoki vaqt byudjeti tufayli TO'LIQ tugallanmadi (T findings #14/#19):
+     *  bunda "hammasi xavfsiz" TTS o'rniga "N ta tekshirildi" versiyasi ishlatiladi va
+     *  Config.markInstalledScanDone() chaqirilmaydi (due-tekshiruv qolganini keyinroq topsin). */
+    private var scanIncomplete = false
+
+    /** Orqaga tugmasi — faqat Faza A2 davomida yoqiladi, Skip bilan bir xil ishlaydi. */
+    private val skipA2BackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            skipRequested = true
+        }
+    }
+
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.apply(newBase))
     }
@@ -103,9 +134,14 @@ class InitialScanActivity : AppCompatActivity() {
         // TTS engine'ni oldindan tayyorlaymiz — scan tugagach darhol gapirsin.
         VoiceVerdict.init(this)
 
-        binding.btnSkip.setOnClickListener { goToDashboard() }
+        // Faza A2 davomida Skip skanni muloyimlik bilan to'xtatadi (isCancelled); undan
+        // oldin/tashqarida — ilgarigidek darhol Dashboard'ga chiqadi.
+        binding.btnSkip.setOnClickListener {
+            if (inPhaseA2) skipRequested = true else goToDashboard()
+        }
         binding.btnContinue.setOnClickListener { goToDashboard() }
         binding.btnDeleteAll.setOnClickListener { confirmDeleteAll() }
+        onBackPressedDispatcher.addCallback(this, skipA2BackCallback)
         // Skan onResume'da boshlanadi — avval "Barcha fayllarga ruxsat" tekshiriladi.
     }
 
@@ -159,71 +195,93 @@ class InitialScanActivity : AppCompatActivity() {
         // Faza A boshlanishi: "fayllar qidirilmoqda" — uzun qidiruvda (ko'p faylli telefon)
         // ekran "qotib qolgandek" ko'rinmasin. Ilgari bu yerda hech narsa yangilanmasdi va
         // butun fayl tizimi obhod qilinguncha ekran 0% da turardi.
+        binding.tvScanPhaseLabel.text = getString(R.string.kq4_is2_phase_label_files)
         binding.tvCurrentFile.text = getString(R.string.kq4_is_searching)
         binding.tvScanProgress.text = ""
         scope.launch {
             try {
-                val apks = withContext(Dispatchers.IO) {
-                    // Tez yo'l: MediaStore indeksidan (yangi/katta telefonlarda ham darhol
-                    // topadi) + to'liq rekursiv yurish (endi vaqt byudjeti bilan — hech qachon
-                    // cheksiz osilmaydi). Yo'l bo'yicha dedup qilamiz.
-                    val fast = try {
-                        ApkScanner.findApkFiles(this@InitialScanActivity)
-                    } catch (_: Throwable) { emptyList<ApkItem>() }
-                    val deep = try {
-                        FullPhoneScan.findAllApkFiles(this@InitialScanActivity)
-                    } catch (_: Throwable) { emptyList<ApkItem>() }
-                    val seen = HashSet<String>(fast.size + deep.size)
-                    (fast + deep).filter { seen.add(it.path) }
-                }
-                if (apks.isEmpty()) {
-                    presentResults()
-                    return@launch
+                // Fayl ro'yxati (tez+chuqur) VA o'rnatilgan paketlar ro'yxati — PARALLEL
+                // (Faza A2, T5 p.4.2.1): o'rnatilganlar ro'yxatini ZARARDAN oldindan olamiz,
+                // shu bilan combinedTotal (fayl+dastur) darhol ma'lum bo'ladi va Faza A/A2
+                // chegarasida kольцо orqaga sakramaydi.
+                val (apks, installedPackages) = withContext(Dispatchers.IO) {
+                    val apksDeferred = async {
+                        // Tez yo'l: MediaStore indeksidan (yangi/katta telefonlarda ham darhol
+                        // topadi) + to'liq rekursiv yurish (endi vaqt byudjeti bilan — hech qachon
+                        // cheksiz osilmaydi). Yo'l bo'yicha dedup qilamiz.
+                        val fast = try {
+                            ApkScanner.findApkFiles(this@InitialScanActivity)
+                        } catch (_: Throwable) { emptyList<ApkItem>() }
+                        val deep = try {
+                            FullPhoneScan.findAllApkFiles(this@InitialScanActivity)
+                        } catch (_: Throwable) { emptyList<ApkItem>() }
+                        val seen = HashSet<String>(fast.size + deep.size)
+                        (fast + deep).filter { seen.add(it.path) }
+                    }
+                    val installedDeferred = async {
+                        try {
+                            packageManager.getInstalledPackages(0)
+                        } catch (_: Throwable) { emptyList<PackageInfo>() }
+                    }
+                    apksDeferred.await() to installedDeferred.await()
                 }
 
-                val total = apks.size
-                binding.tvFoundCount.text = total.toString()
+                val filesTotal = apks.size
+                val appsTotal = installedPackages.size
+                val combinedTotal = (filesTotal + appsTotal).coerceAtLeast(1)
 
-                // OPTIMIZATSIYA: ilgari APK'lar BIRMA-BIR (ketma-ket) skanlanardi — ko'p faylli
-                // telefonda sekin va uzoq. Endi cheklangan PARALLEL (SCAN_CONCURRENCY ta bir
-                // vaqtda) — ~bir necha barobar tez. Cheksiz EMAS — loyihada qizish tarixi bor,
-                // shuning uchun bir vaqtda atigi 3 ta (qizishni nazoratda ushlaymiz).
-                var done = 0
-                for (chunk in apks.chunked(SCAN_CONCURRENCY)) {
-                    if (!isActive) break
-                    val scanned = withContext(Dispatchers.IO) {
-                        chunk.map { apk ->
-                            async {
-                                apk to try {
-                                    ApkScanner.scan(this@InitialScanActivity, apk.path)
-                                } catch (e: Throwable) {
-                                    android.util.Log.w("InitialScan", "scan failed: ${apk.path}", e)
-                                    null
+                if (apks.isNotEmpty()) {
+                    // OPTIMIZATSIYA: ilgari APK'lar BIRMA-BIR (ketma-ket) skanlanardi — ko'p faylli
+                    // telefonda sekin va uzoq. Endi cheklangan PARALLEL (SCAN_CONCURRENCY ta bir
+                    // vaqtda) — ~bir necha barobar tez. Cheksiz EMAS — loyihada qizish tarixi bor,
+                    // shuning uchun bir vaqtda atigi 3 ta (qizishni nazoratda ushlaymiz).
+                    var done = 0
+                    for (chunk in apks.chunked(SCAN_CONCURRENCY)) {
+                        if (!isActive) break
+                        val scanned = withContext(Dispatchers.IO) {
+                            chunk.map { apk ->
+                                async {
+                                    apk to try {
+                                        ApkScanner.scan(this@InitialScanActivity, apk.path)
+                                    } catch (e: Throwable) {
+                                        android.util.Log.w("InitialScan", "scan failed: ${apk.path}", e)
+                                        null
+                                    }
                                 }
-                            }
-                        }.awaitAll()
-                    }
-                    for ((apk, result) in scanned) {
-                        done++
-                        binding.tvCurrentFile.text = apk.name
-                        val pct = done * 100 / total
-                        binding.tvScanProgress.text = "$pct%"
-                        binding.scanRing.setValue(pct.toFloat(), animate = false)
-                        val isThreat = result != null && result.verdict != ScanResult.Verdict.SAFE
-                        if (isThreat) {
-                            dangerous += DangerEntry(
-                                path = apk.path,
-                                filename = apk.name,
-                                sizeBytes = apk.sizeBytes,
-                                verdict = result!!.verdict,
-                                reason = result.reason,
-                            )
-                            binding.tvDangerCount.text = dangerous.size.toString()
+                            }.awaitAll()
                         }
-                        // Statistika ApkScanner.scan() ICHIDA sanaladi — bu yerda qayta emas.
+                        for ((apk, result) in scanned) {
+                            done++
+                            combinedTotalChecked = done
+                            binding.tvCurrentFile.text = apk.name
+                            // Yagona uchma-uch kольцо (T5 p.4.5): fayl+dastur umumiy foizi —
+                            // Faza A2'ga o'tganda orqaga sakramasligi uchun combinedTotal'dan.
+                            val overallPct = done * 100 / combinedTotal
+                            binding.tvScanProgress.text = "$overallPct%"
+                            binding.scanRing.setValue(overallPct.toFloat(), animate = false)
+                            AnimationHelper.countUp(binding.tvFoundCount, done, duration = 200)
+                            val isThreat = result != null && result.verdict != ScanResult.Verdict.SAFE
+                            if (isThreat) {
+                                dangerous += DangerEntry(
+                                    path = apk.path,
+                                    filename = apk.name,
+                                    sizeBytes = apk.sizeBytes,
+                                    verdict = result!!.verdict,
+                                    reason = result.reason,
+                                )
+                                binding.tvDangerCount.text = dangerous.size.toString()
+                            }
+                            // Statistika ApkScanner.scan() ICHIDA sanaladi — bu yerda qayta emas.
+                        }
+                        yield() // animatsiya/UI nafas olsin
                     }
-                    yield() // animatsiya/UI nafas olsin
                 }
+
+                // Faza A2 — o'rnatilgan dasturlar (birinchi ishga tushirish, SO'ZSIZ, T5 p.4).
+                // Faza A tugagach BOSHLANADI (parallel emas — issiqlik cho'qqisini
+                // ikkilantirmaslik uchun, T5 talabi).
+                runInstalledAppsPhaseA2(filesTotal, combinedTotal, installedPackages)
+
                 presentResults()
             } catch (e: Throwable) {
                 android.util.Log.e("InitialScan", "scan loop crashed", e)
@@ -232,14 +290,149 @@ class InitialScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun presentResults() {
-        binding.layoutScanning.visibility = View.GONE
-        binding.layoutResults.visibility = View.VISIBLE
-        binding.btnSkip.visibility = View.GONE
+    /**
+     * Faza A2: qurilmaga o'rnatilgan dasturlarni tekshiradi (ApkScanner.scanInstalledForThreats,
+     * IO oqimida). Bitta marotaba, birinchi ishga tushirishda, cheklangan (limit+vaqt byudjeti) —
+     * qolgani mavjud kunlik InstalledAppsRescanWorker orqali qamrab olinadi (T5 p.4.2.4).
+     */
+    private suspend fun CoroutineScope.runInstalledAppsPhaseA2(
+        filesTotal: Int,
+        combinedTotal: Int,
+        installedPackages: List<PackageInfo>,
+    ) {
+        inPhaseA2 = true
+        skipA2BackCallback.isEnabled = true
+        // Ilova ikonkasi endi ko'rinadi (T findings #2/#17) — ilgari GONE default'dan
+        // hech qachon VISIBLE'ga o'tmasdi, shuning uchun butun Faza A2 davomida yashiringan qolardi.
+        binding.ivCurrentAppIcon.visibility = View.VISIBLE
+        binding.tvScanPhaseLabel.text = getString(R.string.kq4_is2_phase_label_apps)
+        AnimationHelper.fadeOut(binding.tvCurrentFile, duration = 150) {
+            binding.tvCurrentFile.text = "—"
+            AnimationHelper.fadeIn(binding.tvCurrentFile, duration = 150)
+        }
 
-        if (dangerous.isEmpty()) {
-            renderEmptyState(allDeleted = false)
-            VoiceVerdict.speak(this, ScanResult.Verdict.SAFE)
+        try {
+            var appsProcessed = 0
+            var appsDangerSoFar = 0
+            // ApkScanner o'z ro'yxatini QAYTA oladi (Faza A davomida ilova o'rnatilgan/o'chirilgan
+            // bo'lishi mumkin) — to'liqlikni uning `total`i bo'yicha o'lchaymiz, appsTotal emas.
+            var a2Total = 0
+            val threats = withContext(Dispatchers.IO) {
+                ApkScanner.scanInstalledForThreats(
+                    context = this@InitialScanActivity,
+                    limit = FIRST_RUN_APP_LIMIT,
+                    startIndex = 0,
+                    loadIcons = true,
+                    timeBudgetMs = FIRST_RUN_TIME_BUDGET_MS,
+                    isCancelled = { skipRequested || !isActive },
+                    onProgress = { _, total, _, label, icon, verdict ->
+                        // onProgress IO oqimidan chaqiriladi — UI faqat post() orqali yangilanadi.
+                        a2Total = total
+                        appsProcessed++
+                        val isThreat = verdict != null && verdict != ScanResult.Verdict.SAFE
+                        if (isThreat) appsDangerSoFar++
+                        val overallPct = (filesTotal + appsProcessed) * 100 / combinedTotal
+                        val checkedSoFar = filesTotal + appsProcessed
+                        combinedTotalChecked = checkedSoFar
+                        val dangerSoFar = dangerous.size + appsDangerSoFar
+                        binding.root.post {
+                            binding.tvCurrentFile.text = getString(R.string.kq4_is2_current_app, label)
+                            binding.tvScanProgress.text = "$overallPct%"
+                            binding.scanRing.setValue(overallPct.toFloat(), animate = false)
+                            AnimationHelper.countUp(binding.tvFoundCount, checkedSoFar, duration = 300)
+                            if (icon != null) {
+                                binding.ivCurrentAppIcon.setImageDrawable(icon)
+                                AnimationHelper.bounce(binding.ivCurrentAppIcon, duration = 320)
+                            }
+                            if (isThreat) {
+                                binding.tvDangerCount.text = dangerSoFar.toString()
+                                AnimationHelper.shake(binding.ivCurrentAppIcon, duration = 280)
+                            }
+                        }
+                    },
+                )
+            }
+
+            for (t in threats) {
+                dangerous += DangerEntry(
+                    // Haqiqiy apk fayl yo'li (t.sourceDir) — paket nomi EMAS (T findings #9/#20):
+                    // aks holda ScanResultActivity'da File(apkPath).exists() doim false chiqadi
+                    // (hajm bo'sh, arxiv-meta o'qish sinadi). t.pkg — faqat fallback (nazariy jihatdan
+                    // bo'sh bo'lmasligi kerak, chunki tahdid faqat sourceDir mavjud bo'lgandagina qo'shiladi).
+                    path = t.sourceDir.ifBlank { t.pkg },
+                    filename = t.label,
+                    sizeBytes = 0L,
+                    verdict = t.result.verdict,
+                    reason = t.result.reason,
+                    pkgName = t.pkg,
+                    fullResult = t.result,
+                    icon = t.icon,
+                )
+            }
+            binding.tvDangerCount.text = dangerous.size.toString()
+
+            // Faza A2 Skip yoki vaqt byudjeti tufayli TO'LIQ tugallanmagan bo'lishi mumkin
+            // (T findings #14/#19) — bunda "birinchi to'liq tekshiruv bajarildi" deb
+            // BELGILAMAYMIZ, aks holda Dashboard'ning due-tekshiruvi qolgan qismni
+            // kunlik workergacha topa olmaydi.
+            scanIncomplete = skipRequested || (a2Total > 0 && appsProcessed < a2Total)
+            if (!scanIncomplete) {
+                // Dashboard'dagi userPackagesForStatusCheck() bilan BIR XIL filtr (T findings #3):
+                // son ham, maxFirstInstallTs ham FILTRLANGAN ro'yxatdan — aks holda tizim
+                // ilovalari kirib, Dashboard'ning "yangi ilova bormi" tekshiruvi hech qachon
+                // ishlamaydi yoki birinchi ochilishdayoq keraksiz doskan ishga tushadi.
+                val userPkgs = userPackages(installedPackages)
+                val maxFirstInstallTs = userPkgs.maxOfOrNull { it.firstInstallTime } ?: 0L
+                Config.markInstalledScanDone(
+                    this@InitialScanActivity,
+                    userPkgs.size,
+                    maxFirstInstallTs,
+                )
+            }
+        } finally {
+            inPhaseA2 = false
+            skipA2BackCallback.isEnabled = false
+            binding.ivCurrentAppIcon.visibility = View.GONE
+        }
+    }
+
+    private fun presentResults() {
+        binding.btnSkip.visibility = View.GONE
+        val safe = dangerous.isEmpty()
+        // Kontent avval (layoutResults hali GONE), keyin o'tish animatsiyasi.
+        if (safe) renderEmptyState(allDeleted = false) else renderDangerList()
+
+        // Skan → natija o'tishi: skan-ekran so'nadi (300ms), natija pastdan chiqadi (400ms),
+        // yakuniy belgi — SAFE: bounce, XAVF: shake; ro'yxat qatorlari kaskad bilan (80ms qadam).
+        AnimationHelper.fadeOut(binding.layoutScanning, duration = 300) {
+            val dy = 48f * resources.displayMetrics.density
+            binding.layoutResults.alpha = 0f
+            binding.layoutResults.translationY = dy
+            binding.layoutResults.visibility = View.VISIBLE
+            binding.layoutResults.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(400)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+            if (safe) {
+                AnimationHelper.bounce(binding.resultIcon, duration = 600)
+            } else {
+                AnimationHelper.shake(binding.resultIcon, duration = 500)
+                AnimationHelper.cascadeChildren(binding.dangerList, delayBetween = 80)
+            }
+        }
+
+        // Faza A2 endi shartsiz ishlaydi — natija doim kombinatsiyalangan (fayl+dastur),
+        // shu sabab TTS/sarlavhalar kq4_is2_* satrlaridan (T5 p.8).
+        if (safe) {
+            // Skan Skip/vaqt byudjeti tufayli to'liq tugallanmagan bo'lsa — "BARCHASI xavfsiz"
+            // deb KATEGORIK da'vo qilmaymiz (T findings #19), aniq son bilan gapiramiz.
+            VoiceVerdict.speak(
+                this,
+                if (scanIncomplete) getString(R.string.kq4_is2_tts_safe_partial, combinedTotalChecked)
+                else getString(R.string.kq4_is2_tts_safe_combined)
+            )
         } else {
             renderDangerList()
             val worst = if (dangerous.any { it.verdict == ScanResult.Verdict.DANGER })
@@ -247,8 +440,8 @@ class InitialScanActivity : AppCompatActivity() {
             VoiceVerdict.speak(
                 this,
                 getString(
-                    if (worst == ScanResult.Verdict.DANGER) R.string.kq4_is_tts_danger
-                    else R.string.kq4_is_tts_susp,
+                    if (worst == ScanResult.Verdict.DANGER) R.string.kq4_is2_tts_danger
+                    else R.string.kq4_is2_tts_susp,
                     dangerous.size,
                 ),
             )
@@ -269,9 +462,13 @@ class InitialScanActivity : AppCompatActivity() {
         binding.tvHeaderSub.text = getString(
             if (allDeleted) R.string.is_all_deleted else R.string.is_sub_no_threats
         )
-        binding.tvEmptyText.text = getString(
-            if (allDeleted) R.string.kq4_is_all_deleted else R.string.kq4_is_none_found
-        )
+        // allDeleted=false — bu doim kombinatsiyalangan (fayl+dastur) skandan keyin
+        // yetiladi (Faza A2 endi shartsiz ishlaydi), shu sabab kq4_is2_header_combined.
+        binding.tvEmptyText.text = if (allDeleted) {
+            getString(R.string.kq4_is_all_deleted)
+        } else {
+            getString(R.string.kq4_is2_header_combined, combinedTotalChecked)
+        }
         binding.btnDeleteAll.visibility = View.GONE
         binding.dangerList.removeAllViews()
         binding.dangerList.visibility = View.GONE
@@ -336,20 +533,31 @@ class InitialScanActivity : AppCompatActivity() {
             setOnClickListener { openDetails(entry) }
         }
 
-        // av 48dp r18: danger — danger_bg + kq_danger; suspicious — warn variant
+        // av 48dp r18: o'rnatilgan dastur (Faza A2) — haqiqiy ilova ikonkasi (dumaloq
+        // kesilgan); fayl (Faza A) — ilgarigidek danger_bg/warn_bg + ic4_file.
         val av = FrameLayout(this).apply {
             setBackgroundResource(if (danger) R.drawable.kq4_av_danger else R.drawable.kq4_av_warn)
             layoutParams = LinearLayout.LayoutParams(dp(48), dp(48))
         }
-        av.addView(ImageView(this).apply {
-            setImageResource(R.drawable.ic4_file)
-            imageTintList = ColorStateList.valueOf(
-                getColor(if (danger) R.color.kq_danger else R.color.kq_warn)
-            )
-            layoutParams = FrameLayout.LayoutParams(dp(22), dp(22)).apply {
-                gravity = Gravity.CENTER
-            }
-        })
+        if (entry.pkgName != null && entry.icon != null) {
+            av.addView(ImageView(this).apply {
+                setImageDrawable(entry.icon)
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                background = ContextCompat.getDrawable(this@InitialScanActivity, R.drawable.kq4_circle_surface)
+                clipToOutline = true
+                layoutParams = FrameLayout.LayoutParams(dp(48), dp(48))
+            })
+        } else {
+            av.addView(ImageView(this).apply {
+                setImageResource(R.drawable.ic4_file)
+                imageTintList = ColorStateList.valueOf(
+                    getColor(if (danger) R.color.kq_danger else R.color.kq_warn)
+                )
+                layoutParams = FrameLayout.LayoutParams(dp(22), dp(22)).apply {
+                    gravity = Gravity.CENTER
+                }
+            })
+        }
 
         val textColumn = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -368,11 +576,16 @@ class InitialScanActivity : AppCompatActivity() {
             isSingleLine = true
         })
 
-        // .sub — manba (papka nomi) · hajm, 13sp kq_ink_3
-        val folder = java.io.File(entry.path).parentFile?.name.orEmpty()
+        // .sub — o'rnatilgan dastur uchun kq4_is2_danger_row_sub (paket nomi); fayl uchun
+        // ilgarigidek manba (papka nomi) · hajm, 13sp kq_ink_3
         textColumn.addView(TextView(this).apply {
-            text = if (folder.isEmpty()) humanSize(entry.sizeBytes)
-            else "$folder · ${humanSize(entry.sizeBytes)}"
+            text = if (entry.pkgName != null) {
+                getString(R.string.kq4_is2_danger_row_sub, entry.pkgName)
+            } else {
+                val folder = java.io.File(entry.path).parentFile?.name.orEmpty()
+                if (folder.isEmpty()) humanSize(entry.sizeBytes)
+                else "$folder · ${humanSize(entry.sizeBytes)}"
+            }
             typeface = ResourcesCompat.getFont(this@InitialScanActivity, R.font.onest_regular)
             setTextColor(getColor(R.color.kq_ink_3))
             textSize = 13f
@@ -419,6 +632,15 @@ class InitialScanActivity : AppCompatActivity() {
     }
 
     private fun attemptDelete(entry: DangerEntry) {
+        // O'rnatilgan dastur (Faza A2) — entry.path bu yerda PAKET NOMI, fayl yo'li EMAS
+        // (T findings #1). FileDeleter.delete unga uzatilsa File(path).exists() doim false
+        // qaytaradi va bu Result.Deleted (YOLG'ON muvaffaqiyat) sifatida talqin qilinadi —
+        // dastur haqiqatda o'rnatilgan qolaveradi. Shuning uchun o'rnatilgan dasturlar
+        // uchun FileDeleter emas, shtatniy uninstall-oqim ishlatiladi.
+        if (entry.pkgName != null) {
+            uninstallInstalledApp(entry.pkgName)
+            return
+        }
         try {
             when (val r = FileDeleter.delete(this, entry.path)) {
                 FileDeleter.Result.Deleted -> onItemDeleted(entry)
@@ -464,6 +686,31 @@ class InitialScanActivity : AppCompatActivity() {
                 getString(R.string.toast_error_generic, e.message ?: e.javaClass.simpleName),
                 Toast.LENGTH_LONG,
             ).show()
+        }
+    }
+
+    /**
+     * O'rnatilgan dastur uchun shtatniy uninstall oynasi (ScanResultActivity.uninstall() bilan
+     * bir xil pattern). Natija ASINXRON (foydalanuvchi tizim dialogida o'zi hal qiladi) —
+     * shuning uchun bu yerda onItemDeleted() DARHOL chaqirilmaydi (hech qachon yolg'on
+     * "o'chirildi" deb da'vo qilinmasin, T findings #1). Ro'yxat keyingi skanda o'zi yangilanadi.
+     */
+    private fun uninstallInstalledApp(pkg: String) {
+        if (DeviceAdminUtil.isActiveAdmin(this, pkg)) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.devadmin_block_title)
+                .setMessage(R.string.devadmin_block_msg)
+                .setPositiveButton(R.string.kq4_prot_autostart_open) { _, _ ->
+                    DeviceAdminUtil.openDeviceAdminSettings(this)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+            return
+        }
+        try {
+            startActivity(Intent(Intent.ACTION_DELETE, android.net.Uri.parse("package:$pkg")))
+        } catch (e: Throwable) {
+            Toast.makeText(this, e.message ?: e.javaClass.simpleName, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -529,15 +776,24 @@ class InitialScanActivity : AppCompatActivity() {
     }
 
     private fun openDetails(entry: DangerEntry) {
-        val result = ScanResult(
-            verdict = entry.verdict,
-            reason = entry.reason,
-            details = emptyList(),
-            dangerousPermissions = emptyList(),
-            malwareSignatures = emptyList(),
-        )
-        startActivity(ScanResultActivity.intent(this, entry.path, result))
+        val intent = if (entry.pkgName != null) {
+            // O'rnatilgan dastur (Faza A2) — bor bo'lsa to'liq ScanResult (fullResult),
+            // ScanResultActivity.intent'ning packageName parametri orqali.
+            ScanResultActivity.intent(this, entry.path, entry.fullResult ?: stripDetails(entry), packageName = entry.pkgName)
+        } else {
+            ScanResultActivity.intent(this, entry.path, stripDetails(entry))
+        }
+        startActivity(intent)
     }
+
+    /** Fayl-yozuvlar uchun ilgarigidek — DangerEntry'dan urezan (details/perms/sigs bo'sh) ScanResult. */
+    private fun stripDetails(entry: DangerEntry): ScanResult = ScanResult(
+        verdict = entry.verdict,
+        reason = entry.reason,
+        details = emptyList(),
+        dangerousPermissions = emptyList(),
+        malwareSignatures = emptyList(),
+    )
 
     private fun openManageStorage() {
         try {
@@ -575,6 +831,20 @@ class InitialScanActivity : AppCompatActivity() {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
+    /**
+     * DashboardNewActivity.userPackagesForStatusCheck() bilan BIR XIL filtr (T findings #3):
+     * tizim ilovalari (updated-system bundan mustasno) va o'zimizni chiqarib tashlaymiz —
+     * Config.markInstalledScanDone() shu sonni yozadi, Dashboard'ning due-tekshiruvi esa
+     * xuddi shu filtr bo'yicha hisoblangan son bilan solishtiradi.
+     */
+    private fun userPackages(packages: List<PackageInfo>): List<PackageInfo> = packages.filter { p ->
+        val app = p.applicationInfo ?: return@filter false
+        val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+        val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+        val isSelf = p.packageName == packageName || p.packageName == "$packageName.debug"
+        (!isSystem || updatedSystem) && !isSelf
+    }
+
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
     private fun humanSize(bytes: Long): String {
@@ -586,5 +856,11 @@ class InitialScanActivity : AppCompatActivity() {
         // Bir vaqtda parallel skanlanadigan APK soni. 3 — sekvensialdan sezilarli tez,
         // lekin cheklangan (qizishni nazoratda ushlaydi; loyihada qizish tarixi bor).
         private const val SCAN_CONCURRENCY = 3
+
+        // Faza A2 (birinchi ishga tushirish, T5 p.4.2.4): limit+vaqt byudjeti — sovuq
+        // keshda 100+ ilovali telefonda ekran "osilib qolmasligi" uchun. Qolgan qism
+        // mavjud kunlik InstalledAppsRescanWorker orqali qamrab olinadi.
+        private const val FIRST_RUN_APP_LIMIT = 500
+        private const val FIRST_RUN_TIME_BUDGET_MS = 60_000L
     }
 }

@@ -11,6 +11,7 @@ package com.uzguard
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -339,7 +340,16 @@ object ApkScanner {
     }
 
     /** O'rnatilgan ilovada topilgan tahdid — [scanInstalledForThreats] qaytaradi. */
-    data class InstalledThreat(val pkg: String, val label: String, val result: ScanResult)
+    data class InstalledThreat(
+        val pkg: String,
+        val label: String,
+        val result: ScanResult,
+        val icon: Drawable? = null,
+        // Haqiqiy apk fayl yo'li (ApplicationInfo.sourceDir) — ScanResultActivity'ga
+        // "path" sifatida shu boradi, paket nomi EMAS (aks holda File(apkPath).exists()
+        // doim false, hajm/arxiv-meta o'qish sinadi).
+        val sourceDir: String = "",
+    )
 
     /**
      * QURILMAGA O'RNATILGAN ilovalarni virusga tekshiradi (fayllarni EMAS — o'rnatilgan
@@ -353,8 +363,29 @@ object ApkScanner {
      *
      * Faqat SAFE bo'lmagan (DANGER/SUSPICIOUS) natijalar qaytariladi. Budjet [limit] ilova (qizishdan
      * saqlanish). ScanCache tufayli takroriy chaqiruvlar arzon. Fon oqimida (IO) chaqiring.
+     *
+     * YANGI (barchasi — standart qiymat bilan, eski chaqiruvlar o'zgarmasdan ishlaydi):
+     * - [startIndex] — ro'yxat ustidan aylanish shu indeksdan boshlanadi va AYLANA bo'ylab (rotatsiya)
+     *   yuriladi, har doim noldan emas — 40 tadan ko'p sideload ilova bo'lsa, "dum" hech qachon
+     *   tekshirilmay qolmasligi uchun (chaqiruvchi keyingi safar oxirgi indeksdan davom ettiradi).
+     * - [loadIcons] — true bo'lsa, har bir tekshirilayotgan ilova uchun [Drawable] ikonka yuklanadi
+     *   (UI'da ko'rsatish uchun); false (standart) — hech qanday qo'shimcha yuk yo'q.
+     * - [timeBudgetMs] — berilsa, shu vaqt (millisekund) tugagach tsikl to'xtaydi, qolgani keyingi
+     *   chaqiruvga qoladi (masalan, birinchi ishga tushishda "osilib qolish"ning oldini olish uchun).
+     * - [isCancelled] — har iteratsiyada tekshiriladi; `true` qaytarsa, tsikl darhol to'xtaydi
+     *   (foydalanuvchi "O'tkazib yuborish" bossa).
+     * - [onProgress] — har bir ko'rib chiqilgan (skip qilinganlar ham) paket uchun chaqiriladi:
+     *   (indeks, jami, paket nomi, nom, ikonka, verdikt-yoki-null-agar-skanlanmagan-bo'lsa).
      */
-    fun scanInstalledForThreats(context: Context, limit: Int = 40): List<InstalledThreat> {
+    fun scanInstalledForThreats(
+        context: Context,
+        limit: Int = 40,
+        startIndex: Int = 0,
+        loadIcons: Boolean = false,
+        timeBudgetMs: Long? = null,
+        isCancelled: (() -> Boolean)? = null,
+        onProgress: ((index: Int, total: Int, pkg: String, label: String, icon: Drawable?, verdict: ScanResult.Verdict?) -> Unit)? = null
+    ): List<InstalledThreat> {
         val out = mutableListOf<InstalledThreat>()
         val pm = context.packageManager
         val packages = try {
@@ -362,31 +393,72 @@ object ApkScanner {
         } catch (e: Throwable) {
             Log.w(TAG, "getInstalledPackages failed", e); return out
         }
+        val total = packages.size
+        if (total == 0) return out
+
+        val startedAt = SystemClock.elapsedRealtime()
         var budget = 0
-        for (p in packages) {
-            if (budget >= limit) break
+        var idx = startIndex.coerceIn(0, total - 1)
+        var iterations = 0
+
+        loop@ while (iterations < total) {
+            if (isCancelled?.invoke() == true) break@loop
+            if (timeBudgetMs != null && SystemClock.elapsedRealtime() - startedAt > timeBudgetMs) break@loop
+
+            val p = packages[idx]
+            var verdictForCallback: ScanResult.Verdict? = null
+            var label = ""
+            var icon: Drawable? = null
+            var name: String? = null
+
             try {
-                val app = p.applicationInfo ?: continue
+                val app = p.applicationInfo
+                name = p.packageName
+                if (app == null || name == null) {
+                    // onProgress ham chaqirilishi kerak — aks holda chaqiruvchi (masalan UI
+                    // hisoblagichi) real onProgress-tik sonini `total`dan kam deb hisoblaydi.
+                    onProgress?.invoke(idx, total, name ?: "?", name ?: "?", null, null)
+                    idx = (idx + 1) % total; iterations++; continue@loop
+                }
+                // Inson o'qiy oladigan nom — SKIP/budjetdan qat'i nazar darhol yuklanadi
+                // (arzon operatsiya): onProgress skip qilingan paketlar uchun ham chaqiriladi,
+                // UI'da esa "com.whatsapp tekshirilmoqda..." o'rniga "WhatsApp tekshirilmoqda..."
+                // ko'rinishi kerak.
+                label = try { app.loadLabel(pm).toString() } catch (_: Throwable) { name }
                 val isSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
                 val updatedSystem = (app.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
-                if (isSystem && !updatedSystem) continue
-                val name = p.packageName ?: continue
-                if (name == context.packageName || name == "${context.packageName}.debug") continue
-                // Rasmiy do'kondan o'rnatilgan — TEGMAYMIZ (foydalanuvchi talabi + Play Protect).
-                if (isFromTrustedStore(context, name)) continue
-                val src = app.sourceDir ?: continue
-                if (!java.io.File(src).exists()) continue
-                budget++
-                val res = try { scan(context, src) } catch (e: Throwable) {
-                    Log.w(TAG, "installed scan failed for $name", e); continue
+                val skip = (isSystem && !updatedSystem) ||
+                    name == context.packageName || name == "${context.packageName}.debug" ||
+                    // Rasmiy do'kondan o'rnatilgan — TEGMAYMIZ (foydalanuvchi talabi + Play Protect).
+                    isFromTrustedStore(context, name)
+
+                if (!skip && budget < limit) {
+                    val src = app.sourceDir
+                    if (src != null && java.io.File(src).exists()) {
+                        if (loadIcons) {
+                            icon = try { app.loadIcon(pm) } catch (_: Throwable) { null }
+                        }
+                        budget++
+                        val res = try { scan(context, src) } catch (e: Throwable) {
+                            Log.w(TAG, "installed scan failed for $name", e); null
+                        }
+                        if (res != null) {
+                            verdictForCallback = res.verdict
+                            if (res.verdict != ScanResult.Verdict.SAFE) {
+                                out.add(InstalledThreat(name, label, res, icon, sourceDir = src))
+                            }
+                        }
+                    }
                 }
-                if (res.verdict != ScanResult.Verdict.SAFE) {
-                    val label = try { app.loadLabel(pm).toString() } catch (_: Throwable) { name }
-                    out.add(InstalledThreat(name, label, res))
-                }
+
+                onProgress?.invoke(idx, total, name, label, icon, verdictForCallback)
             } catch (e: Throwable) {
                 Log.w(TAG, "installed-threat iteration failed", e)
             }
+
+            idx = (idx + 1) % total
+            iterations++
+            if (budget >= limit) break@loop
         }
         return out
     }

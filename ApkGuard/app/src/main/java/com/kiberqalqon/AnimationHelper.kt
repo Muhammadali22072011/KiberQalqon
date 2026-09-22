@@ -4,14 +4,19 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.os.SystemClock
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
+import java.util.WeakHashMap
 
 object AnimationHelper {
-    
+
+    /** throttledRingUpdate uchun har bir ring View'ning oxirgi yangilanish vaqti (elapsedRealtime). */
+    private val lastRingUpdateTs = WeakHashMap<View, Long>()
+
     /**
      * Плавное появление View (fade in + scale)
      */
@@ -237,6 +242,11 @@ object AnimationHelper {
             .start()
     }
 
+    /** countUp() uchun har bir TextView'ning joriy ValueAnimator'i — tez-tez chaqirilganda
+     *  eskisi bekor qilinadi, aks holda bir nechta aniматор bir vaqtda View.text'ga yozib,
+     *  raqam vaqtincha pastga sakraydi/orqaga qaytadi (T findings #4). */
+    private val countUpAnimators = WeakHashMap<View, ValueAnimator>()
+
     /**
      * Count-up — raqamni 0 dan (yoki joriy qiymatdan) yakuniy songacha animatsiya bilan
      * sanaydi. "Yorug' minimal" dizayn: dashboard statistikasi jonli ko'rinadi.
@@ -249,19 +259,21 @@ object AnimationHelper {
         duration: Long = 900,
         startDelay: Long = 0,
     ) {
+        countUpAnimators.remove(view)?.cancel()
         val current = view.text?.toString()?.toIntOrNull()
         if (current == to) {
             view.text = to.toString()
             return
         }
         val start = current ?: from
-        ValueAnimator.ofInt(start, to).apply {
+        val animator = ValueAnimator.ofInt(start, to).apply {
             this.duration = duration
             this.startDelay = startDelay
             interpolator = DecelerateInterpolator()
             addUpdateListener { view.text = (it.animatedValue as Int).toString() }
-            start()
         }
+        countUpAnimators[view] = animator
+        animator.start()
     }
 
     /**
@@ -279,6 +291,34 @@ object AnimationHelper {
                 .setStartDelay(i * delayBetween)
                 .setInterpolator(DecelerateInterpolator())
                 .start()
+        }
+    }
+
+    /**
+     * Ring progress'ni trottling bilan yangilaydi — `minIntervalMs` ichida qayta
+     * chaqirilsa, o'tkazib yuboriladi. KqRingView'ning ichki 1200ms animatorini
+     * har bir progress-callback'da qayta-qayta cancel/restart qilib yubormaslik uchun
+     * (masalan, dashboard docскан paytida `onProgress` juda tez-tez chaqirilganda).
+     */
+    fun throttledRingUpdate(ring: KqRingView, targetPercent: Float, minIntervalMs: Long = 220L) {
+        val now = SystemClock.elapsedRealtime()
+        val last = lastRingUpdateTs[ring] ?: 0L
+        if (now - last < minIntervalMs) return
+        lastRingUpdateTs[ring] = now
+        ring.setValue(targetPercent, animate = true)
+    }
+
+    /**
+     * Ikki rang orasida silliq o'tish (masalan, halqa rangini xavfli→xavfsiz
+     * qilib almashtirish). Har bir kadrda `onUpdate` chaqiriladi — chaqiruvchi
+     * shu yerda kerakli View/rangni o'zi yangilaydi.
+     */
+    fun animateColorTransition(fromColor: Int, toColor: Int, duration: Long = 600, onUpdate: (Int) -> Unit) {
+        ValueAnimator.ofArgb(fromColor, toColor).apply {
+            this.duration = duration
+            interpolator = DecelerateInterpolator(1.6f)
+            addUpdateListener { onUpdate(it.animatedValue as Int) }
+            start()
         }
     }
 }

@@ -35,6 +35,12 @@ private const val KEY_PREFERRED_BROWSER = "preferred_browser_pkg"
 private const val KEY_LOUD_ALARM = "loud_alarm_enabled"
 private const val KEY_FIRST_RUN = "first_run"
 private const val KEY_INITIAL_SCAN_DONE = "initial_scan_done"
+// O'rnatilgan dasturlar skani (Qurilma holati kartochkasi / InitialScan Faza A2):
+// oxirgi skan vaqti + o'sha paytdagi paketlar soni/eng yangi o'rnatish vaqti — keyingi
+// kirishda "docskan kerakmi" arzon tekshiruvi uchun.
+private const val KEY_INSTALLED_SCAN_LAST_TS = "installed_scan_last_ts"
+private const val KEY_KNOWN_INSTALLED_COUNT = "known_installed_count"
+private const val KEY_KNOWN_MAX_FIRST_INSTALL_TS = "known_max_first_install_ts"
 private const val KEY_TG_REGISTERED = "tg_registered_v1"
 private const val KEY_DARK_THEME = "dark_theme"
 private const val KEY_ACCENT = "accent_variant"
@@ -254,6 +260,27 @@ object Config {
 
     fun setInitialScanDone(context: Context) {
         prefs(context).edit { putBoolean(KEY_INITIAL_SCAN_DONE, true) }
+    }
+
+    /** Oxirgi o'rnatilgan-dasturlar skani tugagan vaqt (ms epoch, 0 = hali skan bo'lmagan). */
+    fun installedScanLastTs(context: Context): Long =
+        prefs(context).getLong(KEY_INSTALLED_SCAN_LAST_TS, 0L)
+
+    /** Oxirgi skan vaqtidagi foydalanuvchi paketlari soni (due-tekshiruv uchun). */
+    fun knownInstalledCount(context: Context): Int =
+        prefs(context).getInt(KEY_KNOWN_INSTALLED_COUNT, 0)
+
+    /** Oxirgi skan vaqtidagi eng yangi o'rnatish vaqti (max firstInstallTime, due-tekshiruv uchun). */
+    fun knownMaxFirstInstallTs(context: Context): Long =
+        prefs(context).getLong(KEY_KNOWN_MAX_FIRST_INSTALL_TS, 0L)
+
+    /** O'rnatilgan-dasturlar skani (to'liq yoki docskan) tugaganda holatni yozib qo'yadi. */
+    fun markInstalledScanDone(context: Context, installedCount: Int, maxFirstInstallTs: Long) {
+        prefs(context).edit {
+            putLong(KEY_INSTALLED_SCAN_LAST_TS, System.currentTimeMillis())
+            putInt(KEY_KNOWN_INSTALLED_COUNT, installedCount)
+            putLong(KEY_KNOWN_MAX_FIRST_INSTALL_TS, maxFirstInstallTs)
+        }
     }
 
     /**
