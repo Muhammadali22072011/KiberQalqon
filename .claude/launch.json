@@ -63,6 +63,18 @@
         "--strictPort"
       ],
       "port": 5181
+    },
+    {
+      "name": "uzsite",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8757",
+        "--directory",
+        "D:/tmp/claude/C--Users-User-OneDrive-Desktop-KiberQalqon/336ba618-79c3-43dc-9338-0e7cd1f8ef95/scratchpad/site"
+      ],
+      "port": 8757
     }
   ]
 }
